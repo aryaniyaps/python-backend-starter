@@ -24,7 +24,7 @@ async def test_login_user_valid_credentials() -> None:
             )
 
     assert isinstance(result, LoginUserResult)
-    assert result.token == "fake_token"
+    assert result.authentication_token == "fake_token"
     assert result.user == mock_user
 
 
@@ -88,7 +88,7 @@ async def test_login_user_password_rehash() -> None:
             )
 
     assert isinstance(result, LoginUserResult)
-    assert result.token == "fake_token"
+    assert result.authentication_token == "fake_token"
     assert result.user == mock_user
 
 

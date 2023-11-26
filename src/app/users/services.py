@@ -45,9 +45,9 @@ class UserService:
                 message="Could not create user. Please try again.",
             )
         else:
-            token = await AuthRepo.create_authentication_token(user=user)
+            authentication_token = await AuthRepo.create_authentication_token(user=user)
             return CreateUserResult(
-                token=token,
+                authentication_token=authentication_token,
                 user=user,
             )
 

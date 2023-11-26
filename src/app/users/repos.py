@@ -35,32 +35,21 @@ class UserRepo:
             return User(**user_row)
 
     @classmethod
-    async def update_user(
+    async def update_user_password(
         cls,
         user_id: int,
-        username: str | None = None,
-        email: str | None = None,
         password: str | None = None,
     ) -> User | None:
-        """Update the user with the given ID."""
+        """Update the password for the user with the given ID."""
         user = await cls.get_user_by_id(user_id=user_id)
         if not user:
             return
-
-        update_data = {}
-
-        if username is not None:
-            update_data["username"] = username
-        if email is not None:
-            update_data["email"] = email
-        if password is not None:
-            update_data["password"] = password
 
         async with engine.connect() as connection:
             result = await connection.execute(
                 update(users_table)
                 .where(users_table.c.id == user_id)
-                .values(**update_data)
+                .values(password=password)
                 .returning(
                     users_table.c.id,
                     users_table.c.username,

@@ -13,7 +13,10 @@ from app.core.errors import InvalidInputError, UnauthenticatedError
 async def test_on_post_login_valid_credentials(conductor: ASGIConductor) -> None:
     # Mock AuthService to simulate a successful login
     with patch.object(AuthService, "login_user") as mock_login_user:
-        mock_result = LoginUserResult(token="fake_token", user=MagicMock())
+        mock_result = LoginUserResult(
+            authentication_token="fake_token",
+            user=MagicMock(),
+        )
         mock_login_user.return_value = mock_result
 
         # Perform the login using the TestClient

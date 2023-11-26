@@ -45,15 +45,15 @@ class AuthService:
                 hash=user.password,
             ):
                 # update user's password hash
-                await UserRepo.update_user(
+                await UserRepo.update_user_password(
                     user_id=user.id,
                     password=password_hasher.hash(
                         password=data.password,
                     ),
                 )
-            token = await AuthRepo.create_authentication_token(user=user)
+            authentication_token = await AuthRepo.create_authentication_token(user=user)
             return LoginUserResult(
-                token=token,
+                authentication_token=authentication_token,
                 user=user,
             )
 

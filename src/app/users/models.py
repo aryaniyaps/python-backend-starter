@@ -1,16 +1,24 @@
 from datetime import datetime
-from typing import Annotated, ClassVar
+from typing import Annotated
 from pydantic import BaseModel, Field, EmailStr
 
 
 class User(BaseModel):
     id: int
+
     username: str
+
     email: str
-    # `password` is a private attribute and is
-    # not printed while dumping the model
-    password: ClassVar[str]
+
+    password: Annotated[
+        str,
+        Field(
+            exclude=True,
+        ),
+    ]
+
     created_at: datetime
+
     updated_at: datetime
 
 
@@ -47,5 +55,6 @@ class CreateUserInput(BaseModel):
 
 
 class CreateUserResult(BaseModel):
-    token: str
+    authentication_token: str
+
     user: User

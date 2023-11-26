@@ -14,6 +14,7 @@ class LoginUserInput(BaseModel):
             ],
         ),
     ]
+
     password: str
 
     @validator("login")
@@ -27,5 +28,6 @@ class LoginUserInput(BaseModel):
 
 
 class LoginUserResult(BaseModel):
-    token: str
+    authentication_token: str
+
     user: User

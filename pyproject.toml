@@ -21,4 +21,6 @@ license = {text = "MIT"}
 [tool.pdm.dev-dependencies]
 test = [
     "pytest>=7.4.3",
+    "pytest-asyncio>=0.21.1",
+    "pytest-xdist>=3.5.0",
 ]
