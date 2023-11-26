@@ -69,7 +69,7 @@ class AuthService:
 
         if not user_id:
             raise UnauthenticatedError(
-                message="Invalid or expired token",
+                message="Invalid authentication token provided.",
             )
         return user_id
 
