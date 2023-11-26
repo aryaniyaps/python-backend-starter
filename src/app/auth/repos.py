@@ -36,8 +36,10 @@ class AuthRepo:
         cls,
         authentication_token: str,
     ) -> int | None:
-        """Verify the given authentication token and
-        return the corresponding user ID, if the token is valid."""
+        """
+        Verify the given authentication token and
+        return the corresponding user ID, if the token is valid.
+        """
         user_id = await redis_client.get(
             name=cls.generate_authentication_token_key(
                 authentication_token=authentication_token,
