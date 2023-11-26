@@ -1,7 +1,8 @@
-from falcon import Request, Response, HTTP_201, before
+from falcon import HTTP_201, before
+from falcon.asgi import Request, Response
 
 from app.auth.hooks import login_required
-from app.users.models import CreateUserInput, User
+from app.users.models import CreateUserInput
 
 from .services import UserService
 

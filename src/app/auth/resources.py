@@ -1,4 +1,5 @@
-from falcon import Request, Response, before
+from falcon import before, HTTP_204
+from falcon.asgi import Request, Response
 
 from app.auth.hooks import login_required
 from app.auth.services import AuthService
@@ -26,7 +27,11 @@ class AuthResource:
         resp: Response,
     ) -> None:
         """Logout the current user."""
-        pass
+        authentication_token = req.context["authentication_token"]
+        await AuthService.remove_authentication_token(
+            authentication_token=authentication_token,
+        )
+        resp.status = HTTP_204
 
 
 auth_resource = AuthResource()

@@ -2,7 +2,6 @@ from secrets import token_hex
 
 from app.core.redis_client import redis_client
 from app.users.models import User
-from app.users.repos import UserRepo
 
 
 class AuthRepo:
@@ -45,3 +44,20 @@ class AuthRepo:
             )
         )
         return user_id
+
+    @classmethod
+    async def remove_authentication_tokens(cls, user_id: int) -> None:
+        """
+        Remove all the authentication tokens that
+        exist for the given user ID.
+        """
+        raise NotImplementedError()
+
+    @classmethod
+    async def remove_authentication_token(cls, authentication_token: str) -> None:
+        """Remove the given authentication token."""
+        await redis_client.delete(
+            cls.generate_authentication_token_key(
+                authentication_token=authentication_token,
+            ),
+        )

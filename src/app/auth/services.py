@@ -72,3 +72,10 @@ class AuthService:
                 message="Invalid or expired token",
             )
         return user_id
+
+    @classmethod
+    async def remove_authentication_token(cls, authentication_token: str) -> None:
+        """Remove the given authentication token."""
+        await AuthRepo.remove_authentication_token(
+            authentication_token=authentication_token,
+        )
