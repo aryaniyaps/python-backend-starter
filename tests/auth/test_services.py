@@ -98,7 +98,7 @@ async def test_login_user_password_rehash() -> None:
 
 @pytest.mark.asyncio
 async def test_verify_authentication_token_valid_token() -> None:
-    # Mock AuthRepo to simulate a valid authentication token
+    """Ensure we can verify a valid authentication token."""
     with patch(
         "app.auth.services.AuthRepo.verify_authentication_token"
     ) as mock_verify_token:
@@ -112,7 +112,7 @@ async def test_verify_authentication_token_valid_token() -> None:
 
 @pytest.mark.asyncio
 async def test_verify_authentication_token_invalid_token() -> None:
-    # Mock AuthRepo to simulate an invalid authentication token
+    """Ensure we cannot verify an invalid authentication token."""
     with patch(
         "app.auth.services.AuthRepo.verify_authentication_token"
     ) as mock_verify_token:
@@ -125,7 +125,7 @@ async def test_verify_authentication_token_invalid_token() -> None:
 
 @pytest.mark.asyncio
 async def test_remove_authentication_token() -> None:
-    # Mock AuthRepo to simulate removing an authentication token
+    """Ensure we can remove an authentication token."""
     with patch(
         "app.auth.services.AuthRepo.remove_authentication_token"
     ) as mock_remove_token:
