@@ -20,8 +20,14 @@ async def test_on_post_login_valid_credentials(conductor: ASGIConductor) -> None
         mock_login_user.return_value = mock_result
 
         # Perform the login using the TestClient
-        login_data = {"login": "user@example.com", "password": "password"}
-        response = await conductor.post("/auth/login", body=json.dumps(login_data))
+        login_data = {
+            "login": "user@example.com",
+            "password": "password",
+        }
+        response = await conductor.post(
+            "/auth/login",
+            body=json.dumps(login_data),
+        )
 
     assert response.status == HTTP_200
     assert json.loads(response.content) == mock_result.model_dump_json()
@@ -38,7 +44,10 @@ async def test_on_post_login_invalid_credentials(conductor: ASGIConductor) -> No
             "login": "invalid_user@example.com",
             "password": "invalid_password",
         }
-        response = await conductor.post("/auth/login", body=json.dumps(login_data))
+        response = await conductor.post(
+            "/auth/login",
+            body=json.dumps(login_data),
+        )
 
     assert (
         response.status == HTTP_400
@@ -52,8 +61,14 @@ async def test_on_post_login_password_mismatch(conductor: ASGIConductor) -> None
         mock_login_user.side_effect = VerifyMismatchError("Password mismatch")
 
         # Perform the login using the TestClient
-        login_data = {"login": "user@example.com", "password": "wrong_password"}
-        response = await conductor.post("/auth/login", body=json.dumps(login_data))
+        login_data = {
+            "login": "user@example.com",
+            "password": "wrong_password",
+        }
+        response = await conductor.post(
+            "/auth/login",
+            body=json.dumps(login_data),
+        )
 
     assert (
         response.status == HTTP_400
@@ -65,8 +80,13 @@ async def test_on_post_logout_authenticated_user(conductor: ASGIConductor) -> No
     # Mock AuthService to simulate a successful logout
     with patch.object(AuthService, "remove_authentication_token") as mock_remove_token:
         # Perform the logout using the TestClient
-        headers = {"Authorization": "Bearer fake_token"}
-        response = await conductor.post("/auth/logout", headers=headers)
+        headers = {
+            "X-Authentication-Token": "fake_token",
+        }
+        response = await conductor.post(
+            "/auth/logout",
+            headers=headers,
+        )
 
     assert response.status == HTTP_204
 

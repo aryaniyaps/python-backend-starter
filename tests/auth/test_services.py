@@ -20,7 +20,10 @@ async def test_login_user_valid_credentials() -> None:
 
             # Perform the login
             result = await AuthService.login_user(
-                LoginUserInput(login="user@example.com", password="password")
+                LoginUserInput(
+                    login="user@example.com",
+                    password="password",
+                )
             )
 
     assert isinstance(result, LoginUserResult)

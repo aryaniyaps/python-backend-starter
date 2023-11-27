@@ -1,4 +1,3 @@
-from datetime import datetime
 import pytest
 from app.auth.repos import AuthRepo
 from app.core.redis_client import redis_client
@@ -7,38 +6,22 @@ from app.users.models import User
 
 
 @pytest.mark.asyncio
-async def test_create_authentication_token() -> None:
+async def test_create_authentication_token(user: User) -> None:
     # Perform token creation
-    user = User(
-        id=1,
-        username="test_user",
-        email="test@example.com",
-        password="hashed_password",
-        created_at=datetime.now(),
-        updated_at=datetime.now(),
-    )
     token = await AuthRepo.create_authentication_token(user)
 
     assert isinstance(token, str)
 
 
 @pytest.mark.asyncio
-async def test_verify_authentication_token_valid() -> None:
+async def test_verify_authentication_token_valid(user: User) -> None:
     # Create a test user and token
-    user = User(
-        id=1,
-        username="test_user",
-        email="test@example.com",
-        password="hashed_password",
-        created_at=datetime.now(),
-        updated_at=datetime.now(),
-    )
     token = await AuthRepo.create_authentication_token(user)
 
     # Perform token verification
     user_id = await AuthRepo.verify_authentication_token(token)
 
-    assert user_id == 1
+    assert user_id == user.id
 
 
 @pytest.mark.asyncio
@@ -49,16 +32,8 @@ async def test_verify_authentication_token_invalid() -> None:
 
 
 @pytest.mark.asyncio
-async def test_remove_authentication_token() -> None:
+async def test_remove_authentication_token(user: User) -> None:
     # Create a test user and token
-    user = User(
-        id=1,
-        username="test_user",
-        email="test@example.com",
-        password="hashed_password",
-        created_at=datetime.now(),
-        updated_at=datetime.now(),
-    )
     token = await AuthRepo.create_authentication_token(user)
 
     # Perform token removal
