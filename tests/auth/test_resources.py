@@ -11,7 +11,7 @@ from app.core.errors import InvalidInputError, UnauthenticatedError
 
 @pytest.mark.asyncio
 async def test_on_post_login_valid_credentials(conductor: ASGIConductor) -> None:
-    # Mock AuthService to simulate a successful login
+    """Ensure we can login a user with valid credentials."""
     with patch.object(AuthService, "login_user") as mock_login_user:
         mock_result = LoginUserResult(
             authentication_token="fake_token",
@@ -35,7 +35,7 @@ async def test_on_post_login_valid_credentials(conductor: ASGIConductor) -> None
 
 @pytest.mark.asyncio
 async def test_on_post_login_invalid_credentials(conductor: ASGIConductor) -> None:
-    # Mock AuthService to simulate invalid credentials
+    """Ensure we cannot login a user with invalid credentials."""
     with patch.object(AuthService, "login_user") as mock_login_user:
         mock_login_user.side_effect = InvalidInputError("Invalid credentials provided.")
 
@@ -56,7 +56,7 @@ async def test_on_post_login_invalid_credentials(conductor: ASGIConductor) -> No
 
 @pytest.mark.asyncio
 async def test_on_post_login_password_mismatch(conductor: ASGIConductor) -> None:
-    # Mock AuthService to simulate a password mismatch during login
+    """Ensure we cannot login an existing user with the wrong password."""
     with patch.object(AuthService, "login_user") as mock_login_user:
         mock_login_user.side_effect = VerifyMismatchError("Password mismatch")
 
@@ -77,7 +77,7 @@ async def test_on_post_login_password_mismatch(conductor: ASGIConductor) -> None
 
 @pytest.mark.asyncio
 async def test_on_post_logout_authenticated_user(conductor: ASGIConductor) -> None:
-    # Mock AuthService to simulate a successful logout
+    """Ensure we can logout an authenticated user."""
     with patch.object(AuthService, "remove_authentication_token") as mock_remove_token:
         # Perform the logout using the TestClient
         headers = {
@@ -93,7 +93,7 @@ async def test_on_post_logout_authenticated_user(conductor: ASGIConductor) -> No
 
 @pytest.mark.asyncio
 async def test_on_post_logout_unauthenticated_user(conductor: ASGIConductor) -> None:
-    # Mock AuthService to simulate an unauthenticated user during logout
+    """Ensure we cannot logout an unauthenticated user."""
     with patch.object(AuthService, "remove_authentication_token") as mock_remove_token:
         mock_remove_token.side_effect = UnauthenticatedError(
             "Invalid authentication token provided."

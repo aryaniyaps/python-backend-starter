@@ -7,7 +7,7 @@ from app.users.models import User
 
 @pytest.mark.asyncio
 async def test_create_authentication_token(user: User) -> None:
-    # Perform token creation
+    """Ensure we can create an authentication token."""
     token = await AuthRepo.create_authentication_token(user)
 
     assert isinstance(token, str)
@@ -15,7 +15,7 @@ async def test_create_authentication_token(user: User) -> None:
 
 @pytest.mark.asyncio
 async def test_verify_authentication_token_valid(user: User) -> None:
-    # Create a test user and token
+    """Ensure we can verify an authentication token."""
     token = await AuthRepo.create_authentication_token(user)
 
     # Perform token verification
@@ -26,14 +26,14 @@ async def test_verify_authentication_token_valid(user: User) -> None:
 
 @pytest.mark.asyncio
 async def test_verify_authentication_token_invalid() -> None:
-    # Perform token verification for an invalid token
+    """Ensure verifying an invalid token raises an error."""
     with pytest.raises(UnauthenticatedError):
         await AuthRepo.verify_authentication_token("invalid_token")
 
 
 @pytest.mark.asyncio
 async def test_remove_authentication_token(user: User) -> None:
-    # Create a test user and token
+    """Ensure we can remove an authentication token."""
     token = await AuthRepo.create_authentication_token(user)
 
     # Perform token removal

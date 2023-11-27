@@ -7,7 +7,7 @@ from app.core.errors import InvalidInputError, UnauthenticatedError
 
 @pytest.mark.asyncio
 async def test_login_user_valid_credentials() -> None:
-    # Mock UserRepo and AuthRepo dependencies
+    """Ensure we can login a user with valid credentials."""
     with patch("app.auth.services.UserRepo.get_user_by_email") as mock_get_user:
         with patch(
             "app.auth.services.AuthRepo.create_authentication_token"
@@ -33,7 +33,7 @@ async def test_login_user_valid_credentials() -> None:
 
 @pytest.mark.asyncio
 async def test_login_user_invalid_credentials() -> None:
-    # Mock UserRepo to simulate invalid credentials
+    """Ensure we cannot login an user with invalid credentials."""
     with patch("app.auth.services.UserRepo.get_user_by_email") as mock_get_user:
         mock_get_user.return_value = None
 
@@ -49,7 +49,7 @@ async def test_login_user_invalid_credentials() -> None:
 
 @pytest.mark.asyncio
 async def test_login_user_password_mismatch() -> None:
-    # Mock UserRepo to simulate a password mismatch
+    """Ensure we cannot login an existing user with the wrong password."""
     with patch("app.auth.services.UserRepo.get_user_by_email") as mock_get_user:
         mock_user = MagicMock()
         mock_user.id = 1
@@ -71,7 +71,8 @@ async def test_login_user_password_mismatch() -> None:
 
 @pytest.mark.asyncio
 async def test_login_user_password_rehash() -> None:
-    # Mock UserRepo and AuthRepo dependencies to simulate password rehashing
+    """Ensure the user's password gets rehashed if the old
+    password needs rehashing."""
     with patch("app.auth.services.UserRepo.get_user_by_email") as mock_get_user:
         with patch(
             "app.auth.services.AuthRepo.create_authentication_token"
