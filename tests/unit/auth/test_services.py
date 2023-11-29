@@ -5,7 +5,9 @@ from app.auth.models import LoginUserInput, LoginUserResult
 from app.core.errors import InvalidInputError, UnauthenticatedError
 
 
-@pytest.mark.asyncio
+pytestmark = pytest.mark.asyncio
+
+
 async def test_login_user_valid_credentials() -> None:
     """Ensure we can login a user with valid credentials."""
     with patch("app.auth.services.UserRepo.get_user_by_email") as mock_get_user:
@@ -31,7 +33,6 @@ async def test_login_user_valid_credentials() -> None:
     assert result.user == mock_user
 
 
-@pytest.mark.asyncio
 async def test_login_user_invalid_credentials() -> None:
     """Ensure we cannot login an user with invalid credentials."""
     with patch("app.auth.services.UserRepo.get_user_by_email") as mock_get_user:
@@ -47,7 +48,6 @@ async def test_login_user_invalid_credentials() -> None:
             )
 
 
-@pytest.mark.asyncio
 async def test_login_user_password_mismatch() -> None:
     """Ensure we cannot login an existing user with the wrong password."""
     with patch("app.auth.services.UserRepo.get_user_by_email") as mock_get_user:
@@ -69,7 +69,6 @@ async def test_login_user_password_mismatch() -> None:
                 )
 
 
-@pytest.mark.asyncio
 async def test_login_user_password_rehash() -> None:
     """Ensure the user's password gets rehashed if the old
     password needs rehashing."""
@@ -96,7 +95,6 @@ async def test_login_user_password_rehash() -> None:
     assert result.user == mock_user
 
 
-@pytest.mark.asyncio
 async def test_verify_authentication_token_valid_token() -> None:
     """Ensure we can verify a valid authentication token."""
     with patch(
@@ -110,7 +108,6 @@ async def test_verify_authentication_token_valid_token() -> None:
     assert user_id == 1
 
 
-@pytest.mark.asyncio
 async def test_verify_authentication_token_invalid_token() -> None:
     """Ensure we cannot verify an invalid authentication token."""
     with patch(
@@ -123,7 +120,6 @@ async def test_verify_authentication_token_invalid_token() -> None:
             await AuthService.verify_authentication_token("invalid_token")
 
 
-@pytest.mark.asyncio
 async def test_remove_authentication_token() -> None:
     """Ensure we can remove an authentication token."""
     with patch(

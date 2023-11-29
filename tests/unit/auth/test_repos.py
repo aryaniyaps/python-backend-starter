@@ -4,8 +4,9 @@ from app.core.redis_client import redis_client
 from app.core.errors import UnauthenticatedError
 from app.users.models import User
 
+pytestmark = pytest.mark.asyncio
 
-@pytest.mark.asyncio
+
 async def test_create_authentication_token(user: User) -> None:
     """Ensure we can create an authentication token."""
     token = await AuthRepo.create_authentication_token(user)
@@ -13,7 +14,6 @@ async def test_create_authentication_token(user: User) -> None:
     assert isinstance(token, str)
 
 
-@pytest.mark.asyncio
 async def test_verify_authentication_token_valid(user: User) -> None:
     """Ensure we can verify an authentication token."""
     token = await AuthRepo.create_authentication_token(user)
@@ -24,14 +24,12 @@ async def test_verify_authentication_token_valid(user: User) -> None:
     assert user_id == user.id
 
 
-@pytest.mark.asyncio
 async def test_verify_authentication_token_invalid() -> None:
     """Ensure verifying an invalid token raises an error."""
     with pytest.raises(UnauthenticatedError):
         await AuthRepo.verify_authentication_token("invalid_token")
 
 
-@pytest.mark.asyncio
 async def test_remove_authentication_token(user: User) -> None:
     """Ensure we can remove an authentication token."""
     token = await AuthRepo.create_authentication_token(user)
