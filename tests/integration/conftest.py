@@ -30,3 +30,10 @@ async def auth_test_client(app: App, user: User) -> TestClient:
             "X-Authentication-Token": authentication_token,
         },
     )
+
+
+@pytest.fixture(scope="function")
+async def auth_conductor(auth_test_client: TestClient) -> AsyncIterator[ASGIConductor]:
+    """Initialize an authenticated test conductor for the ASGI app."""
+    async with auth_test_client as conductor:
+        yield conductor
