@@ -1,16 +1,57 @@
-from argon2.exceptions import VerifyMismatchError
-from app.auth.repos import AuthRepo
+from argon2.exceptions import VerifyMismatchError, HashingError
 
-from app.core.errors import InvalidInputError, UnauthenticatedError
+from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
 
-from .models import LoginUserInput, LoginUserResult
+from .models import CreateUserInput, CreateUserResult, LoginUserInput, LoginUserResult
 
 from app.users.repos import UserRepo
+from app.auth.repos import AuthRepo
 
 from app.core.security import password_hasher
 
 
 class AuthService:
+    @classmethod
+    async def register_user(cls, data: CreateUserInput) -> CreateUserResult:
+        """Register a new user."""
+        try:
+            if (
+                await UserRepo.get_user_by_email(
+                    email=data.email,
+                )
+                is not None
+            ):
+                raise InvalidInputError(
+                    message="User with that email already exists.",
+                )
+            if (
+                await UserRepo.get_user_by_username(
+                    username=data.username,
+                )
+                is not None
+            ):
+                raise InvalidInputError(
+                    message="User with that username already exists.",
+                )
+            user = await UserRepo.create_user(
+                username=data.username,
+                email=data.email,
+                # hash password before storing
+                password=password_hasher.hash(
+                    password=data.password,
+                ),
+            )
+        except HashingError:
+            raise UnexpectedError(
+                message="Could not create user. Please try again.",
+            )
+        else:
+            authentication_token = await AuthRepo.create_authentication_token(user=user)
+            return CreateUserResult(
+                authentication_token=authentication_token,
+                user=user,
+            )
+
     @classmethod
     async def login_user(cls, data: LoginUserInput) -> LoginUserResult:
         """

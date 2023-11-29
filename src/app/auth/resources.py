@@ -1,13 +1,26 @@
-from falcon import before, HTTP_204
+from falcon import before, HTTP_204, HTTP_201
 from falcon.asgi import Request, Response
 
 from app.auth.hooks import login_required
 from app.auth.services import AuthService
 
-from .models import LoginUserInput
+from .models import CreateUserInput, LoginUserInput
 
 
 class AuthResource:
+    async def on_post_register(
+        self,
+        req: Request,
+        resp: Response,
+    ) -> None:
+        """Register a new user."""
+        data = await req.media
+        result = await AuthService.register_user(
+            data=CreateUserInput.model_validate_json(data),
+        )
+        resp.media = result.model_dump_json()
+        resp.status = HTTP_201
+
     async def on_post_login(
         self,
         req: Request,

@@ -28,6 +28,11 @@ def add_routes(app: App) -> None:
         suffix="login",
     )
     app.add_route(
+        "/auth/register",
+        auth_resource,
+        suffix="register",
+    )
+    app.add_route(
         "/auth/logout",
         auth_resource,
         suffix="logout",
