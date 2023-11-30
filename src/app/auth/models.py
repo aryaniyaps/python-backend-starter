@@ -60,7 +60,8 @@ class CreateUserInput(BaseModel):
         Field(
             min_length=8,
             max_length=32,
-            pattern="^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-])$",
+            # TODO: fix regex issues with pydantic
+            # pattern=r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()-_+=]).+",
         ),
     ]
 

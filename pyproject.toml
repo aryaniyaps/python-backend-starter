@@ -8,11 +8,13 @@ authors = [
 dependencies = [
     "falcon>=3.1.1",
     "uvicorn>=0.24.0.post1",
-    "sqlalchemy[postgresql_asyncpg]>=2.0.23",
+    "sqlalchemy>=2.0.23",
     "pydantic[email]>=2.5.1",
     "argon2-cffi>=23.1.0",
-    "aioredis>=2.0.1",
     "pydantic-settings>=2.1.0",
+    "alembic>=1.12.1",
+    "asyncpg>=0.29.0",
+    "redis>=5.0.1",
 ]
 requires-python = ">=3.12"
 readme = "README.md"

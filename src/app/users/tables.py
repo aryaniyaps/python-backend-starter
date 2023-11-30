@@ -15,11 +15,13 @@ users_table = Table(
         "username",
         String(32),
         nullable=False,
+        unique=True,
     ),
     Column(
         "email",
         String(250),
         nullable=False,
+        unique=True,
     ),
     Column(
         "created_at",

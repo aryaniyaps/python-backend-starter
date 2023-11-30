@@ -1,0 +1,25 @@
+services:
+  postgres:
+    image: "bitnami/postgresql:16"
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRESQL_USERNAME=user
+      - POSTGRESQL_PASSWORD=pass
+      - POSTGRESQL_DATABASE=starter
+    volumes:
+      - "postgres_data:/bitnami/postgresql"
+
+  redis:
+    image: "bitnami/redis:6.2"
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_USERNAME=user
+      - REDIS_PASSWORD=pass
+    volumes:
+      - "redis_data:/bitnami"
+
+volumes:
+  postgres_data:
+  redis_data:

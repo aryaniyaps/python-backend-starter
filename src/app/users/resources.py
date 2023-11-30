@@ -1,4 +1,4 @@
-from falcon import HTTP_201, before
+from falcon import before
 from falcon.asgi import Request, Response
 
 from app.auth.hooks import login_required
