@@ -14,4 +14,5 @@
   "python.analysis.indexing": true,
   "python.analysis.inlayHints.functionReturnTypes": true,
   "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": [""]
 }
