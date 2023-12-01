@@ -15,6 +15,7 @@ def app() -> App:
 @pytest.fixture(scope="session")
 async def user() -> User:
     """Create an user for testing."""
+    # TODO: cleanup user after testing
     return await UserRepo.create_user(
         username="tester",
         email="tester@example.org",

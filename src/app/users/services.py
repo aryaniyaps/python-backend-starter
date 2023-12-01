@@ -3,8 +3,6 @@ from app.core.errors import ResourceNotFoundError
 from .models import User
 from .repos import UserRepo
 
-from app.core.security import password_hasher
-
 
 class UserService:
     @classmethod
