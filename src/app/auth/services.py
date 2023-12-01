@@ -1,13 +1,11 @@
-from argon2.exceptions import VerifyMismatchError, HashingError
+from argon2.exceptions import HashingError, VerifyMismatchError
 
+from app.auth.repos import AuthRepo
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
+from app.core.security import password_hasher
+from app.users.repos import UserRepo
 
 from .models import CreateUserInput, CreateUserResult, LoginUserInput, LoginUserResult
-
-from app.users.repos import UserRepo
-from app.auth.repos import AuthRepo
-
-from app.core.security import password_hasher
 
 
 class AuthService:
@@ -41,10 +39,10 @@ class AuthService:
                     password=data.password,
                 ),
             )
-        except HashingError:
+        except HashingError as exception:
             raise UnexpectedError(
                 message="Could not create user. Please try again.",
-            )
+            ) from exception
         else:
             authentication_token = await AuthRepo.create_authentication_token(user=user)
             return CreateUserResult(
@@ -77,10 +75,10 @@ class AuthService:
                 hash=user.password,
                 password=data.password,
             )
-        except VerifyMismatchError:
+        except VerifyMismatchError as exception:
             raise InvalidInputError(
                 message="Invalid credentials provided.",
-            )
+            ) from exception
         else:
             if password_hasher.check_needs_rehash(
                 hash=user.password,

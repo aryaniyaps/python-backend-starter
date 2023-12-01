@@ -1,4 +1,5 @@
 from typing import Annotated
+
 from pydantic import BaseModel, EmailStr, Field, validator
 
 from app.users.models import User

@@ -1,14 +1,14 @@
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
 from argon2.exceptions import HashingError
 
+from app.auth.models import CreateUserResult, LoginUserInput, LoginUserResult
 from app.auth.repos import AuthRepo
 from app.auth.services import AuthService
-from app.auth.models import CreateUserResult, LoginUserInput, LoginUserResult
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
 from app.users.models import User
 from app.users.repos import UserRepo
-
 
 pytestmark = pytest.mark.asyncio
 

@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, Integer, String, DateTime
+from sqlalchemy import Column, DateTime, Integer, String, Table
 from sqlalchemy.sql import func
 
 from app.core.database import database_metadata

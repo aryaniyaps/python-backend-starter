@@ -1,4 +1,5 @@
 from sqlalchemy import insert, select, update
+
 from app.core.database import engine
 from app.users.models import User
 

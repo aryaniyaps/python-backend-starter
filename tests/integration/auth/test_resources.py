@@ -1,16 +1,10 @@
 import json
+
 import pytest
-from falcon import (
-    HTTP_200,
-    HTTP_201,
-    HTTP_400,
-    HTTP_401,
-    HTTP_204,
-)
+from falcon import HTTP_200, HTTP_201, HTTP_204, HTTP_400, HTTP_401
 from falcon.testing import ASGIConductor
 
 from app.users.models import User
-
 
 pytestmark = pytest.mark.asyncio
 

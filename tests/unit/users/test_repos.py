@@ -1,6 +1,7 @@
 import pytest
-from app.users.repos import UserRepo
+
 from app.users.models import User
+from app.users.repos import UserRepo
 
 pytestmark = pytest.mark.asyncio
 

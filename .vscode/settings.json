@@ -1,12 +1,17 @@
 {
   "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter"
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true,
+    },
   },
+  "isort.args":["--profile", "black"],
   "python.analysis.autoImportCompletions": true,
   "python.analysis.typeCheckingMode": "basic",
   "python.analysis.autoFormatStrings": true,
   "python.analysis.enablePytestSupport": true,
   "python.analysis.indexing": true,
   "python.analysis.inlayHints.functionReturnTypes": true,
-  "python.testing.pytestEnabled": true
+  "python.testing.pytestEnabled": true,
 }

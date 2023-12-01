@@ -1,7 +1,8 @@
 import pytest
+
 from app.auth.repos import AuthRepo
-from app.core.redis_client import redis_client
 from app.core.errors import UnauthenticatedError
+from app.core.redis_client import redis_client
 from app.users.models import User
 
 pytestmark = pytest.mark.asyncio

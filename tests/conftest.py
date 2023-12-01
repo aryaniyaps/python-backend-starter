@@ -1,9 +1,8 @@
-from falcon.asgi import App
 import pytest
+from falcon.asgi import App
 
 from app import create_app
 from app.core.security import password_hasher
-
 from app.users.models import User
 from app.users.repos import UserRepo
 

@@ -1,5 +1,5 @@
-from falcon.asgi import App
 from falcon import CORSMiddleware
+from falcon.asgi import App
 
 from app.auth.resources import auth_resource
 from app.config import settings

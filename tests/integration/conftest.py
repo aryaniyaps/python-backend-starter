@@ -1,7 +1,8 @@
 from typing import AsyncIterator
-from falcon.asgi import App
-from falcon.testing import TestClient, ASGIConductor
+
 import pytest
+from falcon.asgi import App
+from falcon.testing import ASGIConductor, TestClient
 
 from app.auth.repos import AuthRepo
 from app.users.models import User

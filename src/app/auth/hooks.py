@@ -1,6 +1,6 @@
 from falcon.asgi import Request, Response
-from app.auth.services import AuthService
 
+from app.auth.services import AuthService
 from app.core.errors import UnauthenticatedError
 
 

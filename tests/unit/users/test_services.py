@@ -1,10 +1,11 @@
-import pytest
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from app.core.errors import ResourceNotFoundError
-from app.users.services import UserService
 from app.users.models import User
 from app.users.repos import UserRepo
+from app.users.services import UserService
 
 pytestmark = pytest.mark.asyncio
 
