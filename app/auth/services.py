@@ -5,7 +5,14 @@ from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedE
 from app.core.security import password_hasher
 from app.users.repos import UserRepo
 
-from .models import CreateUserInput, CreateUserResult, LoginUserInput, LoginUserResult
+from .models import (
+    CreateUserInput,
+    CreateUserResult,
+    LoginUserInput,
+    LoginUserResult,
+    PasswordResetInput,
+    PasswordResetRequestInput,
+)
 
 
 class AuthService:
@@ -118,3 +125,13 @@ class AuthService:
         await AuthRepo.remove_authentication_token(
             authentication_token=authentication_token,
         )
+
+    @classmethod
+    async def send_password_reset_request(cls, data: PasswordResetRequestInput) -> None:
+        """Send a password reset request to the given email."""
+        raise NotImplementedError()
+
+    @classmethod
+    async def reset_password(cls, data: PasswordResetInput) -> None:
+        """Reset the relevant user's password with the given credentials."""
+        raise NotImplementedError()

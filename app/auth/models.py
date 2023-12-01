@@ -71,3 +71,29 @@ class CreateUserResult(BaseModel):
     authentication_token: str
 
     user: User
+
+
+class PasswordResetRequestInput(BaseModel):
+    email: Annotated[
+        EmailStr,
+        Field(
+            max_length=250,
+            examples=[
+                "aryan@example.com",
+            ],
+        ),
+    ]
+
+
+class PasswordResetInput(BaseModel):
+    email: Annotated[
+        EmailStr,
+        Field(
+            max_length=250,
+            examples=[
+                "aryan@example.com",
+            ],
+        ),
+    ]
+
+    reset_code: str

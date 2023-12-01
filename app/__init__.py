@@ -9,10 +9,6 @@ from app.users.resources import user_resource
 def add_routes(app: App) -> None:
     """Register routes for the app."""
     app.add_route(
-        "/users",
-        user_resource,
-    )
-    app.add_route(
         "/users/@me",
         user_resource,
         suffix="current_user",
@@ -37,6 +33,16 @@ def add_routes(app: App) -> None:
         auth_resource,
         suffix="logout",
     )
+    app.add_route(
+        "/auth/reset-password-request",
+        auth_resource,
+        suffix="reset_password_request",
+    )
+    app.add_route(
+        "/auth/reset-password",
+        auth_resource,
+        suffix="reset_password",
+    )
 
 
 def add_middleware(app: App) -> None:
@@ -49,6 +55,7 @@ def add_middleware(app: App) -> None:
 
 
 def create_app() -> App:
+    """Create the ASGI app."""
     app = App(cors_enable=True)
     add_middleware(app)
     add_routes(app)
