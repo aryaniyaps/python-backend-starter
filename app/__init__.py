@@ -56,7 +56,7 @@ def add_middleware(app: App) -> None:
 
 def create_app() -> App:
     """Create the ASGI app."""
-    app = App(cors_enable=True)
+    app = App()
     add_middleware(app)
     add_routes(app)
     return app
