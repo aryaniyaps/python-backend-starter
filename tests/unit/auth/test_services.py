@@ -15,12 +15,22 @@ pytestmark = pytest.mark.asyncio
 
 async def test_register_user_success(create_user_input) -> None:
     """Ensure we can register a user successfully."""
-    with patch.object(UserRepo, "get_user_by_email", return_value=None), patch.object(
-        UserRepo, "get_user_by_username", return_value=None
+    with patch.object(
+        UserRepo,
+        "get_user_by_email",
+        return_value=None,
     ), patch.object(
-        UserRepo, "create_user", return_value=MagicMock(spec=User)
+        UserRepo,
+        "get_user_by_username",
+        return_value=None,
     ), patch.object(
-        AuthRepo, "create_authentication_token", return_value="fake_token"
+        UserRepo,
+        "create_user",
+        return_value=MagicMock(spec=User),
+    ), patch.object(
+        AuthRepo,
+        "create_authentication_token",
+        return_value="fake_token",
     ):
         result = await AuthService.register_user(create_user_input)
 
@@ -41,7 +51,9 @@ async def test_register_user_existing_email(create_user_input) -> None:
 async def test_register_user_existing_username(create_user_input) -> None:
     """Ensure we cannot create an user with an existing username."""
     with patch.object(UserRepo, "get_user_by_email", return_value=None), patch.object(
-        UserRepo, "get_user_by_username", return_value=MagicMock(spec=User)
+        UserRepo,
+        "get_user_by_username",
+        return_value=MagicMock(spec=User),
     ):
         with pytest.raises(
             InvalidInputError, match="User with that username already exists."
@@ -51,10 +63,22 @@ async def test_register_user_existing_username(create_user_input) -> None:
 
 async def test_register_user_hashing_error(create_user_input) -> None:
     """Ensure we cannot create an user when there is a password hashing error."""
-    with patch.object(UserRepo, "get_user_by_email", return_value=None), patch.object(
-        UserRepo, "get_user_by_username", return_value=None
-    ), patch.object(UserRepo, "create_user", side_effect=HashingError), patch.object(
-        AuthRepo, "create_authentication_token", return_value="fake_token"
+    with patch.object(
+        UserRepo,
+        "get_user_by_email",
+        return_value=None,
+    ), patch.object(
+        UserRepo,
+        "get_user_by_username",
+        return_value=None,
+    ), patch.object(
+        UserRepo,
+        "create_user",
+        side_effect=HashingError,
+    ), patch.object(
+        AuthRepo,
+        "create_authentication_token",
+        return_value="fake_token",
     ):
         with pytest.raises(
             UnexpectedError, match="Could not create user. Please try again."
