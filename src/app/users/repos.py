@@ -14,7 +14,6 @@ class UserRepo:
         password: str,
     ) -> User:
         """Create a new user."""
-        # TODO: hash password in the repository layer itself
         async with engine.connect() as connection:
             result = await connection.execute(
                 insert(users_table)

@@ -16,6 +16,9 @@ async def test_create_user() -> None:
     assert user.id is not None
     assert user.username == "new_user"
     assert user.email == "new@example.com"
+    # passwords are not hashed in the repository layer
+    # the hash must be passed as a value directly
+    assert user.password == "new_password"
 
 
 async def test_update_user_password(user: User) -> None:
@@ -25,6 +28,8 @@ async def test_update_user_password(user: User) -> None:
         password="new_password",
     )
     assert updated_user
+    # passwords are not hashed in the repository layer
+    # the hash must be passed as a value directly
     assert updated_user.password == "new_password"
 
 

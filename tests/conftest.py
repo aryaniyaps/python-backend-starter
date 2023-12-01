@@ -2,6 +2,8 @@ from falcon.asgi import App
 import pytest
 
 from app import create_app
+from app.core.security import password_hasher
+
 from app.users.models import User
 from app.users.repos import UserRepo
 
@@ -19,5 +21,7 @@ async def user() -> User:
     return await UserRepo.create_user(
         username="tester",
         email="tester@example.org",
-        password="password",
+        password=password_hasher.hash(
+            password="password",
+        ),
     )

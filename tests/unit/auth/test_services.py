@@ -68,7 +68,7 @@ async def test_login_user_valid_credentials() -> None:
         with patch(
             "app.auth.services.AuthRepo.create_authentication_token"
         ) as mock_create_token:
-            mock_user = MagicMock()
+            mock_user = MagicMock(spec=User)
             mock_user.id = 1
             mock_user.password = "hashed_password"
             mock_get_user.return_value = mock_user
@@ -105,7 +105,7 @@ async def test_login_user_invalid_credentials() -> None:
 async def test_login_user_password_mismatch() -> None:
     """Ensure we cannot login an existing user with the wrong password."""
     with patch("app.auth.services.UserRepo.get_user_by_email") as mock_get_user:
-        mock_user = MagicMock()
+        mock_user = MagicMock(spec=User)
         mock_user.id = 1
         mock_user.password = "hashed_password"
         mock_get_user.return_value = mock_user
@@ -130,7 +130,7 @@ async def test_login_user_password_rehash() -> None:
         with patch(
             "app.auth.services.AuthRepo.create_authentication_token"
         ) as mock_create_token:
-            mock_user = MagicMock()
+            mock_user = MagicMock(spec=User)
             mock_user.id = 1
             mock_user.password = "old_hashed_password"
             mock_get_user.return_value = mock_user
