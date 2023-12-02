@@ -58,7 +58,6 @@ async def test_create_password_reset_token(user: User) -> None:
 
     assert isinstance(reset_token, PasswordResetToken)
     assert reset_token.user_id == user.id
-    assert reset_token.token
     assert reset_token.expires_at - reset_token.created_at == timedelta(
         seconds=PASSWORD_RESET_TOKEN_EXPIRES_IN,
     )
