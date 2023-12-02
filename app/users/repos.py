@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import insert, select, update
+from sqlalchemy import insert, select, text, update
 
 from app.core.database import engine
 from app.users.models import User
@@ -81,7 +81,7 @@ class UserRepo:
             result = await connection.execute(
                 update(users_table)
                 .where(users_table.c.id == user_id)
-                .values(last_login_at=datetime.now())
+                .values(last_login_at=text("(NOW()"))
                 .returning(
                     users_table.c.id,
                     users_table.c.username,
