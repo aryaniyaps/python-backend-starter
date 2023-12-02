@@ -166,11 +166,15 @@ class AuthService:
             )
 
         if existing_user.last_login_at > password_reset_token.last_login_at:
+            # If the user has logged in again after generating the password
+            # reset token, the generated token becomes invalid.
             raise InvalidInputError(
                 message="Invalid password reset token or email provided."
             )
 
         await UserRepo.update_user_password(
             user_id=existing_user.id,
-            password_hash=password_hasher.hash(password=data.new_password),
+            password_hash=password_hasher.hash(
+                password=data.new_password,
+            ),
         )

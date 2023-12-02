@@ -72,7 +72,7 @@ class UserRepo:
         cls,
         user_id: int,
     ) -> User | None:
-        """Update the last login timestamp for the user with the given ID."""
+        """Update the last login timestamp to now for the user with the given ID."""
         user = await cls.get_user_by_id(user_id=user_id)
         if not user:
             return
