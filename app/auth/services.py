@@ -50,12 +50,12 @@ class AuthService:
             raise UnexpectedError(
                 message="Could not create user. Please try again.",
             ) from exception
-        else:
-            authentication_token = await AuthRepo.create_authentication_token(user=user)
-            return CreateUserResult(
-                authentication_token=authentication_token,
-                user=user,
-            )
+
+        authentication_token = await AuthRepo.create_authentication_token(user=user)
+        return CreateUserResult(
+            authentication_token=authentication_token,
+            user=user,
+        )
 
     @classmethod
     async def login_user(cls, data: LoginUserInput) -> LoginUserResult:
@@ -86,22 +86,21 @@ class AuthService:
             raise InvalidInputError(
                 message="Invalid credentials provided.",
             ) from exception
-        else:
-            if password_hasher.check_needs_rehash(
-                hash=user.password,
-            ):
-                # update user's password hash
-                await UserRepo.update_user_password(
-                    user_id=user.id,
-                    password=password_hasher.hash(
-                        password=data.password,
-                    ),
-                )
-            authentication_token = await AuthRepo.create_authentication_token(user=user)
-            return LoginUserResult(
-                authentication_token=authentication_token,
-                user=user,
+        if password_hasher.check_needs_rehash(
+            hash=user.password,
+        ):
+            # update user's password hash
+            await UserRepo.update_user_password(
+                user_id=user.id,
+                password=password_hasher.hash(
+                    password=data.password,
+                ),
             )
+        authentication_token = await AuthRepo.create_authentication_token(user=user)
+        return LoginUserResult(
+            authentication_token=authentication_token,
+            user=user,
+        )
 
     @classmethod
     async def verify_authentication_token(cls, authentication_token: str) -> int:
