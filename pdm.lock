@@ -5,7 +5,7 @@
 groups = ["default", "test"]
 strategy = ["cross_platform"]
 lock_version = "4.4"
-content_hash = "sha256:3b6c01ded0d128e1ee80ea1daf164e31120637d99df78737bed7120d53e9fad4"
+content_hash = "sha256:f837ab31618faad992c4cec3126e4aaa91f61609fa26be1be1c4444286452c41"
 
 [[package]]
 name = "alembic"
@@ -132,6 +132,20 @@ dependencies = [
     "python-dateutil>=2.8.2",
     "tzdata>=2022.7",
     "vine<6.0,>=5.1.0",
+]
+files = [
+    {file = "celery-5.3.6-py3-none-any.whl", hash = "sha256:9da4ea0118d232ce97dff5ed4974587fb1c0ff5c10042eb15278487cdd27d1af"},
+    {file = "celery-5.3.6.tar.gz", hash = "sha256:870cc71d737c0200c397290d730344cc991d13a057534353d124c9380267aab9"},
+]
+
+[[package]]
+name = "celery"
+version = "5.3.6"
+extras = ["librabbitmq"]
+requires_python = ">=3.8"
+summary = "Distributed Task Queue."
+dependencies = [
+    "celery==5.3.6",
 ]
 files = [
     {file = "celery-5.3.6-py3-none-any.whl", hash = "sha256:9da4ea0118d232ce97dff5ed4974587fb1c0ff5c10042eb15278487cdd27d1af"},

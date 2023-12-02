@@ -13,7 +13,7 @@ dependencies = [
     "alembic>=1.12.1",
     "asyncpg>=0.29.0",
     "redis>=5.0.1",
-    "celery>=5.3.6",
+    "celery[librabbitmq]>=5.3.6",
 ]
 requires-python = ">=3.12"
 readme = "README.md"
