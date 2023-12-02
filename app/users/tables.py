@@ -10,18 +10,21 @@ users_table = Table(
         "id",
         Integer,
         primary_key=True,
+        index=True,
     ),
     Column(
         "username",
         String(32),
         nullable=False,
         unique=True,
+        index=True,
     ),
     Column(
         "email",
         String(250),
         nullable=False,
         unique=True,
+        index=True,
     ),
     Column(
         "password_hash",

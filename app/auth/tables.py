@@ -16,6 +16,7 @@ password_reset_tokens_table = Table(
         String(128),
         nullable=False,
         unique=True,
+        index=True,
     ),
     Column(
         "user_id",
