@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated
 
 from pydantic import BaseModel, EmailStr, Field, validator
@@ -96,4 +97,26 @@ class PasswordResetInput(BaseModel):
         ),
     ]
 
-    reset_code: str
+    new_password: Annotated[
+        str,
+        Field(
+            min_length=8,
+            max_length=32,
+            # TODO: fix regex issues with pydantic
+            # pattern=r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()-_+=]).+",
+        ),
+    ]
+
+    reset_token: str
+
+
+class PasswordResetToken(BaseModel):
+    id: int
+
+    user_id: int
+
+    token: str
+
+    created_at: datetime
+
+    expires_at: datetime

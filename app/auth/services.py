@@ -129,9 +129,33 @@ class AuthService:
     @classmethod
     async def send_password_reset_request(cls, data: PasswordResetRequestInput) -> None:
         """Send a password reset request to the given email."""
-        raise NotImplementedError()
+        existing_user = await UserRepo.get_user_by_email(email=data.email)
+        if existing_user is not None:
+            await AuthRepo.create_password_reset_token(
+                user_id=existing_user.id,
+            )
+            # TODO: send password reset email here
 
     @classmethod
     async def reset_password(cls, data: PasswordResetInput) -> None:
         """Reset the relevant user's password with the given credentials."""
-        raise NotImplementedError()
+        password_reset_token = await AuthRepo.get_password_reset_token(
+            password_reset_token=data.reset_token,
+        )
+
+        existing_user = None
+
+        if password_reset_token:
+            existing_user = await UserRepo.get_user_by_email(email=data.email)
+
+        if not existing_user or existing_user.email != data.email:
+            raise InvalidInputError(
+                message="Invalid password reset code or email provided.",
+            )
+
+        await UserRepo.update_user_password(
+            user_id=existing_user.id,
+            password=password_hasher.hash(
+                password=data.new_password,
+            ),
+        )

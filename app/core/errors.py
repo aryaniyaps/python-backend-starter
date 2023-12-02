@@ -13,16 +13,12 @@ class InvalidInputError(BaseError):
     issued an invalid request.
     """
 
-    pass
-
 
 class ResourceNotFoundError(BaseError):
     """
     Indicate that the requested
     resource doesn't exist.
     """
-
-    pass
 
 
 class UnauthenticatedError(BaseError):
@@ -31,13 +27,9 @@ class UnauthenticatedError(BaseError):
     authenticated yet.
     """
 
-    pass
-
 
 class UnexpectedError(BaseError):
     """
     Indicate that an unexpected
     error has occurred.
     """
-
-    pass
