@@ -1,6 +1,6 @@
 from celery import Celery
 
-from app.config import CELERY_BROKER_URL
+from app.config import settings
 
 
 def create_worker() -> Celery:
@@ -8,7 +8,7 @@ def create_worker() -> Celery:
     celery = Celery(__name__)
     celery.conf.update(
         {
-            "broker_url": CELERY_BROKER_URL,
+            "broker_url": settings.celery_broker_url,
             "imports": ("emails.tasks",),
         }
     )

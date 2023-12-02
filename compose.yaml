@@ -20,6 +20,17 @@ services:
     volumes:
       - "redis_data:/bitnami"
 
+  rabbitmq:
+    image: "bitnami/rabbitmq:3.12"
+    ports:
+      - "5672:5672"
+    environment:
+      - RABBITMQ_USERNAME=user
+      - RABBITMQ_PASSWORD=pass
+    volumes:
+      - "rabbitmq_data:/bitnami/rabbitmq/mnesia"
+
 volumes:
   postgres_data:
   redis_data:
+  rabbitmq_data:
