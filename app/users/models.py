@@ -18,6 +18,8 @@ class User(BaseModel):
         ),
     ]
 
+    last_login_at: datetime
+
     created_at: datetime
 
     updated_at: datetime

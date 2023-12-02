@@ -1,3 +1,4 @@
+from datetime import datetime
 from hashlib import sha256
 from secrets import token_hex
 
@@ -16,7 +17,7 @@ class AuthRepo:
     @classmethod
     async def create_authentication_token(
         cls,
-        user: User,
+        user_id: int,
     ) -> str:
         """Create a new authentication token."""
         authentication_token = cls.generate_authentication_token()
@@ -24,7 +25,7 @@ class AuthRepo:
             name=cls.generate_authentication_token_key(
                 authentication_token=authentication_token,
             ),
-            value=user.id,
+            value=user_id,
         )
         return authentication_token
 
@@ -72,8 +73,7 @@ class AuthRepo:
 
     @classmethod
     async def create_password_reset_token(
-        cls,
-        user_id: int,
+        cls, user_id: int, user_last_login_at: datetime
     ) -> str:
         """Create a new password reset token."""
         expires_at = text("(NOW() + INTERVAL :expires_in SECOND)").params(
@@ -89,13 +89,15 @@ class AuthRepo:
                 insert(password_reset_tokens_table)
                 .values(
                     user_id=user_id,
-                    token=reset_token_hash,
+                    token_hash=reset_token_hash,
                     expires_at=expires_at,
+                    last_login_at=user_last_login_at,
                 )
                 .returning(
                     password_reset_tokens_table.c.id,
                     password_reset_tokens_table.c.user_id,
-                    password_reset_tokens_table.c.token,
+                    password_reset_tokens_table.c.token_hash,
+                    password_reset_tokens_table.c.last_login_at,
                     password_reset_tokens_table.c.created_at,
                     password_reset_tokens_table.c.expires_at,
                 ),
@@ -115,10 +117,11 @@ class AuthRepo:
                 select(
                     password_reset_tokens_table.c.id,
                     password_reset_tokens_table.c.user_id,
-                    password_reset_tokens_table.c.token,
+                    password_reset_tokens_table.c.token_hash,
+                    password_reset_tokens_table.c.last_login_at,
                     password_reset_tokens_table.c.created_at,
                     password_reset_tokens_table.c.expires_at,
-                ).where(password_reset_tokens_table.c.token == reset_token_hash)
+                ).where(password_reset_tokens_table.c.token_hash == reset_token_hash)
             )
             reset_token_row = result.scalar_one_or_none()
             if reset_token_row:

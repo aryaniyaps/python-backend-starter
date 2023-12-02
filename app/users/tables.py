@@ -24,6 +24,18 @@ users_table = Table(
         unique=True,
     ),
     Column(
+        "password_hash",
+        String(128),
+        nullable=False,
+        unique=True,
+    ),
+    Column(
+        "last_login_at",
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    ),
+    Column(
         "created_at",
         DateTime(timezone=True),
         server_default=func.now(),

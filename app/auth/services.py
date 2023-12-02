@@ -53,7 +53,9 @@ class AuthService:
                 message="Could not create user. Please try again.",
             ) from exception
 
-        authentication_token = await AuthRepo.create_authentication_token(user=user)
+        authentication_token = await AuthRepo.create_authentication_token(
+            user_id=user.id
+        )
         return CreateUserResult(
             authentication_token=authentication_token,
             user=user,
@@ -98,7 +100,15 @@ class AuthService:
                     password=data.password,
                 ),
             )
-        authentication_token = await AuthRepo.create_authentication_token(user=user)
+
+        # create authentication token
+        authentication_token = await AuthRepo.create_authentication_token(
+            user_id=user.id
+        )
+
+        # update user's last login timestamp
+        await UserRepo.update_user_last_login(user_id=user.id)
+
         return LoginUserResult(
             authentication_token=authentication_token,
             user=user,
@@ -134,6 +144,7 @@ class AuthService:
         if existing_user is not None:
             reset_token = await AuthRepo.create_password_reset_token(
                 user_id=existing_user.id,
+                user_last_login_at=existing_user.last_login_at,
             )
             # TODO: send password reset email here
 
@@ -141,23 +152,25 @@ class AuthService:
     async def reset_password(cls, data: PasswordResetInput) -> None:
         """Reset the relevant user's password with the given credentials."""
         reset_token_hash = sha256(data.reset_token.encode()).hexdigest()
+
+        existing_user = await UserRepo.get_user_by_email(email=data.email)
         password_reset_token = await AuthRepo.get_password_reset_token(
-            reset_token_hash=reset_token_hash,
+            reset_token_hash=reset_token_hash
         )
 
-        existing_user = None
-
-        if password_reset_token:
-            existing_user = await UserRepo.get_user_by_email(email=data.email)
-
-        if not existing_user or existing_user.email != data.email:
+        if not (
+            existing_user and password_reset_token and existing_user.email == data.email
+        ):
             raise InvalidInputError(
-                message="Invalid password reset code or email provided.",
+                message="Invalid password reset token or email provided."
+            )
+
+        if existing_user.last_login_at > password_reset_token.last_login_at:
+            raise InvalidInputError(
+                message="Invalid password reset token or email provided."
             )
 
         await UserRepo.update_user_password(
             user_id=existing_user.id,
-            password_hash=password_hasher.hash(
-                password=data.new_password,
-            ),
+            password_hash=password_hasher.hash(password=data.new_password),
         )

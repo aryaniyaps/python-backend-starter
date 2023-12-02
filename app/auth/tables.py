@@ -12,19 +12,27 @@ password_reset_tokens_table = Table(
         primary_key=True,
     ),
     Column(
-        "token",
-        String(64),
+        "token_hash",
+        String(128),
         nullable=False,
         unique=True,
     ),
     Column(
         "user_id",
         Integer,
-        ForeignKey("users.id", ondelete="CASCADE"),
+        ForeignKey(
+            "users.id",
+            ondelete="CASCADE",
+        ),
         nullable=False,
     ),
     Column(
         "expires_at",
+        DateTime(timezone=True),
+        nullable=False,
+    ),
+    Column(
+        "last_login_at",
         DateTime(timezone=True),
         nullable=False,
     ),

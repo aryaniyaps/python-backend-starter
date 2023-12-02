@@ -117,6 +117,8 @@ class PasswordResetToken(BaseModel):
 
     token: str
 
+    last_login_at: datetime
+
     created_at: datetime
 
     expires_at: datetime

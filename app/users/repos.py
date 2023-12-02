@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy import insert, select, update
 
 from app.core.database import engine
@@ -21,13 +23,14 @@ class UserRepo:
                 .values(
                     username=username,
                     email=email,
-                    password=password_hash,
+                    password_hash=password_hash,
                 )
                 .returning(
                     users_table.c.id,
                     users_table.c.username,
                     users_table.c.email,
-                    users_table.c.password,
+                    users_table.c.password_hash,
+                    users_table.c.last_login_at,
                     users_table.c.created_at,
                     users_table.c.updated_at,
                 ),
@@ -50,12 +53,41 @@ class UserRepo:
             result = await connection.execute(
                 update(users_table)
                 .where(users_table.c.id == user_id)
-                .values(password=password_hash)
+                .values(password_hash=password_hash)
                 .returning(
                     users_table.c.id,
                     users_table.c.username,
                     users_table.c.email,
-                    users_table.c.password,
+                    users_table.c.password_hash,
+                    users_table.c.last_login_at,
+                    users_table.c.created_at,
+                    users_table.c.updated_at,
+                ),
+            )
+            updated_user_row = result.scalar_one()
+            return User(**updated_user_row)
+
+    @classmethod
+    async def update_user_last_login(
+        cls,
+        user_id: int,
+    ) -> User | None:
+        """Update the last login timestamp for the user with the given ID."""
+        user = await cls.get_user_by_id(user_id=user_id)
+        if not user:
+            return
+
+        async with engine.connect() as connection:
+            result = await connection.execute(
+                update(users_table)
+                .where(users_table.c.id == user_id)
+                .values(last_login_at=datetime.now())
+                .returning(
+                    users_table.c.id,
+                    users_table.c.username,
+                    users_table.c.email,
+                    users_table.c.password_hash,
+                    users_table.c.last_login_at,
                     users_table.c.created_at,
                     users_table.c.updated_at,
                 ),
@@ -72,7 +104,8 @@ class UserRepo:
                     users_table.c.id,
                     users_table.c.username,
                     users_table.c.email,
-                    users_table.c.password,
+                    users_table.c.password_hash,
+                    users_table.c.last_login_at,
                     users_table.c.created_at,
                     users_table.c.updated_at,
                 ).where(users_table.c.username == username)
@@ -90,7 +123,8 @@ class UserRepo:
                     users_table.c.id,
                     users_table.c.username,
                     users_table.c.email,
-                    users_table.c.password,
+                    users_table.c.password_hash,
+                    users_table.c.last_login_at,
                     users_table.c.created_at,
                     users_table.c.updated_at,
                 ).where(users_table.c.id == user_id)
@@ -108,7 +142,8 @@ class UserRepo:
                     users_table.c.id,
                     users_table.c.username,
                     users_table.c.email,
-                    users_table.c.password,
+                    users_table.c.password_hash,
+                    users_table.c.last_login_at,
                     users_table.c.created_at,
                     users_table.c.updated_at,
                 ).where(users_table.c.email == email)
