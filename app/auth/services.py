@@ -44,7 +44,7 @@ class AuthService:
                 username=data.username,
                 email=data.email,
                 # hash password before storing
-                password=password_hasher.hash(
+                password_hash=password_hasher.hash(
                     password=data.password,
                 ),
             )
@@ -94,7 +94,7 @@ class AuthService:
             # update user's password hash
             await UserRepo.update_user_password(
                 user_id=user.id,
-                password=password_hasher.hash(
+                password_hash=password_hasher.hash(
                     password=data.password,
                 ),
             )
@@ -142,7 +142,7 @@ class AuthService:
         """Reset the relevant user's password with the given credentials."""
         reset_token_hash = sha256(data.reset_token.encode()).hexdigest()
         password_reset_token = await AuthRepo.get_password_reset_token(
-            password_reset_token=reset_token_hash,
+            reset_token_hash=reset_token_hash,
         )
 
         existing_user = None
@@ -157,7 +157,7 @@ class AuthService:
 
         await UserRepo.update_user_password(
             user_id=existing_user.id,
-            password=password_hasher.hash(
+            password_hash=password_hasher.hash(
                 password=data.new_password,
             ),
         )

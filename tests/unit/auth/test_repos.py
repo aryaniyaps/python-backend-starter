@@ -68,7 +68,7 @@ async def test_get_password_reset_token(user: User) -> None:
     reset_token = await AuthRepo.create_password_reset_token(user_id=user.id)
 
     retrieved_reset_token = await AuthRepo.get_password_reset_token(
-        password_reset_token=reset_token.token,
+        reset_token_hash=reset_token.token,
     )
 
     assert isinstance(reset_token, PasswordResetToken)
@@ -79,7 +79,7 @@ async def test_get_password_reset_token_not_found() -> None:
     """Ensure getting a non-existent password reset token returns None."""
 
     reset_token = await AuthRepo.get_password_reset_token(
-        password_reset_token="nonexistent_token",
+        reset_token_hash="nonexistent_token",
     )
 
     assert reset_token is None

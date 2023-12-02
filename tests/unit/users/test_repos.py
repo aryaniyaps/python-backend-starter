@@ -11,7 +11,7 @@ async def test_create_user() -> None:
     user = await UserRepo.create_user(
         username="new_user",
         email="new@example.com",
-        password="new_password",
+        password_hash="new_password",
     )
     assert isinstance(user, User)
     assert user.id is not None
@@ -26,7 +26,7 @@ async def test_update_user_password(user: User) -> None:
     """Ensure we can update a user's password."""
     updated_user = await UserRepo.update_user_password(
         user_id=user.id,
-        password="new_password",
+        password_hash="new_password",
     )
     assert updated_user
     # passwords are not hashed in the repository layer

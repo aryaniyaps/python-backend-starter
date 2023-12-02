@@ -20,7 +20,7 @@ async def user() -> User:
     return await UserRepo.create_user(
         username="tester",
         email="tester@example.org",
-        password=password_hasher.hash(
+        password_hash=password_hasher.hash(
             password="password",
         ),
     )

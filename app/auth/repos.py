@@ -105,7 +105,7 @@ class AuthRepo:
     @classmethod
     async def get_password_reset_token(
         cls,
-        password_reset_token: str,
+        reset_token_hash: str,
     ) -> PasswordResetToken | None:
         """
         Get a password reset token.
@@ -118,7 +118,7 @@ class AuthRepo:
                     password_reset_tokens_table.c.token,
                     password_reset_tokens_table.c.created_at,
                     password_reset_tokens_table.c.expires_at,
-                ).where(password_reset_tokens_table.c.token == password_reset_token)
+                ).where(password_reset_tokens_table.c.token == reset_token_hash)
             )
             reset_token_row = result.scalar_one_or_none()
             if reset_token_row:

@@ -12,7 +12,7 @@ class UserRepo:
         cls,
         username: str,
         email: str,
-        password: str,
+        password_hash: str,
     ) -> User:
         """Create a new user."""
         async with engine.connect() as connection:
@@ -21,7 +21,7 @@ class UserRepo:
                 .values(
                     username=username,
                     email=email,
-                    password=password,
+                    password=password_hash,
                 )
                 .returning(
                     users_table.c.id,
@@ -39,7 +39,7 @@ class UserRepo:
     async def update_user_password(
         cls,
         user_id: int,
-        password: str | None = None,
+        password_hash: str | None = None,
     ) -> User | None:
         """Update the password for the user with the given ID."""
         user = await cls.get_user_by_id(user_id=user_id)
@@ -50,7 +50,7 @@ class UserRepo:
             result = await connection.execute(
                 update(users_table)
                 .where(users_table.c.id == user_id)
-                .values(password=password)
+                .values(password=password_hash)
                 .returning(
                     users_table.c.id,
                     users_table.c.username,
