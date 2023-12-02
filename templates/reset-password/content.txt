@@ -1,4 +1,4 @@
-Use this link to reset your password. The link is only valid for 5 minutes.
+Use this link to reset your password. The link is only valid for {{ token_expires_in }}.
 
 {{ app_name }} ( {{ app_url }} )
 
