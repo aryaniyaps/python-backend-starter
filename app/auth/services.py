@@ -1,3 +1,5 @@
+from hashlib import sha256
+
 from argon2.exceptions import HashingError, VerifyMismatchError
 
 from app.auth.repos import AuthRepo
@@ -130,7 +132,7 @@ class AuthService:
         """Send a password reset request to the given email."""
         existing_user = await UserRepo.get_user_by_email(email=data.email)
         if existing_user is not None:
-            await AuthRepo.create_password_reset_token(
+            reset_token = await AuthRepo.create_password_reset_token(
                 user_id=existing_user.id,
             )
             # TODO: send password reset email here
@@ -138,8 +140,9 @@ class AuthService:
     @classmethod
     async def reset_password(cls, data: PasswordResetInput) -> None:
         """Reset the relevant user's password with the given credentials."""
+        reset_token_hash = sha256(data.reset_token.encode()).hexdigest()
         password_reset_token = await AuthRepo.get_password_reset_token(
-            password_reset_token=data.reset_token,
+            password_reset_token=reset_token_hash,
         )
 
         existing_user = None

@@ -1,3 +1,4 @@
+from hashlib import sha256
 from secrets import token_hex
 
 from sqlalchemy import insert, select, text
@@ -73,17 +74,22 @@ class AuthRepo:
     async def create_password_reset_token(
         cls,
         user_id: int,
-    ) -> PasswordResetToken:
+    ) -> str:
         """Create a new password reset token."""
         expires_at = text("(NOW() + INTERVAL :expires_in SECOND)").params(
             expires_in=PASSWORD_RESET_TOKEN_EXPIRES_IN
         )
+
+        reset_token = cls.generate_password_reset_token()
+        # hash password reset token before storing
+        reset_token_hash = sha256(reset_token.encode()).hexdigest()
+
         async with engine.connect() as connection:
-            result = await connection.execute(
+            await connection.execute(
                 insert(password_reset_tokens_table)
                 .values(
                     user_id=user_id,
-                    token=cls.generate_password_reset_token(),
+                    token=reset_token_hash,
                     expires_at=expires_at,
                 )
                 .returning(
@@ -94,8 +100,7 @@ class AuthRepo:
                     password_reset_tokens_table.c.expires_at,
                 ),
             )
-            reset_token_row = result.scalar_one()
-            return PasswordResetToken(**reset_token_row)
+            return reset_token
 
     @classmethod
     async def get_password_reset_token(
