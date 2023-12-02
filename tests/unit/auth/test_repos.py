@@ -1,6 +1,10 @@
+from datetime import timedelta
+
 import pytest
 
+from app.auth.models import PasswordResetToken
 from app.auth.repos import AuthRepo
+from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
 from app.core.errors import UnauthenticatedError
 from app.core.redis_client import redis_client
 from app.users.models import User
@@ -45,3 +49,38 @@ async def test_remove_authentication_token(user: User) -> None:
         )
         is None
     )
+
+
+async def test_create_password_reset_token(user: User) -> None:
+    """Ensure a password reset token is created."""
+
+    reset_token = await AuthRepo.create_password_reset_token(user_id=user.id)
+
+    assert isinstance(reset_token, PasswordResetToken)
+    assert reset_token.user_id == user.id
+    assert reset_token.token
+    assert reset_token.expires_at - reset_token.created_at == timedelta(
+        seconds=PASSWORD_RESET_TOKEN_EXPIRES_IN,
+    )
+
+
+async def test_get_password_reset_token(user: User) -> None:
+    """Ensure getting a password reset token works."""
+    reset_token = await AuthRepo.create_password_reset_token(user_id=user.id)
+
+    retrieved_reset_token = await AuthRepo.get_password_reset_token(
+        password_reset_token=reset_token.token,
+    )
+
+    assert isinstance(reset_token, PasswordResetToken)
+    assert reset_token == retrieved_reset_token
+
+
+async def test_get_password_reset_token_not_found() -> None:
+    """Ensure getting a non-existent password reset token returns None."""
+
+    reset_token = await AuthRepo.get_password_reset_token(
+        password_reset_token="nonexistent_token",
+    )
+
+    assert reset_token is None

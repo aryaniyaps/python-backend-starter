@@ -1,7 +1,6 @@
-from datetime import datetime, timedelta
 from secrets import token_hex
 
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, text
 
 from app.auth.models import PasswordResetToken
 from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
@@ -76,8 +75,8 @@ class AuthRepo:
         user_id: int,
     ) -> PasswordResetToken:
         """Create a new password reset token."""
-        expires_at = datetime.now() + timedelta(
-            seconds=PASSWORD_RESET_TOKEN_EXPIRES_IN,
+        expires_at = text("(NOW() + INTERVAL :expires_in SECOND)").params(
+            expires_in=PASSWORD_RESET_TOKEN_EXPIRES_IN
         )
         async with engine.connect() as connection:
             result = await connection.execute(
