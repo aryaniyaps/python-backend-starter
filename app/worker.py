@@ -9,7 +9,7 @@ def create_worker() -> Celery:
     celery.conf.update(
         {
             "broker_url": settings.celery_broker_url,
-            "imports": ("emails.tasks",),
+            "imports": ("app.auth.tasks",),
         }
     )
     return celery

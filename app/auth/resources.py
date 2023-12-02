@@ -1,5 +1,6 @@
 from falcon import HTTP_201, HTTP_204, before
 from falcon.asgi import Request, Response
+from user_agents import parse
 
 from app.auth.hooks import login_required
 from app.auth.services import AuthService
@@ -60,6 +61,7 @@ class AuthResource:
         data = await req.media
         await AuthService.send_password_reset_request(
             data=PasswordResetRequestInput.model_validate_json(data),
+            user_agent=parse(req.user_agent),
         )
         resp.status = HTTP_204
 

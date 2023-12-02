@@ -14,6 +14,8 @@ dependencies = [
     "asyncpg>=0.29.0",
     "redis>=5.0.1",
     "celery[librabbitmq]>=5.3.6",
+    "jinja2>=3.1.2",
+    "user-agents>=2.2.0",
 ]
 requires-python = ">=3.12"
 readme = "README.md"

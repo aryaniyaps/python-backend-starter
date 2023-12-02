@@ -1,8 +1,10 @@
 from hashlib import sha256
 
 from argon2.exceptions import HashingError, VerifyMismatchError
+from user_agents.parsers import UserAgent
 
 from app.auth.repos import AuthRepo
+from app.auth.tasks import send_password_reset_request_email
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
 from app.core.security import password_hasher
 from app.users.repos import UserRepo
@@ -138,7 +140,11 @@ class AuthService:
         )
 
     @classmethod
-    async def send_password_reset_request(cls, data: PasswordResetRequestInput) -> None:
+    async def send_password_reset_request(
+        cls,
+        data: PasswordResetRequestInput,
+        user_agent: UserAgent,
+    ) -> None:
         """Send a password reset request to the given email."""
         existing_user = await UserRepo.get_user_by_email(email=data.email)
         if existing_user is not None:
@@ -146,7 +152,12 @@ class AuthService:
                 user_id=existing_user.id,
                 user_last_login_at=existing_user.last_login_at,
             )
-            # TODO: send password reset email here
+            send_password_reset_request_email.delay(
+                user=existing_user,
+                password_reset_token=reset_token,
+                operating_system=user_agent.get_os(),
+                browser_name=user_agent.get_browser(),
+            )
 
     @classmethod
     async def reset_password(cls, data: PasswordResetInput) -> None:

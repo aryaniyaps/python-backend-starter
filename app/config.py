@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from pydantic import AmqpDsn, Field, PostgresDsn, RedisDsn
+from pydantic import AmqpDsn, EmailStr, Field, PostgresDsn, RedisDsn, SecretStr
 from pydantic_settings import BaseSettings
 
 
@@ -47,6 +47,19 @@ class Settings(BaseSettings):
             },
         ),
     ]
+
+    smtp_server: str
+
+    smtp_port: Annotated[
+        int,
+        Field(
+            examples=[587],
+        ),
+    ]
+
+    email_username: EmailStr
+
+    email_password: SecretStr
 
     class Config:
         env_file = ".env"
