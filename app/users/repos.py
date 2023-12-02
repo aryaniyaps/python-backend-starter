@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from sqlalchemy import insert, select, text, update
 
 from app.core.database import engine
