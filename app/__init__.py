@@ -55,7 +55,7 @@ def add_middleware(app: App) -> None:
 
 
 def create_app() -> App:
-    """Create the ASGI app."""
+    """Initialize an ASGI app instance."""
     app = App()
     add_middleware(app)
     add_routes(app)
