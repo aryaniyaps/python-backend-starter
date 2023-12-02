@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Annotated
 
-from pydantic import BaseModel, EmailStr, Field, validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from app.users.models import User
 
@@ -19,7 +19,7 @@ class LoginUserInput(BaseModel):
 
     password: str
 
-    @validator("login")
+    @field_validator("login")
     @classmethod
     def validate_login(cls, value):
         if "@" in value:

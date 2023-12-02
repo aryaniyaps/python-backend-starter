@@ -30,6 +30,13 @@ services:
     volumes:
       - "rabbitmq_data:/bitnami/rabbitmq/mnesia"
 
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
 volumes:
   postgres_data:
   redis_data:

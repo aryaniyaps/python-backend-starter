@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from pydantic import AmqpDsn, EmailStr, Field, PostgresDsn, RedisDsn, SecretStr
+from pydantic import AmqpDsn, Field, PostgresDsn, RedisDsn
 from pydantic_settings import BaseSettings
 
 
@@ -35,31 +35,35 @@ class Settings(BaseSettings):
     ]
 
     cors_allow_origins: Annotated[
-        set[str],
+        set[str] | str,
         Field(
             examples=[
                 {
                     "example.com",
                 },
-            ],
-            default={
                 "*",
-            },
+            ],
+            default="*",
         ),
     ]
 
-    smtp_server: str
-
-    smtp_port: Annotated[
-        int,
+    email_server: Annotated[
+        str,
         Field(
-            examples=[587],
+            examples=[
+                "smtp://user:pass@host:587",
+            ],
         ),
     ]
 
-    email_username: EmailStr
-
-    email_password: SecretStr
+    email_from: Annotated[
+        str,
+        Field(
+            examples=[
+                "aryaniyaps@example.com",
+            ],
+        ),
+    ]
 
     class Config:
         env_file = ".env"

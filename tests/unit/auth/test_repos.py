@@ -1,4 +1,5 @@
 from datetime import timedelta
+from hashlib import sha256
 
 import pytest
 
@@ -14,14 +15,14 @@ pytestmark = pytest.mark.asyncio
 
 async def test_create_authentication_token(user: User) -> None:
     """Ensure we can create an authentication token."""
-    token = await AuthRepo.create_authentication_token(user)
+    token = await AuthRepo.create_authentication_token(user_id=user.id)
 
     assert isinstance(token, str)
 
 
 async def test_verify_authentication_token_valid(user: User) -> None:
     """Ensure we can verify an authentication token."""
-    token = await AuthRepo.create_authentication_token(user)
+    token = await AuthRepo.create_authentication_token(user_id=user.id)
 
     # Perform token verification
     user_id = await AuthRepo.verify_authentication_token(token)
@@ -37,7 +38,7 @@ async def test_verify_authentication_token_invalid() -> None:
 
 async def test_remove_authentication_token(user: User) -> None:
     """Ensure we can remove an authentication token."""
-    token = await AuthRepo.create_authentication_token(user)
+    token = await AuthRepo.create_authentication_token(user_id=user.id)
 
     # Perform token removal
     await AuthRepo.remove_authentication_token(token)
@@ -54,7 +55,10 @@ async def test_remove_authentication_token(user: User) -> None:
 async def test_create_password_reset_token(user: User) -> None:
     """Ensure a password reset token is created."""
 
-    reset_token = await AuthRepo.create_password_reset_token(user_id=user.id)
+    reset_token = await AuthRepo.create_password_reset_token(
+        user_id=user.id,
+        user_last_login_at=user.last_login_at,
+    )
 
     assert isinstance(reset_token, PasswordResetToken)
     assert reset_token.user_id == user.id
@@ -65,10 +69,15 @@ async def test_create_password_reset_token(user: User) -> None:
 
 async def test_get_password_reset_token(user: User) -> None:
     """Ensure getting a password reset token works."""
-    reset_token = await AuthRepo.create_password_reset_token(user_id=user.id)
+    reset_token = await AuthRepo.create_password_reset_token(
+        user_id=user.id,
+        user_last_login_at=user.last_login_at,
+    )
+
+    reset_token_hash = sha256(reset_token.encode()).hexdigest()
 
     retrieved_reset_token = await AuthRepo.get_password_reset_token(
-        reset_token_hash=reset_token.token,
+        reset_token_hash=reset_token_hash,
     )
 
     assert isinstance(reset_token, PasswordResetToken)
