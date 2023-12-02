@@ -12,7 +12,6 @@ def create_worker() -> Celery:
             "imports": ("emails.tasks",),
         }
     )
-    celery.autodiscover_tasks()
     return celery
 
 
