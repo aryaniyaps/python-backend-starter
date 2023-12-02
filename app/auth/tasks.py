@@ -31,10 +31,16 @@ def send_password_reset_request_email(
     email_sender.send_email(
         to=user.email,
         subject="Password Reset Request",
-        body=reset_password_text.render(),
+        body=reset_password_text.render(
+            action_url=action_url,
+            operating_system=operating_system,
+            browser_name=browser_name,
+            username=user.username,
+        ),
         html_body=reset_password_html.render(
             action_url=action_url,
             operating_system=operating_system,
             browser_name=browser_name,
+            username=user.username,
         ),
     )
