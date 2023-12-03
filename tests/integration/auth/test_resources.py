@@ -4,6 +4,8 @@ import pytest
 from falcon import HTTP_200, HTTP_201, HTTP_204, HTTP_400, HTTP_401
 from falcon.testing import ASGIConductor
 
+from app.auth.repos import AuthRepo
+from app.auth.services import AuthService
 from app.users.models import User
 
 pytestmark = pytest.mark.asyncio
@@ -91,3 +93,84 @@ async def test_on_post_logout_unauthenticated_user(conductor: ASGIConductor) -> 
     logout_response = await conductor.post("/auth/logout")
 
     assert logout_response.status == HTTP_401
+
+
+async def test_on_post_reset_password_request_success(
+    conductor: ASGIConductor, user: User
+) -> None:
+    """Ensure we can successfully send a password reset request."""
+    reset_request_data = {"email": user.email}
+    response = await conductor.post(
+        "/auth/reset-password-request", body=json.dumps(reset_request_data)
+    )
+
+    assert response.status == HTTP_204
+
+
+async def test_on_post_reset_password_request_nonexistent_user(
+    conductor: ASGIConductor,
+) -> None:
+    """Ensure we cannot send a password reset request for a nonexistent user."""
+    reset_request_data = {"email": "nonexistent@example.com"}
+    response = await conductor.post(
+        "/auth/reset-password-request", body=json.dumps(reset_request_data)
+    )
+
+    assert (
+        response.status == HTTP_204
+    )  # You might want to consider a different status code or response behavior
+
+
+async def test_on_post_reset_password_success(
+    conductor: ASGIConductor, user: User
+) -> None:
+    """Ensure we can successfully reset a user's password."""
+    reset_token = await AuthRepo.create_password_reset_token(
+        user_id=user.id,
+        user_last_login_at=user.last_login_at,
+    )
+    reset_data = {
+        "email": user.email,
+        "reset_token": reset_token,
+        "new_password": "new_password",
+    }
+    # TODO: create a password reset token before testing here
+    response = await conductor.post("/auth/reset-password", body=json.dumps(reset_data))
+
+    assert response.status == HTTP_204
+
+
+async def test_on_post_reset_password_invalid_token(conductor: ASGIConductor) -> None:
+    """Ensure we cannot reset a user's password with an invalid token."""
+    reset_data = {
+        "email": "user@example.com",
+        "reset_token": "invalid_token",
+        "new_password": "new_password",
+    }
+    response = await conductor.post("/auth/reset-password", body=json.dumps(reset_data))
+
+    assert response.status == HTTP_400
+
+
+async def test_on_post_reset_password_user_not_found(conductor: ASGIConductor) -> None:
+    """Ensure we cannot reset a password for a non-existing user."""
+    reset_data = {
+        "email": "nonexistent@example.com",
+        "reset_token": "fake_token",
+        "new_password": "new_password",
+    }
+    response = await conductor.post("/auth/reset-password", body=json.dumps(reset_data))
+
+    assert response.status == HTTP_400
+
+
+async def test_on_post_reset_password_invalid_email(conductor: ASGIConductor) -> None:
+    """Ensure we cannot reset a password for an invalid email."""
+    reset_data = {
+        "email": "invalid_email",
+        "reset_token": "fake_token",
+        "new_password": "new_password",
+    }
+    response = await conductor.post("/auth/reset-password", body=json.dumps(reset_data))
+
+    assert response.status == HTTP_400

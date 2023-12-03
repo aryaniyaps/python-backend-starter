@@ -8,7 +8,6 @@ from app.auth.models import PasswordResetToken
 from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
 from app.core.database import engine
 from app.core.redis_client import redis_client
-from app.users.models import User
 
 from .tables import password_reset_tokens_table
 

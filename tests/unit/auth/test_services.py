@@ -10,6 +10,7 @@ from app.auth.models import (
     LoginUserResult,
     PasswordResetInput,
     PasswordResetRequestInput,
+    PasswordResetToken,
 )
 from app.auth.repos import AuthRepo
 from app.auth.services import AuthService
@@ -221,6 +222,7 @@ async def test_send_password_reset_request_success() -> None:
     """Ensure we can send a password reset request successfully."""
     password_reset_request_input = PasswordResetRequestInput(email="user@example.com")
     user_agent = MagicMock(
+        spec=UserAgent,
         get_os=MagicMock(return_value="Windows"),
         get_browser=MagicMock(return_value="Chrome"),
     )
@@ -276,7 +278,11 @@ async def test_reset_password_success() -> None:
 
     with patch.object(UserRepo, "get_user_by_email", return_value=MagicMock(spec=User)):
         with patch.object(
-            AuthRepo, "get_password_reset_token", return_value=MagicMock()
+            AuthRepo,
+            "get_password_reset_token",
+            return_value=MagicMock(
+                spec=PasswordResetToken,
+            ),
         ):
             with patch.object(
                 UserRepo, "update_user_password", return_value=None
