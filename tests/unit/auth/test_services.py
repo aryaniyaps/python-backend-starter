@@ -5,6 +5,7 @@ from argon2.exceptions import HashingError
 from user_agents.parsers import UserAgent
 
 from app.auth.models import (
+    CreateUserInput,
     CreateUserResult,
     LoginUserInput,
     LoginUserResult,
@@ -22,7 +23,7 @@ from app.users.repos import UserRepo
 pytestmark = pytest.mark.asyncio
 
 
-async def test_register_user_success(create_user_input) -> None:
+async def test_register_user_success() -> None:
     """Ensure we can register a user successfully."""
     with patch.object(
         UserRepo,
@@ -41,23 +42,35 @@ async def test_register_user_success(create_user_input) -> None:
         "create_authentication_token",
         return_value="fake_token",
     ):
-        result = await AuthService.register_user(create_user_input)
+        result = await AuthService.register_user(
+            CreateUserInput(
+                username="new_user",
+                email="new_user@example.com",
+                password="password",
+            ),
+        )
 
     assert isinstance(result, CreateUserResult)
     assert result.authentication_token == "fake_token"
     assert result.user is not None
 
 
-async def test_register_user_existing_email(create_user_input) -> None:
+async def test_register_user_existing_email() -> None:
     """Ensure we cannot create an user with an existing email."""
     with patch.object(UserRepo, "get_user_by_email", return_value=MagicMock(spec=User)):
         with pytest.raises(
             InvalidInputError, match="User with that email already exists."
         ):
-            await AuthService.register_user(create_user_input)
+            await AuthService.register_user(
+                CreateUserInput(
+                    username="new_user",
+                    email="new_user@example.com",
+                    password="password",
+                ),
+            )
 
 
-async def test_register_user_existing_username(create_user_input) -> None:
+async def test_register_user_existing_username() -> None:
     """Ensure we cannot create an user with an existing username."""
     with patch.object(UserRepo, "get_user_by_email", return_value=None), patch.object(
         UserRepo,
@@ -67,10 +80,16 @@ async def test_register_user_existing_username(create_user_input) -> None:
         with pytest.raises(
             InvalidInputError, match="User with that username already exists."
         ):
-            await AuthService.register_user(create_user_input)
+            await AuthService.register_user(
+                CreateUserInput(
+                    username="new_user",
+                    email="new_user@example.com",
+                    password="password",
+                ),
+            )
 
 
-async def test_register_user_hashing_error(create_user_input) -> None:
+async def test_register_user_hashing_error() -> None:
     """Ensure we cannot create an user when there is a password hashing error."""
     with patch.object(
         UserRepo,
@@ -92,7 +111,13 @@ async def test_register_user_hashing_error(create_user_input) -> None:
         with pytest.raises(
             UnexpectedError, match="Could not create user. Please try again."
         ):
-            await AuthService.register_user(create_user_input)
+            await AuthService.register_user(
+                CreateUserInput(
+                    username="new_user",
+                    email="new_user@example.com",
+                    password="password",
+                ),
+            )
 
 
 async def test_login_user_valid_credentials() -> None:
