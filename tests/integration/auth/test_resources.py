@@ -5,7 +5,6 @@ from falcon import HTTP_200, HTTP_201, HTTP_204, HTTP_400, HTTP_401
 from falcon.testing import ASGIConductor
 
 from app.auth.repos import AuthRepo
-from app.auth.services import AuthService
 from app.users.models import User
 
 pytestmark = pytest.mark.asyncio
