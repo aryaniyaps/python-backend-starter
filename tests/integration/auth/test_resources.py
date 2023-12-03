@@ -17,7 +17,9 @@ async def test_on_post_register_success(conductor: ASGIConductor) -> None:
         "email": "user@example.com",
         "password": "password",
     }
-    response = await conductor.post("/auth/register", body=json.dumps(user_data))
+    response = await conductor.simulate_post(
+        "/auth/register", body=json.dumps(user_data)
+    )
 
     assert response.status == HTTP_201
     assert "authentication_token" in response.content
@@ -33,7 +35,9 @@ async def test_on_post_register_existing_email(
         "email": user.email,
         "password": "password",
     }
-    response = await conductor.post("/auth/register", body=json.dumps(user_data))
+    response = await conductor.simulate_post(
+        "/auth/register", body=json.dumps(user_data)
+    )
 
     assert response.status == HTTP_400
 
@@ -47,7 +51,9 @@ async def test_on_post_register_existing_username(
         "email": "user@example.com",
         "password": "password",
     }
-    response = await conductor.post("/auth/register", body=json.dumps(user_data))
+    response = await conductor.simulate_post(
+        "/auth/register", body=json.dumps(user_data)
+    )
 
     assert response.status == HTTP_400
 
@@ -57,7 +63,7 @@ async def test_on_post_login_valid_credentials(
 ) -> None:
     """Ensure we can login a user with valid credentials."""
     login_data = {"login": user.email, "password": "password"}
-    response = await conductor.post("/auth/login", body=json.dumps(login_data))
+    response = await conductor.simulate_post("/auth/login", body=json.dumps(login_data))
 
     assert response.status == HTTP_200
 
@@ -65,7 +71,7 @@ async def test_on_post_login_valid_credentials(
 async def test_on_post_login_invalid_credentials(conductor: ASGIConductor) -> None:
     """Ensure we cannot login a user with invalid credentials."""
     login_data = {"login": "invalid_user@example.com", "password": "invalid_password"}
-    response = await conductor.post("/auth/login", body=json.dumps(login_data))
+    response = await conductor.simulate_post("/auth/login", body=json.dumps(login_data))
 
     assert response.status == HTTP_400
 
@@ -75,21 +81,21 @@ async def test_on_post_login_password_mismatch(
 ) -> None:
     """Ensure we cannot login a user with the wrong password."""
     login_data = {"login": user.email, "password": "wrong_password"}
-    response = await conductor.post("/auth/login", body=json.dumps(login_data))
+    response = await conductor.simulate_post("/auth/login", body=json.dumps(login_data))
 
     assert response.status == HTTP_400
 
 
 async def test_on_post_logout_authenticated_user(auth_conductor: ASGIConductor) -> None:
     """Ensure we can logout an authenticated user."""
-    response = await auth_conductor.post("/auth/logout")
+    response = await auth_conductor.simulate_post("/auth/logout")
 
     assert response.status == HTTP_204
 
 
 async def test_on_post_logout_unauthenticated_user(conductor: ASGIConductor) -> None:
     """Ensure we cannot logout an unauthenticated user."""
-    logout_response = await conductor.post("/auth/logout")
+    logout_response = await conductor.simulate_post("/auth/logout")
 
     assert logout_response.status == HTTP_401
 
@@ -99,7 +105,7 @@ async def test_on_post_reset_password_request_success(
 ) -> None:
     """Ensure we can successfully send a password reset request."""
     reset_request_data = {"email": user.email}
-    response = await conductor.post(
+    response = await conductor.simulate_post(
         "/auth/reset-password-request", body=json.dumps(reset_request_data)
     )
 
@@ -111,7 +117,7 @@ async def test_on_post_reset_password_request_nonexistent_user(
 ) -> None:
     """Ensure we cannot send a password reset request for a nonexistent user."""
     reset_request_data = {"email": "nonexistent@example.com"}
-    response = await conductor.post(
+    response = await conductor.simulate_post(
         "/auth/reset-password-request", body=json.dumps(reset_request_data)
     )
 
@@ -134,7 +140,9 @@ async def test_on_post_reset_password_success(
         "new_password": "new_password",
     }
     # TODO: create a password reset token before testing here
-    response = await conductor.post("/auth/reset-password", body=json.dumps(reset_data))
+    response = await conductor.simulate_post(
+        "/auth/reset-password", body=json.dumps(reset_data)
+    )
 
     assert response.status == HTTP_204
 
@@ -146,7 +154,9 @@ async def test_on_post_reset_password_invalid_token(conductor: ASGIConductor) ->
         "reset_token": "invalid_token",
         "new_password": "new_password",
     }
-    response = await conductor.post("/auth/reset-password", body=json.dumps(reset_data))
+    response = await conductor.simulate_post(
+        "/auth/reset-password", body=json.dumps(reset_data)
+    )
 
     assert response.status == HTTP_400
 
@@ -158,7 +168,9 @@ async def test_on_post_reset_password_user_not_found(conductor: ASGIConductor) -
         "reset_token": "fake_token",
         "new_password": "new_password",
     }
-    response = await conductor.post("/auth/reset-password", body=json.dumps(reset_data))
+    response = await conductor.simulate_post(
+        "/auth/reset-password", body=json.dumps(reset_data)
+    )
 
     assert response.status == HTTP_400
 
@@ -170,6 +182,8 @@ async def test_on_post_reset_password_invalid_email(conductor: ASGIConductor) ->
         "reset_token": "fake_token",
         "new_password": "new_password",
     }
-    response = await conductor.post("/auth/reset-password", body=json.dumps(reset_data))
+    response = await conductor.simulate_post(
+        "/auth/reset-password", body=json.dumps(reset_data)
+    )
 
     assert response.status == HTTP_400

@@ -50,7 +50,7 @@ async def test_get_user_by_unknown_username() -> None:
 async def test_get_user_by_id(user: User) -> None:
     """Ensure we can get a user by ID."""
     retrieved_user = await UserRepo.get_user_by_id(user_id=user.id)
-    assert retrieved_user
+    assert retrieved_user is not None
     assert retrieved_user == user
 
 

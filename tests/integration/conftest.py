@@ -24,7 +24,7 @@ async def conductor(test_client: TestClient) -> AsyncIterator[ASGIConductor]:
 @pytest.fixture(scope="session")
 async def auth_test_client(app: App, user: User) -> TestClient:
     """Initialize an authenticated test client for testing."""
-    authentication_token = await AuthRepo.create_authentication_token(user=user)
+    authentication_token = await AuthRepo.create_authentication_token(user_id=user.id)
     return TestClient(
         app,
         headers={

@@ -1,4 +1,4 @@
-from sqlalchemy import insert, select, text, update
+from sqlalchemy import delete, insert, select, text, update
 
 from app.core.database import engine
 from app.users.models import User
@@ -35,6 +35,16 @@ class UserRepo:
             )
             user_row = result.scalar_one()
             return User(**user_row)
+
+    @classmethod
+    async def delete_user(cls, user_id: int) -> None:
+        """Delete a user with the given ID."""
+        async with engine.connect() as connection:
+            await connection.execute(
+                delete(users_table).where(
+                    users_table.c.id == user_id,
+                ),
+            )
 
     @classmethod
     async def update_user_password(
