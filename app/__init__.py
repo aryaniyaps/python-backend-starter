@@ -1,8 +1,22 @@
 from falcon import CORSMiddleware
 from falcon.asgi import App
+from pydantic import ValidationError
 
 from app.auth.resources import auth_resource
 from app.config import settings
+from app.core.error_handlers import (
+    handle_invalid_input_error,
+    handle_resource_not_found_error,
+    handle_unauthenticated_error,
+    handle_unexpected_error,
+    handle_validation_error,
+)
+from app.core.errors import (
+    InvalidInputError,
+    ResourceNotFoundError,
+    UnauthenticatedError,
+    UnexpectedError,
+)
 from app.users.resources import user_resource
 
 
@@ -54,9 +68,34 @@ def add_middleware(app: App) -> None:
     )
 
 
+def add_error_handlers(app: App) -> None:
+    """Register error handlers for the app."""
+    app.add_error_handler(
+        ValidationError,
+        handle_validation_error,
+    )
+    app.add_error_handler(
+        InvalidInputError,
+        handle_invalid_input_error,
+    )
+    app.add_error_handler(
+        ResourceNotFoundError,
+        handle_resource_not_found_error,
+    )
+    app.add_error_handler(
+        UnauthenticatedError,
+        handle_unauthenticated_error,
+    )
+    app.add_error_handler(
+        UnexpectedError,
+        handle_unexpected_error,
+    )
+
+
 def create_app() -> App:
     """Initialize an ASGI app instance."""
     app = App()
     add_middleware(app)
     add_routes(app)
+    add_error_handlers(app)
     return app

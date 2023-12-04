@@ -5,7 +5,7 @@
 groups = ["default", "test"]
 strategy = ["cross_platform"]
 lock_version = "4.4"
-content_hash = "sha256:83633b257b369c1180c2a3ad774760a5542baf7b4a711b12e688c0b3c67176d9"
+content_hash = "sha256:260370680ff46c68f7a6992476dc68471421c799048ea64fb1554931c4db2cec"
 
 [[package]]
 name = "alembic"
@@ -362,6 +362,15 @@ dependencies = [
 files = [
     {file = "kombu-5.3.4-py3-none-any.whl", hash = "sha256:63bb093fc9bb80cfb3a0972336a5cec1fa7ac5f9ef7e8237c6bf8dda9469313e"},
     {file = "kombu-5.3.4.tar.gz", hash = "sha256:0bb2e278644d11dea6272c17974a3dbb9688a949f3bb60aeb5b791329c44fadc"},
+]
+
+[[package]]
+name = "lagom"
+version = "2.6.0"
+requires_python = ">=3.7"
+summary = "Lagom is a dependency injection container designed to give you 'just enough' help with building your dependencies."
+files = [
+    {file = "lagom-2.6.0-py3-none-any.whl", hash = "sha256:59899f29319bfb9f3fa96f1834ae8ed2e25345e697bfff5a3da7aa0b84348978"},
 ]
 
 [[package]]

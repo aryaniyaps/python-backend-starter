@@ -301,7 +301,11 @@ async def test_reset_password_success() -> None:
         new_password="new_password",
     )
 
-    with patch.object(UserRepo, "get_user_by_email", return_value=MagicMock(spec=User)):
+    with patch.object(
+        UserRepo,
+        "get_user_by_email",
+        return_value=MagicMock(spec=User),
+    ):
         with patch.object(
             AuthRepo,
             "get_password_reset_token",
@@ -324,8 +328,16 @@ async def test_reset_password_success() -> None:
 
 async def test_reset_password_invalid_token() -> None:
     """Ensure we cannot reset a user's password with an invalid token."""
-    with patch.object(UserRepo, "get_user_by_email", return_value=MagicMock(spec=User)):
-        with patch.object(AuthRepo, "get_password_reset_token", return_value=None):
+    with patch.object(
+        UserRepo,
+        "get_user_by_email",
+        return_value=MagicMock(spec=User),
+    ):
+        with patch.object(
+            AuthRepo,
+            "get_password_reset_token",
+            return_value=None,
+        ):
             with pytest.raises(
                 InvalidInputError, match="Invalid password reset token or email."
             ):

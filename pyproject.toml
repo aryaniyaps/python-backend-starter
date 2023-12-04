@@ -17,6 +17,7 @@ dependencies = [
     "jinja2>=3.1.2",
     "user-agents>=2.2.0",
     "humanize>=4.9.0",
+    "lagom>=2.6.0",
 ]
 requires-python = ">=3.12"
 readme = "README.md"

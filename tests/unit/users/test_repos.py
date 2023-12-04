@@ -1,4 +1,5 @@
 import pytest
+from sqlalchemy.ext.asyncio import AsyncConnection
 
 from app.users.models import User
 from app.users.repos import UserRepo
@@ -6,12 +7,13 @@ from app.users.repos import UserRepo
 pytestmark = pytest.mark.asyncio
 
 
-async def test_create_user() -> None:
+async def test_create_user(test_connection: AsyncConnection) -> None:
     """Ensure we can create a new user."""
     user = await UserRepo.create_user(
         username="new_user",
         email="new@example.com",
         password_hash="new_password",
+        # TODO: pass connection maker as a parameter here
     )
     assert isinstance(user, User)
     assert user.id is not None
@@ -71,3 +73,6 @@ async def test_get_user_by_unknown_email() -> None:
     """Ensure we cannot get a user by unknown email."""
     retrieved_user = await UserRepo.get_user_by_email(email="unknown@example.com")
     assert retrieved_user is None
+
+
+# TODO: add tests for UserRepo.delete_user

@@ -1,13 +1,15 @@
 from typing import AsyncIterator
 
 import pytest
-from alembic.command import stamp
+from alembic import command
 from alembic.config import Config
 from falcon.asgi import App
-from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine
+from lagom import Container
+from sqlalchemy.ext.asyncio import AsyncConnection
 
 from app import create_app
-from app.core.database import database_metadata, engine
+from app.core.containers import container
+from app.core.database import engine
 from app.core.security import password_hasher
 from app.users.models import User
 from app.users.repos import UserRepo
@@ -19,41 +21,37 @@ def app() -> App:
     return create_app()
 
 
-@pytest.fixture(scope="session")
-async def db_engine() -> AsyncIterator[AsyncEngine]:
-    """
-    Set up the database engine.
+@pytest.fixture(scope="session", autouse=True)
+async def setup_test_database() -> AsyncIterator[None]:
+    """Set up the test database."""
 
-    :return: The test database engine.
-    """
     alembic_cfg = Config("alembic.ini")
-    async with engine.begin() as conn:
-        # create database tables.
-        await conn.run_sync(database_metadata.create_all)
 
-    # stamp the revisions table.
-    stamp(alembic_cfg, revision="head")
+    # apply migrations to the test database
+    command.upgrade(
+        alembic_cfg,
+        revision="head",
+    )
 
-    # yield database engine.
-    yield engine
+    yield
 
-    async with engine.begin() as conn:
-        # drop database tables.
-        await conn.run_sync(database_metadata.drop_all)
-
-    # stamp the revisions table.
-    stamp(alembic_cfg, revision=None, purge=True)
+    # cleanup the test database
+    command.downgrade(
+        alembic_cfg,
+        revision="base",
+    )
 
 
-@pytest.fixture(autouse=True)
-async def setup_transaction(db_engine: AsyncEngine) -> AsyncIterator[AsyncConnection]:
+@pytest.fixture()
+async def test_connection() -> AsyncIterator[AsyncConnection]:
     """Set up a transaction inside a database
     connection for each test case."""
-    async with db_engine.connect() as connection:
+    async with engine.connect() as connection:
         # begin database transaction.
         transaction = await connection.begin()
-        # yield connection with transaction.
+
         yield connection
+
         # rollback database transaction.
         await transaction.rollback()
 
