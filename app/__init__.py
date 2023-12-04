@@ -96,6 +96,6 @@ def create_app() -> App:
     """Initialize an ASGI app instance."""
     app = App()
     add_middleware(app)
-    add_routes(app)
     add_error_handlers(app)
+    add_routes(app)
     return app

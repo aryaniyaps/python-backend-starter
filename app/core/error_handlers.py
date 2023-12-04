@@ -1,9 +1,4 @@
-from falcon import (
-    HTTPBadRequest,
-    HTTPInternalServerError,
-    HTTPNotFound,
-    HTTPUnauthorized,
-)
+from falcon import HTTP_400, HTTP_401, HTTP_404, HTTP_500
 from falcon.asgi import Request, Response
 from pydantic import ValidationError
 
@@ -22,9 +17,11 @@ async def handle_validation_error(
     params,
 ) -> None:
     """Handle ValidationError exceptions."""
-    raise HTTPBadRequest(
-        description=ex.json(),
-    )
+    resp.status = HTTP_400
+    resp.media = {
+        "message": "Invalid input detected.",
+        "errors": ex.errors(),
+    }
 
 
 async def handle_invalid_input_error(
@@ -34,9 +31,10 @@ async def handle_invalid_input_error(
     params,
 ) -> None:
     """Handle InvalidInputError expections."""
-    raise HTTPBadRequest(
-        description=ex.message,
-    )
+    resp.status = HTTP_400
+    resp.media = {
+        "message": ex.message,
+    }
 
 
 async def handle_resource_not_found_error(
@@ -46,9 +44,10 @@ async def handle_resource_not_found_error(
     params,
 ) -> None:
     """Handle ResourceNotFound expections."""
-    raise HTTPNotFound(
-        description=ex.message,
-    )
+    resp.status = HTTP_404
+    resp.media = {
+        "message": ex.message,
+    }
 
 
 async def handle_unauthenticated_error(
@@ -58,9 +57,10 @@ async def handle_unauthenticated_error(
     params,
 ) -> None:
     """Handle UnauthenticatedError expections."""
-    raise HTTPUnauthorized(
-        description=ex.message,
-    )
+    resp.status = HTTP_401
+    resp.media = {
+        "message": ex.message,
+    }
 
 
 async def handle_unexpected_error(
@@ -70,6 +70,7 @@ async def handle_unexpected_error(
     params,
 ) -> None:
     """Handle Unexpected expections."""
-    raise HTTPInternalServerError(
-        description=ex.message,
-    )
+    resp.status = HTTP_500
+    resp.media = {
+        "message": ex.message,
+    }
