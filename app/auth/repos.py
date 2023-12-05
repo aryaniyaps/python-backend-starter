@@ -4,7 +4,7 @@ from secrets import token_hex
 from typing import Awaitable
 
 from lagom import bind_to_container, injectable
-from redis import Redis
+from redis.asyncio import Redis
 from sqlalchemy import insert, select, text
 from sqlalchemy.ext.asyncio import AsyncConnection
 
@@ -108,14 +108,7 @@ class AuthRepo:
                 expires_at=expires_at,
                 last_login_at=user_last_login_at,
             )
-            .returning(
-                password_reset_tokens_table.c.id,
-                password_reset_tokens_table.c.user_id,
-                password_reset_tokens_table.c.token_hash,
-                password_reset_tokens_table.c.last_login_at,
-                password_reset_tokens_table.c.created_at,
-                password_reset_tokens_table.c.expires_at,
-            ),
+            .returning(*password_reset_tokens_table.c),
         )
         return reset_token
 
@@ -129,15 +122,10 @@ class AuthRepo:
         """Get a password reset token."""
         connection = await connection_maker
         result = await connection.execute(
-            select(
-                password_reset_tokens_table.c.id,
-                password_reset_tokens_table.c.user_id,
-                password_reset_tokens_table.c.token_hash,
-                password_reset_tokens_table.c.last_login_at,
-                password_reset_tokens_table.c.created_at,
-                password_reset_tokens_table.c.expires_at,
-            ).where(password_reset_tokens_table.c.token_hash == reset_token_hash)
+            select(*password_reset_tokens_table.c).where(
+                password_reset_tokens_table.c.token_hash == reset_token_hash
+            )
         )
-        reset_token_row = result.scalar_one_or_none()
+        reset_token_row = result.one_or_none()
         if reset_token_row:
-            return PasswordResetToken(**reset_token_row)
+            return PasswordResetToken(**reset_token_row._mapping)

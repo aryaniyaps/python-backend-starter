@@ -8,6 +8,7 @@ from app.core.error_handlers import (
     handle_invalid_input_error,
     handle_resource_not_found_error,
     handle_unauthenticated_error,
+    handle_uncaught_exception,
     handle_unexpected_error,
     handle_validation_error,
 )
@@ -17,6 +18,7 @@ from app.core.errors import (
     UnauthenticatedError,
     UnexpectedError,
 )
+from app.core.media_handlers import media_handlers
 from app.users.resources import user_resource
 
 
@@ -90,11 +92,27 @@ def add_error_handlers(app: App) -> None:
         UnexpectedError,
         handle_unexpected_error,
     )
+    app.add_error_handler(
+        Exception,
+        handle_uncaught_exception,
+    )
+
+
+def add_media_handlers(app: App) -> None:
+    """Add media handlers for the app."""
+    app.req_options.media_handlers.update(
+        media_handlers,
+    )
+
+    app.resp_options.media_handlers.update(
+        media_handlers,
+    )
 
 
 def create_app() -> App:
     """Initialize an ASGI app instance."""
     app = App()
+    add_media_handlers(app)
     add_middleware(app)
     add_error_handlers(app)
     add_routes(app)

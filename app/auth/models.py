@@ -21,12 +21,13 @@ class LoginUserInput(BaseModel):
 
     @field_validator("login")
     @classmethod
-    def validate_login(cls, value):
+    def validate_login(cls, value) -> EmailStr | str:
+        """Validate the given login."""
         if "@" in value:
             # if "@" is present, assume it's an email
             return EmailStr(value)
         # assume it's an username
-        return value
+        return str(value)
 
 
 class LoginUserResult(BaseModel):
@@ -35,7 +36,7 @@ class LoginUserResult(BaseModel):
     user: User
 
 
-class CreateUserInput(BaseModel):
+class RegisterUserInput(BaseModel):
     username: Annotated[
         str,
         Field(
@@ -115,7 +116,12 @@ class PasswordResetToken(BaseModel):
 
     user_id: int
 
-    token: str
+    token_hash: Annotated[
+        str,
+        Field(
+            exclude=True,
+        ),
+    ]
 
     last_login_at: datetime
 

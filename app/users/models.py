@@ -11,7 +11,7 @@ class User(BaseModel):
 
     email: str
 
-    password: Annotated[
+    password_hash: Annotated[
         str,
         Field(
             exclude=True,

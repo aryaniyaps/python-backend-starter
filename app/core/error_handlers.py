@@ -1,3 +1,5 @@
+import logging
+
 from falcon import HTTP_400, HTTP_401, HTTP_404, HTTP_500
 from falcon.asgi import Request, Response
 from pydantic import ValidationError
@@ -20,7 +22,11 @@ async def handle_validation_error(
     resp.status = HTTP_400
     resp.media = {
         "message": "Invalid input detected.",
-        "errors": ex.errors(),
+        "errors": ex.errors(
+            include_url=False,
+            include_context=False,
+            include_input=False,
+        ),
     }
 
 
@@ -69,8 +75,22 @@ async def handle_unexpected_error(
     ex: UnexpectedError,
     params,
 ) -> None:
-    """Handle Unexpected expections."""
+    """Handle UnexpectedError expections."""
     resp.status = HTTP_500
     resp.media = {
         "message": ex.message,
+    }
+
+
+async def handle_uncaught_exception(
+    req: Request,
+    resp: Response,
+    ex: Exception,
+    params,
+) -> None:
+    """Handle uncaught expections."""
+    logging.error(ex)
+    resp.status = HTTP_500
+    resp.media = {
+        "message": "An unexpected error occurred.",
     }

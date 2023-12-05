@@ -10,18 +10,18 @@ from app.core.security import password_hasher
 from app.users.repos import UserRepo
 
 from .models import (
-    CreateUserInput,
     CreateUserResult,
     LoginUserInput,
     LoginUserResult,
     PasswordResetInput,
     PasswordResetRequestInput,
+    RegisterUserInput,
 )
 
 
 class AuthService:
     @classmethod
-    async def register_user(cls, data: CreateUserInput) -> CreateUserResult:
+    async def register_user(cls, data: RegisterUserInput) -> CreateUserResult:
         """Register a new user."""
         try:
             if (

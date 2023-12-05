@@ -6,10 +6,10 @@ from app.auth.hooks import login_required
 from app.auth.services import AuthService
 
 from .models import (
-    CreateUserInput,
     LoginUserInput,
     PasswordResetInput,
     PasswordResetRequestInput,
+    RegisterUserInput,
 )
 
 
@@ -22,9 +22,9 @@ class AuthResource:
         """Register a new user."""
         data = await req.media
         result = await AuthService.register_user(
-            data=CreateUserInput.model_validate_json(data),
+            data=RegisterUserInput.model_validate(data),
         )
-        resp.media = result.model_dump_json()
+        resp.media = result.model_dump()
         resp.status = HTTP_201
 
     async def on_post_login(
@@ -33,11 +33,11 @@ class AuthResource:
         resp: Response,
     ) -> None:
         """Login the current user."""
-        data = await req.stream.read()
+        data = await req.media
         result = await AuthService.login_user(
-            data=LoginUserInput.model_validate_json(data),
+            data=LoginUserInput.model_validate(data),
         )
-        resp.media = result.model_dump_json()
+        resp.text = result.model_dump_json()
 
     @before(login_required)
     async def on_post_logout(
@@ -46,7 +46,7 @@ class AuthResource:
         resp: Response,
     ) -> None:
         """Logout the current user."""
-        authentication_token = req.context["authentication_token"]
+        authentication_token: str = req.context["authentication_token"]
         await AuthService.remove_authentication_token(
             authentication_token=authentication_token,
         )
@@ -60,7 +60,7 @@ class AuthResource:
         """Send a password reset request to the given email."""
         data = await req.media
         await AuthService.send_password_reset_request(
-            data=PasswordResetRequestInput.model_validate_json(data),
+            data=PasswordResetRequestInput.model_validate(data),
             user_agent=parse(req.user_agent),
         )
         resp.status = HTTP_204
@@ -73,7 +73,7 @@ class AuthResource:
         """Reset the relevant user's password with the given credentials."""
         data = await req.media
         await AuthService.reset_password(
-            data=PasswordResetInput.model_validate_json(data),
+            data=PasswordResetInput.model_validate(data),
         )
         resp.status = HTTP_204
 

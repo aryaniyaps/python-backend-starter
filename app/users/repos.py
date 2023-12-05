@@ -29,18 +29,10 @@ class UserRepo:
                 email=email,
                 password_hash=password_hash,
             )
-            .returning(
-                users_table.c.id,
-                users_table.c.username,
-                users_table.c.email,
-                users_table.c.password_hash,
-                users_table.c.last_login_at,
-                users_table.c.created_at,
-                users_table.c.updated_at,
-            ),
+            .returning(*users_table.c),
         )
-        user_row = result.scalar_one()
-        return User(**user_row)
+        user_row = result.one()
+        return User(**user_row._mapping)
 
     @classmethod
     @bind_to_container(container=context_container)
@@ -75,18 +67,10 @@ class UserRepo:
             update(users_table)
             .where(users_table.c.id == user_id)
             .values(password_hash=password_hash)
-            .returning(
-                users_table.c.id,
-                users_table.c.username,
-                users_table.c.email,
-                users_table.c.password_hash,
-                users_table.c.last_login_at,
-                users_table.c.created_at,
-                users_table.c.updated_at,
-            ),
+            .returning(*users_table.c),
         )
-        updated_user_row = result.scalar_one()
-        return User(**updated_user_row)
+        updated_user_row = result.one()
+        return User(**updated_user_row._mapping)
 
     @classmethod
     @bind_to_container(container=context_container)
@@ -104,19 +88,11 @@ class UserRepo:
         result = await connection.execute(
             update(users_table)
             .where(users_table.c.id == user_id)
-            .values(last_login_at=text("(NOW()"))
-            .returning(
-                users_table.c.id,
-                users_table.c.username,
-                users_table.c.email,
-                users_table.c.password_hash,
-                users_table.c.last_login_at,
-                users_table.c.created_at,
-                users_table.c.updated_at,
-            ),
+            .values(last_login_at=text("NOW()"))
+            .returning(*users_table.c),
         )
-        updated_user_row = result.scalar_one()
-        return User(**updated_user_row)
+        updated_user_row = result.one()
+        return User(**updated_user_row._mapping)
 
     @classmethod
     @bind_to_container(container=context_container)
@@ -128,19 +104,11 @@ class UserRepo:
         """Get a user by Username."""
         connection = await connection_maker
         result = await connection.execute(
-            select(
-                users_table.c.id,
-                users_table.c.username,
-                users_table.c.email,
-                users_table.c.password_hash,
-                users_table.c.last_login_at,
-                users_table.c.created_at,
-                users_table.c.updated_at,
-            ).where(users_table.c.username == username)
+            select(*users_table.c).where(users_table.c.username == username)
         )
-        user_row = result.scalar_one_or_none()
+        user_row = result.one_or_none()
         if user_row:
-            return User(**user_row)
+            return User(**user_row._mapping)
 
     @classmethod
     @bind_to_container(container=context_container)
@@ -152,19 +120,11 @@ class UserRepo:
         """Get a user by ID."""
         connection = await connection_maker
         result = await connection.execute(
-            select(
-                users_table.c.id,
-                users_table.c.username,
-                users_table.c.email,
-                users_table.c.password_hash,
-                users_table.c.last_login_at,
-                users_table.c.created_at,
-                users_table.c.updated_at,
-            ).where(users_table.c.id == user_id)
+            select(*users_table.c).where(users_table.c.id == user_id)
         )
-        user_row = result.scalar_one_or_none()
+        user_row = result.one_or_none()
         if user_row:
-            return User(**user_row)
+            return User(**user_row._mapping)
 
     @classmethod
     @bind_to_container(container=context_container)
@@ -176,16 +136,8 @@ class UserRepo:
         """Get a user by email."""
         connection = await connection_maker
         result = await connection.execute(
-            select(
-                users_table.c.id,
-                users_table.c.username,
-                users_table.c.email,
-                users_table.c.password_hash,
-                users_table.c.last_login_at,
-                users_table.c.created_at,
-                users_table.c.updated_at,
-            ).where(users_table.c.email == email)
+            select(*users_table.c).where(users_table.c.email == email)
         )
-        user_row = result.scalar_one_or_none()
+        user_row = result.one_or_none()
         if user_row:
-            return User(**user_row)
+            return User(**user_row._mapping)

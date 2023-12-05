@@ -5,13 +5,13 @@ from argon2.exceptions import HashingError
 from user_agents.parsers import UserAgent
 
 from app.auth.models import (
-    CreateUserInput,
     CreateUserResult,
     LoginUserInput,
     LoginUserResult,
     PasswordResetInput,
     PasswordResetRequestInput,
     PasswordResetToken,
+    RegisterUserInput,
 )
 from app.auth.repos import AuthRepo
 from app.auth.services import AuthService
@@ -43,7 +43,7 @@ async def test_register_user_success() -> None:
         return_value="fake_token",
     ):
         result = await AuthService.register_user(
-            CreateUserInput(
+            RegisterUserInput(
                 username="new_user",
                 email="new_user@example.com",
                 password="password",
@@ -62,7 +62,7 @@ async def test_register_user_existing_email() -> None:
             InvalidInputError, match="User with that email already exists."
         ):
             await AuthService.register_user(
-                CreateUserInput(
+                RegisterUserInput(
                     username="new_user",
                     email="new_user@example.com",
                     password="password",
@@ -81,7 +81,7 @@ async def test_register_user_existing_username() -> None:
             InvalidInputError, match="User with that username already exists."
         ):
             await AuthService.register_user(
-                CreateUserInput(
+                RegisterUserInput(
                     username="new_user",
                     email="new_user@example.com",
                     password="password",
@@ -112,7 +112,7 @@ async def test_register_user_hashing_error() -> None:
             UnexpectedError, match="Could not create user. Please try again."
         ):
             await AuthService.register_user(
-                CreateUserInput(
+                RegisterUserInput(
                     username="new_user",
                     email="new_user@example.com",
                     password="password",

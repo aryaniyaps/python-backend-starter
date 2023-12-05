@@ -4,11 +4,9 @@ import pytest
 from alembic import command
 from alembic.config import Config
 from falcon.asgi import App
-from lagom import Container
 from sqlalchemy.ext.asyncio import AsyncConnection
 
 from app import create_app
-from app.core.containers import container
 from app.core.database import engine
 from app.core.security import password_hasher
 from app.users.models import User
