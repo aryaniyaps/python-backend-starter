@@ -1,4 +1,5 @@
-from typing import AsyncIterator
+from asyncio import AbstractEventLoop, get_event_loop
+from typing import AsyncIterator, Iterator
 
 import pytest
 from alembic import command
@@ -8,9 +9,20 @@ from sqlalchemy.ext.asyncio import AsyncConnection
 
 from app import create_app
 from app.core.database import engine
-from app.core.security import password_hasher
 from app.users.models import User
 from app.users.repos import UserRepo
+
+
+@pytest.fixture(scope="session")
+def event_loop() -> Iterator[AbstractEventLoop]:
+    """
+    Get the event loop (Overwriting the existing
+    fixture to give it a session scope, for use with
+    session-scoped fixtures).
+    """
+    loop = get_event_loop()
+    yield loop
+    loop.close()
 
 
 @pytest.fixture(scope="session")
@@ -20,7 +32,7 @@ def app() -> App:
 
 
 @pytest.fixture(scope="session", autouse=True)
-async def setup_test_database() -> AsyncIterator[None]:
+def setup_test_database() -> Iterator[None]:
     """Set up the test database."""
 
     alembic_cfg = Config("alembic.ini")
@@ -55,16 +67,10 @@ async def test_connection() -> AsyncIterator[AsyncConnection]:
 
 
 @pytest.fixture(scope="session")
-async def user() -> AsyncIterator[User]:
+async def user() -> User:
     """Create an user for testing."""
-    user = await UserRepo.create_user(
+    return await UserRepo.create_user(
         username="tester",
         email="tester@example.org",
-        password_hash=password_hasher.hash(
-            password="password",
-        ),
+        password="password",
     )
-
-    yield user
-
-    await UserRepo.delete_user(user_id=user.id)

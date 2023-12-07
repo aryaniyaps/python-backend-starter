@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from falcon import before
 from falcon.asgi import Request, Response
 
@@ -14,22 +16,22 @@ class UserResource:
         resp: Response,
     ) -> None:
         """Get the current user."""
-        current_user_id: int = req.context["current_user_id"]
+        current_user_id: UUID = req.context["current_user_id"]
         result = await UserService.get_user_by_id(
             user_id=current_user_id,
         )
-        resp.text = result.model_dump_json()
+        resp.media = result.model_dump()
 
     @before(login_required)
     async def on_get_user(
         self,
         req: Request,
         resp: Response,
-        user_id: int,
+        user_id: UUID,
     ) -> None:
         """Get the user with the given ID."""
         result = await UserService.get_user_by_id(user_id=user_id)
-        resp.text = result.model_dump_json()
+        resp.media = result.model_dump()
 
 
 user_resource = UserResource()

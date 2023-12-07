@@ -18,12 +18,16 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    op.execute(sa.text('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'))
     op.create_table(
         "users",
         sa.Column(
             "id",
-            sa.Integer(),
+            sa.UUID(as_uuid=True),
             nullable=False,
+            server_default=sa.text(
+                "gen_random_uuid()",
+            ),
         ),
         sa.Column(
             "username",
@@ -83,8 +87,11 @@ def upgrade() -> None:
         "password_reset_tokens",
         sa.Column(
             "id",
-            sa.Integer(),
+            sa.UUID(as_uuid=True),
             nullable=False,
+            server_default=sa.text(
+                "gen_random_uuid()",
+            ),
         ),
         sa.Column(
             "token_hash",
@@ -93,7 +100,7 @@ def upgrade() -> None:
         ),
         sa.Column(
             "user_id",
-            sa.Integer(),
+            sa.UUID(as_uuid=True),
             nullable=False,
         ),
         sa.Column(

@@ -30,7 +30,7 @@ def add_routes(app: App) -> None:
         suffix="current_user",
     )
     app.add_route(
-        "/users/{user_id:int}",
+        "/users/{user_id:uuid}",
         user_resource,
         suffix="user",
     )

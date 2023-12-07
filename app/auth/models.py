@@ -1,14 +1,15 @@
 from datetime import datetime
 from typing import Annotated
+from uuid import UUID
 
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, EmailStr, Field
 
 from app.users.models import User
 
 
 class LoginUserInput(BaseModel):
     login: Annotated[
-        str,
+        str | EmailStr,
         Field(
             examples=[
                 "aryaniyaps",
@@ -18,16 +19,6 @@ class LoginUserInput(BaseModel):
     ]
 
     password: str
-
-    @field_validator("login")
-    @classmethod
-    def validate_login(cls, value) -> EmailStr | str:
-        """Validate the given login."""
-        if "@" in value:
-            # if "@" is present, assume it's an email
-            return EmailStr(value)
-        # assume it's an username
-        return str(value)
 
 
 class LoginUserResult(BaseModel):
@@ -112,9 +103,9 @@ class PasswordResetInput(BaseModel):
 
 
 class PasswordResetToken(BaseModel):
-    id: int
+    id: UUID
 
-    user_id: int
+    user_id: UUID
 
     token_hash: Annotated[
         str,

@@ -2,12 +2,13 @@ from datetime import timedelta
 from hashlib import sha256
 
 import pytest
+from redis.asyncio import Redis
 
 from app.auth.models import PasswordResetToken
 from app.auth.repos import AuthRepo
 from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
+from app.core.containers import container
 from app.core.errors import UnauthenticatedError
-from app.core.redis_client import redis_client
 from app.users.models import User
 
 pytestmark = pytest.mark.asyncio
@@ -20,20 +21,20 @@ async def test_create_authentication_token(user: User) -> None:
     assert isinstance(token, str)
 
 
-async def test_verify_authentication_token_valid(user: User) -> None:
-    """Ensure we can verify an authentication token."""
+async def test_get_user_id_from_authentication_token_valid(user: User) -> None:
+    """Ensure we can get the user ID from an authentication token."""
     token = await AuthRepo.create_authentication_token(user_id=user.id)
 
     # Perform token verification
-    user_id = await AuthRepo.verify_authentication_token(token)
+    user_id = await AuthRepo.get_user_id_from_authentication_token(token)
 
     assert user_id == user.id
 
 
-async def test_verify_authentication_token_invalid() -> None:
-    """Ensure verifying an invalid token raises an error."""
-    with pytest.raises(UnauthenticatedError):
-        await AuthRepo.verify_authentication_token("invalid_token")
+async def test_get_user_id_from_authentication_token_invalid() -> None:
+    """Ensure we don't get an user ID from an invalid token"""
+    user_id = await AuthRepo.get_user_id_from_authentication_token("invalid_token")
+    assert user_id is None
 
 
 async def test_remove_authentication_token(user: User) -> None:
@@ -41,15 +42,26 @@ async def test_remove_authentication_token(user: User) -> None:
     token = await AuthRepo.create_authentication_token(user_id=user.id)
 
     # Perform token removal
-    await AuthRepo.remove_authentication_token(token)
+    await AuthRepo.remove_authentication_token(
+        authentication_token=token,
+        user_id=user.id,
+    )
 
     # Verify that the token is no longer in Redis
+    redis_client = container[Redis]
     assert (
         await redis_client.get(
             AuthRepo.generate_authentication_token_key(token),
         )
         is None
     )
+
+
+# TODO: add tests for remove_all_authentication_tokens
+
+# TODO: add tests for hash_authentication_token
+
+# TODO: add tests for hash_password_reset_token
 
 
 async def test_create_password_reset_token(user: User) -> None:

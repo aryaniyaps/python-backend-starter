@@ -1,10 +1,12 @@
 from typing import Awaitable
+from uuid import UUID
 
 from lagom import bind_to_container, injectable
 from sqlalchemy import delete, insert, select, text, update
 from sqlalchemy.ext.asyncio import AsyncConnection
 
 from app.core.containers import context_container
+from app.core.security import password_hasher
 from app.users.models import User
 
 from .tables import users_table
@@ -17,7 +19,7 @@ class UserRepo:
         cls,
         username: str,
         email: str,
-        password_hash: str,
+        password: str,
         connection_maker: Awaitable[AsyncConnection] = injectable,
     ) -> User:
         """Create a new user."""
@@ -27,18 +29,28 @@ class UserRepo:
             .values(
                 username=username,
                 email=email,
-                password_hash=password_hash,
+                # hash the password before storing
+                password_hash=cls.hash_password(
+                    password=password,
+                ),
             )
             .returning(*users_table.c),
         )
         user_row = result.one()
         return User(**user_row._mapping)
 
+    @staticmethod
+    def hash_password(password: str) -> str:
+        """Hash the given password."""
+        return password_hasher.hash(
+            password=password,
+        )
+
     @classmethod
     @bind_to_container(container=context_container)
     async def delete_user(
         cls,
-        user_id: int,
+        user_id: UUID,
         connection_maker: Awaitable[AsyncConnection] = injectable,
     ) -> None:
         """Delete a user with the given ID."""
@@ -53,7 +65,7 @@ class UserRepo:
     @bind_to_container(container=context_container)
     async def update_user_password(
         cls,
-        user_id: int,
+        user_id: UUID,
         password_hash: str | None = None,
         connection_maker: Awaitable[AsyncConnection] = injectable,
     ) -> User | None:
@@ -76,7 +88,7 @@ class UserRepo:
     @bind_to_container(container=context_container)
     async def update_user_last_login(
         cls,
-        user_id: int,
+        user_id: UUID,
         connection_maker: Awaitable[AsyncConnection] = injectable,
     ) -> User | None:
         """Update the last login timestamp to now for the user with the given ID."""
@@ -114,7 +126,7 @@ class UserRepo:
     @bind_to_container(container=context_container)
     async def get_user_by_id(
         cls,
-        user_id: int,
+        user_id: UUID,
         connection_maker: Awaitable[AsyncConnection] = injectable,
     ) -> User | None:
         """Get a user by ID."""

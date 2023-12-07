@@ -53,6 +53,6 @@ class EmailSender:
 
 
 email_sender = EmailSender(
-    email_server=settings.email_server,
+    email_server=str(settings.email_server),
     email_from=settings.email_from,
 )

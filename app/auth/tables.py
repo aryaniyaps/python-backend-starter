@@ -1,5 +1,5 @@
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table
-from sqlalchemy.sql import func
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, text
+from sqlalchemy.dialects.postgresql import UUID
 
 from app.core.database import database_metadata
 
@@ -8,8 +8,11 @@ password_reset_tokens_table = Table(
     database_metadata,
     Column(
         "id",
-        Integer,
+        UUID(as_uuid=True),
         primary_key=True,
+        server_default=text(
+            "gen_random_uuid()",
+        ),
     ),
     Column(
         "token_hash",
@@ -20,7 +23,7 @@ password_reset_tokens_table = Table(
     ),
     Column(
         "user_id",
-        Integer,
+        UUID(as_uuid=True),
         ForeignKey(
             "users.id",
             ondelete="CASCADE",
@@ -40,7 +43,7 @@ password_reset_tokens_table = Table(
     Column(
         "created_at",
         DateTime(timezone=True),
-        server_default=func.now(),
+        server_default=text("now()"),
         nullable=False,
     ),
 )

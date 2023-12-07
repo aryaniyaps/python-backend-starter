@@ -1,27 +1,29 @@
-import pytest
-from sqlalchemy.ext.asyncio import AsyncConnection
+from uuid import uuid4
 
+import pytest
+
+from app.core.security import password_hasher
 from app.users.models import User
 from app.users.repos import UserRepo
 
 pytestmark = pytest.mark.asyncio
 
 
-async def test_create_user(test_connection: AsyncConnection) -> None:
+async def test_create_user() -> None:
     """Ensure we can create a new user."""
     user = await UserRepo.create_user(
         username="new_user",
         email="new@example.com",
-        password_hash="password_hash",
-        # TODO: pass connection maker as a parameter here
+        password="password",
     )
     assert isinstance(user, User)
     assert user.id is not None
     assert user.username == "new_user"
     assert user.email == "new@example.com"
-    # passwords are not hashed in the repository layer
-    # the hash must be passed as a value directly
-    assert user.password_hash == "password_hash"
+    assert password_hasher.verify(
+        hash=user.password_hash,
+        password="password",
+    )
 
 
 async def test_update_user_password(user: User) -> None:
@@ -58,7 +60,7 @@ async def test_get_user_by_id(user: User) -> None:
 
 async def test_get_user_by_unknown_id() -> None:
     """Ensure we cannot get a user by unknown ID."""
-    retrieved_user = await UserRepo.get_user_by_id(user_id=1001)
+    retrieved_user = await UserRepo.get_user_by_id(user_id=uuid4())
     assert retrieved_user is None
 
 
@@ -86,4 +88,4 @@ async def test_delete_user(user: User) -> None:
 async def test_delete_unknown_user() -> None:
     """Ensure we cannot delete a user by unknown ID."""
     # TODO: check if error is raised here
-    await UserRepo.delete_user(user_id=1001)
+    await UserRepo.delete_user(user_id=uuid4())

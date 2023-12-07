@@ -1,4 +1,5 @@
 from hashlib import sha256
+from uuid import UUID
 
 from argon2.exceptions import HashingError, VerifyMismatchError
 from user_agents.parsers import UserAgent
@@ -45,10 +46,7 @@ class AuthService:
             user = await UserRepo.create_user(
                 username=data.username,
                 email=data.email,
-                # hash password before storing
-                password_hash=password_hasher.hash(
-                    password=data.password,
-                ),
+                password=data.password,
             )
         except HashingError as exception:
             raise UnexpectedError(
@@ -85,7 +83,7 @@ class AuthService:
             )
         try:
             password_hasher.verify(
-                hash=user.password,
+                hash=user.password_hash,
                 password=data.password,
             )
         except VerifyMismatchError as exception:
@@ -93,7 +91,7 @@ class AuthService:
                 message="Invalid credentials provided.",
             ) from exception
         if password_hasher.check_needs_rehash(
-            hash=user.password,
+            hash=user.password_hash,
         ):
             # update user's password hash
             await UserRepo.update_user_password(
@@ -117,12 +115,12 @@ class AuthService:
         )
 
     @classmethod
-    async def verify_authentication_token(cls, authentication_token: str) -> int:
+    async def verify_authentication_token(cls, authentication_token: str) -> UUID:
         """
         Verify the given authentication token and
         return the corresponding user ID.
         """
-        user_id = await AuthRepo.verify_authentication_token(
+        user_id = await AuthRepo.get_user_id_from_authentication_token(
             authentication_token=authentication_token,
         )
 
@@ -133,10 +131,15 @@ class AuthService:
         return user_id
 
     @classmethod
-    async def remove_authentication_token(cls, authentication_token: str) -> None:
-        """Remove the given authentication token."""
+    async def remove_authentication_token(
+        cls,
+        authentication_token: str,
+        user_id: UUID,
+    ) -> None:
+        """Remove the authentication token for the given user ID."""
         await AuthRepo.remove_authentication_token(
             authentication_token=authentication_token,
+            user_id=user_id,
         )
 
     @classmethod
@@ -188,4 +191,9 @@ class AuthService:
             password_hash=password_hasher.hash(
                 password=data.new_password,
             ),
+        )
+
+        # logout user everywhere
+        await AuthRepo.remove_all_authentication_tokens(
+            user_id=existing_user.id,
         )

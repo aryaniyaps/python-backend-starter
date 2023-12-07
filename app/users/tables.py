@@ -1,5 +1,6 @@
-from sqlalchemy import Column, DateTime, Integer, String, Table
-from sqlalchemy.sql import func
+from sqlalchemy import Column, DateTime, String, Table
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.sql import text
 
 from app.core.database import database_metadata
 
@@ -8,9 +9,11 @@ users_table = Table(
     database_metadata,
     Column(
         "id",
-        Integer,
+        UUID(as_uuid=True),
         primary_key=True,
-        index=True,
+        server_default=text(
+            "gen_random_uuid()",
+        ),
     ),
     Column(
         "username",
@@ -35,20 +38,20 @@ users_table = Table(
     Column(
         "last_login_at",
         DateTime(timezone=True),
-        server_default=func.now(),
+        server_default=text("now()"),
         nullable=False,
     ),
     Column(
         "created_at",
         DateTime(timezone=True),
-        server_default=func.now(),
+        server_default=text("now()"),
         nullable=False,
     ),
     Column(
         "updated_at",
         DateTime(timezone=True),
-        server_default=func.now(),
-        onupdate=func.now(),
+        server_default=text("now()"),
+        onupdate=text("now()"),
         nullable=False,
     ),
 )

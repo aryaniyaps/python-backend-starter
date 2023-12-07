@@ -20,7 +20,7 @@ def test_send_password_reset_request_email() -> None:
     browser_name = "Chrome"
 
     # Mock the email_sender.send_email function
-    with patch("app.worker.email_sender.send_email") as mock_send_email:
+    with patch("app.core.emails.email_sender.send_email") as mock_send_email:
         # Call the Celery task directly
         send_password_reset_request_email.apply_async(
             args=[

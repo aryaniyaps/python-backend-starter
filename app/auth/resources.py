@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from falcon import HTTP_201, HTTP_204, before
 from falcon.asgi import Request, Response
 from user_agents import parse
@@ -37,7 +39,7 @@ class AuthResource:
         result = await AuthService.login_user(
             data=LoginUserInput.model_validate(data),
         )
-        resp.text = result.model_dump_json()
+        resp.media = result.model_dump()
 
     @before(login_required)
     async def on_post_logout(
@@ -46,9 +48,11 @@ class AuthResource:
         resp: Response,
     ) -> None:
         """Logout the current user."""
+        current_user_id: UUID = req.context["current_user_id"]
         authentication_token: str = req.context["authentication_token"]
         await AuthService.remove_authentication_token(
             authentication_token=authentication_token,
+            user_id=current_user_id,
         )
         resp.status = HTTP_204
 
