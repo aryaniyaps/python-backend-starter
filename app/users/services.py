@@ -7,10 +7,15 @@ from .repos import UserRepo
 
 
 class UserService:
-    @classmethod
-    async def get_user_by_id(cls, user_id: UUID) -> User:
+    def __init__(
+        self,
+        user_repo: UserRepo,
+    ) -> None:
+        self._user_repo = user_repo
+
+    async def get_user_by_id(self, user_id: UUID) -> User:
         """Get a user by ID."""
-        user = await UserRepo.get_user_by_id(user_id=user_id)
+        user = await self._user_repo.get_user_by_id(user_id=user_id)
         if user is None:
             raise ResourceNotFoundError(
                 message="Couldn't find user with the given ID.",

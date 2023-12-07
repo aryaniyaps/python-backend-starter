@@ -21,12 +21,19 @@ from .models import (
 
 
 class AuthService:
-    @classmethod
-    async def register_user(cls, data: RegisterUserInput) -> CreateUserResult:
+    def __init__(
+        self,
+        auth_repo: AuthRepo,
+        user_repo: UserRepo,
+    ) -> None:
+        self._auth_repo = auth_repo
+        self._user_repo = user_repo
+
+    async def register_user(self, data: RegisterUserInput) -> CreateUserResult:
         """Register a new user."""
         try:
             if (
-                await UserRepo.get_user_by_email(
+                await self._user_repo.get_user_by_email(
                     email=data.email,
                 )
                 is not None
@@ -35,7 +42,7 @@ class AuthService:
                     message="User with that email already exists.",
                 )
             if (
-                await UserRepo.get_user_by_username(
+                await self._user_repo.get_user_by_username(
                     username=data.username,
                 )
                 is not None
@@ -43,7 +50,7 @@ class AuthService:
                 raise InvalidInputError(
                     message="User with that username already exists.",
                 )
-            user = await UserRepo.create_user(
+            user = await self._user_repo.create_user(
                 username=data.username,
                 email=data.email,
                 password=data.password,
@@ -53,7 +60,7 @@ class AuthService:
                 message="Could not create user. Please try again.",
             ) from exception
 
-        authentication_token = await AuthRepo.create_authentication_token(
+        authentication_token = await self._auth_repo.create_authentication_token(
             user_id=user.id
         )
         return CreateUserResult(
@@ -61,20 +68,19 @@ class AuthService:
             user=user,
         )
 
-    @classmethod
-    async def login_user(cls, data: LoginUserInput) -> LoginUserResult:
+    async def login_user(self, data: LoginUserInput) -> LoginUserResult:
         """
         Check the given credentials and return the
         relevant user if they are valid.
         """
         if "@" in data.login:
             # if "@" is present, assume it's an email
-            user = await UserRepo.get_user_by_email(
+            user = await self._user_repo.get_user_by_email(
                 email=data.login,
             )
         else:
             # assume it's an username
-            user = await UserRepo.get_user_by_username(
+            user = await self._user_repo.get_user_by_username(
                 username=data.login,
             )
         if not user:
@@ -94,7 +100,7 @@ class AuthService:
             hash=user.password_hash,
         ):
             # update user's password hash
-            await UserRepo.update_user_password(
+            await self._user_repo.update_user_password(
                 user_id=user.id,
                 password_hash=password_hasher.hash(
                     password=data.password,
@@ -102,25 +108,24 @@ class AuthService:
             )
 
         # create authentication token
-        authentication_token = await AuthRepo.create_authentication_token(
+        authentication_token = await self._auth_repo.create_authentication_token(
             user_id=user.id
         )
 
         # update user's last login timestamp
-        await UserRepo.update_user_last_login(user_id=user.id)
+        await self._user_repo.update_user_last_login(user_id=user.id)
 
         return LoginUserResult(
             authentication_token=authentication_token,
             user=user,
         )
 
-    @classmethod
-    async def verify_authentication_token(cls, authentication_token: str) -> UUID:
+    async def verify_authentication_token(self, authentication_token: str) -> UUID:
         """
         Verify the given authentication token and
         return the corresponding user ID.
         """
-        user_id = await AuthRepo.get_user_id_from_authentication_token(
+        user_id = await self._auth_repo.get_user_id_from_authentication_token(
             authentication_token=authentication_token,
         )
 
@@ -130,28 +135,26 @@ class AuthService:
             )
         return user_id
 
-    @classmethod
     async def remove_authentication_token(
-        cls,
+        self,
         authentication_token: str,
         user_id: UUID,
     ) -> None:
         """Remove the authentication token for the given user ID."""
-        await AuthRepo.remove_authentication_token(
+        await self._auth_repo.remove_authentication_token(
             authentication_token=authentication_token,
             user_id=user_id,
         )
 
-    @classmethod
     async def send_password_reset_request(
-        cls,
+        self,
         data: PasswordResetRequestInput,
         user_agent: UserAgent,
     ) -> None:
         """Send a password reset request to the given email."""
-        existing_user = await UserRepo.get_user_by_email(email=data.email)
+        existing_user = await self._user_repo.get_user_by_email(email=data.email)
         if existing_user is not None:
-            reset_token = await AuthRepo.create_password_reset_token(
+            reset_token = await self._auth_repo.create_password_reset_token(
                 user_id=existing_user.id,
                 last_login_at=existing_user.last_login_at,
             )
@@ -163,13 +166,12 @@ class AuthService:
                 browser_name=user_agent.get_browser(),
             )
 
-    @classmethod
-    async def reset_password(cls, data: PasswordResetInput) -> None:
+    async def reset_password(self, data: PasswordResetInput) -> None:
         """Reset the relevant user's password with the given credentials."""
         reset_token_hash = sha256(data.reset_token.encode()).hexdigest()
 
-        existing_user = await UserRepo.get_user_by_email(email=data.email)
-        password_reset_token = await AuthRepo.get_password_reset_token(
+        existing_user = await self._user_repo.get_user_by_email(email=data.email)
+        password_reset_token = await self._auth_repo.get_password_reset_token(
             reset_token_hash=reset_token_hash
         )
 
@@ -187,7 +189,7 @@ class AuthService:
                 message="Invalid password reset token or email provided."
             )
 
-        await UserRepo.update_user_password(
+        await self._user_repo.update_user_password(
             user_id=existing_user.id,
             password_hash=password_hasher.hash(
                 password=data.new_password,
@@ -195,6 +197,6 @@ class AuthService:
         )
 
         # logout user everywhere
-        await AuthRepo.remove_all_authentication_tokens(
+        await self._auth_repo.remove_all_authentication_tokens(
             user_id=existing_user.id,
         )

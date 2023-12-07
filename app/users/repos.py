@@ -3,7 +3,6 @@ from uuid import UUID
 from sqlalchemy import delete, insert, select, text, update
 from sqlalchemy.ext.asyncio import AsyncConnection
 
-from app.core.containers import container
 from app.core.security import password_hasher
 from app.users.models import User
 
@@ -11,28 +10,31 @@ from .tables import users_table
 
 
 class UserRepo:
-    @classmethod
+    def __init__(
+        self,
+        connection: AsyncConnection,
+    ) -> None:
+        self._connection = connection
+
     async def create_user(
-        cls,
+        self,
         username: str,
         email: str,
         password: str,
     ) -> User:
         """Create a new user."""
-        async with container.context() as context:
-            connection = await context.resolve(AsyncConnection)
-            result = await connection.execute(
-                insert(users_table)
-                .values(
-                    username=username,
-                    email=email,
-                    # hash the password before storing
-                    password_hash=cls.hash_password(
-                        password=password,
-                    ),
-                )
-                .returning(*users_table.c),
+        result = await self._connection.execute(
+            insert(users_table)
+            .values(
+                username=username,
+                email=email,
+                # hash the password before storing
+                password_hash=self.hash_password(
+                    password=password,
+                ),
             )
+            .returning(*users_table.c),
+        )
         user_row = result.one()
         return User(**user_row._mapping)
 
@@ -43,104 +45,86 @@ class UserRepo:
             password=password,
         )
 
-    @classmethod
     async def delete_user(
-        cls,
+        self,
         user_id: UUID,
     ) -> None:
         """Delete a user with the given ID."""
-        async with container.context() as context:
-            connection = await context.resolve(AsyncConnection)
-            await connection.execute(
-                delete(users_table).where(
-                    users_table.c.id == user_id,
-                ),
-            )
+        await self._connection.execute(
+            delete(users_table).where(
+                users_table.c.id == user_id,
+            ),
+        )
 
-    @classmethod
     async def update_user_password(
-        cls,
+        self,
         user_id: UUID,
         password_hash: str | None = None,
     ) -> User | None:
         """Update the password for the user with the given ID."""
-        user = await cls.get_user_by_id(user_id=user_id)
+        user = await self.get_user_by_id(user_id=user_id)
         if not user:
             return
 
-        async with container.context() as context:
-            connection = await context.resolve(AsyncConnection)
-            result = await connection.execute(
-                update(users_table)
-                .where(users_table.c.id == user_id)
-                .values(password_hash=password_hash)
-                .returning(*users_table.c),
-            )
+        result = await self._connection.execute(
+            update(users_table)
+            .where(users_table.c.id == user_id)
+            .values(password_hash=password_hash)
+            .returning(*users_table.c),
+        )
         updated_user_row = result.one()
         return User(**updated_user_row._mapping)
 
-    @classmethod
     async def update_user_last_login(
-        cls,
+        self,
         user_id: UUID,
     ) -> User | None:
         """Update the last login timestamp to now for the user with the given ID."""
-        user = await cls.get_user_by_id(user_id=user_id)
+        user = await self.get_user_by_id(user_id=user_id)
         if not user:
             return
 
-        async with container.context() as context:
-            connection = await context.resolve(AsyncConnection)
-            result = await connection.execute(
-                update(users_table)
-                .where(users_table.c.id == user_id)
-                .values(last_login_at=text("NOW()"))
-                .returning(*users_table.c),
-            )
+        result = await self._connection.execute(
+            update(users_table)
+            .where(users_table.c.id == user_id)
+            .values(last_login_at=text("NOW()"))
+            .returning(*users_table.c),
+        )
         updated_user_row = result.one()
         return User(**updated_user_row._mapping)
 
-    @classmethod
     async def get_user_by_username(
-        cls,
+        self,
         username: str,
     ) -> User | None:
         """Get a user by Username."""
-        async with container.context() as context:
-            connection = await context.resolve(AsyncConnection)
-            result = await connection.execute(
-                select(*users_table.c).where(users_table.c.username == username)
-            )
+        result = await self._connection.execute(
+            select(*users_table.c).where(users_table.c.username == username)
+        )
         user_row = result.one_or_none()
         if user_row:
             return User(**user_row._mapping)
 
-    @classmethod
     async def get_user_by_id(
-        cls,
+        self,
         user_id: UUID,
     ) -> User | None:
         """Get a user by ID."""
-        async with container.context() as context:
-            connection = await context.resolve(AsyncConnection)
-            result = await connection.execute(
-                select(*users_table.c).where(users_table.c.id == user_id)
-            )
+        result = await self._connection.execute(
+            select(*users_table.c).where(users_table.c.id == user_id)
+        )
         user_row = result.one_or_none()
         if user_row:
             return User(**user_row._mapping)
 
-    @classmethod
     async def get_user_by_email(
-        cls,
+        self,
         email: str,
     ) -> User | None:
         """Get a user by email."""
-        async with container.context() as context:
-            connection = await context.resolve(AsyncConnection)
-            result = await connection.execute(
-                select(*users_table.c).where(users_table.c.email == email)
-            )
+        result = await self._connection.execute(
+            select(*users_table.c).where(users_table.c.email == email)
+        )
         user_row = result.one_or_none()
         if user_row:
             return User(**user_row._mapping)
