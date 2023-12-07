@@ -18,6 +18,7 @@ dependencies = [
     "user-agents>=2.2.0",
     "humanize>=4.9.0",
     "orjson>=3.9.10",
+    "aioinject>=0.15.1",
 ]
 requires-python = ">=3.12"
 readme = "README.md"

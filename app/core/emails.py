@@ -4,8 +4,6 @@ from smtplib import SMTP
 
 from pydantic_core import Url
 
-from app.config import settings
-
 
 class EmailSender:
     def __init__(self, email_server: Url, email_from: str) -> None:
@@ -49,9 +47,3 @@ class EmailSender:
         """Close the SMTP connection."""
         if self.server:
             self.server.quit()
-
-
-email_sender = EmailSender(
-    email_server=settings.email_server,
-    email_from=settings.email_from,
-)

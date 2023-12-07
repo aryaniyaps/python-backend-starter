@@ -3,7 +3,7 @@ from uuid import UUID
 from sqlalchemy import delete, insert, select, text, update
 from sqlalchemy.ext.asyncio import AsyncConnection
 
-from app.containers import container
+from app.core.containers import container
 from app.core.security import password_hasher
 from app.users.models import User
 
@@ -19,7 +19,8 @@ class UserRepo:
         password: str,
     ) -> User:
         """Create a new user."""
-        async with container.resolve(AsyncConnection) as connection:
+        async with container.context() as context:
+            connection = await context.resolve(AsyncConnection)
             result = await connection.execute(
                 insert(users_table)
                 .values(
@@ -48,7 +49,8 @@ class UserRepo:
         user_id: UUID,
     ) -> None:
         """Delete a user with the given ID."""
-        async with container.resolve(AsyncConnection) as connection:
+        async with container.context() as context:
+            connection = await context.resolve(AsyncConnection)
             await connection.execute(
                 delete(users_table).where(
                     users_table.c.id == user_id,
@@ -66,7 +68,8 @@ class UserRepo:
         if not user:
             return
 
-        async with container.resolve(AsyncConnection) as connection:
+        async with container.context() as context:
+            connection = await context.resolve(AsyncConnection)
             result = await connection.execute(
                 update(users_table)
                 .where(users_table.c.id == user_id)
@@ -86,7 +89,8 @@ class UserRepo:
         if not user:
             return
 
-        async with container.resolve(AsyncConnection) as connection:
+        async with container.context() as context:
+            connection = await context.resolve(AsyncConnection)
             result = await connection.execute(
                 update(users_table)
                 .where(users_table.c.id == user_id)
@@ -102,7 +106,8 @@ class UserRepo:
         username: str,
     ) -> User | None:
         """Get a user by Username."""
-        async with container.resolve(AsyncConnection) as connection:
+        async with container.context() as context:
+            connection = await context.resolve(AsyncConnection)
             result = await connection.execute(
                 select(*users_table.c).where(users_table.c.username == username)
             )
@@ -116,7 +121,8 @@ class UserRepo:
         user_id: UUID,
     ) -> User | None:
         """Get a user by ID."""
-        async with container.resolve(AsyncConnection) as connection:
+        async with container.context() as context:
+            connection = await context.resolve(AsyncConnection)
             result = await connection.execute(
                 select(*users_table.c).where(users_table.c.id == user_id)
             )
@@ -130,7 +136,8 @@ class UserRepo:
         email: str,
     ) -> User | None:
         """Get a user by email."""
-        async with container.resolve(AsyncConnection) as connection:
+        async with container.context() as context:
+            connection = await context.resolve(AsyncConnection)
             result = await connection.execute(
                 select(*users_table.c).where(users_table.c.email == email)
             )

@@ -1,7 +1,8 @@
 from urllib.parse import urlencode, urljoin
 
 from app.core.constants import APP_URL
-from app.core.emails import email_sender
+from app.core.containers import container
+from app.core.emails import EmailSender
 from app.core.templates import reset_password_html, reset_password_text
 from app.worker import worker
 
@@ -27,6 +28,9 @@ def send_password_reset_request_email(
             }
         )
     )
+
+    with container.sync_context() as context:
+        email_sender = context.resolve(EmailSender)
 
     email_sender.send_email(
         to=to,

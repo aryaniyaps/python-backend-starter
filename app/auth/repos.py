@@ -8,8 +8,8 @@ from sqlalchemy import insert, select, text
 from sqlalchemy.ext.asyncio import AsyncConnection
 
 from app.auth.models import PasswordResetToken
-from app.containers import container
 from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
+from app.core.containers import container
 
 from .tables import password_reset_tokens_table
 
@@ -21,7 +21,8 @@ class AuthRepo:
         user_id: UUID,
     ) -> str:
         """Create a new authentication token."""
-        redis_client = container.resolve(Redis)
+        with container.sync_context() as context:
+            redis_client = context.resolve(Redis)
         authentication_token = cls.generate_authentication_token()
         # hash authentication token before storing
         authentication_token_hash = cls.hash_authentication_token(
@@ -68,7 +69,8 @@ class AuthRepo:
         authentication_token: str,
     ) -> UUID | None:
         """Get the user ID from the authentication token."""
-        redis_client = container.resolve(Redis)
+        with container.sync_context() as context:
+            redis_client = context.resolve(Redis)
         user_id = await redis_client.get(
             name=cls.generate_authentication_token_key(
                 authentication_token_hash=cls.hash_authentication_token(
@@ -86,7 +88,8 @@ class AuthRepo:
         user_id: UUID,
     ) -> None:
         """Remove the given authentication token."""
-        redis_client = container.resolve(Redis)
+        with container.sync_context() as context:
+            redis_client = context.resolve(Redis)
         authentication_token_hash = cls.hash_authentication_token(
             authentication_token=authentication_token,
         )
@@ -108,7 +111,8 @@ class AuthRepo:
         user_id: UUID,
     ) -> None:
         """Remove all authentication tokens for the given user ID."""
-        redis_client = container.resolve(Redis)
+        with container.sync_context() as context:
+            redis_client = context.resolve(Redis)
         authentication_token_hashes = await redis_client.get(
             name=cls.generate_token_owner_key(
                 user_id=user_id,
@@ -154,7 +158,8 @@ class AuthRepo:
             password_reset_token=reset_token,
         )
 
-        async with container.resolve(AsyncConnection) as connection:
+        async with container.context() as context:
+            connection = await context.resolve(AsyncConnection)
             await connection.execute(
                 insert(password_reset_tokens_table)
                 .values(
@@ -173,7 +178,8 @@ class AuthRepo:
         reset_token_hash: str,
     ) -> PasswordResetToken | None:
         """Get a password reset token."""
-        async with container.resolve(AsyncConnection) as connection:
+        async with container.context() as context:
+            connection = await context.resolve(AsyncConnection)
             result = await connection.execute(
                 select(*password_reset_tokens_table.c).where(
                     password_reset_tokens_table.c.token_hash == reset_token_hash
