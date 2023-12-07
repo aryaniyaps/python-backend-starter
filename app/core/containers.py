@@ -5,9 +5,13 @@ from aioinject import Container, providers
 from redis.asyncio import Redis, from_url
 from sqlalchemy.ext.asyncio import AsyncConnection
 
+from app.auth.repos import AuthRepo
+from app.auth.services import AuthService
 from app.config import settings
 from app.core.database import engine
 from app.core.emails import EmailSender
+from app.users.repos import UserRepo
+from app.users.services import UserService
 
 
 @asynccontextmanager
@@ -49,6 +53,26 @@ def register_dependencies(container: Container) -> None:
     container.register(
         provider=providers.Singleton(
             get_email_sender,
+        )
+    )
+    container.register(
+        provider=providers.Callable(
+            AuthRepo,
+        )
+    )
+    container.register(
+        provider=providers.Callable(
+            AuthService,
+        )
+    )
+    container.register(
+        provider=providers.Callable(
+            UserRepo,
+        )
+    )
+    container.register(
+        provider=providers.Callable(
+            UserService,
         )
     )
 
