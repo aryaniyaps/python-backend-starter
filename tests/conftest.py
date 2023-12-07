@@ -1,28 +1,25 @@
 from asyncio import AbstractEventLoop, get_event_loop
+from contextlib import asynccontextmanager
 from typing import AsyncIterator, Iterator
 
 import pytest
+from aioinject import providers
 from alembic import command
 from alembic.config import Config
 from falcon.asgi import App
 from sqlalchemy.ext.asyncio import AsyncConnection
 
 from app import create_app
+from app.core.containers import container
 from app.core.database import engine
 from app.users.models import User
 from app.users.repos import UserRepo
 
 
 @pytest.fixture(scope="session")
-def event_loop() -> Iterator[AbstractEventLoop]:
-    """
-    Get the event loop (Overwriting the existing
-    fixture to give it a session scope, for use with
-    session-scoped fixtures).
-    """
-    loop = get_event_loop()
-    yield loop
-    loop.close()
+def event_loop() -> AbstractEventLoop:
+    """Get the event loop."""
+    return get_event_loop()
 
 
 @pytest.fixture(scope="session")
@@ -52,20 +49,6 @@ def setup_test_database() -> Iterator[None]:
     )
 
 
-@pytest.fixture(autouse=True)
-async def test_connection() -> AsyncIterator[AsyncConnection]:
-    """Set up a transaction inside a database
-    connection for each test case."""
-    async with engine.connect() as connection:
-        # begin database transaction.
-        transaction = await connection.begin()
-
-        yield connection
-
-        # rollback database transaction.
-        await transaction.rollback()
-
-
 @pytest.fixture(scope="session")
 async def user() -> User:
     """Create an user for testing."""
@@ -74,3 +57,36 @@ async def user() -> User:
         email="tester@example.org",
         password="password",
     )
+
+
+@asynccontextmanager
+async def get_test_database_connection() -> AsyncIterator[AsyncConnection]:
+    """
+    Get a database conenction with a transaction
+    setup inside for each test case.
+    """
+    async with engine.connect() as connection:
+        # begin database transaction
+        transaction = await connection.begin()
+
+        yield connection
+
+        # rollback database transaction
+        await transaction.rollback()
+
+
+# FIXME: the issue is, as soon as the function call gets over
+# example: UserRepo.create_user, the connection dependency closes.
+# thus the connection rolls back and the user is removed from the
+# database. This is making tests fail.
+
+
+@pytest.fixture(scope="function", autouse=True)
+def setup_test_container() -> Iterator[None]:
+    """Set up the container for testing."""
+    with container.override(
+        provider=providers.Callable(
+            get_test_database_connection,
+        ),
+    ):
+        yield
