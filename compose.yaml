@@ -24,6 +24,7 @@ services:
     ports:
       - "5672:5672"
     environment:
+      - RABBITMQ_VHOST=tasks
       - RABBITMQ_USERNAME=user
       - RABBITMQ_PASSWORD=pass
     volumes:

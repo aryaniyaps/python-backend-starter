@@ -41,7 +41,7 @@ async def test_update_user_password(user: User) -> None:
 async def test_get_user_by_username(user: User) -> None:
     """Ensure we can get a user by username."""
     retrieved_user = await UserRepo.get_user_by_username(username=user.username)
-    assert retrieved_user
+    assert retrieved_user is not None
     assert retrieved_user == user
 
 
@@ -67,7 +67,7 @@ async def test_get_user_by_unknown_id() -> None:
 async def test_get_user_by_email(user: User) -> None:
     """Ensure we can get a user by email."""
     retrieved_user = await UserRepo.get_user_by_email(email=user.email)
-    assert retrieved_user
+    assert retrieved_user is not None
     assert retrieved_user == user
 
 

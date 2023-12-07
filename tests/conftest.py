@@ -52,7 +52,7 @@ def setup_test_database() -> Iterator[None]:
     )
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True)
 async def test_connection() -> AsyncIterator[AsyncConnection]:
     """Set up a transaction inside a database
     connection for each test case."""

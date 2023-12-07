@@ -1,30 +1,27 @@
 from datetime import datetime
 from hashlib import sha256
 from secrets import token_hex
-from typing import Awaitable
 from uuid import UUID
 
-from lagom import bind_to_container, injectable
 from redis.asyncio import Redis
 from sqlalchemy import insert, select, text
 from sqlalchemy.ext.asyncio import AsyncConnection
 
 from app.auth.models import PasswordResetToken
+from app.containers import container
 from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
-from app.core.containers import context_container
 
 from .tables import password_reset_tokens_table
 
 
 class AuthRepo:
     @classmethod
-    @bind_to_container(container=context_container)
     async def create_authentication_token(
         cls,
         user_id: UUID,
-        redis_client: Redis = injectable,
     ) -> str:
         """Create a new authentication token."""
+        redis_client = container.resolve(Redis)
         authentication_token = cls.generate_authentication_token()
         # hash authentication token before storing
         authentication_token_hash = cls.hash_authentication_token(
@@ -66,13 +63,12 @@ class AuthRepo:
         return sha256(authentication_token.encode()).hexdigest()
 
     @classmethod
-    @bind_to_container(container=context_container)
     async def get_user_id_from_authentication_token(
         cls,
         authentication_token: str,
-        redis_client: Redis = injectable,
     ) -> UUID | None:
         """Get the user ID from the authentication token."""
+        redis_client = container.resolve(Redis)
         user_id = await redis_client.get(
             name=cls.generate_authentication_token_key(
                 authentication_token_hash=cls.hash_authentication_token(
@@ -84,14 +80,13 @@ class AuthRepo:
             return UUID(bytes=user_id)
 
     @classmethod
-    @bind_to_container(container=context_container)
     async def remove_authentication_token(
         cls,
         authentication_token: str,
         user_id: UUID,
-        redis_client: Redis = injectable,
     ) -> None:
         """Remove the given authentication token."""
+        redis_client = container.resolve(Redis)
         authentication_token_hash = cls.hash_authentication_token(
             authentication_token=authentication_token,
         )
@@ -108,13 +103,12 @@ class AuthRepo:
         )  # type: ignore
 
     @classmethod
-    @bind_to_container(container=context_container)
     async def remove_all_authentication_tokens(
         cls,
         user_id: UUID,
-        redis_client: Redis = injectable,
     ) -> None:
         """Remove all authentication tokens for the given user ID."""
+        redis_client = container.resolve(Redis)
         authentication_token_hashes = await redis_client.get(
             name=cls.generate_token_owner_key(
                 user_id=user_id,
@@ -144,12 +138,10 @@ class AuthRepo:
         return sha256(password_reset_token.encode()).hexdigest()
 
     @classmethod
-    @bind_to_container(container=context_container)
     async def create_password_reset_token(
         cls,
         user_id: UUID,
         last_login_at: datetime,
-        connection_maker: Awaitable[AsyncConnection] = injectable,
     ) -> str:
         """Create a new password reset token."""
         expires_at = text(
@@ -162,33 +154,31 @@ class AuthRepo:
             password_reset_token=reset_token,
         )
 
-        connection = await connection_maker
-        await connection.execute(
-            insert(password_reset_tokens_table)
-            .values(
-                user_id=user_id,
-                token_hash=reset_token_hash,
-                expires_at=expires_at,
-                last_login_at=last_login_at,
+        async with container.resolve(AsyncConnection) as connection:
+            await connection.execute(
+                insert(password_reset_tokens_table)
+                .values(
+                    user_id=user_id,
+                    token_hash=reset_token_hash,
+                    expires_at=expires_at,
+                    last_login_at=last_login_at,
+                )
+                .returning(*password_reset_tokens_table.c),
             )
-            .returning(*password_reset_tokens_table.c),
-        )
         return reset_token
 
     @classmethod
-    @bind_to_container(container=context_container)
     async def get_password_reset_token(
         cls,
         reset_token_hash: str,
-        connection_maker: Awaitable[AsyncConnection] = injectable,
     ) -> PasswordResetToken | None:
         """Get a password reset token."""
-        connection = await connection_maker
-        result = await connection.execute(
-            select(*password_reset_tokens_table.c).where(
-                password_reset_tokens_table.c.token_hash == reset_token_hash
+        async with container.resolve(AsyncConnection) as connection:
+            result = await connection.execute(
+                select(*password_reset_tokens_table.c).where(
+                    password_reset_tokens_table.c.token_hash == reset_token_hash
+                )
             )
-        )
         reset_token_row = result.one_or_none()
         if reset_token_row:
             return PasswordResetToken(**reset_token_row._mapping)

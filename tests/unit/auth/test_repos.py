@@ -6,8 +6,8 @@ from redis.asyncio import Redis
 
 from app.auth.models import PasswordResetToken
 from app.auth.repos import AuthRepo
+from app.containers import container
 from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
-from app.core.containers import container
 from app.users.models import User
 
 pytestmark = pytest.mark.asyncio
@@ -47,7 +47,7 @@ async def test_remove_authentication_token(user: User) -> None:
     )
 
     # Verify that the token is no longer in Redis
-    redis_client = container[Redis]
+    redis_client = container.resolve(Redis)
     assert (
         await redis_client.get(
             AuthRepo.generate_authentication_token_key(token),

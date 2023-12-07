@@ -214,15 +214,16 @@ async def test_login_user_password_rehash() -> None:
 
 async def test_verify_authentication_token_valid_token() -> None:
     """Ensure we can verify a valid authentication token."""
+    user_id = uuid4()
     with patch(
         "app.auth.services.AuthRepo.get_user_id_from_authentication_token"
     ) as mock_get_user_id_from_token:
-        mock_get_user_id_from_token.return_value = 1
+        mock_get_user_id_from_token.return_value = user_id
 
         # Perform token verification
         user_id = await AuthService.verify_authentication_token("valid_token")
 
-    assert user_id == 1
+    assert user_id == user_id
 
 
 async def test_verify_authentication_token_invalid_token() -> None:

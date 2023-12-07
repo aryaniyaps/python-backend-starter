@@ -15,7 +15,6 @@ async def test_on_get_current_user_authenticated(
 
     assert response.status == HTTP_200
 
-    assert "username" in response.content
     assert response.content == user.model_dump_json()
 
 
@@ -33,7 +32,6 @@ async def test_on_get_user_authenticated(
     response = await auth_conductor.simulate_get(f"/users/{user.id}")
 
     assert response.status == HTTP_200
-    assert "username" in response.content
     assert response.content == user.model_dump_json()
 
 
