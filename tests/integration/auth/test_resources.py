@@ -132,7 +132,7 @@ async def test_on_post_reset_password_success(
     """Ensure we can successfully reset a user's password."""
     reset_token = await AuthRepo.create_password_reset_token(
         user_id=user.id,
-        user_last_login_at=user.last_login_at,
+        last_login_at=user.last_login_at,
     )
     reset_data = {
         "email": user.email,

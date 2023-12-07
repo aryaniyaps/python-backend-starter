@@ -8,7 +8,6 @@ from app.auth.models import PasswordResetToken
 from app.auth.repos import AuthRepo
 from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
 from app.core.containers import container
-from app.core.errors import UnauthenticatedError
 from app.users.models import User
 
 pytestmark = pytest.mark.asyncio
@@ -69,21 +68,17 @@ async def test_create_password_reset_token(user: User) -> None:
 
     reset_token = await AuthRepo.create_password_reset_token(
         user_id=user.id,
-        user_last_login_at=user.last_login_at,
+        last_login_at=user.last_login_at,
     )
 
-    assert isinstance(reset_token, PasswordResetToken)
-    assert reset_token.user_id == user.id
-    assert reset_token.expires_at - reset_token.created_at == timedelta(
-        seconds=PASSWORD_RESET_TOKEN_EXPIRES_IN,
-    )
+    assert isinstance(reset_token, str)
 
 
 async def test_get_password_reset_token(user: User) -> None:
     """Ensure getting a password reset token works."""
     reset_token = await AuthRepo.create_password_reset_token(
         user_id=user.id,
-        user_last_login_at=user.last_login_at,
+        last_login_at=user.last_login_at,
     )
 
     reset_token_hash = sha256(reset_token.encode()).hexdigest()
@@ -92,8 +87,15 @@ async def test_get_password_reset_token(user: User) -> None:
         reset_token_hash=reset_token_hash,
     )
 
-    assert isinstance(reset_token, PasswordResetToken)
-    assert reset_token == retrieved_reset_token
+    assert isinstance(retrieved_reset_token, PasswordResetToken)
+    assert retrieved_reset_token.token_hash == reset_token_hash
+    assert retrieved_reset_token.user_id == user.id
+    assert (
+        retrieved_reset_token.expires_at - retrieved_reset_token.created_at
+        == timedelta(
+            seconds=PASSWORD_RESET_TOKEN_EXPIRES_IN,
+        )
+    )
 
 
 async def test_get_password_reset_token_not_found() -> None:

@@ -1,19 +1,18 @@
 from email.message import EmailMessage
 from email.mime.text import MIMEText
 from smtplib import SMTP
-from urllib.parse import urlparse
+
+from pydantic_core import Url
 
 from app.config import settings
 
 
 class EmailSender:
-    def __init__(self, email_server: str, email_from: str) -> None:
-        # Parse the email_server string
-        parsed_url = urlparse(email_server)
-        self.smtp_host = parsed_url.hostname
-        self.smtp_port = parsed_url.port
-        self.username = parsed_url.username
-        self.password = parsed_url.password
+    def __init__(self, email_server: Url, email_from: str) -> None:
+        self.smtp_host = email_server.host
+        self.smtp_port = email_server.port
+        self.username = email_server.username
+        self.password = email_server.password
 
         self.email_from = email_from
 
@@ -53,6 +52,6 @@ class EmailSender:
 
 
 email_sender = EmailSender(
-    email_server=str(settings.email_server),
+    email_server=settings.email_server,
     email_from=settings.email_from,
 )

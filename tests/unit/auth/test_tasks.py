@@ -24,7 +24,8 @@ def test_send_password_reset_request_email() -> None:
         # Call the Celery task directly
         send_password_reset_request_email.apply_async(
             args=[
-                user,
+                user.email,
+                user.username,
                 password_reset_token,
                 operating_system,
                 browser_name,

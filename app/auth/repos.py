@@ -34,7 +34,7 @@ class AuthRepo:
             name=cls.generate_authentication_token_key(
                 authentication_token_hash=authentication_token_hash,
             ),
-            value=str(user_id),
+            value=user_id.bytes,
         )
         await redis_client.sadd(
             cls.generate_token_owner_key(
@@ -80,7 +80,8 @@ class AuthRepo:
                 ),
             )
         )
-        return UUID(user_id)
+        if user_id is not None:
+            return UUID(bytes=user_id)
 
     @classmethod
     @bind_to_container(container=context_container)
@@ -147,12 +148,12 @@ class AuthRepo:
     async def create_password_reset_token(
         cls,
         user_id: UUID,
-        user_last_login_at: datetime,
+        last_login_at: datetime,
         connection_maker: Awaitable[AsyncConnection] = injectable,
     ) -> str:
         """Create a new password reset token."""
-        expires_at = text("NOW() + INTERVAL ':expires_in SECOND'").bindparams(
-            expires_in=PASSWORD_RESET_TOKEN_EXPIRES_IN
+        expires_at = text(
+            f"NOW() + INTERVAL '{PASSWORD_RESET_TOKEN_EXPIRES_IN} SECOND'"
         )
 
         reset_token = cls.generate_password_reset_token()
@@ -168,7 +169,7 @@ class AuthRepo:
                 user_id=user_id,
                 token_hash=reset_token_hash,
                 expires_at=expires_at,
-                last_login_at=user_last_login_at,
+                last_login_at=last_login_at,
             )
             .returning(*password_reset_tokens_table.c),
         )

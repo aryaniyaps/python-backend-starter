@@ -153,10 +153,11 @@ class AuthService:
         if existing_user is not None:
             reset_token = await AuthRepo.create_password_reset_token(
                 user_id=existing_user.id,
-                user_last_login_at=existing_user.last_login_at,
+                last_login_at=existing_user.last_login_at,
             )
             send_password_reset_request_email.delay(
-                user=existing_user,
+                to=existing_user.email,
+                username=existing_user.username,
                 password_reset_token=reset_token,
                 operating_system=user_agent.get_os(),
                 browser_name=user_agent.get_browser(),

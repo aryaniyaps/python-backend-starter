@@ -263,14 +263,18 @@ async def test_send_password_reset_request_success() -> None:
         get_browser=MagicMock(return_value="Chrome"),
     )
 
+    mock_user = MagicMock(
+        spec=User,
+        id=uuid4(),
+        email="user@example.com",
+        username="username",
+        last_login_at=datetime.now(),
+    )
+
     with patch.object(
         UserRepo,
         "get_user_by_email",
-        return_value=MagicMock(
-            spec=User,
-            id=uuid4(),
-            last_login_at=datetime.now(),
-        ),
+        return_value=mock_user,
     ), patch.object(
         AuthRepo, "create_password_reset_token", return_value="reset_token"
     ), patch(
@@ -279,13 +283,14 @@ async def test_send_password_reset_request_success() -> None:
         mock_send_email.return_value = None
         await AuthService.send_password_reset_request(
             PasswordResetRequestInput(
-                email="user@example.com",
+                email=mock_user.email,
             ),
             user_agent,
         )
 
     mock_send_email.assert_called_once_with(
-        user=MagicMock(spec=User),
+        to=mock_user.email,
+        username=mock_user.username,
         password_reset_token="reset_token",
         operating_system=user_agent.get_os(),
         browser_name=user_agent.get_browser(),
@@ -294,9 +299,6 @@ async def test_send_password_reset_request_success() -> None:
 
 async def test_send_password_reset_request_user_not_found() -> None:
     """Ensure we cannot send a password reset request for a non-existing user."""
-    password_reset_request_input = PasswordResetRequestInput(
-        email="nonexistent@example.com"
-    )
     user_agent = MagicMock(
         spec=UserAgent,
         get_os=MagicMock(return_value="Windows"),
@@ -305,7 +307,7 @@ async def test_send_password_reset_request_user_not_found() -> None:
 
     with patch.object(UserRepo, "get_user_by_email", return_value=None):
         await AuthService.send_password_reset_request(
-            password_reset_request_input, user_agent
+            PasswordResetRequestInput(email="nonexistent@example.com"), user_agent
         )
         # TODO: assert password reset email was not sent
         # and password reset token was not created
