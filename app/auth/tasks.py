@@ -1,19 +1,23 @@
+from typing import Annotated
 from urllib.parse import urlencode, urljoin
 
+from aioinject import Inject, inject
+
 from app.core.constants import APP_URL
-from app.core.containers import container
 from app.core.emails import EmailSender
 from app.core.templates import reset_password_html, reset_password_text
 from app.worker import worker
 
 
 @worker.task
+@inject
 def send_password_reset_request_email(
     to: str,
     username: str,
     password_reset_token: str,
     operating_system: str,
     browser_name: str,
+    email_sender: Annotated[EmailSender, Inject],
 ) -> None:
     """Sends a password reset request email to the given user."""
 
@@ -28,9 +32,6 @@ def send_password_reset_request_email(
             }
         )
     )
-
-    with container.sync_context() as context:
-        email_sender = context.resolve(EmailSender)
 
     email_sender.send_email(
         to=to,

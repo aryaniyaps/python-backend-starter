@@ -1,14 +1,19 @@
+from typing import Annotated
+
+from aioinject import Inject, inject
 from falcon.asgi import Request, Response
 
 from app.auth.services import AuthService
 from app.core.errors import UnauthenticatedError
 
 
+@inject
 async def login_required(
     req: Request,
     resp: Response,
     resource,
     params,
+    auth_service: Annotated[AuthService, Inject],
 ) -> None:
     """Ensure that the current user is logged in."""
     authentication_token = req.get_header("X-Authentication-Token")
@@ -18,7 +23,7 @@ async def login_required(
         )
 
     # Verify the token and get the current user ID
-    user_id = await AuthService.verify_authentication_token(
+    user_id = await auth_service.verify_authentication_token(
         authentication_token=authentication_token,
     )
 
