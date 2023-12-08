@@ -176,4 +176,4 @@ class AuthRepo:
         )
         reset_token_row = result.one_or_none()
         if reset_token_row:
-            return PasswordResetToken(**reset_token_row._mapping)
+            return PasswordResetToken.model_validate(reset_token_row)

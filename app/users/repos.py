@@ -36,7 +36,7 @@ class UserRepo:
             .returning(*users_table.c),
         )
         user_row = result.one()
-        return User(**user_row._mapping)
+        return User.model_validate(user_row)
 
     @staticmethod
     def hash_password(password: str) -> str:
@@ -62,7 +62,7 @@ class UserRepo:
             .returning(*users_table.c),
         )
         updated_user_row = result.one()
-        return User(**updated_user_row._mapping)
+        return User.model_validate(updated_user_row)
 
     async def update_user_last_login(
         self,
@@ -80,7 +80,7 @@ class UserRepo:
             .returning(*users_table.c),
         )
         updated_user_row = result.one()
-        return User(**updated_user_row._mapping)
+        return User.model_validate(updated_user_row)
 
     async def get_user_by_username(
         self,
@@ -92,7 +92,7 @@ class UserRepo:
         )
         user_row = result.one_or_none()
         if user_row:
-            return User(**user_row._mapping)
+            return User.model_validate(user_row)
 
     async def get_user_by_id(
         self,
@@ -104,7 +104,7 @@ class UserRepo:
         )
         user_row = result.one_or_none()
         if user_row:
-            return User(**user_row._mapping)
+            return User.model_validate(user_row)
 
     async def get_user_by_email(
         self,
@@ -116,4 +116,4 @@ class UserRepo:
         )
         user_row = result.one_or_none()
         if user_row:
-            return User(**user_row._mapping)
+            return User.model_validate(user_row)

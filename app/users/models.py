@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class User(BaseModel):
@@ -24,3 +24,7 @@ class User(BaseModel):
     created_at: datetime
 
     updated_at: datetime
+
+    model_config = ConfigDict(
+        from_attributes=True,
+    )

@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from app.users.models import User
 
@@ -119,3 +119,7 @@ class PasswordResetToken(BaseModel):
     created_at: datetime
 
     expires_at: datetime
+
+    model_config = ConfigDict(
+        from_attributes=True,
+    )
