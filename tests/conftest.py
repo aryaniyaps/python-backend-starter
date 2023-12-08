@@ -7,13 +7,21 @@ from aioinject import providers
 from alembic import command
 from alembic.config import Config
 from falcon.asgi import App
+from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncConnection
 
 from app import create_app
+from app.auth.repos import AuthRepo
+from app.auth.services import AuthService
 from app.core.containers import container
 from app.core.database import engine
 from app.users.models import User
 from app.users.repos import UserRepo
+from app.users.services import UserService
+
+# the default `event_loop` fixture is function scoped,
+# which means we cannot use it for async session scoped
+# fixtures out of the box
 
 
 @pytest.fixture(scope="session")
@@ -49,13 +57,61 @@ def setup_test_database() -> Iterator[None]:
     )
 
 
-@pytest.fixture(scope="session")
-async def user() -> User:
+@pytest.fixture
+async def user(user_repo: UserRepo) -> User:
     """Create an user for testing."""
-    return await UserRepo.create_user(
+    return await user_repo.create_user(
         username="tester",
         email="tester@example.org",
         password="password",
+    )
+
+
+@pytest.fixture
+async def connection() -> AsyncIterator[AsyncConnection]:
+    """Get the database connection."""
+    async with container.context() as context:
+        yield await context.resolve(AsyncConnection)
+
+
+@pytest.fixture
+def redis_client() -> Iterator[Redis]:
+    """Get the redis client."""
+    with container.sync_context() as context:
+        yield context.resolve(Redis)
+
+
+@pytest.fixture
+def auth_repo(connection: AsyncConnection, redis_client: Redis) -> AuthRepo:
+    """Get the authentication repository."""
+    return AuthRepo(
+        connection=connection,
+        redis_client=redis_client,
+    )
+
+
+@pytest.fixture
+def user_repo(connection: AsyncConnection) -> UserRepo:
+    """Get the user repository."""
+    return UserRepo(
+        connection=connection,
+    )
+
+
+@pytest.fixture
+def auth_service(auth_repo: AuthRepo, user_repo: UserRepo) -> AuthService:
+    """Get the authentication service."""
+    return AuthService(
+        auth_repo=auth_repo,
+        user_repo=user_repo,
+    )
+
+
+@pytest.fixture
+def user_service(user_repo: UserRepo) -> UserService:
+    """Get the user service."""
+    return UserService(
+        user_repo=user_repo,
     )
 
 
@@ -81,7 +137,7 @@ async def get_test_database_connection() -> AsyncIterator[AsyncConnection]:
 # database. This is making tests fail.
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def setup_test_container() -> Iterator[None]:
     """Set up the container for testing."""
     with container.override(

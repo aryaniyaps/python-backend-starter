@@ -13,35 +13,39 @@ from app.users.models import User
 pytestmark = pytest.mark.asyncio
 
 
-async def test_create_authentication_token(user: User) -> None:
+async def test_create_authentication_token(user: User, auth_repo: AuthRepo) -> None:
     """Ensure we can create an authentication token."""
-    token = await AuthRepo.create_authentication_token(user_id=user.id)
+    token = await auth_repo.create_authentication_token(user_id=user.id)
 
     assert isinstance(token, str)
 
 
-async def test_get_user_id_from_authentication_token_valid(user: User) -> None:
+async def test_get_user_id_from_authentication_token_valid(
+    user: User, auth_repo: AuthRepo
+) -> None:
     """Ensure we can get the user ID from an authentication token."""
-    token = await AuthRepo.create_authentication_token(user_id=user.id)
+    token = await auth_repo.create_authentication_token(user_id=user.id)
 
     # Perform token verification
-    user_id = await AuthRepo.get_user_id_from_authentication_token(token)
+    user_id = await auth_repo.get_user_id_from_authentication_token(token)
 
     assert user_id == user.id
 
 
-async def test_get_user_id_from_authentication_token_invalid() -> None:
+async def test_get_user_id_from_authentication_token_invalid(
+    auth_repo: AuthRepo,
+) -> None:
     """Ensure we don't get an user ID from an invalid token"""
-    user_id = await AuthRepo.get_user_id_from_authentication_token("invalid_token")
+    user_id = await auth_repo.get_user_id_from_authentication_token("invalid_token")
     assert user_id is None
 
 
-async def test_remove_authentication_token(user: User) -> None:
+async def test_remove_authentication_token(user: User, auth_repo: AuthRepo) -> None:
     """Ensure we can remove an authentication token."""
-    token = await AuthRepo.create_authentication_token(user_id=user.id)
+    token = await auth_repo.create_authentication_token(user_id=user.id)
 
     # Perform token removal
-    await AuthRepo.remove_authentication_token(
+    await auth_repo.remove_authentication_token(
         authentication_token=token,
         user_id=user.id,
     )
@@ -51,23 +55,63 @@ async def test_remove_authentication_token(user: User) -> None:
         redis_client = context.resolve(Redis)
     assert (
         await redis_client.get(
-            AuthRepo.generate_authentication_token_key(token),
+            auth_repo.generate_authentication_token_key(token),
         )
         is None
     )
 
 
-# TODO: add tests for remove_all_authentication_tokens
+async def test_remove_all_authentication_tokens(
+    user: User, auth_repo: AuthRepo
+) -> None:
+    """Ensure all authentication tokens for a user are removed."""
+    token1 = await auth_repo.create_authentication_token(user_id=user.id)
+    token2 = await auth_repo.create_authentication_token(user_id=user.id)
 
-# TODO: add tests for hash_authentication_token
+    # Perform removal of all authentication tokens
+    await auth_repo.remove_all_authentication_tokens(user_id=user.id)
 
-# TODO: add tests for hash_password_reset_token
+    # Verify that both tokens are no longer in Redis
+    with container.sync_context() as context:
+        redis_client = context.resolve(Redis)
+    assert (
+        await redis_client.get(
+            auth_repo.generate_authentication_token_key(token1),
+        )
+        is None
+    )
+    assert (
+        await redis_client.get(
+            auth_repo.generate_authentication_token_key(token2),
+        )
+        is None
+    )
 
 
-async def test_create_password_reset_token(user: User) -> None:
+def test_hash_authentication_token(auth_repo: AuthRepo) -> None:
+    """Ensure hashing authentication token produces the expected result."""
+    token = "test_token"
+    expected_hash = sha256(token.encode()).hexdigest()
+
+    hashed_token = auth_repo.hash_authentication_token(token)
+
+    assert hashed_token == expected_hash
+
+
+async def test_hash_password_reset_token(auth_repo: AuthRepo) -> None:
+    """Ensure hashing password reset token produces the expected result."""
+    reset_token = "test_reset_token"
+    expected_hash = sha256(reset_token.encode()).hexdigest()
+
+    hashed_reset_token = auth_repo.hash_password_reset_token(reset_token)
+
+    assert hashed_reset_token == expected_hash
+
+
+async def test_create_password_reset_token(user: User, auth_repo: AuthRepo) -> None:
     """Ensure a password reset token is created."""
 
-    reset_token = await AuthRepo.create_password_reset_token(
+    reset_token = await auth_repo.create_password_reset_token(
         user_id=user.id,
         last_login_at=user.last_login_at,
     )
@@ -75,16 +119,16 @@ async def test_create_password_reset_token(user: User) -> None:
     assert isinstance(reset_token, str)
 
 
-async def test_get_password_reset_token(user: User) -> None:
+async def test_get_password_reset_token(user: User, auth_repo: AuthRepo) -> None:
     """Ensure getting a password reset token works."""
-    reset_token = await AuthRepo.create_password_reset_token(
+    reset_token = await auth_repo.create_password_reset_token(
         user_id=user.id,
         last_login_at=user.last_login_at,
     )
 
     reset_token_hash = sha256(reset_token.encode()).hexdigest()
 
-    retrieved_reset_token = await AuthRepo.get_password_reset_token(
+    retrieved_reset_token = await auth_repo.get_password_reset_token(
         reset_token_hash=reset_token_hash,
     )
 
@@ -99,10 +143,10 @@ async def test_get_password_reset_token(user: User) -> None:
     )
 
 
-async def test_get_password_reset_token_not_found() -> None:
+async def test_get_password_reset_token_not_found(auth_repo: AuthRepo) -> None:
     """Ensure getting a non-existent password reset token returns None."""
 
-    reset_token = await AuthRepo.get_password_reset_token(
+    reset_token = await auth_repo.get_password_reset_token(
         reset_token_hash="nonexistent_token",
     )
 

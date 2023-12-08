@@ -25,7 +25,7 @@ from app.users.repos import UserRepo
 pytestmark = pytest.mark.asyncio
 
 
-async def test_register_user_success() -> None:
+async def test_register_user_success(auth_service: AuthService) -> None:
     """Ensure we can register a user successfully."""
     with patch.object(
         UserRepo,
@@ -44,7 +44,7 @@ async def test_register_user_success() -> None:
         "create_authentication_token",
         return_value="fake_token",
     ):
-        result = await AuthService.register_user(
+        result = await auth_service.register_user(
             RegisterUserInput(
                 username="new_user",
                 email="new_user@example.com",
@@ -57,13 +57,13 @@ async def test_register_user_success() -> None:
     assert result.user is not None
 
 
-async def test_register_user_existing_email() -> None:
+async def test_register_user_existing_email(auth_service: AuthService) -> None:
     """Ensure we cannot create an user with an existing email."""
     with patch.object(UserRepo, "get_user_by_email", return_value=MagicMock(spec=User)):
         with pytest.raises(
             InvalidInputError, match="User with that email already exists."
         ):
-            await AuthService.register_user(
+            await auth_service.register_user(
                 RegisterUserInput(
                     username="new_user",
                     email="new_user@example.com",
@@ -72,7 +72,7 @@ async def test_register_user_existing_email() -> None:
             )
 
 
-async def test_register_user_existing_username() -> None:
+async def test_register_user_existing_username(auth_service: AuthService) -> None:
     """Ensure we cannot create an user with an existing username."""
     with patch.object(UserRepo, "get_user_by_email", return_value=None), patch.object(
         UserRepo,
@@ -82,7 +82,7 @@ async def test_register_user_existing_username() -> None:
         with pytest.raises(
             InvalidInputError, match="User with that username already exists."
         ):
-            await AuthService.register_user(
+            await auth_service.register_user(
                 RegisterUserInput(
                     username="new_user",
                     email="new_user@example.com",
@@ -91,7 +91,7 @@ async def test_register_user_existing_username() -> None:
             )
 
 
-async def test_register_user_hashing_error() -> None:
+async def test_register_user_hashing_error(auth_service: AuthService) -> None:
     """Ensure we cannot create an user when there is a password hashing error."""
     with patch.object(
         UserRepo,
@@ -113,7 +113,7 @@ async def test_register_user_hashing_error() -> None:
         with pytest.raises(
             UnexpectedError, match="Could not create user. Please try again."
         ):
-            await AuthService.register_user(
+            await auth_service.register_user(
                 RegisterUserInput(
                     username="new_user",
                     email="new_user@example.com",
@@ -122,7 +122,7 @@ async def test_register_user_hashing_error() -> None:
             )
 
 
-async def test_login_user_valid_credentials() -> None:
+async def test_login_user_valid_credentials(auth_service: AuthService) -> None:
     """Ensure we can login a user with valid credentials."""
     with patch("app.auth.services.UserRepo.get_user_by_email") as mock_get_user, patch(
         "app.auth.services.AuthRepo.create_authentication_token"
@@ -134,7 +134,7 @@ async def test_login_user_valid_credentials() -> None:
         mock_create_token.return_value = "fake_token"
 
         # Perform the login
-        result = await AuthService.login_user(
+        result = await auth_service.login_user(
             LoginUserInput(
                 login="user@example.com",
                 password="password",
@@ -146,14 +146,14 @@ async def test_login_user_valid_credentials() -> None:
     assert result.user == mock_user
 
 
-async def test_login_user_invalid_credentials() -> None:
+async def test_login_user_invalid_credentials(auth_service: AuthService) -> None:
     """Ensure we cannot login an user with invalid credentials."""
     with patch("app.auth.services.UserRepo.get_user_by_email") as mock_get_user:
         mock_get_user.return_value = None
 
         # Perform the login
         with pytest.raises(InvalidInputError):
-            await AuthService.login_user(
+            await auth_service.login_user(
                 LoginUserInput(
                     login="invalid_user@example.com",
                     password="invalid_password",
@@ -161,7 +161,7 @@ async def test_login_user_invalid_credentials() -> None:
             )
 
 
-async def test_login_user_password_mismatch() -> None:
+async def test_login_user_password_mismatch(auth_service: AuthService) -> None:
     """Ensure we cannot login an existing user with the wrong password."""
     with patch("app.auth.services.UserRepo.get_user_by_email") as mock_get_user, patch(
         "app.core.security.password_hasher.verify"
@@ -175,7 +175,7 @@ async def test_login_user_password_mismatch() -> None:
 
         # Perform the login
         with pytest.raises(InvalidInputError):
-            await AuthService.login_user(
+            await auth_service.login_user(
                 LoginUserInput(
                     login="user@example.com",
                     password="wrong_password",
@@ -183,7 +183,7 @@ async def test_login_user_password_mismatch() -> None:
             )
 
 
-async def test_login_user_password_rehash() -> None:
+async def test_login_user_password_rehash(auth_service: AuthService) -> None:
     """
     Ensure the user's password gets rehashed if the old
     password needs rehashing.
@@ -198,7 +198,7 @@ async def test_login_user_password_rehash() -> None:
         mock_create_token.return_value = "fake_token"
 
         # Perform the login
-        result = await AuthService.login_user(
+        result = await auth_service.login_user(
             LoginUserInput(
                 login="user@example.com",
                 password="password",
@@ -212,7 +212,9 @@ async def test_login_user_password_rehash() -> None:
     # TODO: add more checks to see if password was rehashed
 
 
-async def test_verify_authentication_token_valid_token() -> None:
+async def test_verify_authentication_token_valid_token(
+    auth_service: AuthService,
+) -> None:
     """Ensure we can verify a valid authentication token."""
     user_id = uuid4()
     with patch(
@@ -221,12 +223,14 @@ async def test_verify_authentication_token_valid_token() -> None:
         mock_get_user_id_from_token.return_value = user_id
 
         # Perform token verification
-        user_id = await AuthService.verify_authentication_token("valid_token")
+        user_id = await auth_service.verify_authentication_token("valid_token")
 
     assert user_id == user_id
 
 
-async def test_verify_authentication_token_invalid_token() -> None:
+async def test_verify_authentication_token_invalid_token(
+    auth_service: AuthService,
+) -> None:
     """Ensure we cannot verify an invalid authentication token."""
     with patch(
         "app.auth.services.AuthRepo.get_user_id_from_authentication_token"
@@ -235,17 +239,17 @@ async def test_verify_authentication_token_invalid_token() -> None:
 
         # Perform token verification
         with pytest.raises(UnauthenticatedError):
-            await AuthService.verify_authentication_token("invalid_token")
+            await auth_service.verify_authentication_token("invalid_token")
 
 
-async def test_remove_authentication_token() -> None:
+async def test_remove_authentication_token(auth_service: AuthService) -> None:
     """Ensure we can remove an authentication token."""
     mock_user = MagicMock(spec=User, id=uuid4())
     with patch(
         "app.auth.services.AuthRepo.remove_authentication_token"
     ) as mock_remove_token:
         # Perform token removal
-        await AuthService.remove_authentication_token(
+        await auth_service.remove_authentication_token(
             authentication_token="token_to_remove",
             user_id=mock_user.id,
         )
@@ -256,7 +260,7 @@ async def test_remove_authentication_token() -> None:
     )
 
 
-async def test_send_password_reset_request_success() -> None:
+async def test_send_password_reset_request_success(auth_service: AuthService) -> None:
     """Ensure we can send a password reset request successfully."""
     user_agent = MagicMock(
         spec=UserAgent,
@@ -282,7 +286,7 @@ async def test_send_password_reset_request_success() -> None:
         "app.auth.tasks.send_password_reset_request_email"
     ) as mock_send_email:
         mock_send_email.return_value = None
-        await AuthService.send_password_reset_request(
+        await auth_service.send_password_reset_request(
             PasswordResetRequestInput(
                 email=mock_user.email,
             ),
@@ -298,7 +302,9 @@ async def test_send_password_reset_request_success() -> None:
     )
 
 
-async def test_send_password_reset_request_user_not_found() -> None:
+async def test_send_password_reset_request_user_not_found(
+    auth_service: AuthService,
+) -> None:
     """Ensure we cannot send a password reset request for a non-existing user."""
     user_agent = MagicMock(
         spec=UserAgent,
@@ -307,14 +313,14 @@ async def test_send_password_reset_request_user_not_found() -> None:
     )
 
     with patch.object(UserRepo, "get_user_by_email", return_value=None):
-        await AuthService.send_password_reset_request(
+        await auth_service.send_password_reset_request(
             PasswordResetRequestInput(email="nonexistent@example.com"), user_agent
         )
         # TODO: assert password reset email was not sent
         # and password reset token was not created
 
 
-async def test_reset_password_success() -> None:
+async def test_reset_password_success(auth_service: AuthService) -> None:
     """Ensure we can reset a user's password successfully."""
     password_reset_input = PasswordResetInput(
         email="user@example.com",
@@ -346,7 +352,7 @@ async def test_reset_password_success() -> None:
     ) as mock_update_password, patch.object(
         AuthRepo, "remove_all_authentication_tokens", return_value=None
     ) as mock_remove_all_authentication_tokens:
-        await AuthService.reset_password(password_reset_input)
+        await auth_service.reset_password(password_reset_input)
 
     # FIXME: this assertion will always fail as no two
     # argon2 hashes are the same
@@ -362,7 +368,7 @@ async def test_reset_password_success() -> None:
     )
 
 
-async def test_reset_password_invalid_token() -> None:
+async def test_reset_password_invalid_token(auth_service: AuthService) -> None:
     """Ensure we cannot reset a user's password with an invalid token."""
     with patch.object(
         UserRepo,
@@ -376,7 +382,7 @@ async def test_reset_password_invalid_token() -> None:
         with pytest.raises(
             InvalidInputError, match="Invalid password reset token or email."
         ):
-            await AuthService.reset_password(
+            await auth_service.reset_password(
                 PasswordResetInput(
                     email="user@example.com",
                     reset_token="invalid_token",
@@ -385,14 +391,14 @@ async def test_reset_password_invalid_token() -> None:
             )
 
 
-async def test_reset_password_user_not_found() -> None:
+async def test_reset_password_user_not_found(auth_service: AuthService) -> None:
     """Ensure we cannot reset a password for a non-existing user."""
 
     with patch.object(UserRepo, "get_user_by_email", return_value=None):
         with pytest.raises(
             InvalidInputError, match="Invalid password reset token or email."
         ):
-            await AuthService.reset_password(
+            await auth_service.reset_password(
                 PasswordResetInput(
                     email="nonexistent@example.com",
                     reset_token="fake_token",
@@ -401,13 +407,13 @@ async def test_reset_password_user_not_found() -> None:
             )
 
 
-async def test_reset_password_invalid_email() -> None:
+async def test_reset_password_invalid_email(auth_service: AuthService) -> None:
     """Ensure we cannot reset a password for an invalid email."""
     with patch.object(UserRepo, "get_user_by_email", return_value=None):
         with pytest.raises(
             InvalidInputError, match="Invalid password reset token or email."
         ):
-            await AuthService.reset_password(
+            await auth_service.reset_password(
                 PasswordResetInput(
                     email="invalid_email@example.com",
                     reset_token="fake_token",

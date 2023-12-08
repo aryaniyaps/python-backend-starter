@@ -127,10 +127,10 @@ async def test_on_post_reset_password_request_nonexistent_user(
 
 
 async def test_on_post_reset_password_success(
-    conductor: ASGIConductor, user: User
+    conductor: ASGIConductor, user: User, auth_repo: AuthRepo
 ) -> None:
     """Ensure we can successfully reset a user's password."""
-    reset_token = await AuthRepo.create_password_reset_token(
+    reset_token = await auth_repo.create_password_reset_token(
         user_id=user.id,
         last_login_at=user.last_login_at,
     )
