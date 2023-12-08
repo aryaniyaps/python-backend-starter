@@ -137,7 +137,7 @@ async def test_on_post_reset_password_success(
         "reset_token": reset_token,
         "new_password": "new_password",
     }
-    # TODO: create a password reset token before testing here
+
     response = await conductor.simulate_post(
         "/auth/reset-password", body=json.dumps(reset_data)
     )

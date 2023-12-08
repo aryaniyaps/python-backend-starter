@@ -3,7 +3,6 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator, Iterator
 
 import pytest
-from aioinject import providers
 from alembic import command
 from alembic.config import Config
 from falcon.asgi import App
@@ -70,15 +69,13 @@ async def user(user_repo: UserRepo) -> User:
 @pytest.fixture
 async def connection() -> AsyncIterator[AsyncConnection]:
     """Get the database connection."""
-    async with container.context() as context:
-        yield await context.resolve(AsyncConnection)
+    raise NotImplementedError()
 
 
 @pytest.fixture
 def redis_client() -> Iterator[Redis]:
     """Get the redis client."""
-    with container.sync_context() as context:
-        yield context.resolve(Redis)
+    raise NotImplementedError()
 
 
 @pytest.fixture
@@ -129,20 +126,3 @@ async def get_test_database_connection() -> AsyncIterator[AsyncConnection]:
 
         # rollback database transaction
         await transaction.rollback()
-
-
-# FIXME: the issue is, as soon as the function call gets over
-# example: UserRepo.create_user, the connection dependency closes.
-# thus the connection rolls back and the user is removed from the
-# database. This is making tests fail.
-
-
-@pytest.fixture(scope="session", autouse=True)
-def setup_test_container() -> Iterator[None]:
-    """Set up the container for testing."""
-    with container.override(
-        provider=providers.Callable(
-            get_test_database_connection,
-        ),
-    ):
-        yield

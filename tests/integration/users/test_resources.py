@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 import pytest
 from falcon import HTTP_200, HTTP_401, HTTP_404
 from falcon.testing import ASGIConductor
@@ -7,9 +9,7 @@ from app.users.models import User
 pytestmark = pytest.mark.asyncio
 
 
-async def test_on_get_current_user_authenticated(
-    auth_conductor: ASGIConductor, user: User
-) -> None:
+async def test_on_get_current_user_authenticated(auth_conductor: ASGIConductor) -> None:
     """Ensure we can successfully get the current user when authenticated."""
     response = await auth_conductor.simulate_get("/users/@me")
 
@@ -44,7 +44,7 @@ async def test_on_get_user_unauthenticated(
 async def test_on_get_user_not_found(auth_conductor: ASGIConductor) -> None:
     """Ensure getting a non-existent user returns a 404."""
     response = await auth_conductor.simulate_get(
-        "/users/101"
-    )  # Assuming ID 101 does not exist
+        f"/users/{uuid4()}"
+    )  # Assuming generated UUID doesn't exist
 
     assert response.status == HTTP_404

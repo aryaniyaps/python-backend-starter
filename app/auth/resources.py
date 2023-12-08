@@ -1,13 +1,13 @@
-from typing import Annotated
 from uuid import UUID
 
-from aioinject import Inject, inject
 from falcon import HTTP_201, HTTP_204, before
 from falcon.asgi import Request, Response
+from lagom import bind_to_container, injectable
 from user_agents import parse
 
 from app.auth.hooks import login_required
 from app.auth.services import AuthService
+from app.core.containers import context_container
 
 from .models import (
     LoginUserInput,
@@ -18,12 +18,12 @@ from .models import (
 
 
 class AuthResource:
-    @inject
+    @bind_to_container(container=context_container)
     async def on_post_register(
         self,
         req: Request,
         resp: Response,
-        auth_service: Annotated[AuthService, Inject],
+        auth_service: AuthService = injectable,
     ) -> None:
         """Register a new user."""
         data = await req.media
@@ -33,12 +33,12 @@ class AuthResource:
         resp.media = result.model_dump()
         resp.status = HTTP_201
 
-    @inject
+    @bind_to_container(container=context_container)
     async def on_post_login(
         self,
         req: Request,
         resp: Response,
-        auth_service: Annotated[AuthService, Inject],
+        auth_service: AuthService = injectable,
     ) -> None:
         """Login the current user."""
         data = await req.media
@@ -48,12 +48,12 @@ class AuthResource:
         resp.media = result.model_dump()
 
     @before(login_required)
-    @inject
+    @bind_to_container(container=context_container)
     async def on_post_logout(
         self,
         req: Request,
         resp: Response,
-        auth_service: Annotated[AuthService, Inject],
+        auth_service: AuthService = injectable,
     ) -> None:
         """Logout the current user."""
         current_user_id: UUID = req.context["current_user_id"]
@@ -64,12 +64,12 @@ class AuthResource:
         )
         resp.status = HTTP_204
 
-    @inject
+    @bind_to_container(container=context_container)
     async def on_post_reset_password_request(
         self,
         req: Request,
         resp: Response,
-        auth_service: Annotated[AuthService, Inject],
+        auth_service: AuthService = injectable,
     ) -> None:
         """Send a password reset request to the given email."""
         data = await req.media
@@ -79,12 +79,12 @@ class AuthResource:
         )
         resp.status = HTTP_204
 
-    @inject
+    @bind_to_container(container=context_container)
     async def on_post_reset_password(
         self,
         req: Request,
         resp: Response,
-        auth_service: Annotated[AuthService, Inject],
+        auth_service: AuthService = injectable,
     ) -> None:
         """Reset the relevant user's password with the given credentials."""
         data = await req.media
