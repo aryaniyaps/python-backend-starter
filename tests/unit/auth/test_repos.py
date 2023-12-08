@@ -51,7 +51,8 @@ async def test_remove_authentication_token(user: User, auth_repo: AuthRepo) -> N
     )
 
     # Verify that the token is no longer in Redis
-    redis_client = container[Redis]
+    with container.sync_context() as context:
+        redis_client = context.resolve(Redis)
     assert (
         await redis_client.get(
             auth_repo.generate_authentication_token_key(token),
@@ -72,7 +73,8 @@ async def test_remove_all_authentication_tokens(
     await auth_repo.remove_all_authentication_tokens(user_id=user.id)
 
     # Verify that both tokens are no longer in Redis
-    redis_client = container[Redis]
+    with container.sync_context() as context:
+        redis_client = context.resolve(Redis)
     assert (
         await redis_client.get(
             auth_repo.generate_authentication_token_key(first_token),

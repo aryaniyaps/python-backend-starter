@@ -5,7 +5,20 @@
 groups = ["default", "test"]
 strategy = ["cross_platform"]
 lock_version = "4.4"
-content_hash = "sha256:15779ecaf142149372b415499113a02793fa96953975a1cb025b3c1a99db761a"
+content_hash = "sha256:432c17b56b0d31940e8779e4e1b457ddd0578bde5987dd7853c2e6e5a2c9305b"
+
+[[package]]
+name = "aioinject"
+version = "0.15.1"
+requires_python = ">=3.10"
+summary = "Async dependency injection library"
+dependencies = [
+    "typing-extensions>=4.0.0",
+]
+files = [
+    {file = "aioinject-0.15.1-py3-none-any.whl", hash = "sha256:3d56e53c2b80c65e7c079f055f457ce0c4604f438d9e5ea71aaf7e37c399d36e"},
+    {file = "aioinject-0.15.1.tar.gz", hash = "sha256:3679476c47f70b72d30eff92419febbdfc2ec260f7ec87431cfeb226db39ae3a"},
+]
 
 [[package]]
 name = "alembic"
@@ -362,15 +375,6 @@ dependencies = [
 files = [
     {file = "kombu-5.3.4-py3-none-any.whl", hash = "sha256:63bb093fc9bb80cfb3a0972336a5cec1fa7ac5f9ef7e8237c6bf8dda9469313e"},
     {file = "kombu-5.3.4.tar.gz", hash = "sha256:0bb2e278644d11dea6272c17974a3dbb9688a949f3bb60aeb5b791329c44fadc"},
-]
-
-[[package]]
-name = "lagom"
-version = "2.6.0"
-requires_python = ">=3.7"
-summary = "Lagom is a dependency injection container designed to give you 'just enough' help with building your dependencies."
-files = [
-    {file = "lagom-2.6.0-py3-none-any.whl", hash = "sha256:59899f29319bfb9f3fa96f1834ae8ed2e25345e697bfff5a3da7aa0b84348978"},
 ]
 
 [[package]]

@@ -4,6 +4,7 @@ from pydantic import ValidationError
 
 from app.auth.resources import auth_resource
 from app.config import settings
+from app.core.containers import container
 from app.core.error_handlers import (
     handle_invalid_input_error,
     handle_resource_not_found_error,
@@ -19,6 +20,7 @@ from app.core.errors import (
     UnexpectedError,
 )
 from app.core.media_handlers import media_handlers
+from app.core.middleware.aioinject import AioInjectMiddleware
 from app.users.resources import user_resource
 
 
@@ -66,6 +68,11 @@ def add_middleware(app: App) -> None:
     app.add_middleware(
         middleware=CORSMiddleware(
             allow_origins=settings.cors_allow_origins,
+        )
+    )
+    app.add_middleware(
+        AioInjectMiddleware(
+            container=container,
         )
     )
 

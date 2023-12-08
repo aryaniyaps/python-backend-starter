@@ -89,7 +89,7 @@ async def handle_uncaught_exception(
     params,
 ) -> None:
     """Handle uncaught expections."""
-    logging.error(ex)
+    logging.error(ex, stack_info=True, stacklevel=2)
     resp.status = HTTP_500
     resp.media = {
         "message": "An unexpected error occurred.",

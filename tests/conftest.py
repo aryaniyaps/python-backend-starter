@@ -12,7 +12,6 @@ from sqlalchemy.ext.asyncio import AsyncConnection
 from app import create_app
 from app.auth.repos import AuthRepo
 from app.auth.services import AuthService
-from app.core.containers import container
 from app.core.database import engine
 from app.users.models import User
 from app.users.repos import UserRepo
