@@ -7,7 +7,6 @@ from redis.asyncio import Redis
 from app.auth.models import PasswordResetToken
 from app.auth.repos import AuthRepo
 from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
-from app.core.containers import container
 from app.users.models import User
 
 pytestmark = pytest.mark.asyncio
@@ -40,7 +39,9 @@ async def test_get_user_id_from_authentication_token_invalid(
     assert user_id is None
 
 
-async def test_remove_authentication_token(user: User, auth_repo: AuthRepo) -> None:
+async def test_remove_authentication_token(
+    user: User, auth_repo: AuthRepo, redis_client: Redis
+) -> None:
     """Ensure we can remove an authentication token."""
     token = await auth_repo.create_authentication_token(user_id=user.id)
 
@@ -51,8 +52,6 @@ async def test_remove_authentication_token(user: User, auth_repo: AuthRepo) -> N
     )
 
     # Verify that the token is no longer in Redis
-    with container.sync_context() as context:
-        redis_client = context.resolve(Redis)
     assert (
         await redis_client.get(
             auth_repo.generate_authentication_token_key(token),
@@ -62,7 +61,7 @@ async def test_remove_authentication_token(user: User, auth_repo: AuthRepo) -> N
 
 
 async def test_remove_all_authentication_tokens(
-    user: User, auth_repo: AuthRepo
+    user: User, auth_repo: AuthRepo, redis_client: Redis
 ) -> None:
     """Ensure all authentication tokens for a user are removed."""
     first_token = await auth_repo.create_authentication_token(user_id=user.id)
@@ -73,8 +72,6 @@ async def test_remove_all_authentication_tokens(
     await auth_repo.remove_all_authentication_tokens(user_id=user.id)
 
     # Verify that both tokens are no longer in Redis
-    with container.sync_context() as context:
-        redis_client = context.resolve(Redis)
     assert (
         await redis_client.get(
             auth_repo.generate_authentication_token_key(first_token),
