@@ -24,7 +24,7 @@ class UserResource:
         result = await user_service.get_user_by_id(
             user_id=current_user_id,
         )
-        resp.media = result.model_dump()
+        resp.media = result.model_dump(mode="json")
 
     @before(login_required)
     @inject
@@ -37,7 +37,7 @@ class UserResource:
     ) -> None:
         """Get the user with the given ID."""
         result = await user_service.get_user_by_id(user_id=user_id)
-        resp.media = result.model_dump()
+        resp.media = result.model_dump(mode="json")
 
 
 user_resource = UserResource()

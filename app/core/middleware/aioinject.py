@@ -6,7 +6,11 @@ class AioInjectMiddleware:
     def __init__(self, container: Container) -> None:
         self._container = container
 
-    async def process_request(self, req: Request, resp: Response) -> None:
+    async def process_request(
+        self,
+        req: Request,
+        resp: Response,
+    ) -> None:
         """
         Set the aioinject context manager in the request
         context and enter the context manager.
@@ -15,7 +19,13 @@ class AioInjectMiddleware:
         req.context["aioinject_context_manager"] = context_manager
         await context_manager.__aenter__()
 
-    async def process_response(self, req, resp, resource, req_succeeded) -> None:
+    async def process_response(
+        self,
+        req: Request,
+        resp: Response,
+        resource,
+        req_succeeded: bool,
+    ) -> None:
         """
         Remove the aioinject context manager from the request
         context and exit the context manager.

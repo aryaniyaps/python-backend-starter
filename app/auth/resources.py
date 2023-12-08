@@ -30,7 +30,7 @@ class AuthResource:
         result = await auth_service.register_user(
             data=RegisterUserInput.model_validate(data),
         )
-        resp.media = result.model_dump()
+        resp.media = result.model_dump(mode="json")
         resp.status = HTTP_201
 
     @inject
@@ -45,7 +45,7 @@ class AuthResource:
         result = await auth_service.login_user(
             data=LoginUserInput.model_validate(data),
         )
-        resp.media = result.model_dump()
+        resp.media = result.model_dump(mode="json")
 
     @before(login_required)
     @inject
