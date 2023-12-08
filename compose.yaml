@@ -29,6 +29,7 @@ services:
       - RABBITMQ_PASSWORD=pass
     volumes:
       - "rabbitmq_data:/bitnami/rabbitmq/mnesia"
+      - "./rabbitmq.conf:/bitnami/rabbitmq/conf/rabbitmq.conf"
 
 
   mailhog:
