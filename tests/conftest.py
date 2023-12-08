@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator, Iterator
 
 import pytest
+from aioinject import providers
 from alembic import command
 from alembic.config import Config
 from falcon.asgi import App
@@ -24,9 +25,12 @@ from app.users.services import UserService
 
 
 @pytest.fixture(scope="session")
-def event_loop() -> AbstractEventLoop:
+def event_loop() -> Iterator[AbstractEventLoop]:
     """Get the event loop."""
-    return get_event_loop()
+    loop = get_event_loop()
+    yield loop
+    if loop.is_running:
+        loop.close()
 
 
 @pytest.fixture(scope="session")
@@ -56,7 +60,7 @@ def setup_test_database() -> Iterator[None]:
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 async def user(user_repo: UserRepo) -> User:
     """Create an user for testing."""
     return await user_repo.create_user(
@@ -66,21 +70,27 @@ async def user(user_repo: UserRepo) -> User:
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
+async def authentication_token(user: User, auth_repo: AuthRepo) -> str:
+    """Create an authentication token for the user."""
+    return await auth_repo.create_authentication_token(user_id=user.id)
+
+
+@pytest.fixture(scope="session")
 async def connection() -> AsyncIterator[AsyncConnection]:
     """Get the database connection."""
     async with container.context() as context:
         yield await context.resolve(AsyncConnection)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def redis_client() -> Iterator[Redis]:
     """Get the redis client."""
     with container.sync_context() as context:
         yield context.resolve(Redis)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def auth_repo(connection: AsyncConnection, redis_client: Redis) -> AuthRepo:
     """Get the authentication repository."""
     return AuthRepo(
@@ -89,7 +99,7 @@ def auth_repo(connection: AsyncConnection, redis_client: Redis) -> AuthRepo:
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def user_repo(connection: AsyncConnection) -> UserRepo:
     """Get the user repository."""
     return UserRepo(
@@ -97,7 +107,7 @@ def user_repo(connection: AsyncConnection) -> UserRepo:
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def auth_service(auth_repo: AuthRepo, user_repo: UserRepo) -> AuthService:
     """Get the authentication service."""
     return AuthService(
@@ -106,7 +116,7 @@ def auth_service(auth_repo: AuthRepo, user_repo: UserRepo) -> AuthService:
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def user_service(user_repo: UserRepo) -> UserService:
     """Get the user service."""
     return UserService(
@@ -128,3 +138,14 @@ async def get_test_database_connection() -> AsyncIterator[AsyncConnection]:
 
         # rollback database transaction
         await transaction.rollback()
+
+
+@pytest.fixture(scope="session")
+def setup_test_container() -> Iterator[None]:
+    """Setup the container for testing."""
+    with container.override(
+        provider=providers.Callable(
+            get_test_database_connection,
+        ),
+    ):
+        yield

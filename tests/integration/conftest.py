@@ -4,9 +4,6 @@ import pytest
 from falcon.asgi import App
 from falcon.testing import ASGIConductor, TestClient
 
-from app.auth.repos import AuthRepo
-from app.users.models import User
-
 
 @pytest.fixture(scope="session")
 def test_client(app: App) -> TestClient:
@@ -21,10 +18,9 @@ async def conductor(test_client: TestClient) -> AsyncIterator[ASGIConductor]:
         yield conductor
 
 
-@pytest.fixture
-async def auth_test_client(app: App, user: User, auth_repo: AuthRepo) -> TestClient:
+@pytest.fixture(scope="session")
+async def auth_test_client(app: App, authentication_token: str) -> TestClient:
     """Initialize an authenticated test client for testing."""
-    authentication_token = await auth_repo.create_authentication_token(user_id=user.id)
     return TestClient(
         app,
         headers={
