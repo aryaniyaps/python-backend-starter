@@ -65,8 +65,9 @@ async def test_remove_all_authentication_tokens(
     user: User, auth_repo: AuthRepo
 ) -> None:
     """Ensure all authentication tokens for a user are removed."""
-    token1 = await auth_repo.create_authentication_token(user_id=user.id)
-    token2 = await auth_repo.create_authentication_token(user_id=user.id)
+    first_token = await auth_repo.create_authentication_token(user_id=user.id)
+
+    second_token = await auth_repo.create_authentication_token(user_id=user.id)
 
     # Perform removal of all authentication tokens
     await auth_repo.remove_all_authentication_tokens(user_id=user.id)
@@ -76,13 +77,19 @@ async def test_remove_all_authentication_tokens(
         redis_client = context.resolve(Redis)
     assert (
         await redis_client.get(
-            auth_repo.generate_authentication_token_key(token1),
+            auth_repo.generate_authentication_token_key(first_token),
         )
         is None
     )
     assert (
         await redis_client.get(
-            auth_repo.generate_authentication_token_key(token2),
+            auth_repo.generate_authentication_token_key(second_token),
+        )
+        is None
+    )
+    assert (
+        await redis_client.get(
+            auth_repo.generate_token_owner_key(user_id=user.id),
         )
         is None
     )

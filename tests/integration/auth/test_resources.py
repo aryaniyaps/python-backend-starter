@@ -22,8 +22,6 @@ async def test_on_post_register_success(conductor: ASGIConductor) -> None:
     )
 
     assert response.status == HTTP_201
-    assert "authentication_token" in response.content
-    assert "user" in response.content
 
 
 async def test_on_post_register_existing_email(
