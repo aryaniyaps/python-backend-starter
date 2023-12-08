@@ -3,7 +3,6 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator, Iterator
 
 import pytest
-from aioinject import providers
 from alembic import command
 from alembic.config import Config
 from falcon.asgi import App
@@ -142,14 +141,3 @@ async def get_test_database_connection() -> AsyncIterator[AsyncConnection]:
         if nested.is_active:
             await nested.rollback()
         await transaction.rollback()
-
-
-# @pytest.fixture(scope="session", autouse=True)
-# def setup_test_container() -> Iterator[None]:
-#     """Setup the container for testing."""
-#     with container.override(
-#         provider=providers.Callable(
-#             get_test_database_connection,
-#         ),
-#     ):
-#         yield

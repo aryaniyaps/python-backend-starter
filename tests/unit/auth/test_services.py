@@ -163,15 +163,11 @@ async def test_login_user_invalid_credentials(auth_service: AuthService) -> None
 
 async def test_login_user_password_mismatch(auth_service: AuthService) -> None:
     """Ensure we cannot login an existing user with the wrong password."""
-    with patch("app.auth.services.UserRepo.get_user_by_email") as mock_get_user, patch(
-        "app.core.security.password_hasher.verify"
-    ) as mock_verify:
+    with patch("app.auth.services.UserRepo.get_user_by_email") as mock_get_user:
         mock_user = MagicMock(spec=User)
         mock_user.id = uuid4()
         mock_user.password_hash = password_hasher.hash("password")
         mock_get_user.return_value = mock_user
-
-        mock_verify.side_effect = Exception("Password mismatch")
 
         # Perform the login
         with pytest.raises(InvalidInputError):
@@ -210,6 +206,7 @@ async def test_login_user_password_rehash(auth_service: AuthService) -> None:
     assert result.user == mock_user
 
     # TODO: add more checks to see if password was rehashed
+    # passwords need rehashing if the argon2 parameters change
 
 
 async def test_verify_authentication_token_valid_token(
