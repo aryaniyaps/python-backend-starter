@@ -48,7 +48,7 @@ class UserRepo:
     async def update_user_password(
         self,
         user_id: UUID,
-        password_hash: str | None = None,
+        password: str,
     ) -> User | None:
         """Update the password for the user with the given ID."""
         user = await self.get_user_by_id(user_id=user_id)
@@ -58,7 +58,11 @@ class UserRepo:
         result = await self._connection.execute(
             update(users_table)
             .where(users_table.c.id == user_id)
-            .values(password_hash=password_hash)
+            .values(
+                password_hash=self.hash_password(
+                    password=password,
+                )
+            )
             .returning(*users_table.c),
         )
         updated_user_row = result.one()

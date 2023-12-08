@@ -102,9 +102,7 @@ class AuthService:
             # update user's password hash
             await self._user_repo.update_user_password(
                 user_id=user.id,
-                password_hash=password_hasher.hash(
-                    password=data.password,
-                ),
+                password=data.password,
             )
 
         # create authentication token
@@ -191,9 +189,7 @@ class AuthService:
 
         await self._user_repo.update_user_password(
             user_id=existing_user.id,
-            password_hash=password_hasher.hash(
-                password=data.new_password,
-            ),
+            password=data.new_password,
         )
 
         # logout user everywhere

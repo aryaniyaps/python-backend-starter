@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
 import pytest
+from argon2 import PasswordHasher
 from argon2.exceptions import HashingError
 from user_agents.parsers import UserAgent
 
@@ -326,6 +327,8 @@ async def test_reset_password_success(auth_service: AuthService) -> None:
     )
 
     user_id = uuid4()
+
+    # Mock the hash_password method of the PasswordHasher class
     with patch.object(
         UserRepo,
         "get_user_by_email",
@@ -333,7 +336,6 @@ async def test_reset_password_success(auth_service: AuthService) -> None:
             spec=User,
             email="user@example.com",
             id=user_id,
-            # user has logged in before requesting password reset token
             last_login_at=datetime.now() - timedelta(minutes=5),
         ),
     ), patch.object(
@@ -351,13 +353,10 @@ async def test_reset_password_success(auth_service: AuthService) -> None:
     ) as mock_remove_all_authentication_tokens:
         await auth_service.reset_password(password_reset_input)
 
-    # FIXME: this assertion will always fail as no two
-    # argon2 hashes are the same
+    # Check that the update_user_password method is called with the correct password
     mock_update_password.assert_called_once_with(
         user_id=user_id,
-        password_hash=password_hasher.hash(
-            password=password_reset_input.new_password,
-        ),  # You may want to use a more specific assertion here
+        password=password_reset_input.new_password,
     )
 
     mock_remove_all_authentication_tokens.assert_called_once_with(

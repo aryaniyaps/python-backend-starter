@@ -30,12 +30,13 @@ async def test_update_user_password(user: User, user_repo: UserRepo) -> None:
     """Ensure we can update a user's password."""
     updated_user = await user_repo.update_user_password(
         user_id=user.id,
-        password_hash="password_hash",
+        password="password",
     )
     assert updated_user
-    # passwords are not hashed in the repository layer
-    # the hash must be passed as a value directly
-    assert updated_user.password_hash == "password_hash"
+    assert password_hasher.verify(
+        hash=updated_user.password_hash,
+        password="password",
+    )
 
 
 async def test_get_user_by_username(user: User, user_repo: UserRepo) -> None:
