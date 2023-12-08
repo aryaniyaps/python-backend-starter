@@ -92,22 +92,22 @@ async def test_remove_all_authentication_tokens(
     )
 
 
-def test_hash_authentication_token(auth_repo: AuthRepo) -> None:
+def test_hash_authentication_token() -> None:
     """Ensure hashing authentication token produces the expected result."""
     token = "test_token"
     expected_hash = sha256(token.encode()).hexdigest()
 
-    hashed_token = auth_repo.hash_authentication_token(token)
+    hashed_token = AuthRepo.hash_authentication_token(token)
 
     assert hashed_token == expected_hash
 
 
-async def test_hash_password_reset_token(auth_repo: AuthRepo) -> None:
+def test_hash_password_reset_token() -> None:
     """Ensure hashing password reset token produces the expected result."""
     reset_token = "test_reset_token"
     expected_hash = sha256(reset_token.encode()).hexdigest()
 
-    hashed_reset_token = auth_repo.hash_password_reset_token(reset_token)
+    hashed_reset_token = AuthRepo.hash_password_reset_token(reset_token)
 
     assert hashed_reset_token == expected_hash
 
