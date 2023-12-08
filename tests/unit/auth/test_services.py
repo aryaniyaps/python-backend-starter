@@ -328,7 +328,6 @@ async def test_reset_password_success(auth_service: AuthService) -> None:
 
     user_id = uuid4()
 
-    # Mock the hash_password method of the PasswordHasher class
     with patch.object(
         UserRepo,
         "get_user_by_email",
