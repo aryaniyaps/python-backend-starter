@@ -84,11 +84,10 @@ async def test_remove_all_authentication_tokens(
         )
         is None
     )
-    assert (
-        await redis_client.get(
+    assert not (
+        await redis_client.smembers(
             auth_repo.generate_token_owner_key(user_id=user.id),
-        )
-        is None
+        )  # type: ignore
     )
 
 

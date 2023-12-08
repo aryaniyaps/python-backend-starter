@@ -79,8 +79,8 @@ async def authentication_token(user: User, auth_repo: AuthRepo) -> str:
 @pytest.fixture(scope="session")
 async def connection() -> AsyncIterator[AsyncConnection]:
     """Get the database connection."""
-    async with container.context() as context:
-        yield await context.resolve(AsyncConnection)
+    async with get_test_database_connection() as connection:
+        yield connection
 
 
 @pytest.fixture(scope="session")
@@ -127,25 +127,29 @@ def user_service(user_repo: UserRepo) -> UserService:
 @asynccontextmanager
 async def get_test_database_connection() -> AsyncIterator[AsyncConnection]:
     """
-    Get a database conenction with a transaction
+    Get a database connection with a transaction
     setup inside for each test case.
     """
     async with engine.connect() as connection:
         # begin database transaction
         transaction = await connection.begin()
 
+        nested = await connection.begin_nested()
+
         yield connection
 
         # rollback database transaction
+        if nested.is_active:
+            await nested.rollback()
         await transaction.rollback()
 
 
-@pytest.fixture(scope="session")
-def setup_test_container() -> Iterator[None]:
-    """Setup the container for testing."""
-    with container.override(
-        provider=providers.Callable(
-            get_test_database_connection,
-        ),
-    ):
-        yield
+# @pytest.fixture(scope="session", autouse=True)
+# def setup_test_container() -> Iterator[None]:
+#     """Setup the container for testing."""
+#     with container.override(
+#         provider=providers.Callable(
+#             get_test_database_connection,
+#         ),
+#     ):
+#         yield

@@ -1,4 +1,4 @@
-from aioinject import Container
+from aioinject import Container, InjectionContext
 from falcon.asgi import Request, Response
 
 
@@ -30,6 +30,8 @@ class AioInjectMiddleware:
         Remove the aioinject context manager from the request
         context and exit the context manager.
         """
-        context_manager = req.context.pop("aioinject_context_manager", None)
-        if context_manager:
+        context_manager: InjectionContext = req.context.pop(
+            "aioinject_context_manager", None
+        )
+        if context_manager is not None:
             await context_manager.__aexit__(None, None, None)

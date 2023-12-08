@@ -75,17 +75,3 @@ async def test_get_user_by_unknown_email(user_repo: UserRepo) -> None:
     """Ensure we cannot get a user by unknown email."""
     retrieved_user = await user_repo.get_user_by_email(email="unknown@example.com")
     assert retrieved_user is None
-
-
-async def test_delete_user(user: User, user_repo: UserRepo) -> None:
-    """Ensure we can delete a user."""
-    await user_repo.delete_user(user_id=user.id)
-
-    retrieved_user = await user_repo.get_user_by_id(user_id=user.id)
-    assert retrieved_user is None
-
-
-async def test_delete_unknown_user(user_repo: UserRepo) -> None:
-    """Ensure we cannot delete a user by unknown ID."""
-    # TODO: check if error is raised here
-    await user_repo.delete_user(user_id=uuid4())

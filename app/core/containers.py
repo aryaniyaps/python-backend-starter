@@ -17,7 +17,7 @@ from app.users.services import UserService
 @asynccontextmanager
 async def get_database_connection() -> AsyncIterator[AsyncConnection]:
     """Get a database connection."""
-    async with engine.connect() as connection:
+    async with engine.begin() as connection:
         yield connection
 
 

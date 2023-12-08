@@ -11,7 +11,7 @@ def test_client(app: App) -> TestClient:
     return TestClient(app)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 async def conductor(test_client: TestClient) -> AsyncIterator[ASGIConductor]:
     """Initialize the test conductor for the ASGI app."""
     async with test_client as conductor:
@@ -29,7 +29,7 @@ async def auth_test_client(app: App, authentication_token: str) -> TestClient:
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 async def auth_conductor(auth_test_client: TestClient) -> AsyncIterator[ASGIConductor]:
     """Initialize an authenticated test conductor for the ASGI app."""
     async with auth_test_client as conductor:

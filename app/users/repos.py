@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import delete, insert, select, text, update
+from sqlalchemy import insert, select, text, update
 from sqlalchemy.ext.asyncio import AsyncConnection
 
 from app.core.security import password_hasher
@@ -43,17 +43,6 @@ class UserRepo:
         """Hash the given password."""
         return password_hasher.hash(
             password=password,
-        )
-
-    async def delete_user(
-        self,
-        user_id: UUID,
-    ) -> None:
-        """Delete a user with the given ID."""
-        await self._connection.execute(
-            delete(users_table).where(
-                users_table.c.id == user_id,
-            ),
         )
 
     async def update_user_password(

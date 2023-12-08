@@ -108,11 +108,11 @@ class AuthRepo:
         user_id: UUID,
     ) -> None:
         """Remove all authentication tokens for the given user ID."""
-        authentication_token_hashes = await self._redis_client.get(
+        authentication_token_hashes = await self._redis_client.smembers(
             name=self.generate_token_owner_key(
                 user_id=user_id,
             )
-        )
+        )  # type: ignore
         for authentication_token_hash in authentication_token_hashes:
             await self._redis_client.delete(
                 self.generate_authentication_token_key(
