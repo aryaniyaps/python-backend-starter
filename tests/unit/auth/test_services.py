@@ -3,7 +3,6 @@ from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
 import pytest
-from argon2 import PasswordHasher
 from argon2.exceptions import HashingError
 from user_agents.parsers import UserAgent
 
