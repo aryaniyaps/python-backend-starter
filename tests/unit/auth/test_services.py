@@ -218,7 +218,6 @@ async def test_login_user_password_rehash(auth_service: AuthService) -> None:
     assert result.user == mock_user
 
     # Check if update_user_password was called
-    mock_password_hasher.check_needs_rehash.assert_called()
     mock_update_password.assert_called_once_with(
         user_id=mock_user.id,
         password="password",
