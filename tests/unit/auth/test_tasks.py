@@ -24,17 +24,21 @@ def test_send_password_reset_request_email() -> None:
     operating_system = "Windows"
     browser_name = "Chrome"
 
-    with patch.object(EmailSender, "send_email") as mock_send_email:
-        # Call the Celery task directly
-        send_password_reset_request_email.apply_async(
-            kwargs={
-                "to": user.email,
-                "username": user.username,
-                "password_reset_token": password_reset_token,
-                "operating_system": operating_system,
-                "browser_name": browser_name,
-            }
-        )
+    mock_email_sender = MagicMock(
+        spec=EmailSender,
+        send_email=MagicMock(
+            return_value=None,
+        ),
+    )
+
+    send_password_reset_request_email(
+        to=user.email,
+        username=user.username,
+        password_reset_token=password_reset_token,
+        operating_system=operating_system,
+        browser_name=browser_name,
+        email_sender=mock_email_sender,
+    )
 
     action_url = (
         urljoin(APP_URL, "/auth/reset-password")
@@ -48,7 +52,7 @@ def test_send_password_reset_request_email() -> None:
     )
 
     # Perform assertions on the mocked send_email function
-    mock_send_email.assert_called_once_with(
+    mock_email_sender.send_email.assert_called_once_with(
         to=user.email,
         subject=reset_password_subject.render(
             username=user.username,
@@ -64,5 +68,5 @@ def test_send_password_reset_request_email() -> None:
             operating_system=operating_system,
             browser_name=browser_name,
             username=user.username,
-        ),  # You may want to use more specific assertions here
+        ),
     )
