@@ -4,7 +4,11 @@ from urllib.parse import urlencode, urljoin
 from app.auth.tasks import send_password_reset_request_email
 from app.core.constants import APP_URL
 from app.core.emails import EmailSender
-from app.core.templates import reset_password_html, reset_password_text
+from app.core.templates import (
+    reset_password_html,
+    reset_password_subject,
+    reset_password_text,
+)
 from app.users.models import User
 
 
@@ -20,19 +24,16 @@ def test_send_password_reset_request_email() -> None:
     operating_system = "Windows"
     browser_name = "Chrome"
 
-    # Mock the email_sender.send_email function
-    # FIXME: this patch isn't working because we are using the context to get
-    # the email sender.
     with patch.object(EmailSender, "send_email") as mock_send_email:
         # Call the Celery task directly
         send_password_reset_request_email.apply_async(
-            args=[
-                user.email,
-                user.username,
-                password_reset_token,
-                operating_system,
-                browser_name,
-            ]
+            kwargs={
+                "to": user.email,
+                "username": user.username,
+                "password_reset_token": password_reset_token,
+                "operating_system": operating_system,
+                "browser_name": browser_name,
+            }
         )
 
     action_url = (
@@ -49,7 +50,9 @@ def test_send_password_reset_request_email() -> None:
     # Perform assertions on the mocked send_email function
     mock_send_email.assert_called_once_with(
         to=user.email,
-        subject="Password Reset Request",
+        subject=reset_password_subject.render(
+            username=user.username,
+        ),
         body=reset_password_text.render(
             action_url=action_url,
             operating_system=operating_system,

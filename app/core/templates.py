@@ -32,8 +32,14 @@ def create_environment() -> Environment:
 
 environment = create_environment()
 
+# password reset templates
+
+reset_password_subject = environment.get_template(
+    name="reset-password/subject.txt",
+)
+
 reset_password_html = environment.get_template(
-    name="reset-password/content.html",
+    name="reset-password/body.html",
     globals={
         "token_expires_in": naturaldelta(
             timedelta(
@@ -44,7 +50,7 @@ reset_password_html = environment.get_template(
 )
 
 reset_password_text = environment.get_template(
-    name="reset-password/content.txt",
+    name="reset-password/body.txt",
     globals={
         "token_expires_in": naturaldelta(
             timedelta(

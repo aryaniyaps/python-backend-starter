@@ -280,9 +280,9 @@ async def test_send_password_reset_request_success(auth_service: AuthService) ->
     ), patch.object(
         AuthRepo, "create_password_reset_token", return_value="reset_token"
     ), patch(
-        "app.auth.tasks.send_password_reset_request_email"
+        "app.auth.tasks.send_password_reset_request_email.delay",
+        return_value=None,
     ) as mock_send_email:
-        mock_send_email.return_value = None
         await auth_service.send_password_reset_request(
             PasswordResetRequestInput(
                 email=mock_user.email,

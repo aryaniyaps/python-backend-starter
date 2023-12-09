@@ -5,7 +5,11 @@ from aioinject import Inject, inject
 
 from app.core.constants import APP_URL
 from app.core.emails import EmailSender
-from app.core.templates import reset_password_html, reset_password_text
+from app.core.templates import (
+    reset_password_html,
+    reset_password_subject,
+    reset_password_text,
+)
 from app.worker import worker
 
 
@@ -35,7 +39,9 @@ def send_password_reset_request_email(
 
     email_sender.send_email(
         to=to,
-        subject="Password Reset Request",
+        subject=reset_password_subject.render(
+            username=username,
+        ),
         body=reset_password_text.render(
             action_url=action_url,
             operating_system=operating_system,
