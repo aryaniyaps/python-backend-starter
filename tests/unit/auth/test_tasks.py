@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 from urllib.parse import urlencode, urljoin
 
 from app.auth.tasks import send_password_reset_request_email
