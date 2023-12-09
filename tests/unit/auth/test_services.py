@@ -309,12 +309,14 @@ async def test_send_password_reset_request_user_not_found(
         get_browser=MagicMock(return_value="Chrome"),
     )
 
-    with patch.object(UserRepo, "get_user_by_email", return_value=None):
+    with patch.object(UserRepo, "get_user_by_email", return_value=None), patch(
+        "app.auth.tasks.send_password_reset_request_email"
+    ) as mock_send_email:
         await auth_service.send_password_reset_request(
             PasswordResetRequestInput(email="nonexistent@example.com"), user_agent
         )
-        # TODO: assert password reset email was not sent
-        # and password reset token was not created
+    mock_send_email.assert_not_called()
+    # TODO: assert password reset token was not created
 
 
 async def test_reset_password_success(auth_service: AuthService) -> None:

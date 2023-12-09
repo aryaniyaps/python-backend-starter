@@ -5,7 +5,10 @@ from app.config import settings
 
 def create_worker() -> Celery:
     """Initialize a worker instance."""
-    celery = Celery(__name__)
+    celery = Celery(
+        __name__,
+        task_cls="app.core.tasks.AioInjectTask",
+    )
     celery.conf.update(
         {
             "broker_url": str(settings.celery_broker_url),

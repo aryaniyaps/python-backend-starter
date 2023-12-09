@@ -3,6 +3,7 @@ from urllib.parse import urlencode, urljoin
 
 from app.auth.tasks import send_password_reset_request_email
 from app.core.constants import APP_URL
+from app.core.emails import EmailSender
 from app.core.templates import reset_password_html, reset_password_text
 from app.users.models import User
 
@@ -22,7 +23,7 @@ def test_send_password_reset_request_email() -> None:
     # Mock the email_sender.send_email function
     # FIXME: this patch isn't working because we are using the context to get
     # the email sender.
-    with patch("app.core.emails.EmailSender.send_email") as mock_send_email:
+    with patch.object(EmailSender, "send_email") as mock_send_email:
         # Call the Celery task directly
         send_password_reset_request_email.apply_async(
             args=[
