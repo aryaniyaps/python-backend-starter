@@ -96,6 +96,7 @@ class AuthService:
             raise InvalidInputError(
                 message="Invalid credentials provided.",
             ) from exception
+
         if password_hasher.check_needs_rehash(
             hash=user.password_hash,
         ):

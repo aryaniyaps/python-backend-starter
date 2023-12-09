@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
 import pytest
+from argon2 import PasswordHasher
 from argon2.exceptions import HashingError
 from user_agents.parsers import UserAgent
 
@@ -184,9 +185,20 @@ async def test_login_user_password_rehash(auth_service: AuthService) -> None:
     Ensure the user's password gets rehashed if the old
     password needs rehashing.
     """
+    mock_password_hasher = MagicMock(
+        spec=PasswordHasher,
+        check_needs_rehash=MagicMock(
+            return_value=True,
+        ),
+    )
+
     with patch("app.auth.services.UserRepo.get_user_by_email") as mock_get_user, patch(
         "app.auth.services.AuthRepo.create_authentication_token"
-    ) as mock_create_token:
+    ) as mock_create_token, patch(
+        "app.auth.services.UserRepo.update_user_password"
+    ) as mock_update_password, patch(
+        "app.auth.services.password_hasher", mock_password_hasher
+    ):
         mock_user = MagicMock(spec=User)
         mock_user.id = uuid4()
         mock_user.password_hash = password_hasher.hash("password")
@@ -205,8 +217,12 @@ async def test_login_user_password_rehash(auth_service: AuthService) -> None:
     assert result.authentication_token == "fake_token"
     assert result.user == mock_user
 
-    # TODO: add more checks to see if password was rehashed
-    # passwords need rehashing if the argon2 parameters change
+    # Check if update_user_password was called
+    mock_password_hasher.check_needs_rehash.assert_called()
+    mock_update_password.assert_called_once_with(
+        user_id=mock_user.id,
+        password="password",
+    )
 
 
 async def test_verify_authentication_token_valid_token(
@@ -311,12 +327,14 @@ async def test_send_password_reset_request_user_not_found(
 
     with patch.object(UserRepo, "get_user_by_email", return_value=None), patch(
         "app.auth.tasks.send_password_reset_request_email"
-    ) as mock_send_email:
+    ) as mock_send_email, patch.object(
+        AuthRepo, "create_password_reset_token"
+    ) as mock_create_password_reset_token:
         await auth_service.send_password_reset_request(
             PasswordResetRequestInput(email="nonexistent@example.com"), user_agent
         )
     mock_send_email.assert_not_called()
-    # TODO: assert password reset token was not created
+    mock_create_password_reset_token.assert_not_called()
 
 
 async def test_reset_password_success(auth_service: AuthService) -> None:

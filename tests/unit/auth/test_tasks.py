@@ -15,7 +15,7 @@ from app.users.models import User
 def test_send_password_reset_request_email() -> None:
     """Ensure we can send a password reset request email."""
     # Mock the required objects
-    user = MagicMock(
+    mock_user = MagicMock(
         spec=User,
         email="user@example.com",
         username="testuser",
@@ -32,8 +32,8 @@ def test_send_password_reset_request_email() -> None:
     )
 
     send_password_reset_request_email(
-        to=user.email,
-        username=user.username,
+        to=mock_user.email,
+        username=mock_user.username,
         password_reset_token=password_reset_token,
         operating_system=operating_system,
         browser_name=browser_name,
@@ -45,7 +45,7 @@ def test_send_password_reset_request_email() -> None:
         + "?"
         + urlencode(
             {
-                "email": user.email,
+                "email": mock_user.email,
                 "reset_token": password_reset_token,
             }
         )
@@ -53,20 +53,20 @@ def test_send_password_reset_request_email() -> None:
 
     # Perform assertions on the mocked send_email function
     mock_email_sender.send_email.assert_called_once_with(
-        to=user.email,
+        to=mock_user.email,
         subject=reset_password_subject.render(
-            username=user.username,
+            username=mock_user.username,
         ),
         body=reset_password_text.render(
             action_url=action_url,
             operating_system=operating_system,
             browser_name=browser_name,
-            username=user.username,
+            username=mock_user.username,
         ),
         html_body=reset_password_html.render(
             action_url=action_url,
             operating_system=operating_system,
             browser_name=browser_name,
-            username=user.username,
+            username=mock_user.username,
         ),
     )
