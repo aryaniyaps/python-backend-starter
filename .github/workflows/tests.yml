@@ -29,13 +29,6 @@ jobs:
                 POSTGRESQL_USERNAME: "user"
                 POSTGRESQL_PASSWORD: "pass"
                 POSTGRESQL_DATABASE: "starter"
-            options: >-
-                --health-cmd pg_isready
-                --health-interval 10s
-                --health-timeout 5s
-                --health-retries 5
-            volumes:
-              - "./postgres_data:/bitnami/postgresql"
 
         redis:
             image: "bitnami/redis:6.2"
@@ -43,13 +36,6 @@ jobs:
                 - "6379:6379"
             env:
                 REDIS_PASSWORD: "pass"
-            options: >-
-                --health-cmd "redis-cli ping"
-                --health-interval 10s
-                --health-timeout 5s
-                --health-retries 5
-            volumes:
-                - "./redis_data:/bitnami"
 
         rabbitmq:
             image: "bitnami/rabbitmq:3.12"
@@ -61,7 +47,6 @@ jobs:
                 RABBITMQ_DEFAULT_PASS: "pass"
                 RABBITMQ_CONF_FILE: "/opt/bitnami/rabbitmq/etc/rabbitmq/rabbitmq.conf"
             volumes:
-                - "./rabbitmq_data:/bitnami/rabbitmq/mnesia"
                 - "./rabbitmq.conf:/opt/bitnami/rabbitmq/etc/rabbitmq/rabbitmq.conf"
 
 
