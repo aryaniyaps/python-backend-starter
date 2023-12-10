@@ -1,2 +1,2 @@
 #!/bin/sh
-pipenv run pytest -v
+pdm run pytest -v
