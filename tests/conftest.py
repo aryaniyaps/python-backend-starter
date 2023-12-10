@@ -2,7 +2,6 @@ from typing import AsyncIterator, Iterator
 
 import pytest
 from aioinject import Container, InjectionContext, providers
-from aioinject.context import context_var
 from alembic import command
 from alembic.config import Config
 from falcon.asgi import App
@@ -138,18 +137,9 @@ async def test_container(
 
 
 @pytest.fixture
-async def _injection_context(
+async def injection_context(
     test_container: Container,
 ) -> AsyncIterator[InjectionContext]:
     """Get the injection context."""
     async with test_container.context() as context:
         yield context
-
-
-@pytest.fixture
-def injection_context(
-    _injection_context: InjectionContext,
-) -> Iterator[InjectionContext]:
-    token = context_var.set(_injection_context)
-    yield _injection_context
-    context_var.reset(token)

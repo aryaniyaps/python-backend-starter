@@ -5,7 +5,7 @@
 groups = ["default", "test"]
 strategy = ["cross_platform"]
 lock_version = "4.4"
-content_hash = "sha256:dbe1b406ff1fe8178d2eae4f2a4a5f9f5005394ce2c229cabdc796e5d34bec65"
+content_hash = "sha256:f753e6e056e7adace0ef94628d637aeee80ad82d9d22324028d6966b632bb9b3"
 
 [[package]]
 name = "aioinject"
@@ -597,19 +597,6 @@ dependencies = [
 files = [
     {file = "pytest-7.4.3-py3-none-any.whl", hash = "sha256:0d009c083ea859a71b76adf7c1d502e4bc170b80a8ef002da5806527b9591fac"},
     {file = "pytest-7.4.3.tar.gz", hash = "sha256:d989d136982de4e3b29dabcc838ad581c64e8ed52c11fbe86ddebd9da0818cd5"},
-]
-
-[[package]]
-name = "pytest-asyncio"
-version = "0.23.3a0"
-requires_python = ">=3.8"
-summary = "Pytest support for asyncio"
-dependencies = [
-    "pytest>=7.0.0",
-]
-files = [
-    {file = "pytest-asyncio-0.23.3a0.tar.gz", hash = "sha256:73bd3462a32ac4197c78c371f6960569d8d9f2e66a8c109aea98a203b1099bf7"},
-    {file = "pytest_asyncio-0.23.3a0-py3-none-any.whl", hash = "sha256:7c26437f1f821e2109dc2b372bf2de2de61c46d046acbf193b2b764728ee1564"},
 ]
 
 [[package]]

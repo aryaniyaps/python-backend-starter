@@ -1,9 +1,12 @@
 from uuid import uuid4
 
+import pytest
 from falcon import HTTP_200, HTTP_401, HTTP_404
 from falcon.testing import ASGIConductor
 
 from app.users.models import User
+
+pytestmark = [pytest.mark.anyio]
 
 
 async def test_on_get_current_user_authenticated(auth_conductor: ASGIConductor) -> None:

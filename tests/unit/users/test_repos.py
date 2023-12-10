@@ -1,8 +1,12 @@
 from uuid import uuid4
 
+import pytest
+
 from app.core.security import password_hasher
 from app.users.models import User
 from app.users.repos import UserRepo
+
+pytestmark = [pytest.mark.anyio]
 
 
 async def test_create_user(user_repo: UserRepo) -> None:

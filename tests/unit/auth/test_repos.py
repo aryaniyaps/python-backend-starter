@@ -9,6 +9,8 @@ from app.auth.repos import AuthRepo
 from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
 from app.users.models import User
 
+pytestmark = [pytest.mark.anyio]
+
 
 async def test_create_authentication_token(user: User, auth_repo: AuthRepo) -> None:
     """Ensure we can create an authentication token."""

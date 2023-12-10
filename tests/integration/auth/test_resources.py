@@ -1,10 +1,13 @@
 import json
 
+import pytest
 from falcon import HTTP_200, HTTP_201, HTTP_204, HTTP_400, HTTP_401
 from falcon.testing import ASGIConductor
 
 from app.auth.repos import AuthRepo
 from app.users.models import User
+
+pytestmark = [pytest.mark.anyio]
 
 
 async def test_on_post_register_success(conductor: ASGIConductor) -> None:
