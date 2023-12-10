@@ -101,36 +101,26 @@ async def user_service(injection_context: InjectionContext) -> UserService:
     return await injection_context.resolve(UserService)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 async def test_database_connection() -> AsyncIterator[AsyncConnection]:
     """Get a database connection."""
     async with engine.connect() as connection:
+        transaction = await connection.begin()
         # yield database connection
         yield connection
+        if transaction.is_active:
+            await transaction.rollback()
 
 
-@pytest.fixture(autouse=True)
-async def wrap_connection_in_transaction(
-    test_database_connection: AsyncConnection,
-) -> AsyncIterator[AsyncConnection]:
-    """Wrap the connection with a transaction for every test case."""
-    transaction = await test_database_connection.begin()
-    yield test_database_connection
-    await transaction.rollback()
-
-
-@pytest.fixture(scope="session")
+@pytest.fixture
 async def test_container(
     test_database_connection: AsyncConnection,
 ) -> AsyncIterator[Container]:
     """Initialize the container for testing."""
 
-    def get_test_database_connection() -> AsyncConnection:
-        return test_database_connection
-
     with container.override(
-        provider=providers.Callable(
-            get_test_database_connection,
+        provider=providers.Object(
+            test_database_connection,
         ),
     ):
         yield container

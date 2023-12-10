@@ -20,13 +20,13 @@ async def test_create_authentication_token(user: User, auth_repo: AuthRepo) -> N
 
 
 async def test_get_user_id_from_authentication_token_valid(
-    user: User, auth_repo: AuthRepo
+    user: User, authentication_token: str, auth_repo: AuthRepo
 ) -> None:
     """Ensure we can get the user ID from an authentication token."""
-    token = await auth_repo.create_authentication_token(user_id=user.id)
-
     # Perform token verification
-    user_id = await auth_repo.get_user_id_from_authentication_token(token)
+    user_id = await auth_repo.get_user_id_from_authentication_token(
+        authentication_token=authentication_token,
+    )
 
     assert user_id == user.id
 
