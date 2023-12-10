@@ -9,7 +9,7 @@ class AioInjectMiddleware:
     async def process_request(
         self,
         req: Request,
-        resp: Response,
+        _resp: Response,
     ) -> None:
         """
         Set the aioinject context manager in the request
@@ -22,9 +22,9 @@ class AioInjectMiddleware:
     async def process_response(
         self,
         req: Request,
-        resp: Response,
-        resource,
-        req_succeeded: bool,
+        _resp: Response,
+        _resource,
+        _req_succeeded: bool,
     ) -> None:
         """
         Remove the aioinject context manager from the request

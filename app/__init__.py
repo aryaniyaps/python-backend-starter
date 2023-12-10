@@ -1,4 +1,3 @@
-from aioinject import Container
 from falcon import CORSMiddleware
 from falcon.asgi import App
 from pydantic import ValidationError
@@ -72,8 +71,8 @@ def add_middleware(app: App, testing: bool) -> None:
         )
     )
     if not testing:
-        # tests automatically have the dependency
-        # injection context
+        # tests automatically have the injection context,
+        # no need to activate it per request
         app.add_middleware(
             AioInjectMiddleware(
                 container=container,
@@ -126,10 +125,7 @@ def create_app(
     """Initialize an ASGI app instance."""
     app = App()
     add_media_handlers(app)
-    add_middleware(
-        app,
-        testing=testing,
-    )
+    add_middleware(app, testing=testing)
     add_error_handlers(app)
     add_routes(app)
     return app

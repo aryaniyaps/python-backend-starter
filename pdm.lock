@@ -5,7 +5,7 @@
 groups = ["default", "test"]
 strategy = ["cross_platform"]
 lock_version = "4.4"
-content_hash = "sha256:1dcf4125f9e74d5da634f5c287872979198cc31ff1c9eda585c70b9bca4ac759"
+content_hash = "sha256:4a06e418b3ae91de5abf0fef33eb838960e06f4292cfb69af39ff3831c93edb5"
 
 [[package]]
 name = "aioinject"
@@ -610,6 +610,19 @@ dependencies = [
 files = [
     {file = "pytest-7.4.3-py3-none-any.whl", hash = "sha256:0d009c083ea859a71b76adf7c1d502e4bc170b80a8ef002da5806527b9591fac"},
     {file = "pytest-7.4.3.tar.gz", hash = "sha256:d989d136982de4e3b29dabcc838ad581c64e8ed52c11fbe86ddebd9da0818cd5"},
+]
+
+[[package]]
+name = "pytest-timeout"
+version = "2.2.0"
+requires_python = ">=3.7"
+summary = "pytest plugin to abort hanging tests"
+dependencies = [
+    "pytest>=5.0.0",
+]
+files = [
+    {file = "pytest-timeout-2.2.0.tar.gz", hash = "sha256:3b0b95dabf3cb50bac9ef5ca912fa0cfc286526af17afc806824df20c2f72c90"},
+    {file = "pytest_timeout-2.2.0-py3-none-any.whl", hash = "sha256:bde531e096466f49398a59f2dde76fa78429a09a12411466f88a07213e220de2"},
 ]
 
 [[package]]

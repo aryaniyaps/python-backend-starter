@@ -109,7 +109,6 @@ async def test_database_connection() -> AsyncIterator[AsyncConnection]:
         transaction = await connection.begin_nested()
         # yield database connection
         yield connection
-        print("ROLLING BACK TRANSACTION")
         if transaction.is_active:
             await transaction.rollback()
         await connection.rollback()
@@ -127,7 +126,7 @@ async def test_container() -> AsyncIterator[Container]:
             yield container
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 async def injection_context(
     test_container: Container,
 ) -> AsyncIterator[InjectionContext]:
