@@ -20,16 +20,12 @@ dependencies = [
     "orjson>=3.9.10",
     "aioinject>=0.15.1",
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 readme = "README.md"
 license = { text = "AGPL-3.0" }
 
 [tool.pdm.dev-dependencies]
-test = [
-    "pytest>=7.4.3",
-    "pytest-xdist>=3.5.0",
-    "anyio>=4.1.0",
-]
+test = ["pytest>=7.4.3", "pytest-xdist>=3.5.0", "anyio>=4.1.0"]
 
 [tool.setuptools.packages.find]
 where = ["."] # list of folders that contain the packages (["."] by default)
