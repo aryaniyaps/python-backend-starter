@@ -8,8 +8,6 @@ from app.users.models import User
 from app.users.repos import UserRepo
 from app.users.services import UserService
 
-pytestmark = pytest.mark.asyncio
-
 
 async def test_get_user_by_id_success(user_service: UserService) -> None:
     """Ensure we can retrieve a user by ID."""

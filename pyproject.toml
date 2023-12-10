@@ -25,7 +25,11 @@ readme = "README.md"
 license = { text = "AGPL-3.0" }
 
 [tool.pdm.dev-dependencies]
-test = ["pytest>=7.4.3", "pytest-asyncio>=0.21.1", "pytest-xdist>=3.5.0"]
+test = [
+    "pytest>=7.4.3",
+    "pytest-asyncio>=0.23.3a0",
+    "pytest-xdist>=3.5.0",
+]
 
 [tool.setuptools.packages.find]
 where = ["."] # list of folders that contain the packages (["."] by default)

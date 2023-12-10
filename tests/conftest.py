@@ -1,8 +1,7 @@
-from asyncio import AbstractEventLoop, get_event_loop
-from contextlib import asynccontextmanager
 from typing import AsyncIterator, Iterator
 
 import pytest
+from aioinject import Container, InjectionContext, providers
 from alembic import command
 from alembic.config import Config
 from falcon.asgi import App
@@ -17,19 +16,6 @@ from app.core.database import engine
 from app.users.models import User
 from app.users.repos import UserRepo
 from app.users.services import UserService
-
-# the default `event_loop` fixture is function scoped,
-# which means we cannot use it for async session scoped
-# fixtures out of the box
-
-
-@pytest.fixture(scope="session")
-def event_loop() -> Iterator[AbstractEventLoop]:
-    """Get the event loop."""
-    loop = get_event_loop()
-    yield loop
-    if loop.is_running:
-        loop.close()
 
 
 @pytest.fixture(scope="session")
@@ -76,68 +62,74 @@ async def authentication_token(user: User, auth_repo: AuthRepo) -> str:
 
 
 @pytest.fixture(scope="session")
-async def connection() -> AsyncIterator[AsyncConnection]:
-    """Get the database connection."""
-    async with get_test_database_connection() as connection:
-        yield connection
-
-
-@pytest.fixture(scope="session")
-def redis_client() -> Iterator[Redis]:
+async def redis_client(injection_context: InjectionContext) -> Redis:
     """Get the redis client."""
-    with container.sync_context() as context:
-        yield context.resolve(Redis)
+    return await injection_context.resolve(Redis)
 
 
 @pytest.fixture(scope="session")
-def auth_repo(connection: AsyncConnection, redis_client: Redis) -> AuthRepo:
+async def auth_repo(injection_context: InjectionContext) -> AuthRepo:
     """Get the authentication repository."""
-    return AuthRepo(
-        connection=connection,
-        redis_client=redis_client,
-    )
+    return await injection_context.resolve(AuthRepo)
 
 
 @pytest.fixture(scope="session")
-def user_repo(connection: AsyncConnection) -> UserRepo:
+async def user_repo(injection_context: InjectionContext) -> UserRepo:
     """Get the user repository."""
-    return UserRepo(
-        connection=connection,
-    )
+    return await injection_context.resolve(UserRepo)
 
 
 @pytest.fixture(scope="session")
-def auth_service(auth_repo: AuthRepo, user_repo: UserRepo) -> AuthService:
+async def auth_service(injection_context: InjectionContext) -> AuthService:
     """Get the authentication service."""
-    return AuthService(
-        auth_repo=auth_repo,
-        user_repo=user_repo,
-    )
+    return await injection_context.resolve(AuthService)
 
 
 @pytest.fixture(scope="session")
-def user_service(user_repo: UserRepo) -> UserService:
+async def user_service(injection_context: InjectionContext) -> UserService:
     """Get the user service."""
-    return UserService(
-        user_repo=user_repo,
-    )
+    return await injection_context.resolve(UserService)
 
 
-@asynccontextmanager
-async def get_test_database_connection() -> AsyncIterator[AsyncConnection]:
-    """
-    Get a database connection with a transaction
-    setup inside for each test case.
-    """
+@pytest.fixture(scope="session")
+async def test_database_connection() -> AsyncIterator[AsyncConnection]:
+    """Get a database connection."""
     async with engine.connect() as connection:
-        # begin database transaction
-        transaction = await connection.begin()
-
-        nested = await connection.begin_nested()
-
+        # yield database connection
         yield connection
 
-        # rollback database transaction
-        if nested.is_active:
-            await nested.rollback()
-        await transaction.rollback()
+
+@pytest.fixture(autouse=True)
+async def wrap_connection_in_transaction(
+    test_database_connection: AsyncConnection,
+) -> AsyncIterator[AsyncConnection]:
+    """Wrap the connection with a transaction for every test case."""
+    transaction = await test_database_connection.begin()
+    yield test_database_connection
+    await transaction.rollback()
+
+
+@pytest.fixture(scope="session")
+async def test_container(
+    test_database_connection: AsyncConnection,
+) -> AsyncIterator[Container]:
+    """Initialize the container for testing."""
+
+    def get_test_database_connection() -> AsyncConnection:
+        return test_database_connection
+
+    with container.override(
+        provider=providers.Callable(
+            get_test_database_connection,
+        ),
+    ):
+        yield container
+
+
+@pytest.fixture(scope="session")
+async def injection_context(
+    test_container: Container,
+) -> AsyncIterator[InjectionContext]:
+    """Get the injection context."""
+    async with test_container.context() as context:
+        yield context
