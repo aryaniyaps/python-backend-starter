@@ -29,7 +29,7 @@ def anyio_backend() -> str:
     return "asyncio"
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def app(test_container: Container) -> App:
     """Initialize the app for testing."""
     return create_app(
