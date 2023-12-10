@@ -64,20 +64,16 @@ def add_routes(app: App) -> None:
     )
 
 
-def add_middleware(app: App, overriding_container: Container | None = None) -> None:
+def add_middleware(app: App, testing: bool) -> None:
     """Register middleware for the app."""
     app.add_middleware(
         middleware=CORSMiddleware(
             allow_origins=settings.cors_allow_origins,
         )
     )
-    if overriding_container is not None:
-        app.add_middleware(
-            AioInjectMiddleware(
-                container=overriding_container,
-            )
-        )
-    else:
+    if not testing:
+        # tests automatically have the dependency
+        # injection context
         app.add_middleware(
             AioInjectMiddleware(
                 container=container,
@@ -125,14 +121,14 @@ def add_media_handlers(app: App) -> None:
 
 
 def create_app(
-    overriding_container: Container | None = None,
+    testing: bool = False,
 ) -> App:
     """Initialize an ASGI app instance."""
     app = App()
     add_media_handlers(app)
     add_middleware(
         app,
-        overriding_container=overriding_container,
+        testing=testing,
     )
     add_error_handlers(app)
     add_routes(app)

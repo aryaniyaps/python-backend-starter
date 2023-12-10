@@ -1,12 +1,13 @@
 from typing import AsyncIterator
 
 import pytest
+from aioinject import InjectionContext
 from falcon.asgi import App
 from falcon.testing import ASGIConductor, TestClient
 
 
 @pytest.fixture
-def test_client(app: App) -> TestClient:
+def test_client(app: App, injection_context: InjectionContext) -> TestClient:
     """Initialize the test client."""
     return TestClient(app)
 
@@ -19,7 +20,9 @@ async def conductor(test_client: TestClient) -> AsyncIterator[ASGIConductor]:
 
 
 @pytest.fixture
-async def auth_test_client(app: App, authentication_token: str) -> TestClient:
+async def auth_test_client(
+    app: App, authentication_token: str, injection_context: InjectionContext
+) -> TestClient:
     """Initialize an authenticated test client for testing."""
     return TestClient(
         app,

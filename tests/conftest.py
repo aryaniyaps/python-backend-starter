@@ -30,11 +30,9 @@ def anyio_backend() -> str:
 
 
 @pytest.fixture(scope="session")
-def app(test_container: Container) -> App:
+def app() -> App:
     """Initialize the app for testing."""
-    return create_app(
-        overriding_container=test_container,
-    )
+    return create_app(testing=True)
 
 
 @pytest.fixture(scope="session", autouse=True)
