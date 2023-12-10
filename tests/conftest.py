@@ -1,4 +1,4 @@
-from contextlib import asynccontextmanager
+from contextlib import aclosing, asynccontextmanager
 from typing import AsyncIterator, Iterator
 
 import pytest
@@ -29,10 +29,12 @@ def anyio_backend() -> str:
     return "asyncio"
 
 
-@pytest.fixture(scope="session")
-def app() -> App:
+@pytest.fixture
+def app(test_container: Container) -> App:
     """Initialize the app for testing."""
-    return create_app()
+    return create_app(
+        overriding_container=test_container,
+    )
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -102,29 +104,29 @@ async def user_service(injection_context: InjectionContext) -> UserService:
     return await injection_context.resolve(UserService)
 
 
-@pytest.fixture
+@asynccontextmanager
 async def test_database_connection() -> AsyncIterator[AsyncConnection]:
     """Get the test database connection."""
     async with engine.begin() as connection:
         transaction = await connection.begin_nested()
         # yield database connection
         yield connection
+        print("ROLLING BACK TRANSACTION")
         if transaction.is_active:
             await transaction.rollback()
         await connection.rollback()
 
 
-@pytest.fixture
-async def test_container(
-    test_database_connection: AsyncConnection,
-) -> AsyncIterator[Container]:
+@pytest.fixture(scope="session")
+async def test_container() -> AsyncIterator[Container]:
     """Initialize the container for testing."""
-    with container.override(
-        provider=providers.Object(
-            test_database_connection,
-        ),
-    ):
-        yield container
+    async with aclosing(container):
+        with container.override(
+            provider=providers.Callable(
+                test_database_connection,
+            ),
+        ):
+            yield container
 
 
 @pytest.fixture

@@ -1,3 +1,4 @@
+from aioinject import Container
 from falcon import CORSMiddleware
 from falcon.asgi import App
 from pydantic import ValidationError
@@ -63,18 +64,25 @@ def add_routes(app: App) -> None:
     )
 
 
-def add_middleware(app: App) -> None:
+def add_middleware(app: App, overriding_container: Container | None = None) -> None:
     """Register middleware for the app."""
     app.add_middleware(
         middleware=CORSMiddleware(
             allow_origins=settings.cors_allow_origins,
         )
     )
-    app.add_middleware(
-        AioInjectMiddleware(
-            container=container,
+    if overriding_container is not None:
+        app.add_middleware(
+            AioInjectMiddleware(
+                container=overriding_container,
+            )
         )
-    )
+    else:
+        app.add_middleware(
+            AioInjectMiddleware(
+                container=container,
+            )
+        )
 
 
 def add_error_handlers(app: App) -> None:
@@ -116,11 +124,16 @@ def add_media_handlers(app: App) -> None:
     )
 
 
-def create_app() -> App:
+def create_app(
+    overriding_container: Container | None = None,
+) -> App:
     """Initialize an ASGI app instance."""
     app = App()
     add_media_handlers(app)
-    add_middleware(app)
+    add_middleware(
+        app,
+        overriding_container=overriding_container,
+    )
     add_error_handlers(app)
     add_routes(app)
     return app

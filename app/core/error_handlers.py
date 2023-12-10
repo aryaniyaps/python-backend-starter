@@ -13,10 +13,10 @@ from app.core.errors import (
 
 
 async def handle_validation_error(
-    req: Request,
+    _req: Request,
     resp: Response,
     ex: ValidationError,
-    params,
+    _params,
 ) -> None:
     """Handle ValidationError exceptions."""
     resp.status = HTTP_400
@@ -31,10 +31,10 @@ async def handle_validation_error(
 
 
 async def handle_invalid_input_error(
-    req: Request,
+    _req: Request,
     resp: Response,
     ex: InvalidInputError,
-    params,
+    _params,
 ) -> None:
     """Handle InvalidInputError expections."""
     resp.status = HTTP_400
@@ -44,10 +44,10 @@ async def handle_invalid_input_error(
 
 
 async def handle_resource_not_found_error(
-    req: Request,
+    _req: Request,
     resp: Response,
     ex: ResourceNotFoundError,
-    params,
+    _params,
 ) -> None:
     """Handle ResourceNotFound expections."""
     resp.status = HTTP_404
@@ -57,10 +57,10 @@ async def handle_resource_not_found_error(
 
 
 async def handle_unauthenticated_error(
-    req: Request,
+    _req: Request,
     resp: Response,
     ex: UnauthenticatedError,
-    params,
+    _params,
 ) -> None:
     """Handle UnauthenticatedError expections."""
     resp.status = HTTP_401
@@ -70,10 +70,10 @@ async def handle_unauthenticated_error(
 
 
 async def handle_unexpected_error(
-    req: Request,
+    _req: Request,
     resp: Response,
     ex: UnexpectedError,
-    params,
+    _params,
 ) -> None:
     """Handle UnexpectedError expections."""
     resp.status = HTTP_500
@@ -83,10 +83,10 @@ async def handle_unexpected_error(
 
 
 async def handle_uncaught_exception(
-    req: Request,
+    _req: Request,
     resp: Response,
     ex: Exception,
-    params,
+    _params,
 ) -> None:
     """Handle uncaught expections."""
     logging.error(ex, stack_info=True, stacklevel=2)
