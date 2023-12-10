@@ -5,20 +5,20 @@ from falcon.asgi import App
 from falcon.testing import ASGIConductor, TestClient
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def test_client(app: App) -> TestClient:
     """Initialize the test client."""
     return TestClient(app)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 async def conductor(test_client: TestClient) -> AsyncIterator[ASGIConductor]:
     """Initialize the test conductor for the ASGI app."""
     async with test_client as conductor:
         yield conductor
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 async def auth_test_client(app: App, authentication_token: str) -> TestClient:
     """Initialize an authenticated test client for testing."""
     return TestClient(
@@ -29,7 +29,7 @@ async def auth_test_client(app: App, authentication_token: str) -> TestClient:
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 async def auth_conductor(auth_test_client: TestClient) -> AsyncIterator[ASGIConductor]:
     """Initialize an authenticated test conductor for the ASGI app."""
     async with auth_test_client as conductor:

@@ -2,6 +2,7 @@ from typing import AsyncIterator, Iterator
 
 import pytest
 from aioinject import Container, InjectionContext, providers
+from aioinject.context import context_var
 from alembic import command
 from alembic.config import Config
 from falcon.asgi import App
@@ -16,6 +17,16 @@ from app.core.database import engine
 from app.users.models import User
 from app.users.repos import UserRepo
 from app.users.services import UserService
+
+pytest_plugins = [
+    "anyio",
+]
+
+
+@pytest.fixture(scope="session")
+def anyio_backend() -> str:
+    """Get the anyio backend"""
+    return "asyncio"
 
 
 @pytest.fixture(scope="session")
@@ -45,7 +56,7 @@ def setup_test_database() -> Iterator[None]:
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 async def user(user_repo: UserRepo) -> User:
     """Create an user for testing."""
     return await user_repo.create_user(
@@ -55,37 +66,37 @@ async def user(user_repo: UserRepo) -> User:
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 async def authentication_token(user: User, auth_repo: AuthRepo) -> str:
     """Create an authentication token for the user."""
     return await auth_repo.create_authentication_token(user_id=user.id)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 async def redis_client(injection_context: InjectionContext) -> Redis:
     """Get the redis client."""
     return await injection_context.resolve(Redis)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 async def auth_repo(injection_context: InjectionContext) -> AuthRepo:
     """Get the authentication repository."""
     return await injection_context.resolve(AuthRepo)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 async def user_repo(injection_context: InjectionContext) -> UserRepo:
     """Get the user repository."""
     return await injection_context.resolve(UserRepo)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 async def auth_service(injection_context: InjectionContext) -> AuthService:
     """Get the authentication service."""
     return await injection_context.resolve(AuthService)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 async def user_service(injection_context: InjectionContext) -> UserService:
     """Get the user service."""
     return await injection_context.resolve(UserService)
@@ -126,10 +137,19 @@ async def test_container(
         yield container
 
 
-@pytest.fixture(scope="session")
-async def injection_context(
+@pytest.fixture
+async def _injection_context(
     test_container: Container,
 ) -> AsyncIterator[InjectionContext]:
     """Get the injection context."""
     async with test_container.context() as context:
         yield context
+
+
+@pytest.fixture
+def injection_context(
+    _injection_context: InjectionContext,
+) -> Iterator[InjectionContext]:
+    token = context_var.set(_injection_context)
+    yield _injection_context
+    context_var.reset(token)
