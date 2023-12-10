@@ -24,13 +24,13 @@ services:
     ports:
       - "5672:5672"
     environment:
-      RABBITMQ_DEFAULT_VHOST: tasks
-      RABBITMQ_DEFAULT_USER: user
-      RABBITMQ_DEFAULT_PASS: pass
-      RABBITMQ_CONF_FILE: /opt/bitnami/rabbitmq/etc/rabbitmq/rabbitmq.conf
+      - RABBITMQ_DEFAULT_VHOST=tasks
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=pass
+      - RABBITMQ_CONF_FILE=/opt/bitnami/rabbitmq/etc/rabbitmq/rabbitmq.conf
     volumes:
-      - rabbitmq_data:/bitnami/rabbitmq/mnesia
-      - ./rabbitmq.conf:/opt/bitnami/rabbitmq/etc/rabbitmq/rabbitmq.conf
+      - "rabbitmq_data:/bitnami/rabbitmq/mnesia"
+      - "./rabbitmq.conf:/opt/bitnami/rabbitmq/etc/rabbitmq/rabbitmq.conf"
 
 
   mailhog:

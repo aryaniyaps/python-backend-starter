@@ -1,0 +1,90 @@
+name: tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  tests:
+    runs-on: ubuntu-20.04
+    env:
+      debug: true
+      database_url: "postgresql+asyncpg://user:pass@localhost:5432/starter"
+      redis_url: "redis://:pass@localhost:6379/1"
+      celery_broker_url: "amqp://user:pass@localhost:5672/tasks"
+      email_server: "smtp://localhost:1025"
+      email_from: "noreply@example.com"
+
+
+    services:
+        postgres:
+            image: "bitnami/postgresql:16"
+            ports:
+              - "5432:5432"
+            env:
+                POSTGRESQL_USERNAME: "user"
+                POSTGRESQL_PASSWORD: "pass"
+                POSTGRESQL_DATABASE: "starter"
+            options: >-
+                --health-cmd pg_isready
+                --health-interval 10s
+                --health-timeout 5s
+                --health-retries 5
+            volumes:
+              - "./postgres_data:/bitnami/postgresql"
+
+        redis:
+            image: "bitnami/redis:6.2"
+            ports:
+                - "6379:6379"
+            env:
+                REDIS_PASSWORD: "pass"
+            options: >-
+                --health-cmd "redis-cli ping"
+                --health-interval 10s
+                --health-timeout 5s
+                --health-retries 5
+            volumes:
+                - "./redis_data:/bitnami"
+
+        rabbitmq:
+            image: "bitnami/rabbitmq:3.12"
+            ports:
+                - "5672:5672"
+            env:
+                RABBITMQ_DEFAULT_VHOST: "tasks"
+                RABBITMQ_DEFAULT_USER: "user"
+                RABBITMQ_DEFAULT_PASS: "pass"
+                RABBITMQ_CONF_FILE: "/opt/bitnami/rabbitmq/etc/rabbitmq/rabbitmq.conf"
+            volumes:
+                - "./rabbitmq_data:/bitnami/rabbitmq/mnesia"
+                - "./rabbitmq.conf:/opt/bitnami/rabbitmq/etc/rabbitmq/rabbitmq.conf"
+
+
+        mailhog:
+            image: mailhog/mailhog:v1.0.1
+            ports:
+                - "1025:1025"
+                - "8025:8025"
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.12"
+
+      - name: Install PDM
+        run: pip install --no-cache pdm
+
+      - name: Install Dependencies
+        run: pdm install -G test
+
+      - name: Run Tests
+        run: sh ./scripts/run-tests.sh
