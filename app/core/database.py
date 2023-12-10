@@ -8,6 +8,7 @@ engine = create_async_engine(
     echo=settings.debug,
     pool_size=20,
     max_overflow=0,
+    pool_pre_ping=True,
 )
 
 database_metadata = MetaData()

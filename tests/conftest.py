@@ -102,8 +102,8 @@ async def user_service(injection_context: InjectionContext) -> UserService:
     return await injection_context.resolve(UserService)
 
 
-@asynccontextmanager
-async def get_test_database_connection() -> AsyncIterator[AsyncConnection]:
+@pytest.fixture
+async def test_database_connection() -> AsyncIterator[AsyncConnection]:
     """Get the test database connection."""
     async with engine.begin() as connection:
         transaction = await connection.begin_nested()
@@ -115,12 +115,13 @@ async def get_test_database_connection() -> AsyncIterator[AsyncConnection]:
 
 
 @pytest.fixture
-async def test_container() -> AsyncIterator[Container]:
+async def test_container(
+    test_database_connection: AsyncConnection,
+) -> AsyncIterator[Container]:
     """Initialize the container for testing."""
-
     with container.override(
-        provider=providers.Callable(
-            get_test_database_connection,
+        provider=providers.Object(
+            test_database_connection,
         ),
     ):
         yield container
