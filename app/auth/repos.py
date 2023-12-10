@@ -162,6 +162,7 @@ class AuthRepo:
             )
             .returning(*password_reset_tokens_table.c),
         )
+        await self._connection.commit()
         return reset_token
 
     async def get_password_reset_token(

@@ -7,6 +7,7 @@ engine = create_async_engine(
     url=str(settings.database_url),
     echo=settings.debug,
     pool_size=20,
+    max_overflow=0,
 )
 
 database_metadata = MetaData()

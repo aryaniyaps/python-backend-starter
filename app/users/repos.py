@@ -35,6 +35,7 @@ class UserRepo:
             )
             .returning(*users_table.c),
         )
+        await self._connection.commit()
         user_row = result.one()
         return User.model_validate(user_row)
 
@@ -65,6 +66,7 @@ class UserRepo:
             )
             .returning(*users_table.c),
         )
+        await self._connection.commit()
         updated_user_row = result.one()
         return User.model_validate(updated_user_row)
 
@@ -83,6 +85,7 @@ class UserRepo:
             .values(last_login_at=text("NOW()"))
             .returning(*users_table.c),
         )
+        await self._connection.commit()
         updated_user_row = result.one()
         return User.model_validate(updated_user_row)
 

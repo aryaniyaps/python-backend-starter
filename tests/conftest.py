@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from typing import AsyncIterator, Iterator
 
 import pytest
@@ -101,26 +102,25 @@ async def user_service(injection_context: InjectionContext) -> UserService:
     return await injection_context.resolve(UserService)
 
 
-@pytest.fixture
-async def test_database_connection() -> AsyncIterator[AsyncConnection]:
-    """Get a database connection."""
-    async with engine.connect() as connection:
-        transaction = await connection.begin()
+@asynccontextmanager
+async def get_test_database_connection() -> AsyncIterator[AsyncConnection]:
+    """Get the test database connection."""
+    async with engine.begin() as connection:
+        transaction = await connection.begin_nested()
         # yield database connection
         yield connection
         if transaction.is_active:
             await transaction.rollback()
+        await connection.rollback()
 
 
 @pytest.fixture
-async def test_container(
-    test_database_connection: AsyncConnection,
-) -> AsyncIterator[Container]:
+async def test_container() -> AsyncIterator[Container]:
     """Initialize the container for testing."""
 
     with container.override(
-        provider=providers.Object(
-            test_database_connection,
+        provider=providers.Callable(
+            get_test_database_connection,
         ),
     ):
         yield container
