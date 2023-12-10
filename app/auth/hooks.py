@@ -10,9 +10,9 @@ from app.core.errors import UnauthenticatedError
 @inject
 async def login_required(
     req: Request,
-    resp: Response,
-    resource,
-    params,
+    _resp: Response,
+    _resource,
+    _params,
     auth_service: Annotated[AuthService, Inject],
 ) -> None:
     """Ensure that the current user is logged in."""
