@@ -1,20 +1,18 @@
 from uuid import UUID
 
+import inject
+from argon2 import PasswordHasher
 from sqlalchemy import insert, select, text, update
 from sqlalchemy.ext.asyncio import AsyncConnection
 
-from app.core.security import password_hasher
 from app.users.models import User
 
 from .tables import users_table
 
 
 class UserRepo:
-    def __init__(
-        self,
-        connection: AsyncConnection,
-    ) -> None:
-        self._connection = connection
+    _connection = inject.attr(AsyncConnection)
+    _password_hasher = inject.attr(PasswordHasher)
 
     async def create_user(
         self,
@@ -38,10 +36,9 @@ class UserRepo:
         user_row = result.one()
         return User.model_validate(user_row)
 
-    @staticmethod
-    def hash_password(password: str) -> str:
+    def hash_password(self, password: str) -> str:
         """Hash the given password."""
-        return password_hasher.hash(
+        return self._password_hasher.hash(
             password=password,
         )
 
@@ -115,6 +112,7 @@ class UserRepo:
         email: str,
     ) -> User | None:
         """Get a user by email."""
+        print("GETTING USER BY EMAIL")
         result = await self._connection.execute(
             select(*users_table.c).where(users_table.c.email == email)
         )

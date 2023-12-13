@@ -1,13 +1,14 @@
 from hashlib import sha256
 from uuid import UUID
 
+import inject
+from argon2 import PasswordHasher
 from argon2.exceptions import HashingError, VerifyMismatchError
 from user_agents.parsers import UserAgent
 
 from app.auth.repos import AuthRepo
 from app.auth.tasks import send_password_reset_request_email
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
-from app.core.security import password_hasher
 from app.users.repos import UserRepo
 
 from .models import (
@@ -21,13 +22,9 @@ from .models import (
 
 
 class AuthService:
-    def __init__(
-        self,
-        auth_repo: AuthRepo,
-        user_repo: UserRepo,
-    ) -> None:
-        self._auth_repo = auth_repo
-        self._user_repo = user_repo
+    _auth_repo = inject.attr(AuthRepo)
+    _user_repo = inject.attr(UserRepo)
+    _password_hasher = inject.attr(PasswordHasher)
 
     async def register_user(self, data: RegisterUserInput) -> CreateUserResult:
         """Register a new user."""
@@ -88,7 +85,7 @@ class AuthService:
                 message="Invalid credentials provided.",
             )
         try:
-            password_hasher.verify(
+            self._password_hasher.verify(
                 hash=user.password_hash,
                 password=data.password,
             )
@@ -97,7 +94,7 @@ class AuthService:
                 message="Invalid credentials provided.",
             ) from exception
 
-        if password_hasher.check_needs_rehash(
+        if self._password_hasher.check_needs_rehash(
             hash=user.password_hash,
         ):
             # update user's password hash

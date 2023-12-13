@@ -1,17 +1,14 @@
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, contextmanager
 from typing import AsyncIterator, Iterator
 
-from aioinject import Container, providers
+import inject
+from argon2 import PasswordHasher
 from redis.asyncio import Redis, from_url
 from sqlalchemy.ext.asyncio import AsyncConnection
 
-from app.auth.repos import AuthRepo
-from app.auth.services import AuthService
 from app.config import settings
 from app.core.database import engine
 from app.core.emails import EmailSender
-from app.users.repos import UserRepo
-from app.users.services import UserService
 
 
 @asynccontextmanager
@@ -21,13 +18,18 @@ async def get_database_connection() -> AsyncIterator[AsyncConnection]:
         yield connection
 
 
-def get_redis_client() -> Redis:
+@asynccontextmanager
+async def get_redis_client() -> AsyncIterator[Redis]:
     """Get the redis client."""
-    return from_url(
+    redis_client = from_url(
         url=str(settings.redis_url),
     )
+    yield redis_client
+
+    await redis_client.aclose()
 
 
+@contextmanager
 def get_email_sender() -> Iterator[EmailSender]:
     """Get the email sender."""
     email_sender = EmailSender(
@@ -38,50 +40,24 @@ def get_email_sender() -> Iterator[EmailSender]:
     email_sender.close_connection()
 
 
-def register_dependencies(container: Container) -> None:
-    """Register dependencies for the container."""
-    container.register(
-        provider=providers.Callable(
-            get_database_connection,
-        )
+def app_config(binder: inject.Binder) -> None:
+    """Configure dependencies for the binder."""
+    binder.bind_to_constructor(
+        EmailSender,
+        get_email_sender,
     )
-    container.register(
-        provider=providers.Singleton(
-            get_redis_client,
-        )
+    binder.bind_to_constructor(
+        Redis,
+        get_redis_client,
     )
-    container.register(
-        provider=providers.Singleton(
-            get_email_sender,
-        )
+    binder.bind_to_provider(
+        AsyncConnection,
+        get_database_connection,
     )
-    container.register(
-        provider=providers.Callable(
-            AuthRepo,
-        )
-    )
-    container.register(
-        provider=providers.Callable(
-            AuthService,
-        )
-    )
-    container.register(
-        provider=providers.Callable(
-            UserRepo,
-        )
-    )
-    container.register(
-        provider=providers.Callable(
-            UserService,
-        )
+    binder.bind(
+        PasswordHasher,
+        PasswordHasher(),
     )
 
 
-def create_container() -> Container:
-    """Initialize a container."""
-    container = Container()
-    register_dependencies(container)
-    return container
-
-
-container = create_container()
+inject.configure(app_config)

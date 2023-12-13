@@ -1,5 +1,7 @@
 from uuid import UUID
 
+import inject
+
 from app.core.errors import ResourceNotFoundError
 
 from .models import User
@@ -7,11 +9,7 @@ from .repos import UserRepo
 
 
 class UserService:
-    def __init__(
-        self,
-        user_repo: UserRepo,
-    ) -> None:
-        self._user_repo = user_repo
+    _user_repo = inject.attr(UserRepo)
 
     async def get_user_by_id(self, user_id: UUID) -> User:
         """Get a user by ID."""

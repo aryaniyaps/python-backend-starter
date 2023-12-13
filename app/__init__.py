@@ -4,7 +4,6 @@ from pydantic import ValidationError
 
 from app.auth.resources import auth_resource
 from app.config import settings
-from app.core.containers import container
 from app.core.error_handlers import (
     handle_invalid_input_error,
     handle_resource_not_found_error,
@@ -20,7 +19,6 @@ from app.core.errors import (
     UnexpectedError,
 )
 from app.core.media_handlers import media_handlers
-from app.core.middleware.aioinject import AioInjectMiddleware
 from app.users.resources import user_resource
 
 
@@ -63,21 +61,13 @@ def add_routes(app: App) -> None:
     )
 
 
-def add_middleware(app: App, testing: bool) -> None:
+def add_middleware(app: App) -> None:
     """Register middleware for the app."""
     app.add_middleware(
         middleware=CORSMiddleware(
             allow_origins=settings.cors_allow_origins,
         )
     )
-    if not testing:
-        # tests automatically have the injection context,
-        # no need to activate it per request
-        app.add_middleware(
-            AioInjectMiddleware(
-                container=container,
-            )
-        )
 
 
 def add_error_handlers(app: App) -> None:
@@ -119,13 +109,11 @@ def add_media_handlers(app: App) -> None:
     )
 
 
-def create_app(
-    testing: bool = False,
-) -> App:
+def create_app() -> App:
     """Initialize an ASGI app instance."""
     app = App()
     add_media_handlers(app)
-    add_middleware(app, testing=testing)
+    add_middleware(app)
     add_error_handlers(app)
     add_routes(app)
     return app
