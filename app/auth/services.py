@@ -1,7 +1,6 @@
 from hashlib import sha256
 from uuid import UUID
 
-import inject
 from argon2 import PasswordHasher
 from argon2.exceptions import HashingError, VerifyMismatchError
 from user_agents.parsers import UserAgent
@@ -22,9 +21,15 @@ from .models import (
 
 
 class AuthService:
-    _auth_repo = inject.attr(AuthRepo)
-    _user_repo = inject.attr(UserRepo)
-    _password_hasher = inject.attr(PasswordHasher)
+    def __init__(
+        self,
+        auth_repo: AuthRepo,
+        user_repo: UserRepo,
+        password_hasher: PasswordHasher,
+    ) -> None:
+        self._auth_repo = auth_repo
+        self._user_repo = user_repo
+        self._password_hasher = password_hasher
 
     async def register_user(self, data: RegisterUserInput) -> CreateUserResult:
         """Register a new user."""

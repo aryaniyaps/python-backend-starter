@@ -1,6 +1,5 @@
 from uuid import UUID
 
-import inject
 from argon2 import PasswordHasher
 from sqlalchemy import insert, select, text, update
 from sqlalchemy.ext.asyncio import AsyncConnection
@@ -11,8 +10,13 @@ from .tables import users_table
 
 
 class UserRepo:
-    _connection = inject.attr(AsyncConnection)
-    _password_hasher = inject.attr(PasswordHasher)
+    def __init__(
+        self,
+        connection: AsyncConnection,
+        password_hasher: PasswordHasher,
+    ) -> None:
+        self._connection = connection
+        self._password_hasher = password_hasher
 
     async def create_user(
         self,

@@ -1,7 +1,5 @@
 from urllib.parse import urlencode, urljoin
 
-import inject
-
 from app.core.constants import APP_URL
 from app.core.emails import EmailSender
 from app.core.templates import (
@@ -11,9 +9,10 @@ from app.core.templates import (
 )
 from app.worker import worker
 
+# TODO: integrate DI with Celery
+
 
 @worker.task
-@inject.autoparams("email_sender")
 def send_password_reset_request_email(
     to: str,
     username: str,

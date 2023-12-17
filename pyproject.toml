@@ -17,8 +17,9 @@ dependencies = [
     "jinja2>=3.1.2",
     "user-agents>=2.2.0",
     "humanize>=4.9.0",
+    "di>=0.79.2",
+    "sanic>=23.6.0",
     "orjson>=3.9.10",
-    "inject>=5.2.0",
 ]
 requires-python = ">=3.11"
 readme = "README.md"

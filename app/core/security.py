@@ -1,3 +1,6 @@
 from argon2 import PasswordHasher
 
-password_hasher = PasswordHasher()
+
+def get_password_hasher() -> PasswordHasher:
+    """Get the password hasher."""
+    return PasswordHasher()

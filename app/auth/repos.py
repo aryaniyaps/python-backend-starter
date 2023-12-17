@@ -3,7 +3,6 @@ from hashlib import sha256
 from secrets import token_hex
 from uuid import UUID
 
-import inject
 from redis.asyncio import Redis
 from sqlalchemy import insert, select, text
 from sqlalchemy.ext.asyncio import AsyncConnection
@@ -15,8 +14,13 @@ from .tables import password_reset_tokens_table
 
 
 class AuthRepo:
-    _connection = inject.attr(AsyncConnection)
-    _redis_client = inject.attr(Redis)
+    def __init__(
+        self,
+        connection: AsyncConnection,
+        redis_client: Redis,
+    ) -> None:
+        self._connection = connection
+        self._redis_client = redis_client
 
     async def create_authentication_token(
         self,

@@ -8,6 +8,26 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     debug: bool
 
+    host: Annotated[
+        str,
+        Field(
+            examples=[
+                "127.0.0.1",
+            ],
+            default="127.0.0.1",
+        ),
+    ]
+
+    port: Annotated[
+        int,
+        Field(
+            examples=[
+                8000,
+            ],
+            default=8000,
+        ),
+    ]
+
     database_url: Annotated[
         PostgresDsn,
         Field(
@@ -74,6 +94,3 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
-
-
-settings = Settings()  # type: ignore

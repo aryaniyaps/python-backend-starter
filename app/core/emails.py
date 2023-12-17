@@ -1,8 +1,12 @@
+from contextlib import contextmanager
 from email.message import EmailMessage
 from email.mime.text import MIMEText
 from smtplib import SMTP
+from typing import Iterator
 
 from pydantic_core import Url
+
+from app.config import Settings
 
 
 class EmailSender:
@@ -47,3 +51,14 @@ class EmailSender:
         """Close the SMTP connection."""
         if self.server:
             self.server.quit()
+
+
+@contextmanager
+def get_email_sender(settings: Settings) -> Iterator[EmailSender]:
+    """Get the email sender."""
+    email_sender = EmailSender(
+        email_server=settings.email_server,
+        email_from=settings.email_from,
+    )
+    yield email_sender
+    email_sender.close_connection()

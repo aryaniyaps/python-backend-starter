@@ -1,63 +1,128 @@
-from contextlib import asynccontextmanager, contextmanager
-from typing import AsyncIterator, Iterator
+from enum import Enum
 
-import inject
 from argon2 import PasswordHasher
-from redis.asyncio import Redis, from_url
-from sqlalchemy.ext.asyncio import AsyncConnection
+from di import Container, bind_by_type
+from di.dependent import Dependent
+from redis.asyncio import Redis
+from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine
 
-from app.config import settings
-from app.core.database import engine
-from app.core.emails import EmailSender
+from app.auth.repos import AuthRepo
+from app.auth.services import AuthService
+from app.config import Settings
+from app.core.database import get_database_connection, get_database_engine
+from app.core.emails import EmailSender, get_email_sender
+from app.core.redis_client import get_redis_client
+from app.core.security import get_password_hasher
+from app.users.repos import UserRepo
+from app.users.services import UserService
 
 
-@asynccontextmanager
-async def get_database_connection() -> AsyncIterator[AsyncConnection]:
-    """Get a database connection."""
-    async with engine.begin() as connection:
-        yield connection
+class DIScope(Enum):
+    """Enumeration representing dependency injection scopes."""
+
+    APP = "app"
+    REQUEST = "request"
 
 
-@asynccontextmanager
-async def get_redis_client() -> AsyncIterator[Redis]:
-    """Get the redis client."""
-    redis_client = from_url(
-        url=str(settings.redis_url),
+def create_container() -> Container:
+    """Initialze the dependency injection container."""
+    container = Container()
+
+    container.bind(
+        bind_by_type(
+            Dependent(
+                lambda *_args: Settings(),  # type: ignore
+                scope=DIScope.APP,
+            ),
+            Settings,
+        )
     )
-    yield redis_client
-
-    await redis_client.aclose()
-
-
-@contextmanager
-def get_email_sender() -> Iterator[EmailSender]:
-    """Get the email sender."""
-    email_sender = EmailSender(
-        email_server=settings.email_server,
-        email_from=settings.email_from,
+    container.bind(
+        bind_by_type(
+            Dependent(
+                get_database_engine,
+                scope=DIScope.APP,
+            ),
+            AsyncEngine,
+        )
     )
-    yield email_sender
-    email_sender.close_connection()
-
-
-def app_config(binder: inject.Binder) -> None:
-    """Configure dependencies for the binder."""
-    binder.bind_to_constructor(
-        EmailSender,
-        get_email_sender,
+    container.bind(
+        bind_by_type(
+            Dependent(
+                get_database_connection,
+                scope=DIScope.REQUEST,
+            ),
+            AsyncConnection,
+        )
     )
-    binder.bind_to_constructor(
-        Redis,
-        get_redis_client,
-    )
-    binder.bind_to_provider(
-        AsyncConnection,
-        get_database_connection,
-    )
-    binder.bind(
-        PasswordHasher,
-        PasswordHasher(),
+    container.bind(
+        bind_by_type(
+            Dependent(
+                get_redis_client,
+                scope=DIScope.APP,
+            ),
+            Redis,
+        )
     )
 
+    container.bind(
+        bind_by_type(
+            Dependent(
+                get_email_sender,
+                scope=DIScope.APP,
+            ),
+            EmailSender,
+        )
+    )
 
-inject.configure(app_config)
+    container.bind(
+        bind_by_type(
+            Dependent(
+                get_password_hasher,
+                scope=DIScope.APP,
+            ),
+            PasswordHasher,
+        )
+    )
+
+    container.bind(
+        bind_by_type(
+            Dependent(
+                UserRepo,
+                scope=DIScope.REQUEST,
+            ),
+            UserRepo,
+        )
+    )
+
+    container.bind(
+        bind_by_type(
+            Dependent(
+                AuthRepo,
+                scope=DIScope.REQUEST,
+            ),
+            AuthRepo,
+        )
+    )
+
+    container.bind(
+        bind_by_type(
+            Dependent(
+                UserService,
+                scope=DIScope.REQUEST,
+            ),
+            UserService,
+        )
+    )
+
+    container.bind(
+        bind_by_type(
+            Dependent(
+                AuthService,
+                scope=DIScope.REQUEST,
+            ),
+            AuthService,
+        )
+    )
+
+    return container
