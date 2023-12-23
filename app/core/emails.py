@@ -2,7 +2,7 @@ from contextlib import contextmanager
 from email.message import EmailMessage
 from email.mime.text import MIMEText
 from smtplib import SMTP
-from typing import Iterator
+from typing import Generator
 
 from pydantic_core import Url
 
@@ -54,7 +54,7 @@ class EmailSender:
 
 
 @contextmanager
-def get_email_sender(settings: Settings) -> Iterator[EmailSender]:
+def get_email_sender(settings: Settings) -> Generator[EmailSender, None, None]:
     """Get the email sender."""
     email_sender = EmailSender(
         email_server=settings.email_server,

@@ -7,9 +7,7 @@ from app.auth.services import AuthService
 from app.core.errors import UnauthenticatedError
 
 
-async def login_required(
-    callable: Callable[..., Awaitable]
-) -> Callable[..., Awaitable]:
+def login_required(callable: Callable[..., Awaitable]) -> Callable[..., Awaitable]:
     """Ensure that the current user is logged in."""
 
     @wraps(callable)

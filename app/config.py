@@ -37,6 +37,17 @@ class Settings(BaseSettings):
         ),
     ]
 
+    database_pool_size: Annotated[
+        int,
+        Field(
+            examples=[
+                20,
+            ],
+            default=20,
+            gt=0,
+        ),
+    ]
+
     redis_url: Annotated[
         RedisDsn,
         Field(

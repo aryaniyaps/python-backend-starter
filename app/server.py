@@ -1,100 +1,28 @@
-from di import Container, ScopeState
-from orjson import dumps, loads
-from pydantic import ValidationError
-from sanic import Sanic
+import asyncio
 
-from app.auth.routes import auth_blueprint
+from app.asgi import run_app
 from app.config import Settings
-from app.core.error_handlers import (
-    handle_invalid_input_error,
-    handle_resource_not_found_error,
-    handle_unauthenticated_error,
-    handle_unexpected_error,
-    handle_validation_error,
-)
-from app.core.errors import (
-    InvalidInputError,
-    ResourceNotFoundError,
-    UnauthenticatedError,
-    UnexpectedError,
-)
-from app.core.listeners.setup_routes import setup_routes
-from app.users.routes import users_blueprint
+from app.core.containers import DIScope, create_container
+
+from . import create_app
 
 
-def configure_app(app: Sanic, settings: Settings) -> None:
-    """Configure settings for the given app."""
-    app.config.update(
-        {
-            "DEBUG": settings.debug,
-            "FALLBACK_ERROR_FORMAT": "json",
-        }
-    )
-
-
-def add_routes(app: Sanic) -> None:
-    """Register routes for the app."""
-    app.blueprint(blueprint=auth_blueprint)
-    app.blueprint(blueprint=users_blueprint)
-
-
-def add_middleware(_app: Sanic) -> None:
-    """Register middleware for the app."""
-
-
-def add_listeners(
-    app: Sanic,
-    app_state: ScopeState,
-    container: Container,
-) -> None:
-    """Register listeners for the app."""
-    app.register_listener(
-        listener=setup_routes(
-            app_state=app_state,
+async def main() -> None:
+    """Initialize and run the application."""
+    settings = Settings()  # type:ignore
+    container = create_container()
+    async with container.enter_scope(DIScope.APP) as app_state:
+        app = create_app(
+            settings=settings,
             container=container,
-        ),
-        event="before_server_start",
-    )
+            app_state=app_state,
+        )
+
+        await run_app(
+            app=app,
+            settings=settings,
+        )
 
 
-def add_error_handlers(app: Sanic) -> None:
-    """Register error handlers for the app."""
-    app.error_handler.add(
-        exception=ValidationError,
-        handler=handle_validation_error,
-    )
-    app.error_handler.add(
-        exception=InvalidInputError,
-        handler=handle_invalid_input_error,
-    )
-    app.error_handler.add(
-        exception=ResourceNotFoundError,
-        handler=handle_resource_not_found_error,
-    )
-    app.error_handler.add(
-        exception=UnauthenticatedError,
-        handler=handle_unauthenticated_error,
-    )
-    app.error_handler.add(
-        exception=UnexpectedError,
-        handler=handle_unexpected_error,
-    )
-
-
-def create_app(
-    container: Container,
-    app_state: ScopeState,
-    settings: Settings,
-) -> Sanic:
-    """Initialize an app instance."""
-    app = Sanic(
-        name=__name__,
-        dumps=dumps,
-        loads=loads,
-    )
-    configure_app(app, settings)
-    add_middleware(app)
-    add_listeners(app, app_state, container)
-    add_error_handlers(app)
-    add_routes(app)
-    return app
+if __name__ == "__main__":
+    asyncio.run(main())

@@ -16,11 +16,13 @@ def _wrap_with_container(
         Dependent(handler, scope=DIScope.REQUEST),
         scopes=[
             DIScope.REQUEST,
+            DIScope.APP,
         ],
     )
 
     async def wrapped_handler(request: Request, *args, **kwargs):
         async with container.enter_scope(DIScope.REQUEST, app_state) as request_state:
+            # FIXME: path params are not passed to the handlers here
             return await solved.execute_async(
                 executor=AsyncExecutor(),
                 state=request_state,

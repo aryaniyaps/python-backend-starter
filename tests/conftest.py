@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from typing import AsyncIterator, Iterator
+from typing import AsyncGenerator, Iterator
 
 import pytest
 from alembic import command
@@ -8,10 +8,8 @@ from argon2 import PasswordHasher
 from di import Container, bind_by_type
 from di.dependent import Dependent
 from redis.asyncio import Redis
-from sanic import Sanic
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine
 
-from app import create_app
 from app.auth.repos import AuthRepo
 from app.config import Settings
 from app.core.containers import DIScope, create_container
@@ -31,20 +29,6 @@ pytest_plugins = [
 def anyio_backend() -> str:
     """Get the anyio backend"""
     return "asyncio"
-
-
-@pytest.fixture(scope="session")
-async def app(
-    test_container: Container,
-    test_settings: Settings,
-) -> AsyncIterator[Sanic]:
-    """Initialize the app for testing."""
-    async with test_container.enter_scope(DIScope.APP) as app_state:
-        yield create_app(
-            settings=test_settings,
-            container=test_container,
-            app_state=app_state,
-        )
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -71,7 +55,7 @@ def setup_test_database() -> Iterator[None]:
 @asynccontextmanager
 async def get_test_database_connection(
     engine: AsyncEngine,
-) -> AsyncIterator[AsyncConnection]:
+) -> AsyncGenerator[AsyncConnection, None]:
     """Get the test database connection."""
     async with engine.begin() as connection:
         transaction = await connection.begin_nested()
@@ -121,7 +105,7 @@ async def authentication_token(user: User, auth_repo: AuthRepo) -> str:
 
 
 @pytest.fixture(scope="session")
-async def redis_client(test_settings: Settings) -> AsyncIterator[Redis]:
+async def redis_client(test_settings: Settings) -> AsyncGenerator[Redis, None]:
     """Get the redis client."""
     async with get_redis_client(settings=test_settings) as redis_client:
         yield redis_client

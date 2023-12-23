@@ -19,6 +19,9 @@ dependencies = [
     "humanize>=4.9.0",
     "di>=0.79.2",
     "orjson>=3.9.10",
+    # Sanic needs setuptools for now (which will be
+    # removed in a future release)
+    "setuptools>=69.0.2",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
