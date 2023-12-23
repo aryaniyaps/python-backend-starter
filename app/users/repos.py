@@ -1,9 +1,13 @@
+from typing import Annotated
 from uuid import UUID
 
 from argon2 import PasswordHasher
+from fastapi import Depends
 from sqlalchemy import insert, select, text, update
 from sqlalchemy.ext.asyncio import AsyncConnection
 
+from app.core.database import get_database_connection
+from app.core.security import get_password_hasher
 from app.users.models import User
 
 from .tables import users_table
@@ -12,8 +16,18 @@ from .tables import users_table
 class UserRepo:
     def __init__(
         self,
-        connection: AsyncConnection,
-        password_hasher: PasswordHasher,
+        connection: Annotated[
+            AsyncConnection,
+            Depends(
+                dependency=get_database_connection,
+            ),
+        ],
+        password_hasher: Annotated[
+            PasswordHasher,
+            Depends(
+                dependency=get_password_hasher,
+            ),
+        ],
     ) -> None:
         self._connection = connection
         self._password_hasher = password_hasher

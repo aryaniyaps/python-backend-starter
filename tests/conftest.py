@@ -32,25 +32,6 @@ def anyio_backend() -> str:
     return "asyncio"
 
 
-@pytest.fixture(scope="session")
-async def app_state(test_container: Container) -> AsyncGenerator[ScopeState, None]:
-    """Get the app state."""
-    async with test_container.enter_scope(DIScope.APP) as app_state:
-        yield app_state
-
-
-@pytest.fixture
-async def request_state(
-    test_container: Container, app_state: ScopeState
-) -> AsyncGenerator[ScopeState, None]:
-    """Get the request state."""
-    async with test_container.enter_scope(
-        DIScope.REQUEST,
-        app_state,
-    ) as request_state:
-        yield request_state
-
-
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_database() -> Iterator[None]:
     """Set up the test database."""
@@ -135,7 +116,9 @@ async def database_connection(
     database_engine: AsyncEngine,
 ) -> AsyncGenerator[AsyncConnection, None]:
     """Get the database connection."""
-    async with get_test_database_connection(engine=database_engine) as connection:
+    async with get_test_database_connection(
+        engine=database_engine,
+    ) as connection:
         yield connection
 
 

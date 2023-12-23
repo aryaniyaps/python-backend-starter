@@ -1,7 +1,7 @@
 from functools import wraps
-from typing import Awaitable, Callable
+from typing import Annotated, Awaitable, Callable
 
-from sanic import Request
+from fastapi import Depends, Request
 
 from app.auth.services import AuthService
 from app.core.errors import UnauthenticatedError
@@ -13,7 +13,12 @@ def login_required(callable: Callable[..., Awaitable]) -> Callable[..., Awaitabl
     @wraps(callable)
     async def protected_route(
         request: Request,
-        auth_service: AuthService,
+        auth_service: Annotated[
+            AuthService,
+            Depends(
+                dependency=AuthService,
+            ),
+        ],
         *args,
         **kwargs,
     ) -> Awaitable:
@@ -30,8 +35,8 @@ def login_required(callable: Callable[..., Awaitable]) -> Callable[..., Awaitabl
 
         # Put the user ID and authentication token
         # in the request context
-        request.ctx["current_user_id"] = user_id
-        request.ctx["authentication_token"] = authentication_token
+        request.state.current_user_id = user_id
+        request.state.authentication_token = authentication_token
 
         # run the handler method and return the response
         return await callable(request, *args, **kwargs)

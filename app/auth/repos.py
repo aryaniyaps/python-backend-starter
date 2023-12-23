@@ -1,14 +1,18 @@
 from datetime import datetime
 from hashlib import sha256
 from secrets import token_hex
+from typing import Annotated
 from uuid import UUID
 
+from fastapi import Depends
 from redis.asyncio import Redis
 from sqlalchemy import insert, select, text
 from sqlalchemy.ext.asyncio import AsyncConnection
 
 from app.auth.models import PasswordResetToken
 from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
+from app.core.database import get_database_connection
+from app.core.redis_client import get_redis_client
 
 from .tables import password_reset_tokens_table
 
@@ -16,8 +20,18 @@ from .tables import password_reset_tokens_table
 class AuthRepo:
     def __init__(
         self,
-        connection: AsyncConnection,
-        redis_client: Redis,
+        connection: Annotated[
+            AsyncConnection,
+            Depends(
+                dependency=get_database_connection,
+            ),
+        ],
+        redis_client: Annotated[
+            Redis,
+            Depends(
+                dependency=get_redis_client,
+            ),
+        ],
     ) -> None:
         self._connection = connection
         self._redis_client = redis_client

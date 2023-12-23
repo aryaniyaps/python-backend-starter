@@ -1,38 +1,50 @@
+from typing import Annotated
 from uuid import UUID
 
-from sanic import Blueprint, Request
-from sanic.response import JSONResponse, json
+from fastapi import APIRouter, Depends, Path, Request
 
 from app.auth.decorators import login_required
+from app.users.models import User
 from app.users.services import UserService
 
-users_blueprint = Blueprint(
-    name="users",
-    url_prefix="/users",
+users_router = APIRouter(
+    prefix="/users",
 )
 
 
-@users_blueprint.get("/@me")
+@users_router.get("/@me", response_model=User)
 @login_required
 async def on_get_current_user(
     request: Request,
-    user_service: UserService,
-) -> JSONResponse:
+    user_service: Annotated[
+        UserService,
+        Depends(
+            dependency=UserService,
+        ),
+    ],
+) -> User:
     """Get the current user."""
-    current_user_id: UUID = request.ctx["current_user_id"]
-    result = await user_service.get_user_by_id(
+    current_user_id: UUID = request.state.current_user_id
+    return await user_service.get_user_by_id(
         user_id=current_user_id,
     )
-    return json(body=result.model_dump(mode="json"))
 
 
-@users_blueprint.get("/<user_id:uuid>")
+@users_router.get("/{user_id}", response_model=User)
 @login_required
 async def on_get_user(
-    _request: Request,
-    user_id: UUID,
-    user_service: UserService,
-) -> JSONResponse:
+    user_id: Annotated[
+        UUID,
+        Path(
+            title="The ID of the user to get.",
+        ),
+    ],
+    user_service: Annotated[
+        UserService,
+        Depends(
+            dependency=UserService,
+        ),
+    ],
+) -> User:
     """Get the user with the given ID."""
-    result = await user_service.get_user_by_id(user_id=user_id)
-    return json(body=result.model_dump(mode="json"))
+    return await user_service.get_user_by_id(user_id=user_id)

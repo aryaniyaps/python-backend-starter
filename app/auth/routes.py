@@ -1,54 +1,74 @@
+from typing import Annotated
 from uuid import UUID
 
-from sanic import Blueprint, Request
-from sanic.response import HTTPResponse, JSONResponse, empty, json
+from fastapi import APIRouter, Depends, Request, status
 
 from app.auth.decorators import login_required
-from app.auth.models import LoginUserInput, RegisterUserInput
+from app.auth.models import (
+    CreateUserResult,
+    LoginUserInput,
+    LoginUserResult,
+    RegisterUserInput,
+)
 from app.auth.services import AuthService
 
-auth_blueprint = Blueprint(
-    name="auth",
-    url_prefix="/auth",
+auth_router = APIRouter(
+    prefix="/auth",
 )
 
 
-@auth_blueprint.post("/register")
+@auth_router.post(
+    "/register",
+    response_model=CreateUserResult,
+)
 async def register_user(
-    request: Request,
-    auth_service: AuthService,
-) -> JSONResponse:
+    data: RegisterUserInput,
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=AuthService,
+        ),
+    ],
+) -> CreateUserResult:
     """Register a new user."""
-    result = await auth_service.register_user(
-        data=RegisterUserInput.model_validate(request.json),
-    )
-    return json(body=result.model_dump(mode="json"))
+    return await auth_service.register_user(data)
 
 
-@auth_blueprint.post("/login")
+@auth_router.post(
+    "/login",
+    response_model=LoginUserResult,
+)
 async def login_user(
-    request: Request,
-    auth_service: AuthService,
-) -> JSONResponse:
+    data: LoginUserInput,
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=AuthService,
+        ),
+    ],
+) -> LoginUserResult:
     """Login the current user."""
-    result = await auth_service.login_user(
-        data=LoginUserInput.model_validate(request.json),
-    )
-    return json(body=result.model_dump(mode="json"))
+    return await auth_service.login_user(data)
 
 
-@auth_blueprint.post("/logout")
+@auth_router.post(
+    "/logout",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 @login_required
 async def logout_user(
     request: Request,
-    auth_service: AuthService,
-) -> HTTPResponse:
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=AuthService,
+        ),
+    ],
+) -> None:
     """Logout the current user."""
-    current_user_id: UUID = request.ctx["current_user_id"]
-    authentication_token: str = request.ctx["authentication_token"]
+    current_user_id: UUID = request.state.current_user_id
+    authentication_token: str = request.state.authentication_token
     await auth_service.remove_authentication_token(
         authentication_token=authentication_token,
         user_id=current_user_id,
     )
-
-    return empty()

@@ -1,4 +1,7 @@
+from typing import Annotated
 from uuid import UUID
+
+from fastapi import Depends
 
 from app.core.errors import ResourceNotFoundError
 
@@ -9,7 +12,12 @@ from .repos import UserRepo
 class UserService:
     def __init__(
         self,
-        user_repo: UserRepo,
+        user_repo: Annotated[
+            UserRepo,
+            Depends(
+                dependency=UserRepo,
+            ),
+        ],
     ) -> None:
         self._user_repo = user_repo
 

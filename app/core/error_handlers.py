@@ -1,6 +1,6 @@
-from pydantic import ValidationError
-from sanic import Request
-from sanic.response import JSONResponse, json
+from fastapi import Request, status
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import ORJSONResponse
 
 from app.core.errors import (
     InvalidInputError,
@@ -12,69 +12,65 @@ from app.core.errors import (
 
 async def handle_validation_error(
     _request: Request,
-    exception: ValidationError,
-) -> JSONResponse:
+    exception: RequestValidationError,
+) -> ORJSONResponse:
     """Handle ValidationError exceptions."""
-    return json(
-        body={
+    return ORJSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={
             "message": "Invalid input detected.",
-            "errors": exception.errors(
-                include_url=False,
-                include_context=False,
-                include_input=False,
-            ),
+            "errors": exception.errors(),
         },
-        status=422,
     )
 
 
 async def handle_invalid_input_error(
     _request: Request,
     exception: InvalidInputError,
-) -> JSONResponse:
+) -> ORJSONResponse:
     """Handle InvalidInputError expections."""
-    return json(
-        body={
+    return ORJSONResponse(
+        content={
             "message": exception.message,
         },
-        status=400,
+        status_code=status.HTTP_400_BAD_REQUEST,
     )
 
 
 async def handle_resource_not_found_error(
     _request: Request,
     exception: ResourceNotFoundError,
-) -> JSONResponse:
+) -> ORJSONResponse:
     """Handle ResourceNotFound expections."""
-    return json(
-        body={
+    return ORJSONResponse(
+        content={
             "message": exception.message,
         },
-        status=404,
+        status_code=status.HTTP_404_NOT_FOUND,
     )
 
 
 async def handle_unauthenticated_error(
     _request: Request,
     exception: UnauthenticatedError,
-) -> JSONResponse:
+) -> ORJSONResponse:
     """Handle UnauthenticatedError expections."""
-    return json(
-        body={
+    return ORJSONResponse(
+        content={
             "message": exception.message,
         },
-        status=401,
+        status_code=status.HTTP_401_UNAUTHORIZED,
     )
 
 
 async def handle_unexpected_error(
     _request: Request,
     exception: UnexpectedError,
-) -> JSONResponse:
+) -> ORJSONResponse:
     """Handle UnexpectedError expections."""
-    return json(
-        body={
+    return ORJSONResponse(
+        content={
             "message": exception.message,
         },
-        status=500,
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
     )

@@ -4,7 +4,8 @@ version = "0.1"
 description = "Backend starter using Python."
 authors = [{ name = "Aryan Iyappan", email = "aryaniyappan2006@gmail.com" }]
 dependencies = [
-    "sanic>=23.6.0",
+    "fastapi>=0.103.0",
+    "starlette>=0.27.0",
     "uvicorn>=0.24.0.post1",
     "sqlalchemy>=2.0.23",
     "pydantic[email]>=2.5.2",
@@ -17,11 +18,7 @@ dependencies = [
     "jinja2>=3.1.2",
     "user-agents>=2.2.0",
     "humanize>=4.9.0",
-    "di>=0.79.2",
     "orjson>=3.9.10",
-    # Sanic needs setuptools for now (which will be
-    # removed in a future release)
-    "setuptools>=69.0.2",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
