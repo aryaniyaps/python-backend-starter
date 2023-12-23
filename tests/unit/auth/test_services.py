@@ -19,7 +19,6 @@ from app.auth.models import (
 from app.auth.repos import AuthRepo
 from app.auth.services import AuthService
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
-from app.core.security import password_hasher
 from app.users.models import User
 from app.users.repos import UserRepo
 
@@ -123,7 +122,10 @@ async def test_register_user_hashing_error(auth_service: AuthService) -> None:
             )
 
 
-async def test_login_user_valid_credentials(auth_service: AuthService) -> None:
+async def test_login_user_valid_credentials(
+    auth_service: AuthService,
+    password_hasher: PasswordHasher,
+) -> None:
     """Ensure we can login a user with valid credentials."""
     with patch("app.auth.services.UserRepo.get_user_by_email") as mock_get_user, patch(
         "app.auth.services.AuthRepo.create_authentication_token"
@@ -162,7 +164,10 @@ async def test_login_user_invalid_credentials(auth_service: AuthService) -> None
             )
 
 
-async def test_login_user_password_mismatch(auth_service: AuthService) -> None:
+async def test_login_user_password_mismatch(
+    auth_service: AuthService,
+    password_hasher: PasswordHasher,
+) -> None:
     """Ensure we cannot login an existing user with the wrong password."""
     with patch("app.auth.services.UserRepo.get_user_by_email") as mock_get_user:
         mock_user = MagicMock(spec=User)
@@ -180,7 +185,10 @@ async def test_login_user_password_mismatch(auth_service: AuthService) -> None:
             )
 
 
-async def test_login_user_password_rehash(auth_service: AuthService) -> None:
+async def test_login_user_password_rehash(
+    auth_service: AuthService,
+    password_hasher: PasswordHasher,
+) -> None:
     """
     Ensure the user's password gets rehashed if the old
     password needs rehashing.

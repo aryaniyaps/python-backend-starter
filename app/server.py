@@ -1,5 +1,4 @@
 from di import Container, ScopeState
-from falcon import CORSMiddleware
 from orjson import dumps, loads
 from pydantic import ValidationError
 from sanic import Sanic
@@ -19,13 +18,18 @@ from app.core.errors import (
     UnauthenticatedError,
     UnexpectedError,
 )
-from app.core.middleware.container import ContainerMiddleware
+from app.core.listeners.setup_routes import setup_routes
 from app.users.routes import users_blueprint
 
 
 def configure_app(app: Sanic, settings: Settings) -> None:
     """Configure settings for the given app."""
-    app.config.DEBUG = settings.debug
+    app.config.update(
+        {
+            "DEBUG": settings.debug,
+            "FALLBACK_ERROR_FORMAT": "json",
+        }
+    )
 
 
 def add_routes(app: Sanic) -> None:
@@ -34,50 +38,46 @@ def add_routes(app: Sanic) -> None:
     app.blueprint(blueprint=users_blueprint)
 
 
-def add_middleware(
+def add_middleware(_app: Sanic) -> None:
+    """Register middleware for the app."""
+
+
+def add_listeners(
     app: Sanic,
-    settings: Settings,
     app_state: ScopeState,
     container: Container,
 ) -> None:
-    """Register middleware for the app."""
-    app.add_middleware(
-        middleware=CORSMiddleware(
-            allow_origins=settings.cors_allow_origins,
-        )
-    )
-    # add the container middleware at last
-    # as it skips the execution of consequent
-    # middleware
-    app.add_middleware(
-        middleware=ContainerMiddleware(
-            container=container,
+    """Register listeners for the app."""
+    app.register_listener(
+        listener=setup_routes(
             app_state=app_state,
-        )
+            container=container,
+        ),
+        event="before_server_start",
     )
 
 
 def add_error_handlers(app: Sanic) -> None:
     """Register error handlers for the app."""
     app.error_handler.add(
-        ValidationError,
-        handle_validation_error,
+        exception=ValidationError,
+        handler=handle_validation_error,
     )
     app.error_handler.add(
-        InvalidInputError,
-        handle_invalid_input_error,
+        exception=InvalidInputError,
+        handler=handle_invalid_input_error,
     )
     app.error_handler.add(
-        ResourceNotFoundError,
-        handle_resource_not_found_error,
+        exception=ResourceNotFoundError,
+        handler=handle_resource_not_found_error,
     )
     app.error_handler.add(
-        UnauthenticatedError,
-        handle_unauthenticated_error,
+        exception=UnauthenticatedError,
+        handler=handle_unauthenticated_error,
     )
     app.error_handler.add(
-        UnexpectedError,
-        handle_unexpected_error,
+        exception=UnexpectedError,
+        handler=handle_unexpected_error,
     )
 
 
@@ -93,12 +93,8 @@ def create_app(
         loads=loads,
     )
     configure_app(app, settings)
-    add_middleware(
-        app,
-        settings=settings,
-        app_state=app_state,
-        container=container,
-    )
+    add_middleware(app)
+    add_listeners(app, app_state, container)
     add_error_handlers(app)
     add_routes(app)
     return app

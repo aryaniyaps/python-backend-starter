@@ -1,19 +1,22 @@
 from contextlib import asynccontextmanager
 from typing import AsyncIterator, Iterator
 
-import inject
 import pytest
 from alembic import command
 from alembic.config import Config
-from falcon.asgi import App
-from inject import Binder
+from argon2 import PasswordHasher
+from di import Container, bind_by_type
+from di.dependent import Dependent
 from redis.asyncio import Redis
-from sqlalchemy.ext.asyncio import AsyncConnection
+from sanic import Sanic
+from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine
 
 from app import create_app
 from app.auth.repos import AuthRepo
-from app.core.containers import app_config
-from app.core.database import engine
+from app.config import Settings
+from app.core.containers import DIScope, create_container
+from app.core.redis_client import get_redis_client
+from app.core.security import get_password_hasher
 from app.users.models import User
 from app.users.repos import UserRepo
 
@@ -31,9 +34,17 @@ def anyio_backend() -> str:
 
 
 @pytest.fixture(scope="session")
-def app() -> App:
+async def app(
+    test_container: Container,
+    test_settings: Settings,
+) -> AsyncIterator[Sanic]:
     """Initialize the app for testing."""
-    return create_app()
+    async with test_container.enter_scope(DIScope.APP) as app_state:
+        yield create_app(
+            settings=test_settings,
+            container=test_container,
+            app_state=app_state,
+        )
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -58,7 +69,9 @@ def setup_test_database() -> Iterator[None]:
 
 
 @asynccontextmanager
-async def get_test_database_connection() -> AsyncIterator[AsyncConnection]:
+async def get_test_database_connection(
+    engine: AsyncEngine,
+) -> AsyncIterator[AsyncConnection]:
     """Get the test database connection."""
     async with engine.begin() as connection:
         transaction = await connection.begin_nested()
@@ -69,25 +82,26 @@ async def get_test_database_connection() -> AsyncIterator[AsyncConnection]:
         await connection.rollback()
 
 
-def tests_config(binder: Binder) -> None:
-    """Configure dependencies for the test environment."""
-    # reuse existing configuration
-    binder.install(app_config)
-
-    # override dependencies
-    binder.bind_to_provider(
-        AsyncConnection,
-        get_test_database_connection,
+@pytest.fixture(scope="session")
+def test_container() -> Container:
+    """Setup the container for testing."""
+    container = create_container()
+    container.bind(
+        bind_by_type(
+            Dependent(
+                get_test_database_connection,
+                scope=DIScope.REQUEST,
+            ),
+            AsyncConnection,
+        )
     )
+    return container
 
 
-@pytest.fixture(scope="session", autouse=True)
-def setup_test_dependencies() -> None:
-    """Setup dependencies for testing."""
-    inject.clear_and_configure(
-        tests_config,
-        allow_override=True,  # type: ignore
-    )
+@pytest.fixture(scope="session")
+def test_settings() -> Settings:
+    """Setup the settings for testing."""
+    return Settings()  # type: ignore
 
 
 @pytest.fixture
@@ -107,6 +121,13 @@ async def authentication_token(user: User, auth_repo: AuthRepo) -> str:
 
 
 @pytest.fixture(scope="session")
-def redis_client() -> Redis:
+async def redis_client(test_settings: Settings) -> AsyncIterator[Redis]:
     """Get the redis client."""
-    return inject.instance(Redis)
+    async with get_redis_client(settings=test_settings) as redis_client:
+        yield redis_client
+
+
+@pytest.fixture(scope="session")
+def password_hasher() -> PasswordHasher:
+    """Get the password hasher."""
+    return get_password_hasher()

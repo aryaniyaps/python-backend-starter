@@ -1,15 +1,18 @@
 from uuid import uuid4
 
 import pytest
+from argon2 import PasswordHasher
 
-from app.core.security import password_hasher
 from app.users.models import User
 from app.users.repos import UserRepo
 
 pytestmark = [pytest.mark.anyio]
 
 
-async def test_create_user(user_repo: UserRepo) -> None:
+async def test_create_user(
+    user_repo: UserRepo,
+    password_hasher: PasswordHasher,
+) -> None:
     """Ensure we can create a new user."""
     user = await user_repo.create_user(
         username="new_user",
@@ -26,7 +29,11 @@ async def test_create_user(user_repo: UserRepo) -> None:
     )
 
 
-async def test_update_user_password(user: User, user_repo: UserRepo) -> None:
+async def test_update_user_password(
+    user: User,
+    user_repo: UserRepo,
+    password_hasher: PasswordHasher,
+) -> None:
     """Ensure we can update a user's password."""
     updated_user = await user_repo.update_user_password(
         user_id=user.id,
