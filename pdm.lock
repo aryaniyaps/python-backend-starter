@@ -5,7 +5,7 @@
 groups = ["default", "test"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:d00dfe85978e691bee7fcb9193376550e495e3924b9e7fb6448c7bd1dd2c404e"
+content_hash = "sha256:1af87aca7fc96e5d96795f80be3a3def61f5db9911f767e9d44d480376b9772a"
 
 [[package]]
 name = "alembic"
@@ -768,18 +768,6 @@ dependencies = [
 files = [
     {file = "redis-5.0.1-py3-none-any.whl", hash = "sha256:ed4802971884ae19d640775ba3b03aa2e7bd5e8fb8dfaed2decce4d0fc48391f"},
     {file = "redis-5.0.1.tar.gz", hash = "sha256:0dab495cd5753069d3bc650a0dde8a8f9edde16fc5691b689a566eda58100d0f"},
-]
-
-[[package]]
-name = "sanic-testing"
-version = "23.6.0"
-summary = "Core testing clients for Sanic"
-dependencies = [
-    "httpx>=0.18",
-]
-files = [
-    {file = "sanic-testing-23.6.0.tar.gz", hash = "sha256:8617fe61f3657259a7d461c548a9c6eaa040bc2cfc3d5d0d5d064659f58c105b"},
-    {file = "sanic_testing-23.6.0-py3-none-any.whl", hash = "sha256:c74a5e2393ae17a960cd65988d15a43b26d31b54c09011e0df387f1816d2080f"},
 ]
 
 [[package]]

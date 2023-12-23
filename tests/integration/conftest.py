@@ -1,43 +1,45 @@
+from typing import AsyncGenerator
+
 import pytest
-from di import Container, ScopeState
-from sanic import Sanic
-from sanic_testing import TestManager
-from sanic_testing.testing import SanicASGITestClient
+from fastapi import FastAPI
+from httpx import AsyncClient
 
 from app import create_app
 from app.config import Settings
+from app.core.database import get_database_connection
+from tests.dependencies import get_test_database_connection
 
 
 @pytest.fixture(scope="session")
-def app(
-    test_container: Container,
-    app_state: ScopeState,
-    test_settings: Settings,
-) -> Sanic:
+def app(test_settings: Settings) -> FastAPI:
     """Initialize the app for testing."""
-    return create_app(
-        settings=test_settings,
-        container=test_container,
-        app_state=app_state,
-    )
+    app = create_app(settings=test_settings)
+    setup_dependency_overrides(app)
+    return app
+
+
+def setup_dependency_overrides(app: FastAPI) -> None:
+    """Setup dependency overrides for the app."""
+    app.dependency_overrides[get_database_connection] = get_test_database_connection
 
 
 @pytest.fixture
-async def test_client(app: Sanic) -> SanicASGITestClient:
+async def test_client(app: FastAPI) -> AsyncGenerator[AsyncClient, None]:
     """Initialize a test client for testing."""
-    manager = TestManager(app=app)
-    return manager.asgi_client
+    async with AsyncClient(app=app, base_url="http://test") as test_client:
+        yield test_client
 
 
 @pytest.fixture
 async def auth_test_client(
-    app: Sanic, authentication_token: str
-) -> SanicASGITestClient:
+    app: FastAPI, authentication_token: str
+) -> AsyncGenerator[AsyncClient, None]:
     """Initialize an authenticated test client for testing."""
-    manager = TestManager(app=app)
-
-    asgi_client = manager.asgi_client
-    asgi_client.headers = {
-        "X-Authentication-Token": authentication_token,
-    }
-    return asgi_client
+    async with AsyncClient(
+        app=app,
+        base_url="http://test",
+        headers={
+            "X-Authentication-Token": authentication_token,
+        },
+    ) as auth_test_client:
+        yield auth_test_client

@@ -14,12 +14,12 @@ from app.core.security import get_password_hasher
 from app.users.repos import UserRepo
 
 from .models import (
-    CreateUserResult,
     LoginUserInput,
     LoginUserResult,
     PasswordResetInput,
     PasswordResetRequestInput,
     RegisterUserInput,
+    RegisterUserResult,
 )
 
 
@@ -49,7 +49,7 @@ class AuthService:
         self._user_repo = user_repo
         self._password_hasher = password_hasher
 
-    async def register_user(self, data: RegisterUserInput) -> CreateUserResult:
+    async def register_user(self, data: RegisterUserInput) -> RegisterUserResult:
         """Register a new user."""
         try:
             if (
@@ -83,7 +83,7 @@ class AuthService:
         authentication_token = await self._auth_repo.create_authentication_token(
             user_id=user.id
         )
-        return CreateUserResult(
+        return RegisterUserResult(
             authentication_token=authentication_token,
             user=user,
         )

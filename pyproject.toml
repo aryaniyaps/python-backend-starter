@@ -30,7 +30,7 @@ test = [
     "pytest-xdist>=3.5.0",
     "anyio>=4.1.0",
     "pytest-timeout>=2.2.0",
-    "sanic-testing>=23.6.0",
+    "httpx>=0.26.0",
 ]
 
 [tool.setuptools.packages.find]

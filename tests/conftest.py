@@ -1,23 +1,20 @@
-from contextlib import asynccontextmanager
 from typing import AsyncGenerator, Iterator
 
 import pytest
 from alembic import command
 from alembic.config import Config
 from argon2 import PasswordHasher
-from di import Container, ScopeState, bind_by_type
-from di.dependent import Dependent
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine
 
 from app.auth.repos import AuthRepo
 from app.config import Settings
-from app.core.containers import DIScope, create_container
 from app.core.database import get_database_engine
 from app.core.redis_client import get_redis_client
 from app.core.security import get_password_hasher
 from app.users.models import User
 from app.users.repos import UserRepo
+from tests.dependencies import get_test_database_connection
 
 pytest_plugins = [
     "anyio",
@@ -51,36 +48,6 @@ def setup_test_database() -> Iterator[None]:
         alembic_cfg,
         revision="base",
     )
-
-
-@asynccontextmanager
-async def get_test_database_connection(
-    engine: AsyncEngine,
-) -> AsyncGenerator[AsyncConnection, None]:
-    """Get the test database connection."""
-    async with engine.begin() as connection:
-        transaction = await connection.begin_nested()
-        # yield database connection
-        yield connection
-        if transaction.is_active:
-            await transaction.rollback()
-        await connection.rollback()
-
-
-@pytest.fixture(scope="session")
-def test_container() -> Container:
-    """Setup the container for testing."""
-    container = create_container()
-    container.bind(
-        bind_by_type(
-            Dependent(
-                get_test_database_connection,
-                scope=DIScope.REQUEST,
-            ),
-            AsyncConnection,
-        )
-    )
-    return container
 
 
 @pytest.fixture(scope="session")

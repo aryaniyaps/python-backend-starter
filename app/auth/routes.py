@@ -5,10 +5,10 @@ from fastapi import APIRouter, Depends, Request, status
 
 from app.auth.decorators import login_required
 from app.auth.models import (
-    CreateUserResult,
     LoginUserInput,
     LoginUserResult,
     RegisterUserInput,
+    RegisterUserResult,
 )
 from app.auth.services import AuthService
 
@@ -19,19 +19,20 @@ auth_router = APIRouter(
 
 @auth_router.post(
     "/register",
-    response_model=CreateUserResult,
+    response_model=RegisterUserResult,
+    status_code=status.HTTP_201_CREATED,
 )
 async def register_user(
-    data: RegisterUserInput,
+    body: RegisterUserInput,
     auth_service: Annotated[
         AuthService,
         Depends(
             dependency=AuthService,
         ),
     ],
-) -> CreateUserResult:
+) -> RegisterUserResult:
     """Register a new user."""
-    return await auth_service.register_user(data)
+    return await auth_service.register_user(body)
 
 
 @auth_router.post(
@@ -39,7 +40,7 @@ async def register_user(
     response_model=LoginUserResult,
 )
 async def login_user(
-    data: LoginUserInput,
+    body: LoginUserInput,
     auth_service: Annotated[
         AuthService,
         Depends(
@@ -48,7 +49,7 @@ async def login_user(
     ],
 ) -> LoginUserResult:
     """Login the current user."""
-    return await auth_service.login_user(data)
+    return await auth_service.login_user(body)
 
 
 @auth_router.post(

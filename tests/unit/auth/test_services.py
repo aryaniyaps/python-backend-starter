@@ -8,13 +8,13 @@ from argon2.exceptions import HashingError
 from user_agents.parsers import UserAgent
 
 from app.auth.models import (
-    CreateUserResult,
     LoginUserInput,
     LoginUserResult,
     PasswordResetInput,
     PasswordResetRequestInput,
     PasswordResetToken,
     RegisterUserInput,
+    RegisterUserResult,
 )
 from app.auth.repos import AuthRepo
 from app.auth.services import AuthService
@@ -52,7 +52,7 @@ async def test_register_user_success(auth_service: AuthService) -> None:
             ),
         )
 
-    assert isinstance(result, CreateUserResult)
+    assert isinstance(result, RegisterUserResult)
     assert result.authentication_token == "fake_token"
     assert result.user is not None
 

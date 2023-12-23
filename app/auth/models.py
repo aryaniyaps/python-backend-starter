@@ -60,7 +60,7 @@ class RegisterUserInput(BaseModel):
     ]
 
 
-class CreateUserResult(BaseModel):
+class RegisterUserResult(BaseModel):
     authentication_token: str
 
     user: User

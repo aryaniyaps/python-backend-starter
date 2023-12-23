@@ -14,5 +14,5 @@ async def set_request_id(request: Request, call_next):
     response = await call_next(request)
 
     # add the request ID to the response headers
-    response.headers["X-Request-ID"] = request_id
+    response.headers["X-Request-ID"] = str(request_id)
     return response

@@ -1,4 +1,5 @@
 from fastapi import Request, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import ORJSONResponse
 
@@ -17,10 +18,13 @@ async def handle_validation_error(
     """Handle ValidationError exceptions."""
     return ORJSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content={
-            "message": "Invalid input detected.",
-            "errors": exception.errors(),
-        },
+        content=jsonable_encoder(
+            {
+                "message": "Invalid input detected.",
+                "input": exception.body,
+                "errors": exception.errors(),
+            },
+        ),
     )
 
 
