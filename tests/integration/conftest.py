@@ -1,28 +1,25 @@
-from typing import AsyncIterator
-
 import pytest
-from di import Container
+from di import Container, ScopeState
 from sanic import Sanic
 from sanic_testing import TestManager
 from sanic_testing.testing import SanicASGITestClient
 
 from app import create_app
 from app.config import Settings
-from app.core.containers import DIScope
 
 
 @pytest.fixture(scope="session")
-async def app(
+def app(
     test_container: Container,
+    app_state: ScopeState,
     test_settings: Settings,
-) -> AsyncIterator[Sanic]:
+) -> Sanic:
     """Initialize the app for testing."""
-    async with test_container.enter_scope(DIScope.APP) as app_state:
-        yield create_app(
-            settings=test_settings,
-            container=test_container,
-            app_state=app_state,
-        )
+    return create_app(
+        settings=test_settings,
+        container=test_container,
+        app_state=app_state,
+    )
 
 
 @pytest.fixture

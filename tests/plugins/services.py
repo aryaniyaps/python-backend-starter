@@ -1,44 +1,27 @@
-from typing import AsyncIterator
-
 import pytest
-from di import Container
-from di.dependent import Dependent
-from di.executors import AsyncExecutor
+from argon2 import PasswordHasher
 
+from app.auth.repos import AuthRepo
 from app.auth.services import AuthService
-from app.core.containers import DIScope
+from app.users.repos import UserRepo
 from app.users.services import UserService
 
 
 @pytest.fixture
-async def auth_service(test_container: Container) -> AsyncIterator[AuthService]:
+def auth_service(
+    auth_repo: AuthRepo,
+    user_repo: UserRepo,
+    password_hasher: PasswordHasher,
+) -> AuthService:
     """Get the authentication service."""
-    async with test_container.enter_scope(DIScope.APP) as app_state:
-        async with test_container.enter_scope(DIScope.REQUEST, app_state) as state:
-            yield await test_container.solve(
-                Dependent(AuthService),
-                scopes=[
-                    DIScope.APP,
-                    DIScope.REQUEST,
-                ],
-            ).execute_async(
-                executor=AsyncExecutor(),
-                state=state,
-            )
+    return AuthService(
+        auth_repo=auth_repo,
+        user_repo=user_repo,
+        password_hasher=password_hasher,
+    )
 
 
 @pytest.fixture
-async def user_service(test_container: Container) -> AsyncIterator[UserService]:
+def user_service(user_repo: UserRepo) -> UserService:
     """Get the user service."""
-    async with test_container.enter_scope(DIScope.APP) as app_state:
-        async with test_container.enter_scope(DIScope.REQUEST, app_state) as state:
-            yield await test_container.solve(
-                Dependent(UserService),
-                scopes=[
-                    DIScope.APP,
-                    DIScope.REQUEST,
-                ],
-            ).execute_async(
-                executor=AsyncExecutor(),
-                state=state,
-            )
+    return UserService(user_repo=user_repo)

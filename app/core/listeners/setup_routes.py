@@ -15,8 +15,8 @@ def _wrap_with_container(
     solved = container.solve(
         Dependent(handler, scope=DIScope.REQUEST),
         scopes=[
-            DIScope.REQUEST,
             DIScope.APP,
+            DIScope.REQUEST,
         ],
     )
 

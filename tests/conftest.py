@@ -5,7 +5,7 @@ import pytest
 from alembic import command
 from alembic.config import Config
 from argon2 import PasswordHasher
-from di import Container, bind_by_type
+from di import Container, ScopeState, bind_by_type
 from di.dependent import Dependent
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine
@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine
 from app.auth.repos import AuthRepo
 from app.config import Settings
 from app.core.containers import DIScope, create_container
+from app.core.database import get_database_engine
 from app.core.redis_client import get_redis_client
 from app.core.security import get_password_hasher
 from app.users.models import User
@@ -29,6 +30,25 @@ pytest_plugins = [
 def anyio_backend() -> str:
     """Get the anyio backend"""
     return "asyncio"
+
+
+@pytest.fixture(scope="session")
+async def app_state(test_container: Container) -> AsyncGenerator[ScopeState, None]:
+    """Get the app state."""
+    async with test_container.enter_scope(DIScope.APP) as app_state:
+        yield app_state
+
+
+@pytest.fixture
+async def request_state(
+    test_container: Container, app_state: ScopeState
+) -> AsyncGenerator[ScopeState, None]:
+    """Get the request state."""
+    async with test_container.enter_scope(
+        DIScope.REQUEST,
+        app_state,
+    ) as request_state:
+        yield request_state
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -102,6 +122,21 @@ async def user(user_repo: UserRepo) -> User:
 async def authentication_token(user: User, auth_repo: AuthRepo) -> str:
     """Create an authentication token for the user."""
     return await auth_repo.create_authentication_token(user_id=user.id)
+
+
+@pytest.fixture(scope="session")
+def database_engine(test_settings: Settings) -> AsyncEngine:
+    """Get the database engine."""
+    return get_database_engine(settings=test_settings)
+
+
+@pytest.fixture
+async def database_connection(
+    database_engine: AsyncEngine,
+) -> AsyncGenerator[AsyncConnection, None]:
+    """Get the database connection."""
+    async with get_test_database_connection(engine=database_engine) as connection:
+        yield connection
 
 
 @pytest.fixture(scope="session")

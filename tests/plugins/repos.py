@@ -1,44 +1,31 @@
-from typing import AsyncIterator
-
 import pytest
-from di import Container
-from di.dependent import Dependent
-from di.executors import AsyncExecutor
+from argon2 import PasswordHasher
+from redis.asyncio import Redis
+from sqlalchemy.ext.asyncio import AsyncConnection
 
 from app.auth.repos import AuthRepo
-from app.core.containers import DIScope
 from app.users.repos import UserRepo
 
 
 @pytest.fixture
-async def auth_repo(test_container: Container) -> AsyncIterator[AuthRepo]:
+def auth_repo(
+    database_connection: AsyncConnection,
+    redis_client: Redis,
+) -> AuthRepo:
     """Get the authentication repository."""
-    async with test_container.enter_scope(DIScope.APP) as app_state:
-        async with test_container.enter_scope(DIScope.REQUEST, app_state) as state:
-            yield await test_container.solve(
-                Dependent(AuthRepo),
-                scopes=[
-                    DIScope.APP,
-                    DIScope.REQUEST,
-                ],
-            ).execute_async(
-                executor=AsyncExecutor(),
-                state=state,
-            )
+    return AuthRepo(
+        connection=database_connection,
+        redis_client=redis_client,
+    )
 
 
 @pytest.fixture
-async def user_repo(test_container: Container) -> AsyncIterator[UserRepo]:
+def user_repo(
+    database_connection: AsyncConnection,
+    password_hasher: PasswordHasher,
+) -> UserRepo:
     """Get the user repository."""
-    async with test_container.enter_scope(DIScope.APP) as app_state:
-        async with test_container.enter_scope(DIScope.REQUEST, app_state) as state:
-            yield await test_container.solve(
-                Dependent(UserRepo),
-                scopes=[
-                    DIScope.APP,
-                    DIScope.REQUEST,
-                ],
-            ).execute_async(
-                executor=AsyncExecutor(),
-                state=state,
-            )
+    return UserRepo(
+        connection=database_connection,
+        password_hasher=password_hasher,
+    )

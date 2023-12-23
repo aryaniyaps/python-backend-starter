@@ -204,8 +204,8 @@ async def test_login_user_password_rehash(
         "app.auth.services.AuthRepo.create_authentication_token"
     ) as mock_create_token, patch(
         "app.auth.services.UserRepo.update_user_password"
-    ) as mock_update_password, patch(
-        "app.auth.services.password_hasher", mock_password_hasher
+    ) as mock_update_password, patch.object(
+        auth_service, "_password_hasher", mock_password_hasher
     ):
         mock_user = MagicMock(spec=User)
         mock_user.id = uuid4()
