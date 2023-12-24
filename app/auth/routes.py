@@ -1,12 +1,15 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, Header, Request, status
+from user_agents import parse
 
 from app.auth.decorators import login_required
 from app.auth.models import (
     LoginUserInput,
     LoginUserResult,
+    PasswordResetInput,
+    PasswordResetRequestInput,
     RegisterUserInput,
     RegisterUserResult,
 )
@@ -23,7 +26,7 @@ auth_router = APIRouter(
     status_code=status.HTTP_201_CREATED,
 )
 async def register_user(
-    body: RegisterUserInput,
+    data: RegisterUserInput,
     auth_service: Annotated[
         AuthService,
         Depends(
@@ -32,7 +35,7 @@ async def register_user(
     ],
 ) -> RegisterUserResult:
     """Register a new user."""
-    return await auth_service.register_user(body)
+    return await auth_service.register_user(data)
 
 
 @auth_router.post(
@@ -40,7 +43,7 @@ async def register_user(
     response_model=LoginUserResult,
 )
 async def login_user(
-    body: LoginUserInput,
+    data: LoginUserInput,
     auth_service: Annotated[
         AuthService,
         Depends(
@@ -49,7 +52,7 @@ async def login_user(
     ],
 ) -> LoginUserResult:
     """Login the current user."""
-    return await auth_service.login_user(body)
+    return await auth_service.login_user(data)
 
 
 @auth_router.post(
@@ -73,3 +76,41 @@ async def logout_user(
         authentication_token=authentication_token,
         user_id=current_user_id,
     )
+
+
+@auth_router.post(
+    "/reset-password-request",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def request_password_reset(
+    data: PasswordResetRequestInput,
+    user_agent: Annotated[str, Header()],
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=AuthService,
+        ),
+    ],
+) -> None:
+    """Send a password reset request to the given email."""
+    await auth_service.send_password_reset_request(
+        data=data,
+        user_agent=parse(user_agent),
+    )
+
+
+@auth_router.post(
+    "/reset-password",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def reset_password(
+    data: PasswordResetInput,
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=AuthService,
+        ),
+    ],
+) -> None:
+    """Send a password reset request to the given email."""
+    await auth_service.reset_password(data)

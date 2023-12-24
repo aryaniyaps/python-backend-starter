@@ -18,13 +18,10 @@ async def handle_validation_error(
     """Handle ValidationError exceptions."""
     return ORJSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content=jsonable_encoder(
-            {
-                "message": "Invalid input detected.",
-                "input": exception.body,
-                "errors": exception.errors(),
-            },
-        ),
+        content={
+            "message": "Invalid input detected.",
+            "errors": jsonable_encoder(exception.errors()),
+        },
     )
 
 

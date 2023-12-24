@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -29,11 +30,18 @@ def add_routes(app: FastAPI) -> None:
     app.include_router(router=auth_router)
 
 
-def add_middleware(app: FastAPI) -> None:
+def add_middleware(app: FastAPI, settings: Settings) -> None:
     """Register middleware for the app."""
     app.add_middleware(
         BaseHTTPMiddleware,
         dispatch=set_request_id,
+    )
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_allow_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
 
@@ -68,7 +76,7 @@ def create_app(settings: Settings) -> FastAPI:
         default_response_class=ORJSONResponse,
         title=APP_NAME,
     )
-    add_middleware(app)
+    add_middleware(app, settings)
     add_error_handlers(app)
     add_routes(app)
     return app

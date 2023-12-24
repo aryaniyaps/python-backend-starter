@@ -2,12 +2,13 @@ from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import EmailStr, Field
 
+from app.core.models import CoreModel
 from app.users.models import User
 
 
-class LoginUserInput(BaseModel):
+class LoginUserInput(CoreModel):
     login: Annotated[
         str | EmailStr,
         Field(
@@ -21,13 +22,13 @@ class LoginUserInput(BaseModel):
     password: str
 
 
-class LoginUserResult(BaseModel):
+class LoginUserResult(CoreModel):
     authentication_token: str
 
     user: User
 
 
-class RegisterUserInput(BaseModel):
+class RegisterUserInput(CoreModel):
     username: Annotated[
         str,
         Field(
@@ -60,13 +61,13 @@ class RegisterUserInput(BaseModel):
     ]
 
 
-class RegisterUserResult(BaseModel):
+class RegisterUserResult(CoreModel):
     authentication_token: str
 
     user: User
 
 
-class PasswordResetRequestInput(BaseModel):
+class PasswordResetRequestInput(CoreModel):
     email: Annotated[
         EmailStr,
         Field(
@@ -78,7 +79,7 @@ class PasswordResetRequestInput(BaseModel):
     ]
 
 
-class PasswordResetInput(BaseModel):
+class PasswordResetInput(CoreModel):
     email: Annotated[
         EmailStr,
         Field(
@@ -102,7 +103,7 @@ class PasswordResetInput(BaseModel):
     reset_token: str
 
 
-class PasswordResetToken(BaseModel):
+class PasswordResetToken(CoreModel):
     id: UUID
 
     user_id: UUID
@@ -119,7 +120,3 @@ class PasswordResetToken(BaseModel):
     created_at: datetime
 
     expires_at: datetime
-
-    model_config = ConfigDict(
-        from_attributes=True,
-    )
