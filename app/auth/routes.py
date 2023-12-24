@@ -1,10 +1,10 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Header, Request, status
+from fastapi import APIRouter, Depends, Header, status
 from user_agents import parse
 
-from app.auth.decorators import login_required
+from app.auth.dependencies import get_authentication_token, get_current_user_id
 from app.auth.models import (
     LoginUserInput,
     LoginUserResult,
@@ -59,19 +59,27 @@ async def login_user(
     "/logout",
     status_code=status.HTTP_204_NO_CONTENT,
 )
-@login_required
 async def logout_user(
-    request: Request,
     auth_service: Annotated[
         AuthService,
         Depends(
             dependency=AuthService,
         ),
     ],
+    authentication_token: Annotated[
+        str,
+        Depends(
+            dependency=get_authentication_token,
+        ),
+    ],
+    current_user_id: Annotated[
+        UUID,
+        Depends(
+            dependency=get_current_user_id,
+        ),
+    ],
 ) -> None:
     """Logout the current user."""
-    current_user_id: UUID = request.state.current_user_id
-    authentication_token: str = request.state.authentication_token
     await auth_service.remove_authentication_token(
         authentication_token=authentication_token,
         user_id=current_user_id,
