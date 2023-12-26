@@ -105,3 +105,8 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
+
+
+def get_settings() -> Settings:
+    """Get the application settings."""
+    return Settings()  # type: ignore

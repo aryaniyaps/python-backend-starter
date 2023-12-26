@@ -8,7 +8,7 @@ from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine
 
 from app.auth.repos import AuthRepo
-from app.config import Settings
+from app.config import Settings, get_settings
 from app.core.database import get_database_engine
 from app.core.redis_client import get_redis_client
 from app.core.security import get_password_hasher
@@ -53,7 +53,7 @@ def setup_test_database() -> Iterator[None]:
 @pytest.fixture(scope="session")
 def test_settings() -> Settings:
     """Setup the settings for testing."""
-    return Settings()  # type: ignore
+    return get_settings()
 
 
 @pytest.fixture

@@ -74,6 +74,7 @@ def create_app(settings: Settings) -> FastAPI:
     app = FastAPI(
         debug=settings.debug,
         default_response_class=ORJSONResponse,
+        openapi_url=None if not settings.debug else "/openapi.json",
         title=APP_NAME,
     )
     add_middleware(app, settings)

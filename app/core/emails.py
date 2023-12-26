@@ -1,12 +1,12 @@
-from contextlib import contextmanager
 from email.message import EmailMessage
 from email.mime.text import MIMEText
 from smtplib import SMTP
-from typing import Generator
+from typing import Annotated, Generator
 
+from fastapi import Depends
 from pydantic_core import Url
 
-from app.config import Settings
+from app.config import Settings, get_settings
 
 
 class EmailSender:
@@ -53,8 +53,14 @@ class EmailSender:
             self.server.quit()
 
 
-@contextmanager
-def get_email_sender(settings: Settings) -> Generator[EmailSender, None, None]:
+def get_email_sender(
+    settings: Annotated[
+        Settings,
+        Depends(
+            dependency=get_settings,
+        ),
+    ]
+) -> Generator[EmailSender, None, None]:
     """Get the email sender."""
     email_sender = EmailSender(
         email_server=settings.email_server,

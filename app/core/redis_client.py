@@ -1,13 +1,19 @@
-from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from typing import Annotated, AsyncGenerator
 
+from fastapi import Depends
 from redis.asyncio import Redis, from_url
 
-from app.config import Settings
+from app.config import Settings, get_settings
 
 
-@asynccontextmanager
-async def get_redis_client(settings: Settings) -> AsyncGenerator[Redis, None]:
+async def get_redis_client(
+    settings: Annotated[
+        Settings,
+        Depends(
+            dependency=get_settings,
+        ),
+    ]
+) -> AsyncGenerator[Redis, None]:
     """Get the redis client."""
     redis_client = from_url(
         url=str(settings.redis_url),

@@ -1,10 +1,10 @@
-from sanic import Sanic
+from fastapi import FastAPI
 from uvicorn import Config, Server
 
 from app.config import Settings
 
 
-async def run_app(app: Sanic, settings: Settings) -> None:
+async def run_app(app: FastAPI, settings: Settings) -> None:
     """Run the ASGI app instance."""
     server = Server(
         config=Config(

@@ -1,6 +1,6 @@
 from celery import Celery
 
-from app.config import Settings
+from app.config import Settings, get_settings
 
 
 def create_worker(settings: Settings) -> Celery:
@@ -15,6 +15,6 @@ def create_worker(settings: Settings) -> Celery:
     return celery
 
 
-worker = create_worker(
-    settings=Settings(),  # type: ignore
-)
+settings = get_settings()
+
+worker = create_worker(settings=settings)

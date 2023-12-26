@@ -35,7 +35,9 @@ async def register_user(
     ],
 ) -> RegisterUserResult:
     """Register a new user."""
-    return await auth_service.register_user(data)
+    return await auth_service.register_user(
+        data=RegisterUserInput.model_validate(data),
+    )
 
 
 @auth_router.post(
@@ -52,7 +54,9 @@ async def login_user(
     ],
 ) -> LoginUserResult:
     """Login the current user."""
-    return await auth_service.login_user(data)
+    return await auth_service.login_user(
+        data=LoginUserInput.model_validate(data),
+    )
 
 
 @auth_router.post(
@@ -102,7 +106,7 @@ async def request_password_reset(
 ) -> None:
     """Send a password reset request to the given email."""
     await auth_service.send_password_reset_request(
-        data=data,
+        data=PasswordResetRequestInput.model_validate(data),
         user_agent=parse(user_agent),
     )
 
@@ -121,4 +125,6 @@ async def reset_password(
     ],
 ) -> None:
     """Send a password reset request to the given email."""
-    await auth_service.reset_password(data)
+    await auth_service.reset_password(
+        data=PasswordResetInput.model_validate(data),
+    )
