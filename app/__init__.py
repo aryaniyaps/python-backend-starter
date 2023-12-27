@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
@@ -6,7 +6,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.auth.routes import auth_router
 from app.config import Settings
-from app.core.constants import APP_NAME
+from app.core.constants import APP_NAME, SUPPORT_EMAIL
 from app.core.error_handlers import (
     handle_invalid_input_error,
     handle_resource_not_found_error,
@@ -21,6 +21,7 @@ from app.core.errors import (
     UnexpectedError,
 )
 from app.core.middleware.request_id import set_request_id
+from app.core.models import ValidationErrorResult
 from app.users.routes import users_router
 
 
@@ -72,10 +73,20 @@ def add_error_handlers(app: FastAPI) -> None:
 def create_app(settings: Settings) -> FastAPI:
     """Initialize an app instance."""
     app = FastAPI(
+        version="0.0.1",
         debug=settings.debug,
         default_response_class=ORJSONResponse,
-        openapi_url=None if not settings.debug else "/openapi.json",
+        redoc_url=None,
         title=APP_NAME,
+        responses={
+            status.HTTP_422_UNPROCESSABLE_ENTITY: {
+                "model": ValidationErrorResult,
+                "description": "Validation Error",
+            }
+        },
+        contact={
+            "email": SUPPORT_EMAIL,
+        },
     )
     add_middleware(app, settings)
     add_error_handlers(app)

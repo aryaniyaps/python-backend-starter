@@ -10,9 +10,25 @@ from app.core.models import CoreModel
 class User(CoreModel):
     id: UUID
 
-    username: str
+    username: Annotated[
+        str,
+        Field(
+            examples=[
+                "aryaniyaps",
+            ],
+            description="The username of the user.",
+        ),
+    ]
 
-    email: str
+    email: Annotated[
+        str,
+        Field(
+            examples=[
+                "aryaniyaps@example.com",
+            ],
+            description="The email of the user.",
+        ),
+    ]
 
     password_hash: Annotated[
         str,
@@ -21,8 +37,23 @@ class User(CoreModel):
         ),
     ]
 
-    last_login_at: datetime
+    last_login_at: Annotated[
+        datetime,
+        Field(
+            description="When the user last logged in.",
+        ),
+    ]
 
-    created_at: datetime
+    created_at: Annotated[
+        datetime,
+        Field(
+            description="When the user was created.",
+        ),
+    ]
 
-    updated_at: datetime
+    updated_at: Annotated[
+        datetime,
+        Field(
+            description="When the user was last updated.",
+        ),
+    ]

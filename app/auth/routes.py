@@ -17,6 +17,7 @@ from app.auth.services import AuthService
 
 auth_router = APIRouter(
     prefix="/auth",
+    tags=["authentication"],
 )
 
 
@@ -24,6 +25,10 @@ auth_router = APIRouter(
     "/register",
     response_model=RegisterUserResult,
     status_code=status.HTTP_201_CREATED,
+    summary="Register a new user.",
+    description="""Allows users to register a new account by providing the
+    required user registration information. Upon successful registration,
+    it returns details about the registered user.""",
 )
 async def register_user(
     data: RegisterUserInput,
@@ -43,6 +48,10 @@ async def register_user(
 @auth_router.post(
     "/login",
     response_model=LoginUserResult,
+    summary="Login the current user.",
+    description="""Handles user login by validating the provided login credentials.
+    If the credentials are valid, it returns information about the authenticated user,
+    including an authentication token for future requests.""",
 )
 async def login_user(
     data: LoginUserInput,
@@ -62,6 +71,10 @@ async def login_user(
 @auth_router.post(
     "/logout",
     status_code=status.HTTP_204_NO_CONTENT,
+    summary="Logout the current user.",
+    description="""Logs out the currently authenticated user by invalidating
+    the authentication token associated with the user. Requires the user's
+    authentication token and user ID for security validation.""",
 )
 async def logout_user(
     auth_service: Annotated[
@@ -93,6 +106,10 @@ async def logout_user(
 @auth_router.post(
     "/reset-password-request",
     status_code=status.HTTP_204_NO_CONTENT,
+    summary="Send a password reset request.",
+    description="""Initiates the process of resetting a user's password
+    by sending a reset request to the provided email address. The user
+    agent information is also captured for security purposes.""",
 )
 async def request_password_reset(
     data: PasswordResetRequestInput,
@@ -114,6 +131,10 @@ async def request_password_reset(
 @auth_router.post(
     "/reset-password",
     status_code=status.HTTP_204_NO_CONTENT,
+    summary="Reset user password.",
+    description="""Allows users to reset their password by providing the
+    necessary information, including a valid reset token. After successful
+    validation, the user's password is updated.""",
 )
 async def reset_password(
     data: PasswordResetInput,

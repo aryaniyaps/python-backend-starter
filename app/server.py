@@ -1,9 +1,8 @@
 import asyncio
 
+from app import create_app
 from app.asgi import run_app
 from app.config import get_settings
-
-from . import create_app
 
 
 async def main() -> None:

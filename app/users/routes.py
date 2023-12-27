@@ -9,10 +9,18 @@ from app.users.services import UserService
 
 users_router = APIRouter(
     prefix="/users",
+    tags=["users"],
 )
 
 
-@users_router.get("/@me", response_model=User)
+@users_router.get(
+    "/@me",
+    response_model=User,
+    summary="Get the current user.",
+    description="""Retrieves information about the currently authenticated
+    user based on their user ID. Requires the authentication token to be
+    included in the request headers for security validation.""",
+)
 async def on_get_current_user(
     current_user_id: Annotated[
         UUID,
@@ -33,7 +41,15 @@ async def on_get_current_user(
     )
 
 
-@users_router.get("/{user_id}", response_model=User)
+@users_router.get(
+    "/{user_id}",
+    response_model=User,
+    summary="Get the user with the given ID.",
+    description="""Retrieves information about a user based on the
+    provided user ID. The user ID is expected to be a valid UUID.
+    This endpoint is useful for fetching details about specific users
+    in the system.""",
+)
 async def on_get_user(
     user_id: Annotated[
         UUID,

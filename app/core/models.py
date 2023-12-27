@@ -1,4 +1,7 @@
-from pydantic import BaseModel, ConfigDict
+from typing import Annotated, List
+from uuid import UUID
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 def _snake_to_camel(name: str) -> str:
@@ -13,3 +16,21 @@ class CoreModel(BaseModel):
         populate_by_name=True,
         alias_generator=_snake_to_camel,
     )
+
+
+class ValidationError(BaseModel):
+    loc: List[str] | None = None
+    msg: str
+    type: str
+
+
+class ValidationErrorResult(CoreModel):
+    message: Annotated[
+        str,
+        Field(
+            examples=[
+                "Invalid input detected.",
+            ],
+        ),
+    ]
+    errors: List[ValidationError]
