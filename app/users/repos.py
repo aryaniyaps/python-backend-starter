@@ -130,7 +130,6 @@ class UserRepo:
         email: str,
     ) -> User | None:
         """Get a user by email."""
-        print("GETTING USER BY EMAIL")
         result = await self._connection.execute(
             select(*users_table.c).where(users_table.c.email == email)
         )

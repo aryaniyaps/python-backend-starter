@@ -8,7 +8,12 @@ from app.core.models import CoreModel
 
 
 class User(CoreModel):
-    id: UUID
+    id: Annotated[
+        UUID,
+        Field(
+            description="The ID of the user.",
+        ),
+    ]
 
     username: Annotated[
         str,

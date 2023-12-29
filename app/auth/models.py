@@ -19,6 +19,7 @@ class LoginUserInput(CoreModel):
             description="The identifier of the user account (username or email).",
         ),
     ]
+
     password: Annotated[
         str,
         Field(
@@ -40,7 +41,13 @@ class LoginUserResult(CoreModel):
             description="The authentication token generated upon successful login.",
         ),
     ]
-    user: User
+
+    user: Annotated[
+        User,
+        Field(
+            description="The logged in user.",
+        ),
+    ]
 
 
 class RegisterUserInput(CoreModel):
@@ -55,6 +62,7 @@ class RegisterUserInput(CoreModel):
             description="The desired username for the new user account.",
         ),
     ]
+
     email: Annotated[
         EmailStr,
         Field(
@@ -65,6 +73,7 @@ class RegisterUserInput(CoreModel):
             description="The email address associated with the new user account.",
         ),
     ]
+
     password: Annotated[
         str,
         Field(
@@ -90,7 +99,13 @@ class RegisterUserResult(CoreModel):
             ],
         ),
     ]
-    user: User
+
+    user: Annotated[
+        User,
+        Field(
+            description="The registered user.",
+        ),
+    ]
 
 
 class PasswordResetRequestInput(CoreModel):
@@ -119,6 +134,7 @@ class PasswordResetInput(CoreModel):
             for which the password is being reset.""",
         ),
     ]
+
     new_password: Annotated[
         str,
         Field(
@@ -132,6 +148,7 @@ class PasswordResetInput(CoreModel):
             description="The new password for the user account.",
         ),
     ]
+
     reset_token: Annotated[
         str,
         Field(
@@ -145,19 +162,27 @@ class PasswordResetInput(CoreModel):
 
 
 class PasswordResetToken(CoreModel):
-    id: UUID
+    id: Annotated[
+        UUID,
+        Field(
+            description="The ID of the password reset token.",
+        ),
+    ]
+
     user_id: Annotated[
         UUID,
         Field(
             description="The ID of the user associated with the password reset token.",
         ),
     ]
+
     token_hash: Annotated[
         str,
         Field(
             exclude=True,
         ),
     ]
+
     last_login_at: Annotated[
         datetime,
         Field(
@@ -165,12 +190,14 @@ class PasswordResetToken(CoreModel):
             reset token last logged in.""",
         ),
     ]
+
     created_at: Annotated[
         datetime,
         Field(
             description="When the password reset token was created.",
         ),
     ]
+
     expires_at: Annotated[
         datetime,
         Field(
