@@ -9,12 +9,8 @@ from app.core.templates import (
     reset_password_subject,
     reset_password_text,
 )
-from app.worker import worker
-
-# TODO: integrate DI with Celery
 
 
-@worker.task
 def send_password_reset_request_email(
     to: str,
     username: str,
