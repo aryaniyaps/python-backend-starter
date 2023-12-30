@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from pydantic import AmqpDsn, Field, PostgresDsn, RedisDsn, UrlConstraints
+from pydantic import Field, PostgresDsn, RedisDsn, UrlConstraints
 from pydantic_core import Url
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -55,15 +55,6 @@ class Settings(BaseSettings):
         Field(
             examples=[
                 "redis://user:pass@localhost:6379/1",
-            ],
-        ),
-    ]
-
-    celery_broker_url: Annotated[
-        AmqpDsn,
-        Field(
-            examples=[
-                "amqp://user:pass@localhost:5672//",
             ],
         ),
     ]
