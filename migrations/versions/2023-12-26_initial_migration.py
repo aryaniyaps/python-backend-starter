@@ -45,7 +45,6 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.PrimaryKeyConstraint("id", name=op.f("users_pkey")),
-        sa.UniqueConstraint("password_hash", name=op.f("users_password_hash_key")),
     )
     op.create_index(op.f("users_email_idx"), "users", ["email"], unique=True)
     op.create_index(op.f("users_username_idx"), "users", ["username"], unique=True)

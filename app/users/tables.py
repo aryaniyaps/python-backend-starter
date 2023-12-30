@@ -33,7 +33,6 @@ users_table = Table(
         "password_hash",
         String(128),
         nullable=False,
-        unique=True,
     ),
     Column(
         "last_login_at",
