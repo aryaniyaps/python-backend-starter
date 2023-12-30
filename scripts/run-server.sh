@@ -1,2 +1,2 @@
 #!/bin/sh
-pdm run app/asgi.py
+pdm run app/server.py

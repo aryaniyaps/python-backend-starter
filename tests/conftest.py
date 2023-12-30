@@ -68,13 +68,14 @@ async def authentication_token(user: User, auth_repo: AuthRepo) -> str:
 @asynccontextmanager
 async def get_test_database_connection() -> AsyncGenerator[AsyncConnection, None]:
     """Get the test database connection."""
-    async with database_engine.begin() as connection:
-        transaction = await connection.begin_nested()
-        # yield database connection
-        yield connection
-        if transaction.is_active:
-            await transaction.rollback()
-        await connection.rollback()
+    async with database_engine.connect() as connection:
+        async with connection.begin() as transaction:
+            try:
+                # yield database connection
+                yield connection
+            finally:
+                print("ROLLING BACK TRANSACTION")
+                await transaction.rollback()
 
 
 @pytest.fixture

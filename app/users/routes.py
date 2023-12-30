@@ -21,7 +21,7 @@ users_router = APIRouter(
     user based on their user ID. Requires the authentication token to be
     included in the request headers for security validation.""",
 )
-async def on_get_current_user(
+async def get_current_user(
     current_user_id: Annotated[
         UUID,
         Depends(
@@ -50,7 +50,7 @@ async def on_get_current_user(
     This endpoint is useful for fetching details about specific users
     in the system.""",
 )
-async def on_get_user(
+async def get_user(
     user_id: Annotated[
         UUID,
         Path(

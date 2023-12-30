@@ -110,6 +110,7 @@ async def logout_user(
     description="""Initiates the process of resetting a user's password
     by sending a reset request to the provided email address. The user
     agent information is also captured for security purposes.""",
+    response_model=None,
 )
 async def request_password_reset(
     data: PasswordResetRequestInput,
@@ -135,6 +136,7 @@ async def request_password_reset(
     description="""Allows users to reset their password by providing the
     necessary information, including a valid reset token. After successful
     validation, the user's password is updated.""",
+    response_model=None,
 )
 async def reset_password(
     data: PasswordResetInput,

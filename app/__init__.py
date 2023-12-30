@@ -22,11 +22,13 @@ from app.core.errors import (
 )
 from app.core.middleware.request_id import set_request_id
 from app.core.models import ValidationErrorResult
+from app.meta.routes import meta_router
 from app.users.routes import users_router
 
 
 def add_routes(app: FastAPI) -> None:
     """Register routes for the app."""
+    app.include_router(router=meta_router)
     app.include_router(router=users_router)
     app.include_router(router=auth_router)
 
@@ -79,6 +81,10 @@ def create_app() -> FastAPI:
         openapi_url=settings.openapi_url,
         redoc_url=None,
         title=APP_NAME,
+        swagger_ui_parameters={
+            "syntaxHighlight.theme": "nord",
+            "displayRequestDuration": True,
+        },
         responses={
             status.HTTP_422_UNPROCESSABLE_ENTITY: {
                 "model": ValidationErrorResult,
