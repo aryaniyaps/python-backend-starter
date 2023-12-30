@@ -24,9 +24,9 @@ async def run_app(app: FastAPI) -> None:
 
 async def main() -> None:
     """Initialize and run the application."""
-    app = create_app()
-
-    await run_app(app=app)
+    await run_app(
+        app=create_app(),
+    )
 
 
 if __name__ == "__main__":

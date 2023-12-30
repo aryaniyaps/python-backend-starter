@@ -40,35 +40,33 @@ def add_middleware(app: FastAPI) -> None:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    # FIXME: adding custom middleware raises anyio.wouldBlock
-    # this will be fixed when starlette is bumped!
-    # app.add_middleware(
-    #     BaseHTTPMiddleware,
-    #     dispatch=set_request_id,
-    # )
+    app.add_middleware(
+        BaseHTTPMiddleware,
+        dispatch=set_request_id,
+    )
 
 
 def add_error_handlers(app: FastAPI) -> None:
     """Register error handlers for the app."""
     app.add_exception_handler(
         RequestValidationError,
-        handler=handle_validation_error,
+        handler=handle_validation_error,  # type: ignore
     )
     app.add_exception_handler(
         InvalidInputError,
-        handler=handle_invalid_input_error,
+        handler=handle_invalid_input_error,  # type: ignore
     )
     app.add_exception_handler(
         ResourceNotFoundError,
-        handler=handle_resource_not_found_error,
+        handler=handle_resource_not_found_error,  # type: ignore
     )
     app.add_exception_handler(
         UnauthenticatedError,
-        handler=handle_unauthenticated_error,
+        handler=handle_unauthenticated_error,  # type: ignore
     )
     app.add_exception_handler(
         UnexpectedError,
-        handler=handle_unexpected_error,
+        handler=handle_unexpected_error,  # type: ignore
     )
 
 
