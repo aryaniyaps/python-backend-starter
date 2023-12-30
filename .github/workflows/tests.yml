@@ -12,12 +12,15 @@ jobs:
   tests:
     runs-on: ubuntu-20.04
     env:
-      debug: true
-      database_url: "postgresql+asyncpg://user:pass@localhost:5432/starter"
-      redis_url: "redis://:pass@localhost:6379/1"
-      celery_broker_url: "amqp://user:pass@localhost:5672/tasks"
-      email_server: "smtp://localhost:1025"
-      email_from: "noreply@example.com"
+      DEBUG: true
+      DATABASE_URL: "postgresql+asyncpg://user:pass@localhost:5432/starter"
+      DATABASE_POOL_SIZE: 20
+      OPENAPI_URL:
+      CORS_ALLOW_ORIGINS:
+      REDIS_URL: "redis://:pass@localhost:6379/1"
+      CELERY_BROKER_URL: "amqp://user:pass@localhost:5672/tasks"
+      EMAIL_SERVER: "smtp://localhost:1025"
+      EMAIL_FROM: "noreply@example.com"
 
 
     services:
@@ -36,18 +39,6 @@ jobs:
                 - "6379:6379"
             env:
                 REDIS_PASSWORD: "pass"
-
-        rabbitmq:
-            image: "bitnami/rabbitmq:3.12"
-            ports:
-                - "5672:5672"
-            env:
-                RABBITMQ_DEFAULT_VHOST: "tasks"
-                RABBITMQ_DEFAULT_USER: "user"
-                RABBITMQ_DEFAULT_PASS: "pass"
-                RABBITMQ_CONF_FILE: "/opt/bitnami/rabbitmq/etc/rabbitmq/rabbitmq.conf"
-            volumes:
-                - "./rabbitmq.conf:/opt/bitnami/rabbitmq/etc/rabbitmq/rabbitmq.conf"
 
 
         mailhog:
