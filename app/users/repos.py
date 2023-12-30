@@ -51,8 +51,7 @@ class UserRepo:
             )
             .returning(*users_table.c),
         )
-        user_row = result.one()
-        return User.model_validate(user_row)
+        return User.model_validate(result.one())
 
     def hash_password(self, password: str) -> str:
         """Hash the given password."""
@@ -80,8 +79,7 @@ class UserRepo:
             )
             .returning(*users_table.c),
         )
-        updated_user_row = result.one()
-        return User.model_validate(updated_user_row)
+        return User.model_validate(result.one())
 
     async def update_user_last_login(
         self,
@@ -98,8 +96,7 @@ class UserRepo:
             .values(last_login_at=text("NOW()"))
             .returning(*users_table.c),
         )
-        updated_user_row = result.one()
-        return User.model_validate(updated_user_row)
+        return User.model_validate(result.one())
 
     async def get_user_by_username(
         self,

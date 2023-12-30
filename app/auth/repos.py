@@ -127,12 +127,13 @@ class AuthRepo:
                 user_id=user_id,
             )
         )  # type: ignore
-        for authentication_token_hash in authentication_token_hashes:
-            await self._redis_client.delete(
-                self.generate_authentication_token_key(
-                    authentication_token_hash=authentication_token_hash,
-                ),
+        authentication_token_keys = [
+            self.generate_authentication_token_key(
+                authentication_token_hash=authentication_token_hash
             )
+            for authentication_token_hash in authentication_token_hashes
+        ]
+        await self._redis_client.delete(*authentication_token_keys)
         await self._redis_client.delete(
             self.generate_token_owner_key(
                 user_id=user_id,

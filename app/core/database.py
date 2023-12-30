@@ -1,39 +1,21 @@
-from typing import Annotated, AsyncGenerator
+from typing import AsyncGenerator
 
-from fastapi import Depends
 from sqlalchemy import MetaData
-from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncConnection, create_async_engine
 
-from app.config import Settings, get_settings
+from app.config import settings
 
-
-def get_database_engine(
-    settings: Annotated[
-        Settings,
-        Depends(
-            dependency=get_settings,
-        ),
-    ]
-) -> AsyncEngine:
-    """Get the database engine."""
-    return create_async_engine(
-        url=str(settings.database_url),
-        echo=settings.debug,
-        pool_size=settings.database_pool_size,
-        pool_pre_ping=True,
-    )
+database_engine = create_async_engine(
+    url=str(settings.database_url),
+    echo=settings.debug,
+    pool_size=settings.database_pool_size,
+    pool_pre_ping=True,
+)
 
 
-async def get_database_connection(
-    engine: Annotated[
-        AsyncEngine,
-        Depends(
-            dependency=get_database_engine,
-        ),
-    ],
-) -> AsyncGenerator[AsyncConnection, None]:
+async def get_database_connection() -> AsyncGenerator[AsyncConnection, None]:
     """Get the database connection."""
-    async with engine.begin() as connection:
+    async with database_engine.begin() as connection:
         yield connection
 
 

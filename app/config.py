@@ -2,7 +2,7 @@ from typing import Annotated
 
 from pydantic import AmqpDsn, Field, PostgresDsn, RedisDsn, UrlConstraints
 from pydantic_core import Url
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -27,6 +27,8 @@ class Settings(BaseSettings):
             default=8000,
         ),
     ]
+
+    openapi_url: str | None = "/openapi.json"
 
     database_url: Annotated[
         PostgresDsn,
@@ -103,10 +105,9 @@ class Settings(BaseSettings):
         ),
     ]
 
-    class Config:
-        env_file = ".env"
+    model_config = SettingsConfigDict(
+        env_file=".env",
+    )
 
 
-def get_settings() -> Settings:
-    """Get the application settings."""
-    return Settings()  # type: ignore
+settings = Settings()  # type: ignore

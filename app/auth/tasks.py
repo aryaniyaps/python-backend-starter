@@ -1,7 +1,9 @@
 from urllib.parse import urlencode, urljoin
 
+from fastapi import Depends
+
 from app.core.constants import APP_URL
-from app.core.emails import EmailSender
+from app.core.emails import EmailSender, get_email_sender
 from app.core.templates import (
     reset_password_html,
     reset_password_subject,
@@ -19,7 +21,9 @@ def send_password_reset_request_email(
     password_reset_token: str,
     operating_system: str,
     browser_name: str,
-    email_sender: EmailSender,
+    email_sender: EmailSender = Depends(
+        dependency=get_email_sender,
+    ),
 ) -> None:
     """Sends a password reset request email to the given user."""
 

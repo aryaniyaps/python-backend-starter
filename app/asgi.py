@@ -4,10 +4,10 @@ from fastapi import FastAPI
 from uvicorn import Config, Server
 
 from app import create_app
-from app.config import Settings, get_settings
+from app.config import settings
 
 
-async def run_app(app: FastAPI, settings: Settings) -> None:
+async def run_app(app: FastAPI) -> None:
     """Run the ASGI app instance."""
     server = Server(
         config=Config(
@@ -24,13 +24,9 @@ async def run_app(app: FastAPI, settings: Settings) -> None:
 
 async def main() -> None:
     """Initialize and run the application."""
-    settings = get_settings()
-    app = create_app(settings=settings)
+    app = create_app()
 
-    await run_app(
-        app=app,
-        settings=settings,
-    )
+    await run_app(app=app)
 
 
 if __name__ == "__main__":

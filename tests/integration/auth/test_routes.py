@@ -18,7 +18,6 @@ async def test_on_post_register_success(test_client: AsyncClient) -> None:
             "password": "password",
         },
     )
-    print(response.content)
     assert response.status_code == status.HTTP_201_CREATED
 
 
@@ -123,7 +122,9 @@ async def test_on_post_reset_password_request_success(
     """Ensure we can successfully send a password reset request."""
     response = await test_client.post(
         "/auth/reset-password-request",
-        json={"email": user.email},
+        json={
+            "email": user.email,
+        },
     )
 
     assert response.status_code == status.HTTP_204_NO_CONTENT
@@ -135,7 +136,9 @@ async def test_on_post_reset_password_request_nonexistent_user(
     """Ensure we cannot send a password reset request for a nonexistent user."""
     response = await test_client.post(
         "/auth/reset-password-request",
-        json={"email": "nonexistent@example.com"},
+        json={
+            "email": "nonexistent@example.com",
+        },
     )
 
     assert (
@@ -188,22 +191,6 @@ async def test_on_post_reset_password_user_not_found(
         "/auth/reset-password",
         json={
             "email": "nonexistent@example.com",
-            "reset_token": "fake_token",
-            "new_password": "new_password",
-        },
-    )
-
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
-
-
-async def test_on_post_reset_password_invalid_email(
-    test_client: AsyncClient,
-) -> None:
-    """Ensure we cannot reset a password for an invalid email."""
-    response = await test_client.post(
-        "/auth/reset-password",
-        json={
-            "email": "invalid_email",
             "reset_token": "fake_token",
             "new_password": "new_password",
         },

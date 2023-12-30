@@ -5,7 +5,7 @@ from fastapi.responses import ORJSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.auth.routes import auth_router
-from app.config import Settings
+from app.config import settings
 from app.core.constants import APP_NAME, SUPPORT_EMAIL
 from app.core.error_handlers import (
     handle_invalid_input_error,
@@ -31,12 +31,8 @@ def add_routes(app: FastAPI) -> None:
     app.include_router(router=auth_router)
 
 
-def add_middleware(app: FastAPI, settings: Settings) -> None:
+def add_middleware(app: FastAPI) -> None:
     """Register middleware for the app."""
-    app.add_middleware(
-        BaseHTTPMiddleware,
-        dispatch=set_request_id,
-    )
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_allow_origins,
@@ -44,6 +40,12 @@ def add_middleware(app: FastAPI, settings: Settings) -> None:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    # FIXME: adding custom middleware raises anyio.wouldBlock
+    # this will be fixed when starlette is bumped!
+    # app.add_middleware(
+    #     BaseHTTPMiddleware,
+    #     dispatch=set_request_id,
+    # )
 
 
 def add_error_handlers(app: FastAPI) -> None:
@@ -70,12 +72,13 @@ def add_error_handlers(app: FastAPI) -> None:
     )
 
 
-def create_app(settings: Settings) -> FastAPI:
+def create_app() -> FastAPI:
     """Initialize an app instance."""
     app = FastAPI(
         version="0.0.1",
         debug=settings.debug,
         default_response_class=ORJSONResponse,
+        openapi_url=settings.openapi_url,
         redoc_url=None,
         title=APP_NAME,
         responses={
@@ -88,7 +91,7 @@ def create_app(settings: Settings) -> FastAPI:
             "email": SUPPORT_EMAIL,
         },
     )
-    add_middleware(app, settings)
+    add_middleware(app)
     add_error_handlers(app)
     add_routes(app)
     return app

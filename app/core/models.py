@@ -1,5 +1,4 @@
 from typing import Annotated, List
-from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -18,10 +17,28 @@ class CoreModel(BaseModel):
     )
 
 
-class ValidationError(BaseModel):
-    loc: List[str] | None = None
-    msg: str
-    type: str
+class ValidationError(CoreModel):
+    loc: Annotated[
+        List[str] | None,
+        Field(
+            default=None,
+            description="The location of the validation error.",
+        ),
+    ]
+
+    msg: Annotated[
+        str,
+        Field(
+            description="A message describing the validation error.",
+        ),
+    ]
+
+    type: Annotated[
+        str,
+        Field(
+            description="The type of the validation error.",
+        ),
+    ]
 
 
 class ValidationErrorResult(CoreModel):
@@ -31,6 +48,12 @@ class ValidationErrorResult(CoreModel):
             examples=[
                 "Invalid input detected.",
             ],
+            description="A human readable message describing the error.",
         ),
     ]
-    errors: List[ValidationError]
+    errors: Annotated[
+        List[ValidationError],
+        Field(
+            description="A list of validation errors.",
+        ),
+    ]

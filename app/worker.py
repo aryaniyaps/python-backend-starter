@@ -1,9 +1,9 @@
 from celery import Celery
 
-from app.config import Settings, get_settings
+from app.config import settings
 
 
-def create_worker(settings: Settings) -> Celery:
+def create_worker() -> Celery:
     """Initialize a worker instance."""
     celery = Celery(__name__)
     celery.conf.update(
@@ -15,6 +15,4 @@ def create_worker(settings: Settings) -> Celery:
     return celery
 
 
-settings = get_settings()
-
-worker = create_worker(settings=settings)
+worker = create_worker()
