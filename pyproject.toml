@@ -6,9 +6,9 @@ authors = [{ name = "Aryan Iyappan", email = "aryaniyappan2006@gmail.com" }]
 dependencies = [
     "fastapi>=0.108.0",
     "starlette>=0.32.0",
-    "uvicorn>=0.24.0.post1",
+    "uvicorn>=0.25.0",
     "sqlalchemy>=2.0.23",
-    "pydantic[email]>=2.5.2",
+    "pydantic[email]>=2.5.3",
     "argon2-cffi>=23.1.0",
     "pydantic-settings>=2.1.0",
     "alembic>=1.12.1",
