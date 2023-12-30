@@ -1,7 +1,11 @@
+{% extends "base/body.txt" %}
+
+{% block title %}
 Use this link to reset your password. The link is only valid for {{ token_expires_in }}.
+{% endblock%}
 
-{{ app_name }} ( {{ app_url }} )
 
+{% block content %}
 ************
 Hi {{ username }},
 ************
@@ -18,9 +22,4 @@ The {{ app_name }} team
 If you’re having trouble with the button above, copy and paste the URL below into your web browser.
 
 {{action_url}}
-
-[Company Name, LLC]
-
-1234 Street Rd.
-
-Suite 1234
+{% endblock%}
