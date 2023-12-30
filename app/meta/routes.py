@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter
 
 from app.meta.models import HealthCheckResult
 

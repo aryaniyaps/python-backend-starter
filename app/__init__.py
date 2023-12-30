@@ -82,7 +82,7 @@ def create_app() -> FastAPI:
         redoc_url=None,
         title=APP_NAME,
         swagger_ui_parameters={
-            "syntaxHighlight.theme": "nord",
+            "syntaxHighlight.theme": "monokai",
             "displayRequestDuration": True,
         },
         responses={
