@@ -50,3 +50,6 @@ async def test_get_user_not_found(auth_test_client: AsyncClient) -> None:
     )  # Assuming generated UUID doesn't exist
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+# TODO: add tests for update current user

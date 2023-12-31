@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from pydantic import Field
+from pydantic import EmailStr, Field
 
 from app.core.models import CoreModel
 
@@ -60,5 +60,47 @@ class User(CoreModel):
         datetime,
         Field(
             description="When the user was last updated.",
+        ),
+    ]
+
+
+class UpdateUserInput(CoreModel):
+    username: Annotated[
+        str | None,
+        Field(
+            default=None,
+            max_length=32,
+            min_length=2,
+            examples=[
+                "aryaniyaps_new",
+            ],
+            description="The new username for the user.",
+        ),
+    ]
+
+    email: Annotated[
+        EmailStr | None,
+        Field(
+            default=None,
+            max_length=250,
+            examples=[
+                "aryan_new@example.com",
+            ],
+            description="The new email address for the user.",
+        ),
+    ]
+
+    password: Annotated[
+        str | None,
+        Field(
+            default=None,
+            min_length=8,
+            max_length=32,
+            # TODO: fix regex issues with pydantic
+            # pattern=r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()-_+=]).+",
+            examples=[
+                "my_new_super_secret",
+            ],
+            description="The new password for the user.",
         ),
     ]

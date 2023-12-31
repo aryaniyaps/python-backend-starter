@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Path
 
 from app.auth.dependencies import get_current_user_id
 from app.core.constants import OpenAPITag
-from app.users.models import User
+from app.users.models import UpdateUserInput, User
 from app.users.services import UserService
 
 users_router = APIRouter(
@@ -39,6 +39,33 @@ async def get_current_user(
     """Get the current user."""
     return await user_service.get_user_by_id(
         user_id=current_user_id,
+    )
+
+
+@users_router.patch(
+    "/@me",
+    response_model=User,
+    summary="Update the current user.",
+)
+async def update_current_user(
+    data: UpdateUserInput,
+    current_user_id: Annotated[
+        UUID,
+        Depends(
+            dependency=get_current_user_id,
+        ),
+    ],
+    user_service: Annotated[
+        UserService,
+        Depends(
+            dependency=UserService,
+        ),
+    ],
+) -> User:
+    """Get the current user."""
+    return await user_service.update_user(
+        user_id=current_user_id,
+        data=UpdateUserInput.model_validate(data),
     )
 
 

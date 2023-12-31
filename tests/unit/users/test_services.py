@@ -30,3 +30,6 @@ async def test_get_user_by_id_not_found(user_service: UserService) -> None:
             match="Couldn't find user with the given ID.",
         ):
             await user_service.get_user_by_id(user_id=user_id)
+
+
+# TODO: add tests for update_user

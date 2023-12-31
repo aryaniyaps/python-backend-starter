@@ -66,12 +66,8 @@ class UserRepo:
         email: str | None = None,
         password: str | None = None,
         update_last_login: bool = False,
-    ) -> User | None:
+    ) -> User:
         """Update the user with the given ID."""
-        user = await self.get_user_by_id(user_id=user_id)
-        if not user:
-            return
-
         values = {}
         if update_last_login:
             values["last_login_at"] = text("NOW()")

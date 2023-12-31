@@ -39,7 +39,6 @@ async def test_update_user_password(
         user_id=user.id,
         password="password",
     )
-    assert updated_user is not None
     assert password_hasher.verify(
         hash=updated_user.password_hash,
         password="password",
@@ -56,7 +55,6 @@ async def test_update_user_username(
         user_id=user.id,
         username="new_username",
     )
-    assert updated_user is not None
     assert updated_user.username == "new_username"
     assert updated_user.updated_at > user.updated_at
 
@@ -71,7 +69,6 @@ async def test_update_user_email(
         email="new_email@example.com",
         update_last_login=True,
     )
-    assert updated_user is not None
     assert updated_user.email == "new_email@example.com"
     assert updated_user.updated_at > user.updated_at
 
@@ -85,7 +82,6 @@ async def test_update_user_last_login_at(
         user_id=user.id,
         update_last_login=True,
     )
-    assert updated_user is not None
     assert updated_user.last_login_at > user.last_login_at
     assert updated_user.updated_at > user.updated_at
 
