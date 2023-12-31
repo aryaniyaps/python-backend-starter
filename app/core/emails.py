@@ -4,13 +4,13 @@ from functools import lru_cache
 from smtplib import SMTP
 from typing import Generator
 
-from pydantic_core import Url
+from pydantic import AnyUrl
 
 from app.config import settings
 
 
 class EmailSender:
-    def __init__(self, email_server: Url, email_from: str) -> None:
+    def __init__(self, email_server: AnyUrl, email_from: str) -> None:
         self.smtp_host = email_server.host
         self.smtp_port = email_server.port
         self.username = email_server.username

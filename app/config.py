@@ -1,7 +1,6 @@
 from typing import Annotated
 
-from pydantic import Field, PostgresDsn, RedisDsn, UrlConstraints
-from pydantic_core import Url
+from pydantic import AnyUrl, Field, PostgresDsn, RedisDsn, UrlConstraints
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -75,7 +74,7 @@ class Settings(BaseSettings):
     ]
 
     email_server: Annotated[
-        Url,
+        AnyUrl,
         UrlConstraints(
             allowed_schemes=[
                 "smtp",
