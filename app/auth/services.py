@@ -1,3 +1,4 @@
+from datetime import datetime
 from hashlib import sha256
 from typing import Annotated, Tuple
 from uuid import UUID
@@ -196,6 +197,12 @@ class AuthService:
         if not (
             existing_user and password_reset_token and existing_user.email == email
         ):
+            raise InvalidInputError(
+                message="Invalid password reset token or email provided."
+            )
+
+        if datetime.utcnow() > password_reset_token.expires_at:
+            # password reset token has expired.
             raise InvalidInputError(
                 message="Invalid password reset token or email provided."
             )

@@ -380,6 +380,66 @@ async def test_reset_password_invalid_token(auth_service: AuthService) -> None:
             )
 
 
+async def test_reset_password_expired_token(auth_service: AuthService) -> None:
+    """Ensure we cannot reset a user's password with an expired token."""
+    with patch.object(
+        UserRepo,
+        "get_user_by_email",
+        return_value=MagicMock(
+            spec=User,
+            email="user@example.com",
+        ),
+    ), patch.object(
+        AuthRepo,
+        "get_password_reset_token",
+        return_value=MagicMock(
+            spec=PasswordResetToken,
+            # reset token expired 2 minutes ago
+            expires_at=datetime.utcnow() - timedelta(minutes=2),
+        ),
+    ):
+        with pytest.raises(
+            InvalidInputError, match="Invalid password reset token or email."
+        ):
+            await auth_service.reset_password(
+                email="user@example.com",
+                reset_token="invalid_token",
+                new_password="new_password",
+            )
+
+
+async def test_reset_password_after_login(auth_service: AuthService) -> None:
+    """Ensure we cannot reset a user's password with an reset token generated
+    before they logged in again."""
+    with patch.object(
+        UserRepo,
+        "get_user_by_email",
+        return_value=MagicMock(
+            spec=User,
+            email="user@example.com",
+            # user has logged in after requesting a reset token.
+            last_login_at=datetime.utcnow(),
+        ),
+    ), patch.object(
+        AuthRepo,
+        "get_password_reset_token",
+        return_value=MagicMock(
+            spec=PasswordResetToken,
+            # user has logged in 5 minutes ago while requesting
+            # for a password reset token.
+            last_login_at=datetime.utcnow() - timedelta(minutes=5),
+        ),
+    ):
+        with pytest.raises(
+            InvalidInputError, match="Invalid password reset token or email."
+        ):
+            await auth_service.reset_password(
+                email="user@example.com",
+                reset_token="invalid_token",
+                new_password="new_password",
+            )
+
+
 async def test_reset_password_user_not_found(auth_service: AuthService) -> None:
     """Ensure we cannot reset a password for a non-existing user."""
 
