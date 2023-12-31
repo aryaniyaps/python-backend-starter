@@ -68,7 +68,6 @@ class UpdateUserInput(CoreModel):
     username: Annotated[
         str | None,
         Field(
-            default=None,
             max_length=32,
             min_length=2,
             examples=[
@@ -76,24 +75,22 @@ class UpdateUserInput(CoreModel):
             ],
             description="The new username for the user.",
         ),
-    ]
+    ] = None
 
     email: Annotated[
         EmailStr | None,
         Field(
-            default=None,
             max_length=250,
             examples=[
                 "aryan_new@example.com",
             ],
             description="The new email address for the user.",
         ),
-    ]
+    ] = None
 
     password: Annotated[
         str | None,
         Field(
-            default=None,
             min_length=8,
             max_length=32,
             # TODO: fix regex issues with pydantic
@@ -103,4 +100,4 @@ class UpdateUserInput(CoreModel):
             ],
             description="The new password for the user.",
         ),
-    ]
+    ] = None

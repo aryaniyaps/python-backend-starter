@@ -1,6 +1,5 @@
 from typing import Annotated
 from uuid import UUID
-from xml.dom import InvalidAccessErr
 
 from fastapi import Depends
 
@@ -34,12 +33,22 @@ class UserService:
     async def update_user(self, user_id: UUID, data: UpdateUserInput) -> User:
         """Update the user with the given ID."""
         user = await self.get_user_by_id(user_id=user_id)
-        if data.email and self._user_repo.get_user_by_email(email=data.email):
+        if (
+            data.email
+            and self._user_repo.get_user_by_email(
+                email=data.email,
+            )
+            is not None
+        ):
             raise InvalidInputError(
                 message="User with that email already exists.",
             )
-        if data.username and self._user_repo.get_user_by_username(
-            username=data.username
+        if (
+            data.username
+            and self._user_repo.get_user_by_username(
+                username=data.username,
+            )
+            is not None
         ):
             raise InvalidInputError(
                 message="User with that username already exists.",

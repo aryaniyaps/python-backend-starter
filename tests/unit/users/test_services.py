@@ -3,8 +3,8 @@ from uuid import uuid4
 
 import pytest
 
-from app.core.errors import ResourceNotFoundError
-from app.users.models import User
+from app.core.errors import InvalidInputError, ResourceNotFoundError
+from app.users.models import UpdateUserInput, User
 from app.users.repos import UserRepo
 from app.users.services import UserService
 
@@ -24,7 +24,11 @@ async def test_get_user_by_id_success(user_service: UserService) -> None:
 async def test_get_user_by_id_not_found(user_service: UserService) -> None:
     """Ensure ResourceNotFoundError is raised when a user with the given ID is not found."""
     user_id = uuid4()
-    with patch.object(UserRepo, "get_user_by_id", return_value=None):
+    with patch.object(
+        UserRepo,
+        "get_user_by_id",
+        return_value=None,
+    ):
         with pytest.raises(
             ResourceNotFoundError,
             match="Couldn't find user with the given ID.",
@@ -32,4 +36,90 @@ async def test_get_user_by_id_not_found(user_service: UserService) -> None:
             await user_service.get_user_by_id(user_id=user_id)
 
 
-# TODO: add tests for update_user
+async def test_update_user_success(user_service: UserService) -> None:
+    """Ensure we can update a user successfully."""
+    user_id = uuid4()
+    update_data = UpdateUserInput(
+        username="new_username",
+        email="new_email@example.com",
+        password="new_password",
+    )
+
+    existing_user = MagicMock(spec=User, id=user_id)
+    with patch.object(
+        UserService,
+        "get_user_by_id",
+        return_value=existing_user,
+    ), patch.object(
+        UserRepo,
+        "get_user_by_email",
+        return_value=None,
+    ), patch.object(
+        UserRepo,
+        "get_user_by_username",
+        return_value=None,
+    ), patch.object(
+        UserRepo,
+        "update_user",
+        return_value=existing_user,
+    ):
+        result = await user_service.update_user(
+            user_id=user_id,
+            data=update_data,
+        )
+
+    assert result == existing_user
+
+
+async def test_update_user_email_exists(user_service: UserService) -> None:
+    """Ensure InvalidInputError is raised when trying to update user with an existing email."""
+    user_id = uuid4()
+    update_data = UpdateUserInput(email="existing_email@example.com")
+
+    existing_user = MagicMock(spec=User, id=user_id)
+    with patch.object(UserService, "get_user_by_id", return_value=existing_user):
+        with patch.object(
+            UserRepo, "get_user_by_email", return_value=MagicMock()
+        ), pytest.raises(
+            InvalidInputError, match="User with that email already exists."
+        ):
+            await user_service.update_user(user_id=user_id, data=update_data)
+
+
+async def test_update_user_username_exists(user_service: UserService) -> None:
+    """Ensure InvalidInputError is raised when trying to update user with an existing username."""
+    user_id = uuid4()
+    update_data = UpdateUserInput(username="existing_username")
+
+    existing_user = MagicMock(spec=User, id=user_id)
+    with patch.object(UserService, "get_user_by_id", return_value=existing_user):
+        with patch.object(
+            UserRepo, "get_user_by_username", return_value=MagicMock()
+        ), pytest.raises(
+            InvalidInputError, match="User with that username already exists."
+        ):
+            await user_service.update_user(user_id=user_id, data=update_data)
+
+
+async def test_update_user_not_found(user_service: UserService) -> None:
+    """Ensure ResourceNotFoundError is raised when trying to update a non-existing user."""
+    user_id = uuid4()
+    update_data = UpdateUserInput(
+        username="new_username",
+        email="new_email@example.com",
+        password="new_password",
+    )
+
+    with patch.object(
+        UserService,
+        "get_user_by_id",
+        side_effect=ResourceNotFoundError,
+    ):
+        with pytest.raises(
+            ResourceNotFoundError,
+            match="Couldn't find user with the given ID.",
+        ):
+            await user_service.update_user(
+                user_id=user_id,
+                data=update_data,
+            )
