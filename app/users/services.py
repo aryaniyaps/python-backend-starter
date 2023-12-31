@@ -5,7 +5,7 @@ from fastapi import Depends
 
 from app.core.errors import InvalidInputError, ResourceNotFoundError
 
-from .models import UpdateUserInput, User
+from .models import User
 from .repos import UserRepo
 
 
@@ -30,13 +30,19 @@ class UserService:
             )
         return user
 
-    async def update_user(self, user_id: UUID, data: UpdateUserInput) -> User:
+    async def update_user(
+        self,
+        user_id: UUID,
+        username: str | None = None,
+        email: str | None = None,
+        password: str | None = None,
+    ) -> User:
         """Update the user with the given ID."""
         user = await self.get_user_by_id(user_id=user_id)
         if (
-            data.email
+            email
             and self._user_repo.get_user_by_email(
-                email=data.email,
+                email=email,
             )
             is not None
         ):
@@ -44,9 +50,9 @@ class UserService:
                 message="User with that email already exists.",
             )
         if (
-            data.username
+            username
             and self._user_repo.get_user_by_username(
-                username=data.username,
+                username=username,
             )
             is not None
         ):
@@ -54,8 +60,8 @@ class UserService:
                 message="User with that username already exists.",
             )
         return await self._user_repo.update_user(
-            user_id=user.id,
-            username=data.username,
-            email=data.email,
-            password=data.password,
+            user=user,
+            username=username,
+            email=email,
+            password=password,
         )

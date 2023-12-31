@@ -5,7 +5,8 @@ from fastapi import APIRouter, Depends, Path
 
 from app.auth.dependencies import get_current_user_id
 from app.core.constants import OpenAPITag
-from app.users.models import UpdateUserInput, User
+from app.users.models import User
+from app.users.schemas import UpdateUserInput, UserSchema
 from app.users.services import UserService
 
 users_router = APIRouter(
@@ -16,7 +17,7 @@ users_router = APIRouter(
 
 @users_router.get(
     "/@me",
-    response_model=User,
+    response_model=UserSchema,
     summary="Get the current user.",
     description="""Retrieves information about the currently authenticated
     user based on their user ID. Requires the authentication token to be
@@ -44,7 +45,7 @@ async def get_current_user(
 
 @users_router.patch(
     "/@me",
-    response_model=User,
+    response_model=UserSchema,
     summary="Update the current user.",
 )
 async def update_current_user(
@@ -65,13 +66,15 @@ async def update_current_user(
     """Get the current user."""
     return await user_service.update_user(
         user_id=current_user_id,
-        data=UpdateUserInput.model_validate(data),
+        username=data.username,
+        email=data.email,
+        password=data.password,
     )
 
 
 @users_router.get(
     "/{user_id}",
-    response_model=User,
+    response_model=UserSchema,
     summary="Get the user with the given ID.",
     description="""Retrieves information about a user based on the
     provided user ID. The user ID is expected to be a valid UUID.

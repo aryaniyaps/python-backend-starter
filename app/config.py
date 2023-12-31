@@ -30,6 +30,8 @@ class Settings(BaseSettings):
 
     openapi_url: str | None = "/openapi.json"
 
+    server_url: str = "http://localhost:8000"
+
     database_url: Annotated[
         PostgresDsn,
         Field(

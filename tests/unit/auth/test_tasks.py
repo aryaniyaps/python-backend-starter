@@ -9,14 +9,14 @@ from app.core.templates import (
     reset_password_subject,
     reset_password_text,
 )
-from app.users.models import User
+from app.users.schemas import UserSchema
 
 
 def test_send_password_reset_request_email() -> None:
     """Ensure we can send a password reset request email."""
     # Mock the required objects
     mock_user = MagicMock(
-        spec=User,
+        spec=UserSchema,
         email="user@example.com",
         username="testuser",
     )

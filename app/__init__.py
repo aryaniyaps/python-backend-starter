@@ -23,7 +23,7 @@ from app.core.errors import (
     UnexpectedError,
 )
 from app.core.middleware.request_id import set_request_id
-from app.core.models import ValidationErrorResult
+from app.core.schemas import ValidationErrorResult
 from app.metadata.routes import metadata_router
 from app.users.routes import users_router
 
@@ -85,7 +85,12 @@ def create_app() -> FastAPI:
         debug=settings.debug,
         default_response_class=ORJSONResponse,
         openapi_url=settings.openapi_url,
-        title=APP_NAME,
+        title=f"{APP_NAME} HTTP API",
+        servers=[
+            {
+                "url": settings.server_url,
+            },
+        ],
         swagger_ui_parameters={
             "syntaxHighlight.theme": "monokai",
             "displayRequestDuration": True,

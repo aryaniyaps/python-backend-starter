@@ -1,11 +1,11 @@
-from typing import Annotated
+from typing import Annotated, Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, status
 from user_agents import parse
 
 from app.auth.dependencies import get_authentication_token, get_current_user_id
-from app.auth.models import (
+from app.auth.schemas import (
     LoginUserInput,
     LoginUserResult,
     PasswordResetInput,
@@ -39,11 +39,18 @@ async def register_user(
             dependency=AuthService,
         ),
     ],
-) -> RegisterUserResult:
+) -> dict[str, Any]:
     """Register a new user."""
-    return await auth_service.register_user(
-        data=RegisterUserInput.model_validate(data),
+    authentication_token, user = await auth_service.register_user(
+        email=data.email,
+        username=data.username,
+        password=data.password,
     )
+
+    return {
+        "authentication_token": authentication_token,
+        "user": user,
+    }
 
 
 @auth_router.post(
@@ -62,11 +69,15 @@ async def login_user(
             dependency=AuthService,
         ),
     ],
-) -> LoginUserResult:
+) -> dict[str, Any]:
     """Login the current user."""
-    return await auth_service.login_user(
-        data=LoginUserInput.model_validate(data),
+    authentication_token, user = await auth_service.login_user(
+        login=data.login, password=data.password
     )
+    return {
+        "authentication_token": authentication_token,
+        "user": user,
+    }
 
 
 @auth_router.post(
@@ -125,7 +136,7 @@ async def request_password_reset(
 ) -> None:
     """Send a password reset request to the given email."""
     await auth_service.send_password_reset_request(
-        data=PasswordResetRequestInput.model_validate(data),
+        email=data.email,
         user_agent=parse(user_agent),
     )
 
@@ -150,5 +161,7 @@ async def reset_password(
 ) -> None:
     """Send a password reset request to the given email."""
     await auth_service.reset_password(
-        data=PasswordResetInput.model_validate(data),
+        reset_token=data.reset_token,
+        email=data.email,
+        new_password=data.new_password,
     )

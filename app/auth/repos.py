@@ -6,24 +6,22 @@ from uuid import UUID
 
 from fastapi import Depends
 from redis.asyncio import Redis
-from sqlalchemy import insert, select, text
-from sqlalchemy.ext.asyncio import AsyncConnection
+from sqlalchemy import select, text
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.models import PasswordResetToken
 from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
-from app.core.database import get_database_connection
+from app.core.database import get_database_session
 from app.core.redis_client import get_redis_client
-
-from .tables import password_reset_tokens_table
 
 
 class AuthRepo:
     def __init__(
         self,
-        connection: Annotated[
-            AsyncConnection,
+        session: Annotated[
+            AsyncSession,
             Depends(
-                dependency=get_database_connection,
+                dependency=get_database_session,
             ),
         ],
         redis_client: Annotated[
@@ -33,7 +31,7 @@ class AuthRepo:
             ),
         ],
     ) -> None:
-        self._connection = connection
+        self._session = session
         self._redis_client = redis_client
 
     async def create_authentication_token(
@@ -167,16 +165,15 @@ class AuthRepo:
             password_reset_token=reset_token,
         )
 
-        await self._connection.execute(
-            insert(password_reset_tokens_table)
-            .values(
+        self._session.add(
+            PasswordResetToken(
                 user_id=user_id,
                 token_hash=reset_token_hash,
                 expires_at=expires_at,
                 last_login_at=last_login_at,
             )
-            .returning(*password_reset_tokens_table.c),
         )
+        await self._session.commit()
         return reset_token
 
     async def get_password_reset_token(
@@ -184,11 +181,8 @@ class AuthRepo:
         reset_token_hash: str,
     ) -> PasswordResetToken | None:
         """Get a password reset token."""
-        result = await self._connection.execute(
-            select(*password_reset_tokens_table.c).where(
-                password_reset_tokens_table.c.token_hash == reset_token_hash
-            )
+        return await self._session.scalar(
+            select(PasswordResetToken).where(
+                PasswordResetToken.token_hash == reset_token_hash,
+            ),
         )
-        reset_token_row = result.one_or_none()
-        if reset_token_row:
-            return PasswordResetToken.model_validate(reset_token_row)

@@ -2,10 +2,10 @@ from typing import Annotated
 
 from pydantic import Field
 
-from app.core.models import CoreModel
+from app.core.schemas import BaseSchema
 
 
-class HealthCheckResult(CoreModel):
+class HealthCheckResult(BaseSchema):
     status: Annotated[
         str,
         Field(

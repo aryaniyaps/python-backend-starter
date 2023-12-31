@@ -5,21 +5,12 @@ from fastapi import FastAPI
 from httpx import AsyncClient
 
 from app import create_app
-from app.core.database import get_database_connection
-from tests.dependencies import get_test_database_connection
 
 
 @pytest.fixture(scope="session")
 def app() -> FastAPI:
     """Initialize the app for testing."""
-    app = create_app()
-    setup_dependency_overrides(app)
-    return app
-
-
-def setup_dependency_overrides(app: FastAPI) -> None:
-    """Setup dependency overrides for the app."""
-    app.dependency_overrides[get_database_connection] = get_test_database_connection
+    return create_app()
 
 
 @pytest.fixture

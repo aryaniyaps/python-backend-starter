@@ -4,7 +4,7 @@ import pytest
 from fastapi import status
 from httpx import AsyncClient
 
-from app.users.models import User
+from app.users.schemas import UserSchema
 
 pytestmark = [pytest.mark.anyio]
 
@@ -28,7 +28,7 @@ async def test_get_current_user_unauthenticated(
 
 
 async def test_get_user_authenticated(
-    auth_test_client: AsyncClient, user: User
+    auth_test_client: AsyncClient, user: UserSchema
 ) -> None:
     """Ensure we can successfully get a user by ID when authenticated."""
     response = await auth_test_client.get(f"/users/{user.id}")
@@ -36,7 +36,9 @@ async def test_get_user_authenticated(
     assert response.status_code == status.HTTP_200_OK
 
 
-async def test_get_user_unauthenticated(test_client: AsyncClient, user: User) -> None:
+async def test_get_user_unauthenticated(
+    test_client: AsyncClient, user: UserSchema
+) -> None:
     """Ensure we cannot get a user by ID when unauthenticated."""
     response = await test_client.get(f"/users/{user.id}")
 
@@ -97,7 +99,7 @@ async def test_update_current_user_invalid_input(auth_test_client: AsyncClient) 
 
 
 async def test_update_current_user_existing_email(
-    auth_test_client: AsyncClient, user: User
+    auth_test_client: AsyncClient, user: UserSchema
 ) -> None:
     """Ensure we cannot update the current user with an existing email."""
     response = await auth_test_client.patch(
@@ -111,7 +113,7 @@ async def test_update_current_user_existing_email(
 
 
 async def test_update_current_user_existing_username(
-    auth_test_client: AsyncClient, user: User
+    auth_test_client: AsyncClient, user: UserSchema
 ) -> None:
     """Ensure we cannot update the current user with an existing username."""
     response = await auth_test_client.patch(

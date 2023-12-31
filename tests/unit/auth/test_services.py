@@ -7,15 +7,7 @@ from argon2 import PasswordHasher
 from argon2.exceptions import HashingError
 from user_agents.parsers import UserAgent
 
-from app.auth.models import (
-    LoginUserInput,
-    LoginUserResult,
-    PasswordResetInput,
-    PasswordResetRequestInput,
-    PasswordResetToken,
-    RegisterUserInput,
-    RegisterUserResult,
-)
+from app.auth.models import PasswordResetToken
 from app.auth.repos import AuthRepo
 from app.auth.services import AuthService
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
@@ -44,17 +36,14 @@ async def test_register_user_success(auth_service: AuthService) -> None:
         "create_authentication_token",
         return_value="fake_token",
     ):
-        result = await auth_service.register_user(
-            RegisterUserInput(
-                username="new_user",
-                email="new_user@example.com",
-                password="password",
-            ),
+        authentication_token, user = await auth_service.register_user(
+            username="new_user",
+            email="new_user@example.com",
+            password="password",
         )
 
-    assert isinstance(result, RegisterUserResult)
-    assert result.authentication_token == "fake_token"
-    assert result.user is not None
+    assert authentication_token == "fake_token"
+    assert user is not None
 
 
 async def test_register_user_existing_email(auth_service: AuthService) -> None:
@@ -64,11 +53,9 @@ async def test_register_user_existing_email(auth_service: AuthService) -> None:
             InvalidInputError, match="User with that email already exists."
         ):
             await auth_service.register_user(
-                RegisterUserInput(
-                    username="new_user",
-                    email="new_user@example.com",
-                    password="password",
-                ),
+                username="new_user",
+                email="new_user@example.com",
+                password="password",
             )
 
 
@@ -83,11 +70,9 @@ async def test_register_user_existing_username(auth_service: AuthService) -> Non
             InvalidInputError, match="User with that username already exists."
         ):
             await auth_service.register_user(
-                RegisterUserInput(
-                    username="new_user",
-                    email="new_user@example.com",
-                    password="password",
-                ),
+                username="new_user",
+                email="new_user@example.com",
+                password="password",
             )
 
 
@@ -114,11 +99,9 @@ async def test_register_user_hashing_error(auth_service: AuthService) -> None:
             UnexpectedError, match="Could not create user. Please try again."
         ):
             await auth_service.register_user(
-                RegisterUserInput(
-                    username="new_user",
-                    email="new_user@example.com",
-                    password="password",
-                ),
+                username="new_user",
+                email="new_user@example.com",
+                password="password",
             )
 
 
@@ -137,16 +120,13 @@ async def test_login_user_valid_credentials(
         mock_create_token.return_value = "fake_token"
 
         # Perform the login
-        result = await auth_service.login_user(
-            LoginUserInput(
-                login="user@example.com",
-                password="password",
-            )
+        authentication_token, user = await auth_service.login_user(
+            login="user@example.com",
+            password="password",
         )
 
-    assert isinstance(result, LoginUserResult)
-    assert result.authentication_token == "fake_token"
-    assert result.user == mock_user
+    assert authentication_token == "fake_token"
+    assert user == mock_user
 
 
 async def test_login_user_invalid_credentials(auth_service: AuthService) -> None:
@@ -157,10 +137,8 @@ async def test_login_user_invalid_credentials(auth_service: AuthService) -> None
         # Perform the login
         with pytest.raises(InvalidInputError):
             await auth_service.login_user(
-                LoginUserInput(
-                    login="invalid_user@example.com",
-                    password="invalid_password",
-                )
+                login="invalid_user@example.com",
+                password="invalid_password",
             )
 
 
@@ -178,10 +156,8 @@ async def test_login_user_password_mismatch(
         # Perform the login
         with pytest.raises(InvalidInputError):
             await auth_service.login_user(
-                LoginUserInput(
-                    login="user@example.com",
-                    password="wrong_password",
-                )
+                login="user@example.com",
+                password="wrong_password",
             )
 
 
@@ -214,16 +190,13 @@ async def test_login_user_password_rehash(
         mock_create_token.return_value = "fake_token"
 
         # Perform the login
-        result = await auth_service.login_user(
-            LoginUserInput(
-                login="user@example.com",
-                password="password",
-            )
+        authentication_token, user = await auth_service.login_user(
+            login="user@example.com",
+            password="password",
         )
 
-    assert isinstance(result, LoginUserResult)
-    assert result.authentication_token == "fake_token"
-    assert result.user == mock_user
+    assert authentication_token == "fake_token"
+    assert user == mock_user
 
     # Check if update_user was called
     mock_update_user.assert_called_once_with(
@@ -307,10 +280,8 @@ async def test_send_password_reset_request_success(auth_service: AuthService) ->
         return_value=None,
     ) as mock_send_email:
         await auth_service.send_password_reset_request(
-            PasswordResetRequestInput(
-                email=mock_user.email,
-            ),
-            user_agent,
+            email=mock_user.email,
+            user_agent=user_agent,
         )
 
     mock_send_email.assert_called_once_with(
@@ -338,7 +309,8 @@ async def test_send_password_reset_request_user_not_found(
         AuthRepo, "create_password_reset_token"
     ) as mock_create_password_reset_token:
         await auth_service.send_password_reset_request(
-            PasswordResetRequestInput(email="nonexistent@example.com"), user_agent
+            email="nonexistent@example.com",
+            user_agent=user_agent,
         )
     mock_send_email.assert_not_called()
     mock_create_password_reset_token.assert_not_called()
@@ -346,12 +318,6 @@ async def test_send_password_reset_request_user_not_found(
 
 async def test_reset_password_success(auth_service: AuthService) -> None:
     """Ensure we can reset a user's password successfully."""
-    password_reset_input = PasswordResetInput(
-        email="user@example.com",
-        reset_token="fake_token",
-        new_password="new_password",
-    )
-
     user_id = uuid4()
 
     with patch.object(
@@ -376,12 +342,16 @@ async def test_reset_password_success(auth_service: AuthService) -> None:
     ) as mock_update_user, patch.object(
         AuthRepo, "remove_all_authentication_tokens", return_value=None
     ) as mock_remove_all_authentication_tokens:
-        await auth_service.reset_password(password_reset_input)
+        await auth_service.reset_password(
+            email="user@example.com",
+            reset_token="fake_token",
+            new_password="new_password",
+        )
 
     # Check that the update_user method is called with the correct password
     mock_update_user.assert_called_once_with(
         user_id=user_id,
-        password=password_reset_input.new_password,
+        password="new_password",
     )
 
     mock_remove_all_authentication_tokens.assert_called_once_with(
@@ -404,11 +374,9 @@ async def test_reset_password_invalid_token(auth_service: AuthService) -> None:
             InvalidInputError, match="Invalid password reset token or email."
         ):
             await auth_service.reset_password(
-                PasswordResetInput(
-                    email="user@example.com",
-                    reset_token="invalid_token",
-                    new_password="new_password",
-                ),
+                email="user@example.com",
+                reset_token="invalid_token",
+                new_password="new_password",
             )
 
 
@@ -420,11 +388,9 @@ async def test_reset_password_user_not_found(auth_service: AuthService) -> None:
             InvalidInputError, match="Invalid password reset token or email."
         ):
             await auth_service.reset_password(
-                PasswordResetInput(
-                    email="nonexistent@example.com",
-                    reset_token="fake_token",
-                    new_password="new_password",
-                ),
+                email="nonexistent@example.com",
+                reset_token="fake_token",
+                new_password="new_password",
             )
 
 
@@ -435,9 +401,7 @@ async def test_reset_password_invalid_email(auth_service: AuthService) -> None:
             InvalidInputError, match="Invalid password reset token or email."
         ):
             await auth_service.reset_password(
-                PasswordResetInput(
-                    email="invalid_email@example.com",
-                    reset_token="fake_token",
-                    new_password="new_password",
-                ),
+                email="invalid_email@example.com",
+                reset_token="fake_token",
+                new_password="new_password",
             )

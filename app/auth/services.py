@@ -1,5 +1,5 @@
 from hashlib import sha256
-from typing import Annotated
+from typing import Annotated, Tuple
 from uuid import UUID
 
 from argon2 import PasswordHasher
@@ -11,16 +11,8 @@ from app.auth.repos import AuthRepo
 from app.auth.tasks import send_password_reset_request_email
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
 from app.core.security import get_password_hasher
+from app.users.models import User
 from app.users.repos import UserRepo
-
-from .models import (
-    LoginUserInput,
-    LoginUserResult,
-    PasswordResetInput,
-    PasswordResetRequestInput,
-    RegisterUserInput,
-    RegisterUserResult,
-)
 
 
 class AuthService:
@@ -49,12 +41,17 @@ class AuthService:
         self._user_repo = user_repo
         self._password_hasher = password_hasher
 
-    async def register_user(self, data: RegisterUserInput) -> RegisterUserResult:
+    async def register_user(
+        self,
+        email: str,
+        username: str,
+        password: str,
+    ) -> Tuple[str, User]:
         """Register a new user."""
         try:
             if (
                 await self._user_repo.get_user_by_email(
-                    email=data.email,
+                    email=email,
                 )
                 is not None
             ):
@@ -63,7 +60,7 @@ class AuthService:
                 )
             if (
                 await self._user_repo.get_user_by_username(
-                    username=data.username,
+                    username=username,
                 )
                 is not None
             ):
@@ -71,9 +68,9 @@ class AuthService:
                     message="User with that username already exists.",
                 )
             user = await self._user_repo.create_user(
-                username=data.username,
-                email=data.email,
-                password=data.password,
+                username=username,
+                email=email,
+                password=password,
             )
         except HashingError as exception:
             raise UnexpectedError(
@@ -83,25 +80,22 @@ class AuthService:
         authentication_token = await self._auth_repo.create_authentication_token(
             user_id=user.id
         )
-        return RegisterUserResult(
-            authentication_token=authentication_token,
-            user=user,
-        )
+        return authentication_token, user
 
-    async def login_user(self, data: LoginUserInput) -> LoginUserResult:
+    async def login_user(self, login: str, password: str) -> Tuple[str, User]:
         """
         Check the given credentials and return the
         relevant user if they are valid.
         """
-        if "@" in data.login:
+        if "@" in login:
             # if "@" is present, assume it's an email
             user = await self._user_repo.get_user_by_email(
-                email=data.login,
+                email=login,
             )
         else:
             # assume it's an username
             user = await self._user_repo.get_user_by_username(
-                username=data.login,
+                username=login,
             )
         if not user:
             raise InvalidInputError(
@@ -110,7 +104,7 @@ class AuthService:
         try:
             self._password_hasher.verify(
                 hash=user.password_hash,
-                password=data.password,
+                password=password,
             )
         except VerifyMismatchError as exception:
             raise InvalidInputError(
@@ -122,8 +116,8 @@ class AuthService:
         ):
             # update user's password hash
             await self._user_repo.update_user(
-                user_id=user.id,
-                password=data.password,
+                user=user,
+                password=password,
             )
 
         # create authentication token
@@ -133,14 +127,11 @@ class AuthService:
 
         # update user's last login timestamp
         await self._user_repo.update_user(
-            user_id=user.id,
+            user=user,
             update_last_login=True,
         )
 
-        return LoginUserResult(
-            authentication_token=authentication_token,
-            user=user,
-        )
+        return authentication_token, user
 
     async def verify_authentication_token(self, authentication_token: str) -> UUID:
         """
@@ -170,11 +161,11 @@ class AuthService:
 
     async def send_password_reset_request(
         self,
-        data: PasswordResetRequestInput,
+        email: str,
         user_agent: UserAgent,
     ) -> None:
         """Send a password reset request to the given email."""
-        existing_user = await self._user_repo.get_user_by_email(email=data.email)
+        existing_user = await self._user_repo.get_user_by_email(email=email)
         if existing_user is not None:
             reset_token = await self._auth_repo.create_password_reset_token(
                 user_id=existing_user.id,
@@ -188,17 +179,22 @@ class AuthService:
                 browser_name=user_agent.get_browser(),
             )
 
-    async def reset_password(self, data: PasswordResetInput) -> None:
+    async def reset_password(
+        self,
+        email: str,
+        reset_token: str,
+        new_password: str,
+    ) -> None:
         """Reset the relevant user's password with the given credentials."""
-        reset_token_hash = sha256(data.reset_token.encode()).hexdigest()
+        reset_token_hash = sha256(reset_token.encode()).hexdigest()
 
-        existing_user = await self._user_repo.get_user_by_email(email=data.email)
+        existing_user = await self._user_repo.get_user_by_email(email=email)
         password_reset_token = await self._auth_repo.get_password_reset_token(
             reset_token_hash=reset_token_hash
         )
 
         if not (
-            existing_user and password_reset_token and existing_user.email == data.email
+            existing_user and password_reset_token and existing_user.email == email
         ):
             raise InvalidInputError(
                 message="Invalid password reset token or email provided."
@@ -212,8 +208,8 @@ class AuthService:
             )
 
         await self._user_repo.update_user(
-            user_id=existing_user.id,
-            password=data.new_password,
+            user=existing_user,
+            password=new_password,
         )
 
         # logout user everywhere

@@ -1,25 +1,24 @@
+from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
 from argon2 import PasswordHasher
 from fastapi import Depends
-from sqlalchemy import insert, select, text, update
-from sqlalchemy.ext.asyncio import AsyncConnection
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import get_database_connection
+from app.core.database import get_database_session
 from app.core.security import get_password_hasher
 from app.users.models import User
-
-from .tables import users_table
 
 
 class UserRepo:
     def __init__(
         self,
-        connection: Annotated[
-            AsyncConnection,
+        session: Annotated[
+            AsyncSession,
             Depends(
-                dependency=get_database_connection,
+                dependency=get_database_session,
             ),
         ],
         password_hasher: Annotated[
@@ -29,7 +28,7 @@ class UserRepo:
             ),
         ],
     ) -> None:
-        self._connection = connection
+        self._session = session
         self._password_hasher = password_hasher
 
     async def create_user(
@@ -39,19 +38,17 @@ class UserRepo:
         password: str,
     ) -> User:
         """Create a new user."""
-        result = await self._connection.execute(
-            insert(users_table)
-            .values(
-                username=username,
-                email=email,
-                # hash the password before storing
-                password_hash=self.hash_password(
-                    password=password,
-                ),
-            )
-            .returning(*users_table.c),
+        user = User(
+            username=username,
+            email=email,
+            # hash the password before storing
+            password_hash=self.hash_password(
+                password=password,
+            ),
         )
-        return User.model_validate(result.one())
+        self._session.add(user)
+        await self._session.commit()
+        return user
 
     def hash_password(self, password: str) -> str:
         """Hash the given password."""
@@ -61,65 +58,57 @@ class UserRepo:
 
     async def update_user(
         self,
-        user_id: UUID,
+        user: User,
         username: str | None = None,
         email: str | None = None,
         password: str | None = None,
         update_last_login: bool = False,
     ) -> User:
         """Update the user with the given ID."""
-        values = {}
-        if update_last_login:
-            values["last_login_at"] = text("NOW()")
         if username is not None:
-            values["username"] = username
+            user.username = username
         if email is not None:
-            values["email"] = email
+            user.email = email
         if password is not None:
-            values["password_hash"] = self.hash_password(
+            user.password_hash = self.hash_password(
                 password=password,
             )
+        if update_last_login:
+            user.last_login_at = datetime.utcnow()
 
-        result = await self._connection.execute(
-            update(users_table)
-            .where(users_table.c.id == user_id)
-            .values(**values)
-            .returning(*users_table.c),
-        )
-        return User.model_validate(result.one())
+        self._session.add(user)
+        await self._session.commit()
+        return user
 
     async def get_user_by_username(
         self,
         username: str,
     ) -> User | None:
-        """Get a user by Username."""
-        result = await self._connection.execute(
-            select(*users_table.c).where(users_table.c.username == username)
+        """Get a user by username."""
+        return await self._session.scalar(
+            select(User).where(
+                User.username == username,
+            ),
         )
-        user_row = result.one_or_none()
-        if user_row:
-            return User.model_validate(user_row)
 
     async def get_user_by_id(
         self,
         user_id: UUID,
     ) -> User | None:
         """Get a user by ID."""
-        result = await self._connection.execute(
-            select(*users_table.c).where(users_table.c.id == user_id)
+        return await self._session.scalar(
+            select(User).where(
+                User.id == user_id,
+            ),
         )
-        user_row = result.one_or_none()
-        if user_row:
-            return User.model_validate(user_row)
 
     async def get_user_by_email(
         self,
         email: str,
     ) -> User | None:
         """Get a user by email."""
-        result = await self._connection.execute(
-            select(*users_table.c).where(users_table.c.email == email)
+        return await self._session.scalar(
+            select(User).where(
+                User.email == email,
+            ),
         )
-        user_row = result.one_or_none()
-        if user_row:
-            return User.model_validate(user_row)

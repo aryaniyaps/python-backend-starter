@@ -36,7 +36,7 @@ async def test_update_user_password(
 ) -> None:
     """Ensure we can update a user's password."""
     updated_user = await user_repo.update_user(
-        user_id=user.id,
+        user=user,
         password="password",
     )
     assert password_hasher.verify(
@@ -52,7 +52,7 @@ async def test_update_user_username(
 ) -> None:
     """Ensure we can update a user's username."""
     updated_user = await user_repo.update_user(
-        user_id=user.id,
+        user=user,
         username="new_username",
     )
     assert updated_user.username == "new_username"
@@ -65,7 +65,7 @@ async def test_update_user_email(
 ) -> None:
     """Ensure we can update a user's email."""
     updated_user = await user_repo.update_user(
-        user_id=user.id,
+        user=user,
         email="new_email@example.com",
         update_last_login=True,
     )
@@ -79,7 +79,7 @@ async def test_update_user_last_login_at(
 ) -> None:
     """Ensure we can update a user's last login timestamp."""
     updated_user = await user_repo.update_user(
-        user_id=user.id,
+        user=user,
         update_last_login=True,
     )
     assert updated_user.last_login_at > user.last_login_at

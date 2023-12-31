@@ -9,7 +9,7 @@ def _snake_to_camel(name: str) -> str:
     return first + "".join(map(str.capitalize, rest))
 
 
-class CoreModel(BaseModel):
+class BaseSchema(BaseModel):
     model_config = ConfigDict(
         from_attributes=True,
         populate_by_name=True,
@@ -17,7 +17,7 @@ class CoreModel(BaseModel):
     )
 
 
-class ValidationError(CoreModel):
+class ValidationError(BaseSchema):
     loc: Annotated[
         List[str] | None,
         Field(
@@ -41,7 +41,7 @@ class ValidationError(CoreModel):
     ]
 
 
-class ValidationErrorResult(CoreModel):
+class ValidationErrorResult(BaseSchema):
     message: Annotated[
         str,
         Field(

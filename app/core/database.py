@@ -1,7 +1,11 @@
+from datetime import datetime
 from typing import AsyncGenerator
+from uuid import UUID
 
-from sqlalchemy import MetaData
-from sqlalchemy.ext.asyncio import AsyncConnection, create_async_engine
+from sqlalchemy import DateTime, MetaData
+from sqlalchemy.dialects.postgresql import UUID as UUIDColumn
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import DeclarativeBase, registry
 
 from app.config import settings
 
@@ -14,6 +18,8 @@ database_engine = create_async_engine(
     pool_pre_ping=True,
 )
 
+async_session_factory = async_sessionmaker(bind=database_engine)
+
 database_metadata = MetaData(
     naming_convention={
         "ix": "%(column_0_label)s_idx",
@@ -25,7 +31,22 @@ database_metadata = MetaData(
 )
 
 
-async def get_database_connection() -> AsyncGenerator[AsyncConnection, None]:
-    """Get the database connection."""
-    async with database_engine.begin() as connection:
-        yield connection
+class Base(DeclarativeBase):
+    metadata = database_metadata
+
+    registry = registry(
+        type_annotation_map={
+            datetime: DateTime(
+                timezone=True,
+            ),
+            UUID: UUIDColumn(
+                as_uuid=True,
+            ),
+        },
+    )
+
+
+async def get_database_session() -> AsyncGenerator[AsyncSession, None]:
+    """Get the database session."""
+    async with async_session_factory.begin() as session:
+        yield session
