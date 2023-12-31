@@ -203,8 +203,8 @@ async def test_login_user_password_rehash(
     with patch("app.auth.services.UserRepo.get_user_by_email") as mock_get_user, patch(
         "app.auth.services.AuthRepo.create_authentication_token"
     ) as mock_create_token, patch(
-        "app.auth.services.UserRepo.update_user_password"
-    ) as mock_update_password, patch.object(
+        "app.auth.services.UserRepo.update_user"
+    ) as mock_update_user, patch.object(
         auth_service, "_password_hasher", mock_password_hasher
     ):
         mock_user = MagicMock(spec=User)
@@ -225,8 +225,8 @@ async def test_login_user_password_rehash(
     assert result.authentication_token == "fake_token"
     assert result.user == mock_user
 
-    # Check if update_user_password was called
-    mock_update_password.assert_called_once_with(
+    # Check if update_user was called
+    mock_update_user.assert_called_once_with(
         user_id=mock_user.id,
         password="password",
     )
@@ -372,14 +372,14 @@ async def test_reset_password_success(auth_service: AuthService) -> None:
             last_login_at=datetime.now(),
         ),
     ), patch.object(
-        UserRepo, "update_user_password", return_value=None
-    ) as mock_update_password, patch.object(
+        UserRepo, "update_user", return_value=None
+    ) as mock_update_user, patch.object(
         AuthRepo, "remove_all_authentication_tokens", return_value=None
     ) as mock_remove_all_authentication_tokens:
         await auth_service.reset_password(password_reset_input)
 
-    # Check that the update_user_password method is called with the correct password
-    mock_update_password.assert_called_once_with(
+    # Check that the update_user method is called with the correct password
+    mock_update_user.assert_called_once_with(
         user_id=user_id,
         password=password_reset_input.new_password,
     )

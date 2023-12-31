@@ -121,7 +121,7 @@ class AuthService:
             hash=user.password_hash,
         ):
             # update user's password hash
-            await self._user_repo.update_user_password(
+            await self._user_repo.update_user(
                 user_id=user.id,
                 password=data.password,
             )
@@ -132,7 +132,10 @@ class AuthService:
         )
 
         # update user's last login timestamp
-        await self._user_repo.update_user_last_login(user_id=user.id)
+        await self._user_repo.update_user(
+            user_id=user.id,
+            update_last_login=True,
+        )
 
         return LoginUserResult(
             authentication_token=authentication_token,
@@ -177,7 +180,7 @@ class AuthService:
                 user_id=existing_user.id,
                 last_login_at=existing_user.last_login_at,
             )
-            send_password_reset_request_email.delay(
+            send_password_reset_request_email(
                 to=existing_user.email,
                 username=existing_user.username,
                 password_reset_token=reset_token,
@@ -208,7 +211,7 @@ class AuthService:
                 message="Invalid password reset token or email provided."
             )
 
-        await self._user_repo.update_user_password(
+        await self._user_repo.update_user(
             user_id=existing_user.id,
             password=data.new_password,
         )

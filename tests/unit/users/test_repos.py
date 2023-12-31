@@ -35,15 +35,59 @@ async def test_update_user_password(
     password_hasher: PasswordHasher,
 ) -> None:
     """Ensure we can update a user's password."""
-    updated_user = await user_repo.update_user_password(
+    updated_user = await user_repo.update_user(
         user_id=user.id,
         password="password",
     )
-    assert updated_user
+    assert updated_user is not None
     assert password_hasher.verify(
         hash=updated_user.password_hash,
         password="password",
     )
+    assert updated_user.updated_at > user.updated_at
+
+
+async def test_update_user_username(
+    user: User,
+    user_repo: UserRepo,
+) -> None:
+    """Ensure we can update a user's username."""
+    updated_user = await user_repo.update_user(
+        user_id=user.id,
+        username="new_username",
+    )
+    assert updated_user is not None
+    assert updated_user.username == "new_username"
+    assert updated_user.updated_at > user.updated_at
+
+
+async def test_update_user_email(
+    user: User,
+    user_repo: UserRepo,
+) -> None:
+    """Ensure we can update a user's email."""
+    updated_user = await user_repo.update_user(
+        user_id=user.id,
+        email="new_email@example.com",
+        update_last_login=True,
+    )
+    assert updated_user is not None
+    assert updated_user.email == "new_email@example.com"
+    assert updated_user.updated_at > user.updated_at
+
+
+async def test_update_user_last_login_at(
+    user: User,
+    user_repo: UserRepo,
+) -> None:
+    """Ensure we can update a user's last login timestamp."""
+    updated_user = await user_repo.update_user(
+        user_id=user.id,
+        update_last_login=True,
+    )
+    assert updated_user is not None
+    assert updated_user.last_login_at > user.last_login_at
+    assert updated_user.updated_at > user.updated_at
 
 
 async def test_get_user_by_username(user: User, user_repo: UserRepo) -> None:

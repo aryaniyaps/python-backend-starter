@@ -59,41 +59,35 @@ class UserRepo:
             password=password,
         )
 
-    async def update_user_password(
+    async def update_user(
         self,
         user_id: UUID,
-        password: str,
+        username: str | None = None,
+        email: str | None = None,
+        password: str | None = None,
+        update_last_login: bool = False,
     ) -> User | None:
-        """Update the password for the user with the given ID."""
+        """Update the user with the given ID."""
         user = await self.get_user_by_id(user_id=user_id)
         if not user:
             return
 
-        result = await self._connection.execute(
-            update(users_table)
-            .where(users_table.c.id == user_id)
-            .values(
-                password_hash=self.hash_password(
-                    password=password,
-                )
+        values = {}
+        if update_last_login:
+            values["last_login_at"] = text("NOW()")
+        if username is not None:
+            values["username"] = username
+        if email is not None:
+            values["email"] = email
+        if password is not None:
+            values["password_hash"] = self.hash_password(
+                password=password,
             )
-            .returning(*users_table.c),
-        )
-        return User.model_validate(result.one())
-
-    async def update_user_last_login(
-        self,
-        user_id: UUID,
-    ) -> User | None:
-        """Update the last login timestamp to now for the user with the given ID."""
-        user = await self.get_user_by_id(user_id=user_id)
-        if not user:
-            return
 
         result = await self._connection.execute(
             update(users_table)
             .where(users_table.c.id == user_id)
-            .values(last_login_at=text("NOW()"))
+            .values(**values)
             .returning(*users_table.c),
         )
         return User.model_validate(result.one())

@@ -24,15 +24,15 @@ from app.core.errors import (
 )
 from app.core.middleware.request_id import set_request_id
 from app.core.models import ValidationErrorResult
-from app.meta.routes import meta_router
+from app.metadata.routes import metadata_router
 from app.users.routes import users_router
 
 
 def add_routes(app: FastAPI) -> None:
     """Register routes for the app."""
-    app.include_router(router=meta_router)
-    app.include_router(router=users_router)
-    app.include_router(router=auth_router)
+    app.include_router(metadata_router)
+    app.include_router(users_router)
+    app.include_router(auth_router)
 
 
 def add_middleware(app: FastAPI) -> None:
@@ -85,7 +85,6 @@ def create_app() -> FastAPI:
         debug=settings.debug,
         default_response_class=ORJSONResponse,
         openapi_url=settings.openapi_url,
-        redoc_url=None,
         title=APP_NAME,
         swagger_ui_parameters={
             "syntaxHighlight.theme": "monokai",
