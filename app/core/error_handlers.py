@@ -2,6 +2,7 @@ from fastapi import Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import ORJSONResponse
+from starlette.exceptions import HTTPException
 
 from app.core.errors import (
     InvalidInputError,
@@ -21,6 +22,18 @@ async def handle_validation_error(
         content={
             "message": "Invalid input detected.",
             "errors": jsonable_encoder(exception.errors()),
+        },
+    )
+
+
+async def handle_http_exception(
+    _request: Request, exception: HTTPException
+) -> ORJSONResponse:
+    """Handle HTTPExceptions."""
+    return ORJSONResponse(
+        status_code=exception.status_code,
+        content={
+            "message": exception.detail,
         },
     )
 

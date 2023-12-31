@@ -2,12 +2,14 @@ from fastapi import FastAPI, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
+from starlette.exceptions import HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.auth.routes import auth_router
 from app.config import settings
 from app.core.constants import APP_NAME, SUPPORT_EMAIL
 from app.core.error_handlers import (
+    handle_http_exception,
     handle_invalid_input_error,
     handle_resource_not_found_error,
     handle_unauthenticated_error,
@@ -53,6 +55,10 @@ def add_error_handlers(app: FastAPI) -> None:
     app.add_exception_handler(
         RequestValidationError,
         handler=handle_validation_error,  # type: ignore
+    )
+    app.add_exception_handler(
+        HTTPException,
+        handler=handle_http_exception,  # type: ignore
     )
     app.add_exception_handler(
         InvalidInputError,
