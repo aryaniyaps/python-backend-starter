@@ -9,7 +9,7 @@ from app.users.models import User
 pytestmark = [pytest.mark.anyio]
 
 
-async def test_on_get_current_user_authenticated(
+async def test_get_current_user_authenticated(
     auth_test_client: AsyncClient,
 ) -> None:
     """Ensure we can successfully get the current user when authenticated."""
@@ -18,7 +18,7 @@ async def test_on_get_current_user_authenticated(
     assert response.status_code == status.HTTP_200_OK
 
 
-async def test_on_get_current_user_unauthenticated(
+async def test_get_current_user_unauthenticated(
     test_client: AsyncClient,
 ) -> None:
     """Ensure we cannot get the current user when unauthenticated."""
@@ -27,7 +27,7 @@ async def test_on_get_current_user_unauthenticated(
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
-async def test_on_get_user_authenticated(
+async def test_get_user_authenticated(
     auth_test_client: AsyncClient, user: User
 ) -> None:
     """Ensure we can successfully get a user by ID when authenticated."""
@@ -36,16 +36,14 @@ async def test_on_get_user_authenticated(
     assert response.status_code == status.HTTP_200_OK
 
 
-async def test_on_get_user_unauthenticated(
-    test_client: AsyncClient, user: User
-) -> None:
+async def test_get_user_unauthenticated(test_client: AsyncClient, user: User) -> None:
     """Ensure we cannot get a user by ID when unauthenticated."""
     response = await test_client.get(f"/users/{user.id}")
 
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
-async def test_on_get_user_not_found(auth_test_client: AsyncClient) -> None:
+async def test_get_user_not_found(auth_test_client: AsyncClient) -> None:
     """Ensure getting a non-existent user returns a 404."""
     response = await auth_test_client.get(
         f"/users/{uuid4()}"

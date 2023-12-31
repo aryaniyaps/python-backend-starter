@@ -14,13 +14,6 @@ database_engine = create_async_engine(
     pool_pre_ping=True,
 )
 
-
-async def get_database_connection() -> AsyncGenerator[AsyncConnection, None]:
-    """Get the database connection."""
-    async with database_engine.begin() as connection:
-        yield connection
-
-
 database_metadata = MetaData(
     naming_convention={
         "ix": "%(column_0_label)s_idx",
@@ -30,3 +23,9 @@ database_metadata = MetaData(
         "pk": "%(table_name)s_pkey",
     }
 )
+
+
+async def get_database_connection() -> AsyncGenerator[AsyncConnection, None]:
+    """Get the database connection."""
+    async with database_engine.begin() as connection:
+        yield connection

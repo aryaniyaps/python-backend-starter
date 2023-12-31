@@ -1,11 +1,11 @@
 from fastapi import APIRouter
 
-from app.core.constants import Tag
+from app.core.constants import OpenAPITag
 from app.meta.models import HealthCheckResult
 
 meta_router = APIRouter(
     prefix="/meta",
-    tags=[Tag.METADATA],
+    tags=[OpenAPITag.METADATA],
 )
 
 

@@ -1,6 +1,6 @@
-# Branding
-
 from enum import Enum
+
+# Branding
 
 SUPPORT_EMAIL = "support@example.com"
 
@@ -16,8 +16,11 @@ PASSWORD_RESET_TOKEN_EXPIRES_IN = 300  # 5 minutes
 # OpenAPI Tags
 
 
-class Tag(Enum):
-    """Enumeration representing tags used for OpenAPI path operations."""
+class OpenAPITag(Enum):
+    """
+    Enumeration representing tags used for
+    OpenAPI path operations.
+    """
 
     USERS = "users"
     AUTHENTICATION = "authentication"

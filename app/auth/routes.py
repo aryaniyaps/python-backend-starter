@@ -14,11 +14,11 @@ from app.auth.models import (
     RegisterUserResult,
 )
 from app.auth.services import AuthService
-from app.core.constants import Tag
+from app.core.constants import OpenAPITag
 
 auth_router = APIRouter(
     prefix="/auth",
-    tags=[Tag.AUTHENTICATION],
+    tags=[OpenAPITag.AUTHENTICATION],
 )
 
 

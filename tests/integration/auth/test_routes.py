@@ -8,7 +8,7 @@ from app.users.models import User
 pytestmark = [pytest.mark.anyio]
 
 
-async def test_on_post_register_success(test_client: AsyncClient) -> None:
+async def test_register_success(test_client: AsyncClient) -> None:
     """Ensure we can successfully register a new user."""
     response = await test_client.post(
         "/auth/register",
@@ -21,9 +21,7 @@ async def test_on_post_register_success(test_client: AsyncClient) -> None:
     assert response.status_code == status.HTTP_201_CREATED
 
 
-async def test_on_post_register_existing_email(
-    test_client: AsyncClient, user: User
-) -> None:
+async def test_register_existing_email(test_client: AsyncClient, user: User) -> None:
     """Ensure we cannot register an user with an existing email."""
     response = await test_client.post(
         "/auth/register",
@@ -37,9 +35,7 @@ async def test_on_post_register_existing_email(
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
-async def test_on_post_register_existing_username(
-    test_client: AsyncClient, user: User
-) -> None:
+async def test_register_existing_username(test_client: AsyncClient, user: User) -> None:
     """Ensure we cannot register an user with an existing username."""
     response = await test_client.post(
         "/auth/register",
@@ -53,9 +49,7 @@ async def test_on_post_register_existing_username(
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
-async def test_on_post_login_valid_credentials(
-    test_client: AsyncClient, user: User
-) -> None:
+async def test_login_valid_credentials(test_client: AsyncClient, user: User) -> None:
     """Ensure we can login a user with valid credentials."""
     response = await test_client.post(
         "/auth/login",
@@ -68,7 +62,7 @@ async def test_on_post_login_valid_credentials(
     assert response.status_code == status.HTTP_200_OK
 
 
-async def test_on_post_login_invalid_credentials(
+async def test_login_invalid_credentials(
     test_client: AsyncClient,
 ) -> None:
     """Ensure we cannot login a user with invalid credentials."""
@@ -83,9 +77,7 @@ async def test_on_post_login_invalid_credentials(
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
-async def test_on_post_login_password_mismatch(
-    test_client: AsyncClient, user: User
-) -> None:
+async def test_login_password_mismatch(test_client: AsyncClient, user: User) -> None:
     """Ensure we cannot login a user with the wrong password."""
     response = await test_client.post(
         "/auth/login",
@@ -98,7 +90,7 @@ async def test_on_post_login_password_mismatch(
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
-async def test_on_post_logout_authenticated_user(
+async def test_logout_authenticated_user(
     auth_test_client: AsyncClient,
 ) -> None:
     """Ensure we can logout an authenticated user."""
@@ -107,7 +99,7 @@ async def test_on_post_logout_authenticated_user(
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
-async def test_on_post_logout_unauthenticated_user(
+async def test_logout_unauthenticated_user(
     test_client: AsyncClient,
 ) -> None:
     """Ensure we cannot logout an unauthenticated user."""
@@ -116,7 +108,7 @@ async def test_on_post_logout_unauthenticated_user(
     assert logout_response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
-async def test_on_post_reset_password_request_success(
+async def test_reset_password_request_success(
     test_client: AsyncClient, user: User
 ) -> None:
     """Ensure we can successfully send a password reset request."""
@@ -130,7 +122,7 @@ async def test_on_post_reset_password_request_success(
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
-async def test_on_post_reset_password_request_nonexistent_user(
+async def test_reset_password_request_nonexistent_user(
     test_client: AsyncClient,
 ) -> None:
     """Ensure we cannot send a password reset request for a nonexistent user."""
@@ -146,7 +138,7 @@ async def test_on_post_reset_password_request_nonexistent_user(
     )  # You might want to consider a different status_code code or response behavior
 
 
-async def test_on_post_reset_password_success(
+async def test_reset_password_success(
     test_client: AsyncClient, user: User, auth_repo: AuthRepo
 ) -> None:
     """Ensure we can successfully reset a user's password."""
@@ -167,7 +159,7 @@ async def test_on_post_reset_password_success(
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
-async def test_on_post_reset_password_invalid_token(
+async def test_reset_password_invalid_token(
     test_client: AsyncClient,
 ) -> None:
     """Ensure we cannot reset a user's password with an invalid token."""
@@ -183,7 +175,7 @@ async def test_on_post_reset_password_invalid_token(
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
-async def test_on_post_reset_password_user_not_found(
+async def test_reset_password_user_not_found(
     test_client: AsyncClient,
 ) -> None:
     """Ensure we cannot reset a password for a non-existing user."""

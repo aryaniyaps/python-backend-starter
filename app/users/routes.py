@@ -4,13 +4,13 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Path
 
 from app.auth.dependencies import get_current_user_id
-from app.core.constants import Tag
+from app.core.constants import OpenAPITag
 from app.users.models import User
 from app.users.services import UserService
 
 users_router = APIRouter(
     prefix="/users",
-    tags=[Tag.USERS],
+    tags=[OpenAPITag.USERS],
 )
 
 

@@ -1,5 +1,6 @@
 from email.message import EmailMessage
 from email.mime.text import MIMEText
+from functools import lru_cache
 from smtplib import SMTP
 from typing import Generator
 
@@ -52,6 +53,7 @@ class EmailSender:
             self.server.quit()
 
 
+@lru_cache
 def get_email_sender() -> Generator[EmailSender, None, None]:
     """Get the email sender."""
     email_sender = EmailSender(

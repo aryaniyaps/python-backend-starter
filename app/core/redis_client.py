@@ -1,14 +1,13 @@
-from redis.asyncio import ConnectionPool, Redis
+from functools import lru_cache
+
+from redis.asyncio import Redis
 
 from app.config import settings
 
-connection_pool = ConnectionPool.from_url(
-    url=str(settings.redis_url),
-)
 
-
+@lru_cache
 def get_redis_client() -> Redis:
     """Get the redis client."""
-    return Redis.from_pool(
-        connection_pool=connection_pool,
+    return Redis.from_url(
+        url=str(settings.redis_url),
     )
