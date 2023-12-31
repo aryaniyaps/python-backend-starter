@@ -364,7 +364,10 @@ async def test_reset_password_invalid_token(auth_service: AuthService) -> None:
     with patch.object(
         UserRepo,
         "get_user_by_email",
-        return_value=MagicMock(spec=User),
+        return_value=MagicMock(
+            spec=User,
+            email="user@example.com",
+        ),
     ), patch.object(
         AuthRepo,
         "get_password_reset_token",
@@ -449,19 +452,6 @@ async def test_reset_password_user_not_found(auth_service: AuthService) -> None:
         ):
             await auth_service.reset_password(
                 email="nonexistent@example.com",
-                reset_token="fake_token",
-                new_password="new_password",
-            )
-
-
-async def test_reset_password_invalid_email(auth_service: AuthService) -> None:
-    """Ensure we cannot reset a password for an invalid email."""
-    with patch.object(UserRepo, "get_user_by_email", return_value=None):
-        with pytest.raises(
-            InvalidInputError, match="Invalid password reset token or email."
-        ):
-            await auth_service.reset_password(
-                email="invalid_email@example.com",
                 reset_token="fake_token",
                 new_password="new_password",
             )
