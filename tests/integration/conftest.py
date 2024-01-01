@@ -1,16 +1,32 @@
-from typing import AsyncGenerator
+from typing import Any, AsyncGenerator, Generator
 
 import pytest
 from fastapi import FastAPI
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import create_app
+from app.core.database import get_database_session
 
 
 @pytest.fixture(scope="session")
 def app() -> FastAPI:
     """Initialize the app for testing."""
     return create_app()
+
+
+@pytest.fixture(autouse=True)
+def setup_dependency_overrides(
+    app: FastAPI,
+    database_session: AsyncSession,
+) -> None:
+    """Setup dependency overrides for the application."""
+
+    def get_test_database_session() -> Generator[AsyncSession, Any, None]:
+        """Get the test database session."""
+        yield database_session
+
+    app.dependency_overrides[get_database_session] = get_test_database_session
 
 
 @pytest.fixture

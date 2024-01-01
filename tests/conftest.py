@@ -1,4 +1,3 @@
-from contextlib import asynccontextmanager
 from typing import AsyncGenerator, Iterator
 
 import pytest
@@ -6,7 +5,9 @@ from alembic import command
 from alembic.config import Config
 from argon2 import PasswordHasher
 from redis.asyncio import Redis
-from sqlalchemy.ext.asyncio import AsyncConnection
+from sqlalchemy import event
+from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession, async_sessionmaker
+from sqlalchemy.orm import Session, SessionTransaction
 
 from app.auth.repos import AuthRepo
 from app.core.database import database_engine
@@ -65,24 +66,42 @@ async def authentication_token(user: User, auth_repo: AuthRepo) -> str:
     return await auth_repo.create_authentication_token(user_id=user.id)
 
 
-@asynccontextmanager
-async def get_test_database_connection() -> AsyncGenerator[AsyncConnection, None]:
+@pytest.fixture(scope="session")
+async def test_database_connection() -> AsyncGenerator[AsyncConnection, None]:
     """Get the test database connection."""
-    async with database_engine.connect() as connection:
-        async with connection.begin() as transaction:
-            try:
-                # yield database connection
-                yield connection
-            finally:
-                print("ROLLING BACK TRANSACTION")
-                await transaction.rollback()
+    async with database_engine.begin() as connection:
+        yield connection
 
 
 @pytest.fixture
-async def database_connection() -> AsyncGenerator[AsyncConnection, None]:
-    """Get the database connection."""
-    async with get_test_database_connection() as connection:
-        yield connection
+async def database_session() -> AsyncGenerator[AsyncSession, None]:
+    """Get the database session."""
+    connection = await database_engine.connect()
+    trans = connection.begin()
+
+    # Run a parent transaction that can roll back all changes
+    test_session_maker = async_sessionmaker(
+        autocommit=False,
+        autoflush=False,
+        bind=database_engine,
+    )
+    test_session = test_session_maker()
+    test_session.begin_nested()
+
+    @event.listens_for(test_session.sync_session, "after_transaction_end")
+    def restart_savepoint(session: Session, transaction: SessionTransaction) -> None:
+        if transaction.nested and not (
+            transaction.parent and transaction.parent.nested
+        ):
+            session.expire_all()
+            session.begin_nested()
+
+    yield test_session
+
+    # Roll back the parent transaction after the test is complete
+    await test_session.close()
+    await trans.rollback()
+    await connection.close()
 
 
 @pytest.fixture(scope="session")
