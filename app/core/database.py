@@ -18,7 +18,6 @@ database_engine = create_async_engine(
     url=str(settings.database_url),
     echo=settings.debug,
     pool_size=settings.database_pool_size,
-    max_overflow=0,
     pool_use_lifo=True,
     pool_pre_ping=True,
 )
@@ -55,3 +54,4 @@ async def get_database_session() -> AsyncGenerator[AsyncSession, None]:
     """Get the database session."""
     async with async_session_factory.begin() as session:
         yield session
+        await session.close()

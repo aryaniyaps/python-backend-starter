@@ -41,7 +41,7 @@ class UserService:
         user = await self.get_user_by_id(user_id=user_id)
         if (
             email
-            and self._user_repo.get_user_by_email(
+            and await self._user_repo.get_user_by_email(
                 email=email,
             )
             is not None
@@ -51,7 +51,7 @@ class UserService:
             )
         if (
             username
-            and self._user_repo.get_user_by_username(
+            and await self._user_repo.get_user_by_username(
                 username=username,
             )
             is not None

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Annotated
 from uuid import UUID
 
@@ -74,7 +74,7 @@ class UserRepo:
                 password=password,
             )
         if update_last_login:
-            user.last_login_at = datetime.utcnow()
+            user.last_login_at = datetime.now(UTC)
 
         self._session.add(user)
         await self._session.commit()

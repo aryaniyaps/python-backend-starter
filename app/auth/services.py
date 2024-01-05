@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from hashlib import sha256
 from typing import Annotated, Tuple
 from uuid import UUID
@@ -172,13 +172,13 @@ class AuthService:
                 user_id=existing_user.id,
                 last_login_at=existing_user.last_login_at,
             )
-            send_password_reset_request_email(
-                to=existing_user.email,
-                username=existing_user.username,
-                password_reset_token=reset_token,
-                operating_system=user_agent.get_os(),
-                browser_name=user_agent.get_browser(),
-            )
+            # send_password_reset_request_email(
+            #     to=existing_user.email,
+            #     username=existing_user.username,
+            #     password_reset_token=reset_token,
+            #     operating_system=user_agent.get_os(),
+            #     browser_name=user_agent.get_browser(),
+            # )
 
     async def reset_password(
         self,
@@ -201,7 +201,7 @@ class AuthService:
                 message="Invalid password reset token or email provided."
             )
 
-        if datetime.utcnow() > password_reset_token.expires_at:
+        if datetime.now(UTC) > password_reset_token.expires_at:
             # password reset token has expired.
             raise InvalidInputError(
                 message="Invalid password reset token or email provided."

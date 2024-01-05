@@ -7,7 +7,6 @@ from argon2 import PasswordHasher
 from redis.asyncio import Redis
 from sqlalchemy import event
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession, async_sessionmaker
-from sqlalchemy.orm import Session, SessionTransaction
 
 from app.auth.repos import AuthRepo
 from app.core.database import database_engine
@@ -77,30 +76,28 @@ async def test_database_connection() -> AsyncGenerator[AsyncConnection, None]:
 async def database_session() -> AsyncGenerator[AsyncSession, None]:
     """Get the database session."""
     connection = await database_engine.connect()
-    trans = connection.begin()
+    transaction = await connection.begin()
 
-    # Run a parent transaction that can roll back all changes
     test_session_maker = async_sessionmaker(
         autocommit=False,
         autoflush=False,
+        expire_on_commit=False,
         bind=database_engine,
     )
-    test_session = test_session_maker()
-    test_session.begin_nested()
+    async_session = test_session_maker(bind=connection)
+    nested = await connection.begin_nested()
 
-    @event.listens_for(test_session.sync_session, "after_transaction_end")
-    def restart_savepoint(session: Session, transaction: SessionTransaction) -> None:
-        if transaction.nested and not (
-            transaction.parent and transaction.parent.nested
-        ):
-            session.expire_all()
-            session.begin_nested()
+    @event.listens_for(async_session.sync_session, "after_transaction_end")
+    def end_savepoint(_session, _transaction) -> None:
+        nonlocal nested
 
-    yield test_session
+        if not nested.is_active and connection.sync_connection:
+            nested = connection.sync_connection.begin_nested()
 
-    # Roll back the parent transaction after the test is complete
-    await test_session.close()
-    await trans.rollback()
+    yield async_session
+
+    await transaction.rollback()
+    await async_session.close()
     await connection.close()
 
 

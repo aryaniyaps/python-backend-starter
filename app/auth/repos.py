@@ -131,7 +131,8 @@ class AuthRepo:
             )
             for authentication_token_hash in authentication_token_hashes
         ]
-        await self._redis_client.delete(*authentication_token_keys)
+        if authentication_token_keys:
+            await self._redis_client.delete(*authentication_token_keys)
         await self._redis_client.delete(
             self.generate_token_owner_key(
                 user_id=user_id,
