@@ -1,35 +1,21 @@
 from datetime import datetime
 from hashlib import sha256
 from secrets import token_hex
-from typing import Annotated
 from uuid import UUID
 
-from fastapi import Depends
 from redis.asyncio import Redis
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.models import PasswordResetToken
 from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
-from app.core.database import get_database_session
-from app.core.redis_client import get_redis_client
 
 
 class AuthRepo:
     def __init__(
         self,
-        session: Annotated[
-            AsyncSession,
-            Depends(
-                dependency=get_database_session,
-            ),
-        ],
-        redis_client: Annotated[
-            Redis,
-            Depends(
-                dependency=get_redis_client,
-            ),
-        ],
+        session: AsyncSession,
+        redis_client: Redis,
     ) -> None:
         self._session = session
         self._redis_client = redis_client

@@ -4,7 +4,11 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Header, status
 from user_agents import parse
 
-from app.auth.dependencies import get_authentication_token, get_current_user_id
+from app.auth.dependencies import (
+    get_auth_service,
+    get_authentication_token,
+    get_current_user_id,
+)
 from app.auth.schemas import (
     LoginUserInput,
     LoginUserResult,
@@ -36,7 +40,7 @@ async def register_user(
     auth_service: Annotated[
         AuthService,
         Depends(
-            dependency=AuthService,
+            dependency=get_auth_service,
         ),
     ],
 ) -> dict[str, Any]:
@@ -66,7 +70,7 @@ async def login_user(
     auth_service: Annotated[
         AuthService,
         Depends(
-            dependency=AuthService,
+            dependency=get_auth_service,
         ),
     ],
 ) -> dict[str, Any]:
@@ -92,7 +96,7 @@ async def logout_user(
     auth_service: Annotated[
         AuthService,
         Depends(
-            dependency=AuthService,
+            dependency=get_auth_service,
         ),
     ],
     authentication_token: Annotated[
@@ -130,7 +134,7 @@ async def request_password_reset(
     auth_service: Annotated[
         AuthService,
         Depends(
-            dependency=AuthService,
+            dependency=get_auth_service,
         ),
     ],
 ) -> None:
@@ -155,7 +159,7 @@ async def reset_password(
     auth_service: Annotated[
         AuthService,
         Depends(
-            dependency=AuthService,
+            dependency=get_auth_service,
         ),
     ],
 ) -> None:

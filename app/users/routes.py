@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Path
 
 from app.auth.dependencies import get_current_user_id
 from app.core.constants import OpenAPITag
+from app.users.dependencies import get_user_service
 from app.users.models import User
 from app.users.schemas import UpdateUserInput, UserSchema
 from app.users.services import UserService
@@ -33,7 +34,7 @@ async def get_current_user(
     user_service: Annotated[
         UserService,
         Depends(
-            dependency=UserService,
+            dependency=get_user_service,
         ),
     ],
 ) -> User:
@@ -59,7 +60,7 @@ async def update_current_user(
     user_service: Annotated[
         UserService,
         Depends(
-            dependency=UserService,
+            dependency=get_user_service,
         ),
     ],
 ) -> User:
@@ -91,7 +92,7 @@ async def get_user(
     user_service: Annotated[
         UserService,
         Depends(
-            dependency=UserService,
+            dependency=get_user_service,
         ),
     ],
 ) -> User:

@@ -1,32 +1,18 @@
 from datetime import UTC, datetime
-from typing import Annotated
 from uuid import UUID
 
 from argon2 import PasswordHasher
-from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import get_database_session
-from app.core.security import get_password_hasher
 from app.users.models import User
 
 
 class UserRepo:
     def __init__(
         self,
-        session: Annotated[
-            AsyncSession,
-            Depends(
-                dependency=get_database_session,
-            ),
-        ],
-        password_hasher: Annotated[
-            PasswordHasher,
-            Depends(
-                dependency=get_password_hasher,
-            ),
-        ],
+        session: AsyncSession,
+        password_hasher: PasswordHasher,
     ) -> None:
         self._session = session
         self._password_hasher = password_hasher

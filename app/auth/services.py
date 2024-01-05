@@ -1,17 +1,15 @@
 from datetime import UTC, datetime
 from hashlib import sha256
-from typing import Annotated, Tuple
+from typing import Tuple
 from uuid import UUID
 
 from argon2 import PasswordHasher
 from argon2.exceptions import HashingError, VerifyMismatchError
-from fastapi import Depends
 from user_agents.parsers import UserAgent
 
 from app.auth.repos import AuthRepo
 from app.auth.tasks import send_password_reset_request_email
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
-from app.core.security import get_password_hasher
 from app.users.models import User
 from app.users.repos import UserRepo
 
@@ -19,24 +17,9 @@ from app.users.repos import UserRepo
 class AuthService:
     def __init__(
         self,
-        auth_repo: Annotated[
-            AuthRepo,
-            Depends(
-                dependency=AuthRepo,
-            ),
-        ],
-        user_repo: Annotated[
-            UserRepo,
-            Depends(
-                dependency=UserRepo,
-            ),
-        ],
-        password_hasher: Annotated[
-            PasswordHasher,
-            Depends(
-                dependency=get_password_hasher,
-            ),
-        ],
+        auth_repo: AuthRepo,
+        user_repo: UserRepo,
+        password_hasher: PasswordHasher,
     ) -> None:
         self._auth_repo = auth_repo
         self._user_repo = user_repo
