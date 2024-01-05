@@ -333,24 +333,25 @@ async def test_send_password_reset_request_user_not_found(
 
 async def test_reset_password_success(auth_service: AuthService) -> None:
     """Ensure we can reset a user's password successfully."""
-    user_id = uuid4()
+    mock_user = MagicMock(
+        spec=User,
+        email="user@example.com",
+        id=uuid4(),
+        last_login_at=datetime.now(UTC) - timedelta(minutes=5),
+    )
 
     with patch.object(
         UserRepo,
         "get_user_by_email",
-        return_value=MagicMock(
-            spec=User,
-            email="user@example.com",
-            id=user_id,
-            last_login_at=datetime.now(UTC) - timedelta(minutes=5),
-        ),
+        return_value=mock_user,
     ), patch.object(
         AuthRepo,
         "get_password_reset_token",
         return_value=MagicMock(
             spec=PasswordResetToken,
-            user_id=user_id,
+            user_id=mock_user.id,
             last_login_at=datetime.now(UTC),
+            expires_at=datetime.now(UTC) + timedelta(minutes=2),
         ),
     ), patch.object(
         UserRepo,
@@ -369,12 +370,12 @@ async def test_reset_password_success(auth_service: AuthService) -> None:
 
     # Check that the update_user method is called with the correct password
     mock_update_user.assert_called_once_with(
-        user_id=user_id,
+        user=mock_user,
         password="new_password",
     )
 
     mock_remove_all_authentication_tokens.assert_called_once_with(
-        user_id=user_id,
+        user_id=mock_user.id,
     )
 
 
