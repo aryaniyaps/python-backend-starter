@@ -50,7 +50,7 @@ class UserSchema(BaseSchema):
     ]
 
     updated_at: Annotated[
-        datetime,
+        datetime | None,
         Field(
             description="When the user was last updated.",
         ),

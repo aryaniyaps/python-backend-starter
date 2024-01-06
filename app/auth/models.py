@@ -2,7 +2,7 @@ import typing
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import ForeignKey, String, text
+from sqlalchemy import FetchedValue, ForeignKey, String, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
@@ -44,9 +44,12 @@ class PasswordResetToken(Base):
 
     created_at: Mapped[datetime] = mapped_column(
         nullable=False,
-        server_default=func.now(),
+        default=func.now(),
+        server_default=FetchedValue(),
     )
 
     user: Mapped["User"] = relationship(
         back_populates="password_reset_tokens",
     )
+
+    __mapper_args__ = {"eager_defaults": True}

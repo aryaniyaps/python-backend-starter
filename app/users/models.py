@@ -43,19 +43,21 @@ class User(Base):
     )
 
     last_login_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(),
+        default=func.now(),
+        server_default=FetchedValue(),
         nullable=False,
     )
 
     created_at: Mapped[datetime] = mapped_column(
         nullable=False,
-        server_default=func.now(),
+        default=func.now(),
+        server_default=FetchedValue(),
     )
 
-    updated_at: Mapped[datetime] = mapped_column(
-        nullable=False,
-        server_default=func.now(),
+    updated_at: Mapped[datetime | None] = mapped_column(
+        # nullable=False,
         onupdate=func.now(),
+        server_default=FetchedValue(),
         server_onupdate=FetchedValue(),
     )
 

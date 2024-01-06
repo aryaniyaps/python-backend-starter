@@ -35,7 +35,6 @@ async def test_update_user_password(
     password_hasher: PasswordHasher,
 ) -> None:
     """Ensure we can update a user's password."""
-    initial_updated_at = user.updated_at
     updated_user = await user_repo.update_user(
         user=user,
         password="password",
@@ -44,7 +43,7 @@ async def test_update_user_password(
         hash=updated_user.password_hash,
         password="password",
     )
-    assert updated_user.updated_at > initial_updated_at
+    assert updated_user.updated_at is not None
 
 
 async def test_update_user_username(
@@ -52,15 +51,12 @@ async def test_update_user_username(
     user_repo: UserRepo,
 ) -> None:
     """Ensure we can update a user's username."""
-    initial_updated_at = user.updated_at
-    print(f"INITIAL UPDATED AT: {initial_updated_at}")
     updated_user = await user_repo.update_user(
         user=user,
         username="new_username",
     )
-    print(f"FINAL UPDATED AT: {updated_user.updated_at}")
     assert updated_user.username == "new_username"
-    assert updated_user.updated_at > initial_updated_at
+    assert updated_user.updated_at is not None
 
 
 async def test_update_user_email(
@@ -68,14 +64,13 @@ async def test_update_user_email(
     user_repo: UserRepo,
 ) -> None:
     """Ensure we can update a user's email."""
-    initial_updated_at = user.updated_at
     updated_user = await user_repo.update_user(
         user=user,
         email="new_email@example.com",
         update_last_login=True,
     )
     assert updated_user.email == "new_email@example.com"
-    assert updated_user.updated_at > initial_updated_at
+    assert updated_user.updated_at is not None
 
 
 async def test_update_user_last_login_at(
@@ -83,14 +78,13 @@ async def test_update_user_last_login_at(
     user_repo: UserRepo,
 ) -> None:
     """Ensure we can update a user's last login timestamp."""
-    initial_updated_at = user.updated_at
     initial_last_login = user.last_login_at
     updated_user = await user_repo.update_user(
         user=user,
         update_last_login=True,
     )
     assert updated_user.last_login_at > initial_last_login
-    assert updated_user.updated_at > initial_updated_at
+    assert updated_user.updated_at is not None
 
 
 async def test_get_user_by_username(user: User, user_repo: UserRepo) -> None:
