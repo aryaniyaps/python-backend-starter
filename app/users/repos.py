@@ -51,8 +51,6 @@ class UserRepo:
         update_last_login: bool = False,
     ) -> User:
         """Update the user with the given ID."""
-        print("UPDATE USER CALLED")
-        print(f"UPDATE USER PASSWORD: {password}")
         if username is not None:
             user.username = username
         if email is not None:
