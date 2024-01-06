@@ -64,7 +64,7 @@ class UserRepo:
 
         self._session.add(user)
         await self._session.commit()
-        await self._session.refresh(user)
+        # await self._session.refresh(user)
         return user
 
     async def get_user_by_username(

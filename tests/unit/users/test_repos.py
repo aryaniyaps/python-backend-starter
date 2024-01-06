@@ -53,10 +53,12 @@ async def test_update_user_username(
 ) -> None:
     """Ensure we can update a user's username."""
     initial_updated_at = user.updated_at
+    print(f"INITIAL UPDATED AT: {initial_updated_at}")
     updated_user = await user_repo.update_user(
         user=user,
         username="new_username",
     )
+    print(f"FINAL UPDATED AT: {updated_user.updated_at}")
     assert updated_user.username == "new_username"
     assert updated_user.updated_at > initial_updated_at
 

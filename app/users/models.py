@@ -56,6 +56,7 @@ class User(Base):
         nullable=False,
         server_default=func.now(),
         onupdate=func.now(),
+        server_onupdate=FetchedValue(),
     )
 
     password_reset_tokens: Mapped[List["PasswordResetToken"]] = relationship(
