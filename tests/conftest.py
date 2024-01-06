@@ -1,15 +1,19 @@
-from typing import AsyncGenerator, Iterator
+from typing import AsyncGenerator, AsyncIterator, Iterator
 
 import pytest
 from alembic import command
 from alembic.config import Config
 from argon2 import PasswordHasher
 from redis.asyncio import Redis
-from sqlalchemy import event
-from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 from app.auth.repos import AuthRepo
-from app.core.database import database_engine
+from app.config import settings
 from app.core.redis_client import get_redis_client
 from app.core.security import get_password_hasher
 from app.users.models import User
@@ -66,42 +70,46 @@ async def authentication_token(user: User, auth_repo: AuthRepo) -> str:
 
 
 @pytest.fixture(scope="session")
-async def test_database_connection() -> AsyncGenerator[AsyncConnection, None]:
-    """Get the test database connection."""
-    async with database_engine.begin() as connection:
-        yield connection
-
-
-@pytest.fixture
-async def database_session() -> AsyncGenerator[AsyncSession, None]:
-    """Get the database session."""
-    connection = await database_engine.connect()
-    transaction = await connection.begin()
-
-    test_session_maker = async_sessionmaker(
-        autocommit=False,
-        autoflush=False,
-        expire_on_commit=False,
-        bind=database_engine,
+async def test_database_engine() -> AsyncIterator[AsyncEngine]:
+    """Get the test database engine."""
+    engine = create_async_engine(
+        url=str(settings.database_url),
     )
-    async_session = test_session_maker(bind=connection)
-    nested = await connection.begin_nested()
-
-    @event.listens_for(async_session.sync_session, "after_transaction_end")
-    def end_savepoint(_session, _transaction) -> None:
-        nonlocal nested
-
-        if not nested.is_active and connection.sync_connection:
-            nested = connection.sync_connection.begin_nested()
-
-    yield async_session
-
-    await transaction.rollback()
-    await async_session.close()
-    await connection.close()
+    yield engine
+    await engine.dispose()
 
 
 @pytest.fixture(scope="session")
+def test_sessionmaker(
+    test_database_engine: AsyncEngine,
+) -> async_sessionmaker[AsyncSession]:
+    """Get the test session maker."""
+    return async_sessionmaker(
+        autocommit=False,
+        autoflush=False,
+        expire_on_commit=False,
+        bind=test_database_engine,
+    )
+
+
+@pytest.fixture
+async def test_database_session(
+    test_database_engine: AsyncEngine,
+    test_sessionmaker: async_sessionmaker[AsyncSession],
+) -> AsyncGenerator[AsyncSession, None]:
+    """Get the test database session."""
+    async with test_database_engine.connect() as conn:
+        transaction = await conn.begin()
+        test_sessionmaker.configure(bind=conn)
+
+        async with test_sessionmaker() as session:
+            yield session
+
+        if transaction.is_active:
+            await transaction.rollback()
+
+
+@pytest.fixture
 def redis_client() -> Redis:
     """Get the redis client."""
     return get_redis_client()
