@@ -95,25 +95,24 @@ class AuthService:
                 message="Invalid credentials provided.",
             ) from exception
 
-        if self._password_hasher.check_needs_rehash(
-            hash=user.password_hash,
-        ):
-            # update user's password hash
-            await self._user_repo.update_user(
-                user=user,
-                password=password,
-            )
-
         # create authentication token
         authentication_token = await self._auth_repo.create_authentication_token(
             user_id=user.id
         )
 
-        # update user's last login timestamp
-        await self._user_repo.update_user(
-            user=user,
-            update_last_login=True,
-        )
+        if self._password_hasher.check_needs_rehash(
+            hash=user.password_hash,
+        ):
+            # update user's password hash and last login timestamp
+            user = await self._user_repo.update_user(
+                user=user, password=password, update_last_login=True
+            )
+        else:
+            # update user's last login timestamp
+            user = await self._user_repo.update_user(
+                user=user,
+                update_last_login=True,
+            )
 
         return authentication_token, user
 

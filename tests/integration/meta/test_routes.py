@@ -10,4 +10,4 @@ async def test_health(test_client: AsyncClient) -> None:
     response = await test_client.get("/meta/health")
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.content == {"status": "OK"}
+    assert response.json() == {"status": "OK"}

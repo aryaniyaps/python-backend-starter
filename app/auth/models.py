@@ -4,6 +4,7 @@ from uuid import UUID
 
 from sqlalchemy import ForeignKey, String, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.sql import func
 
 from app.core.database import Base
 
@@ -43,7 +44,7 @@ class PasswordResetToken(Base):
 
     created_at: Mapped[datetime] = mapped_column(
         nullable=False,
-        server_default=text("now()"),
+        server_default=func.now(),
     )
 
     user: Mapped["User"] = relationship(

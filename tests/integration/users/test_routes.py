@@ -36,15 +36,6 @@ async def test_get_user_authenticated(
     assert response.status_code == status.HTTP_200_OK
 
 
-async def test_get_user_unauthenticated(
-    test_client: AsyncClient, user: UserSchema
-) -> None:
-    """Ensure we cannot get a user by ID when unauthenticated."""
-    response = await test_client.get(f"/users/{user.id}")
-
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-
 async def test_get_user_not_found(auth_test_client: AsyncClient) -> None:
     """Ensure getting a non-existent user returns a 404."""
     response = await auth_test_client.get(

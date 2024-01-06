@@ -120,7 +120,6 @@ async def test_login_user_valid_credentials(
     ), patch.object(
         UserRepo,
         "update_user",
-        return_value=None,
     ) as mock_update_user:
         mock_user = MagicMock(
             spec=User,
@@ -130,6 +129,7 @@ async def test_login_user_valid_credentials(
             ),
         )
         mock_get_user.return_value = mock_user
+        mock_update_user.return_value = mock_user
         # Perform the login
         authentication_token, user = await auth_service.login_user(
             login="user@example.com",
@@ -191,17 +191,27 @@ async def test_login_user_password_rehash(
         ),
     )
 
-    with patch("app.auth.services.UserRepo.get_user_by_email") as mock_get_user, patch(
-        "app.auth.services.AuthRepo.create_authentication_token"
-    ) as mock_create_token, patch(
-        "app.auth.services.UserRepo.update_user"
+    with patch.object(
+        UserRepo,
+        "get_user_by_email",
+    ) as mock_get_user, patch.object(
+        AuthRepo,
+        "create_authentication_token",
+    ) as mock_create_token, patch.object(
+        UserRepo,
+        "update_user",
     ) as mock_update_user, patch.object(
-        auth_service, "_password_hasher", mock_password_hasher
+        auth_service,
+        "_password_hasher",
+        mock_password_hasher,
     ):
-        mock_user = MagicMock(spec=User)
-        mock_user.id = uuid4()
-        mock_user.password_hash = password_hasher.hash("password")
+        mock_user = MagicMock(
+            spec=User,
+            id=uuid4(),
+            password_hash=password_hasher.hash("password"),
+        )
         mock_get_user.return_value = mock_user
+        mock_update_user.return_value = mock_user
         mock_create_token.return_value = "fake_token"
 
         # Perform the login
@@ -214,9 +224,10 @@ async def test_login_user_password_rehash(
     assert user == mock_user
 
     # Check if update_user was called
-    mock_update_user.assert_called_once_with(
-        user_id=mock_user.id,
+    mock_update_user.assert_called_with(
+        user=mock_user,
         password="password",
+        update_last_login=True,
     )
 
 
@@ -448,9 +459,10 @@ async def test_reset_password_after_login(auth_service: AuthService) -> None:
         "get_password_reset_token",
         return_value=MagicMock(
             spec=PasswordResetToken,
-            # user has logged in 5 minutes ago while requesting
+            # user has last logged in 5 minutes ago while requesting
             # for a password reset token.
             last_login_at=datetime.now(UTC) - timedelta(minutes=5),
+            expires_at=datetime.now(UTC) + timedelta(minutes=5),
         ),
     ):
         with pytest.raises(
