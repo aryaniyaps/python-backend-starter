@@ -22,7 +22,10 @@ database_engine = create_async_engine(
     pool_pre_ping=True,
 )
 
-async_session_factory = async_sessionmaker(bind=database_engine)
+async_session_factory = async_sessionmaker(
+    bind=database_engine,
+    expire_on_commit=False,
+)
 
 database_metadata = MetaData(
     naming_convention={
@@ -52,6 +55,5 @@ class Base(AsyncAttrs, DeclarativeBase):
 
 async def get_database_session() -> AsyncGenerator[AsyncSession, None]:
     """Get the database session."""
-    async with async_session_factory.begin() as session:
+    async with async_session_factory() as session:
         yield session
-        await session.close()

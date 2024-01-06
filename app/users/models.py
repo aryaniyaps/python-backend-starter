@@ -43,22 +43,17 @@ class User(Base):
     )
 
     last_login_at: Mapped[datetime] = mapped_column(
-        default=func.now(),
-        server_default=FetchedValue(),
+        server_default=func.now(),
         nullable=False,
     )
 
     created_at: Mapped[datetime] = mapped_column(
         nullable=False,
-        default=func.now(),
-        server_default=FetchedValue(),
+        server_default=func.now(),
     )
 
     updated_at: Mapped[datetime | None] = mapped_column(
-        # nullable=False,
         onupdate=func.now(),
-        server_default=FetchedValue(),
-        server_onupdate=FetchedValue(),
     )
 
     password_reset_tokens: Mapped[List["PasswordResetToken"]] = relationship(

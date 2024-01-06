@@ -79,10 +79,12 @@ async def test_update_user_last_login_at(
 ) -> None:
     """Ensure we can update a user's last login timestamp."""
     initial_last_login = user.last_login_at
+    print("Initial last login:", initial_last_login)
     updated_user = await user_repo.update_user(
         user=user,
         update_last_login=True,
     )
+    print("Updated last login:", updated_user.last_login_at)
     assert updated_user.last_login_at > initial_last_login
     assert updated_user.updated_at is not None
 

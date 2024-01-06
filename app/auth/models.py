@@ -44,8 +44,7 @@ class PasswordResetToken(Base):
 
     created_at: Mapped[datetime] = mapped_column(
         nullable=False,
-        default=func.now(),
-        server_default=FetchedValue(),
+        server_default=func.now(),
     )
 
     user: Mapped["User"] = relationship(
