@@ -1,9 +1,10 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from urllib.parse import urlencode, urljoin
 
 from redmail.email.sender import EmailSender
 
 from app.auth.tasks import send_password_reset_request_email
+from app.config import settings
 from app.core.constants import APP_URL
 from app.core.templates import (
     reset_password_html,
@@ -11,6 +12,17 @@ from app.core.templates import (
     reset_password_text,
 )
 from app.users.schemas import UserSchema
+
+
+class MockEmailSender(EmailSender):
+    """Mock email sender for testing."""
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.messages = []
+
+    def send_message(self, msg) -> None:
+        self.messages.append(msg)
 
 
 def test_send_password_reset_request_email() -> None:
@@ -25,21 +37,23 @@ def test_send_password_reset_request_email() -> None:
     operating_system = "Windows"
     browser_name = "Chrome"
 
-    mock_email_sender = MagicMock(
-        spec=EmailSender,
-        send=MagicMock(
-            return_value=None,
-        ),
+    mock_email_sender = MockEmailSender(
+        host=settings.email_host,
+        port=settings.email_port,
+        use_starttls=False,
     )
 
-    send_password_reset_request_email(
-        receiver=mock_user.email,
-        username=mock_user.username,
-        password_reset_token=password_reset_token,
-        operating_system=operating_system,
-        browser_name=browser_name,
-        email_sender=mock_email_sender,
-    )
+    with patch(
+        "app.core.emails.email_sender",
+        mock_email_sender,
+    ):
+        send_password_reset_request_email(
+            receiver=mock_user.email,
+            username=mock_user.username,
+            password_reset_token=password_reset_token,
+            operating_system=operating_system,
+            browser_name=browser_name,
+        )
 
     action_url = (
         urljoin(APP_URL, "/auth/reset-password")
@@ -52,22 +66,26 @@ def test_send_password_reset_request_email() -> None:
         )
     )
 
-    # Perform assertions on the mocked send_email function
-    mock_email_sender.send.assert_called_once_with(
-        to=mock_user.email,
+    expected_message = mock_email_sender.get_message(
+        sender=settings.email_from,
+        receivers=[mock_user.email],
         subject=reset_password_subject.render(
             username=mock_user.username,
         ),
-        body=reset_password_text.render(
+        html=reset_password_html.render(
             action_url=action_url,
             operating_system=operating_system,
             browser_name=browser_name,
             username=mock_user.username,
         ),
-        html_body=reset_password_html.render(
+        text=reset_password_text.render(
             action_url=action_url,
             operating_system=operating_system,
             browser_name=browser_name,
             username=mock_user.username,
         ),
     )
+
+    assert mock_email_sender.messages == [
+        expected_message.as_string(),
+    ]
