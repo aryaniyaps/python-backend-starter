@@ -154,13 +154,14 @@ class AuthService:
                 user_id=existing_user.id,
                 last_login_at=existing_user.last_login_at,
             )
-            # send_password_reset_request_email(
-            #     to=existing_user.email,
-            #     username=existing_user.username,
-            #     password_reset_token=reset_token,
-            #     operating_system=user_agent.get_os(),
-            #     browser_name=user_agent.get_browser(),
-            # )
+            send_password_reset_request_email.delay(
+                to=existing_user.email,
+                username=existing_user.username,
+                password_reset_token=reset_token,
+                operating_system=user_agent.get_os(),
+                browser_name=user_agent.get_browser(),
+                email_sender=None,
+            )
 
     async def reset_password(
         self,

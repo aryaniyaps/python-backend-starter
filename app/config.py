@@ -60,6 +60,15 @@ class Settings(BaseSettings):
         ),
     ]
 
+    celery_broker_url: Annotated[
+        RedisDsn,
+        Field(
+            examples=[
+                "redis://user:pass@localhost:6379/1",
+            ],
+        ),
+    ]
+
     cors_allow_origins: Annotated[
         set[str] | str,
         Field(
