@@ -19,6 +19,7 @@ dependencies = [
     "humanize>=4.9.0",
     "orjson>=3.9.10",
     "celery>=5.3.6",
+    "redmail>=0.6.0",
 ]
 requires-python = ">=3.11"
 readme = "README.md"

@@ -1,7 +1,9 @@
 from urllib.parse import urlencode, urljoin
 
+from redmail.email.sender import EmailSender
+
+from app.config import settings
 from app.core.constants import APP_URL
-from app.core.emails import EmailSender
 from app.core.templates import (
     reset_password_html,
     reset_password_subject,
@@ -12,7 +14,7 @@ from app.worker import worker
 
 @worker.task
 def send_password_reset_request_email(
-    to: str,
+    receiver: str,
     username: str,
     password_reset_token: str,
     operating_system: str,
@@ -27,24 +29,25 @@ def send_password_reset_request_email(
         + "?"
         + urlencode(
             {
-                "email": to,
+                "email": receiver,
                 "reset_token": password_reset_token,
             }
         )
     )
 
-    email_sender.send_email(
-        to=to,
+    email_sender.send(
+        receivers=[receiver],
+        sender=settings.email_from,
         subject=reset_password_subject.render(
             username=username,
         ),
-        body=reset_password_text.render(
+        text=reset_password_text.render(
             action_url=action_url,
             operating_system=operating_system,
             browser_name=browser_name,
             username=username,
         ),
-        html_body=reset_password_html.render(
+        html=reset_password_html.render(
             action_url=action_url,
             operating_system=operating_system,
             browser_name=browser_name,

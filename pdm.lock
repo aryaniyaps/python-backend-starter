@@ -5,7 +5,7 @@
 groups = ["default", "test"]
 strategy = ["cross_platform"]
 lock_version = "4.4"
-content_hash = "sha256:a4b7fbdaaf9ecdf2e412fb345cb9fafb68269e0ecf99484b7e75884b503539bc"
+content_hash = "sha256:37de0770abe7bdb500d85e81534e4ce0b9a7c35a493406c11f3cb496f089a0d4"
 
 [[package]]
 name = "alembic"
@@ -776,6 +776,19 @@ dependencies = [
 files = [
     {file = "redis-5.0.1-py3-none-any.whl", hash = "sha256:ed4802971884ae19d640775ba3b03aa2e7bd5e8fb8dfaed2decce4d0fc48391f"},
     {file = "redis-5.0.1.tar.gz", hash = "sha256:0dab495cd5753069d3bc650a0dde8a8f9edde16fc5691b689a566eda58100d0f"},
+]
+
+[[package]]
+name = "redmail"
+version = "0.6.0"
+requires_python = ">=3.6"
+summary = "Email sending library"
+dependencies = [
+    "jinja2",
+]
+files = [
+    {file = "redmail-0.6.0-py3-none-any.whl", hash = "sha256:8e64a680ffc8aaf8054312bf8b216da8fed20669181b77b1f1ccbdf4ee064427"},
+    {file = "redmail-0.6.0.tar.gz", hash = "sha256:0447cbd76deb2788b2d831c12e22b513587e99f725071d9951a01b0f2b8d0a72"},
 ]
 
 [[package]]

@@ -82,20 +82,28 @@ class Settings(BaseSettings):
         ),
     ]
 
-    email_server: Annotated[
-        AnyUrl,
-        UrlConstraints(
-            allowed_schemes=[
-                "smtp",
-            ],
-            default_port=587,
-        ),
+    email_port: Annotated[
+        int,
         Field(
+            default=587,
             examples=[
-                "smtp://user:pass@host:587",
+                587,
             ],
         ),
     ]
+
+    email_host: Annotated[
+        str,
+        Field(
+            examples=[
+                "localhost",
+            ],
+        ),
+    ]
+
+    email_username: str | None = None
+
+    email_password: str | None = None
 
     email_from: Annotated[
         str,

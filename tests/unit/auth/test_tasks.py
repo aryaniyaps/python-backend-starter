@@ -1,9 +1,10 @@
 from unittest.mock import MagicMock
 from urllib.parse import urlencode, urljoin
 
+from redmail.email.sender import EmailSender
+
 from app.auth.tasks import send_password_reset_request_email
 from app.core.constants import APP_URL
-from app.core.emails import EmailSender
 from app.core.templates import (
     reset_password_html,
     reset_password_subject,
@@ -26,13 +27,13 @@ def test_send_password_reset_request_email() -> None:
 
     mock_email_sender = MagicMock(
         spec=EmailSender,
-        send_email=MagicMock(
+        send=MagicMock(
             return_value=None,
         ),
     )
 
     send_password_reset_request_email(
-        to=mock_user.email,
+        receiver=mock_user.email,
         username=mock_user.username,
         password_reset_token=password_reset_token,
         operating_system=operating_system,
@@ -52,7 +53,7 @@ def test_send_password_reset_request_email() -> None:
     )
 
     # Perform assertions on the mocked send_email function
-    mock_email_sender.send_email.assert_called_once_with(
+    mock_email_sender.send.assert_called_once_with(
         to=mock_user.email,
         subject=reset_password_subject.render(
             username=mock_user.username,
