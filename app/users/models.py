@@ -3,9 +3,9 @@ from datetime import datetime
 from typing import List
 from uuid import UUID
 
-from sqlalchemy import FetchedValue, String, text
+from sqlalchemy import String, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.sql import func
+from sqlalchemy.sql.functions import now
 
 from app.core.database import Base
 
@@ -43,17 +43,17 @@ class User(Base):
     )
 
     last_login_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(),
+        server_default=now(),
         nullable=False,
     )
 
     created_at: Mapped[datetime] = mapped_column(
         nullable=False,
-        server_default=func.now(),
+        server_default=now(),
     )
 
     updated_at: Mapped[datetime | None] = mapped_column(
-        onupdate=func.now(),
+        onupdate=now(),
     )
 
     password_reset_tokens: Mapped[List["PasswordResetToken"]] = relationship(

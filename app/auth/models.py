@@ -2,9 +2,9 @@ import typing
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import FetchedValue, ForeignKey, String, text
+from sqlalchemy import ForeignKey, String, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.sql import func
+from sqlalchemy.sql.functions import now
 
 from app.core.database import Base
 
@@ -44,7 +44,7 @@ class PasswordResetToken(Base):
 
     created_at: Mapped[datetime] = mapped_column(
         nullable=False,
-        server_default=func.now(),
+        server_default=now(),
     )
 
     user: Mapped["User"] = relationship(

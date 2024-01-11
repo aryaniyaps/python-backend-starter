@@ -1,6 +1,8 @@
 from unittest.mock import MagicMock, patch
 from urllib.parse import urlencode, urljoin
 
+from redmail.email.sender import EmailSender
+
 from app.auth.tasks import send_password_reset_request_email
 from app.config import settings
 from app.core.constants import APP_URL
@@ -10,6 +12,7 @@ from app.core.templates import (
     reset_password_text,
 )
 from app.users.schemas import UserSchema
+from tests.unit.mock_smtp import MockSMTP
 
 
 def test_send_password_reset_request_email() -> None:
@@ -24,14 +27,15 @@ def test_send_password_reset_request_email() -> None:
     operating_system = "Windows"
     browser_name = "Chrome"
 
-    mock_email_sender = MockEmailSender(
+    mock_email_sender = EmailSender(
         host=settings.email_host,
         port=settings.email_port,
         use_starttls=False,
+        cls_smtp=MockSMTP,  # type: ignore
     )
 
     with patch(
-        "app.core.emails.email_sender",
+        "app.auth.tasks.email_sender",
         mock_email_sender,
     ):
         send_password_reset_request_email(
@@ -53,22 +57,33 @@ def test_send_password_reset_request_email() -> None:
         )
     )
 
-    expected_message = mock_email_sender.get_message(
-        sender=settings.email_from,
-        receivers=[mock_user.email],
-        subject=reset_password_subject.render(
-            username=mock_user.username,
-        ),
-        html=reset_password_html.render(
-            action_url=action_url,
-            operating_system=operating_system,
-            browser_name=browser_name,
-            username=mock_user.username,
-        ),
-        text=reset_password_text.render(
-            action_url=action_url,
-            operating_system=operating_system,
-            browser_name=browser_name,
-            username=mock_user.username,
-        ),
+    last_message = next(iter(MockSMTP.messages))
+
+    subject = last_message.get("Subject")
+
+    html_body = None
+    text_body = None
+
+    for part in last_message.walk():
+        if part.get_content_type() == "text/plain":
+            text_body = part.get_payload()
+        elif part.get_content_type() == "text/html":
+            html_body = part.get_payload()
+
+    assert subject == reset_password_subject.render(
+        username=mock_user.username,
+    )
+
+    assert html_body == reset_password_html.render(
+        action_url=action_url,
+        operating_system=operating_system,
+        browser_name=browser_name,
+        username=mock_user.username,
+    )
+
+    assert text_body == reset_password_text.render(
+        action_url=action_url,
+        operating_system=operating_system,
+        browser_name=browser_name,
+        username=mock_user.username,
     )

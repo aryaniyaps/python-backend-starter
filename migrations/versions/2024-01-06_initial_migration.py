@@ -1,7 +1,7 @@
 """initial migration
 
 Revision ID: 818c11f0ac0a
-Revises: 
+Revises:
 Create Date: 2024-01-06 15:07:41.065968
 
 """
@@ -53,7 +53,11 @@ def upgrade() -> None:
             server_default=sa.text("now()"),
             nullable=False,
         ),
-        sa.Column("updated_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column(
+            "updated_at",
+            sa.DateTime(timezone=True),
+            nullable=True,
+        ),
         sa.PrimaryKeyConstraint("id", name=op.f("users_pkey")),
     )
     op.create_index(
