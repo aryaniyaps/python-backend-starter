@@ -1,2 +1,2 @@
 #!/bin/sh
-pdm run app/server.py
+pdm run start-server

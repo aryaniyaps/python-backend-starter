@@ -5,7 +5,7 @@
 groups = ["default", "test"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:37de0770abe7bdb500d85e81534e4ce0b9a7c35a493406c11f3cb496f089a0d4"
+content_hash = "sha256:42f87db4abe7c7ea2e66e8452c83bff9fe4b062820bd66d60e159f7f3d572b1d"
 
 [[package]]
 name = "alembic"
@@ -471,7 +471,7 @@ files = [
 
 [[package]]
 name = "jinja2"
-version = "3.1.2"
+version = "3.1.3"
 requires_python = ">=3.7"
 summary = "A very fast and expressive template engine."
 groups = ["default"]
@@ -479,8 +479,8 @@ dependencies = [
     "MarkupSafe>=2.0",
 ]
 files = [
-    {file = "Jinja2-3.1.2-py3-none-any.whl", hash = "sha256:6088930bfe239f0e6710546ab9c19c9ef35e29792895fed6e6e31a023a182a61"},
-    {file = "Jinja2-3.1.2.tar.gz", hash = "sha256:31351a702a408a9e7595a8fc6150fc3f43bb6bf7e319770cbc0db9df9437e852"},
+    {file = "Jinja2-3.1.3-py3-none-any.whl", hash = "sha256:7d6d50dd97d52cbc355597bd845fabfbac3f551e1f99619e39a35ce8c370b5fa"},
+    {file = "Jinja2-3.1.3.tar.gz", hash = "sha256:ac8bd6544d4bb2c9792bf3a159e80bba8fda7f07e81bc3aed565432d5925ba90"},
 ]
 
 [[package]]
@@ -540,6 +540,28 @@ files = [
     {file = "MarkupSafe-2.1.3-cp312-cp312-win32.whl", hash = "sha256:715d3562f79d540f251b99ebd6d8baa547118974341db04f5ad06d5ea3eb8007"},
     {file = "MarkupSafe-2.1.3-cp312-cp312-win_amd64.whl", hash = "sha256:1b8dd8c3fd14349433c79fa8abeb573a55fc0fdd769133baac1f5e07abf54aeb"},
     {file = "MarkupSafe-2.1.3.tar.gz", hash = "sha256:af598ed32d6ae86f1b747b82783958b1a4ab8f617b06fe68795c7f026abbdcad"},
+]
+
+[[package]]
+name = "marrow-mailer"
+version = "4.0.3"
+summary = "A light-weight modular mail delivery framework for Python 2.7+, 3.3+, Pypy, and Pypy3."
+groups = ["default"]
+dependencies = [
+    "marrow-util<2.0",
+]
+files = [
+    {file = "marrow.mailer-4.0.3-py2.py3-none-any.whl", hash = "sha256:17d46a976f4f1d32cd780b903ad8c3cfbd11e93bfd73a29e7b8d8d763a8e6d64"},
+    {file = "marrow.mailer-4.0.3.tar.gz", hash = "sha256:5c374b65ea4b9d99b986e9cf8ba859ef3776864f1284c77c852bb51695206ccd"},
+]
+
+[[package]]
+name = "marrow-util"
+version = "1.2.3"
+summary = "A collection of many commonly reimplemented utility classes and functions."
+groups = ["default"]
+files = [
+    {file = "marrow.util-1.2.3.tar.gz", hash = "sha256:1e212c51abc1b04cf44aed836f33d7291b040d1e5f87fa61072ddef2743da26f"},
 ]
 
 [[package]]
@@ -826,20 +848,6 @@ dependencies = [
 files = [
     {file = "redis-5.0.1-py3-none-any.whl", hash = "sha256:ed4802971884ae19d640775ba3b03aa2e7bd5e8fb8dfaed2decce4d0fc48391f"},
     {file = "redis-5.0.1.tar.gz", hash = "sha256:0dab495cd5753069d3bc650a0dde8a8f9edde16fc5691b689a566eda58100d0f"},
-]
-
-[[package]]
-name = "redmail"
-version = "0.6.0"
-requires_python = ">=3.6"
-summary = "Email sending library"
-groups = ["default"]
-dependencies = [
-    "jinja2",
-]
-files = [
-    {file = "redmail-0.6.0-py3-none-any.whl", hash = "sha256:8e64a680ffc8aaf8054312bf8b216da8fed20669181b77b1f1ccbdf4ee064427"},
-    {file = "redmail-0.6.0.tar.gz", hash = "sha256:0447cbd76deb2788b2d831c12e22b513587e99f725071d9951a01b0f2b8d0a72"},
 ]
 
 [[package]]

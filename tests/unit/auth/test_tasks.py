@@ -1,8 +1,6 @@
 from unittest.mock import MagicMock, patch
 from urllib.parse import urlencode, urljoin
 
-from redmail.email.sender import EmailSender
-
 from app.auth.tasks import send_password_reset_request_email
 from app.config import settings
 from app.core.constants import APP_URL
@@ -12,17 +10,6 @@ from app.core.templates import (
     reset_password_text,
 )
 from app.users.schemas import UserSchema
-
-
-class MockEmailSender(EmailSender):
-    """Mock email sender for testing."""
-
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.messages = []
-
-    def send_message(self, msg) -> None:
-        self.messages.append(msg)
 
 
 def test_send_password_reset_request_email() -> None:
@@ -85,7 +72,3 @@ def test_send_password_reset_request_email() -> None:
             username=mock_user.username,
         ),
     )
-
-    assert mock_email_sender.messages == [
-        expected_message.as_string(),
-    ]

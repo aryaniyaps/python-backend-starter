@@ -1,8 +1,7 @@
 from urllib.parse import urlencode, urljoin
 
-from app.config import settings
 from app.core.constants import APP_URL
-from app.core.emails import email_sender
+from app.core.emails import mailer
 from app.core.templates import (
     reset_password_html,
     reset_password_subject,
@@ -33,22 +32,23 @@ def send_password_reset_request_email(
         )
     )
 
-    email_sender.send(
-        receivers=[receiver],
-        sender=settings.email_from,
+    message = mailer.new(
+        to=receiver,
         subject=reset_password_subject.render(
             username=username,
         ),
-        text=reset_password_text.render(
+        plain=reset_password_text.render(
             action_url=action_url,
             operating_system=operating_system,
             browser_name=browser_name,
             username=username,
         ),
-        html=reset_password_html.render(
+        rich=reset_password_html.render(
             action_url=action_url,
             operating_system=operating_system,
             browser_name=browser_name,
             username=username,
         ),
     )
+
+    mailer.send(message)

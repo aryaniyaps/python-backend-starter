@@ -19,7 +19,7 @@ dependencies = [
     "humanize>=4.9.0",
     "orjson>=3.9.10",
     "celery>=5.3.6",
-    "redmail>=0.6.0",
+    "marrow-mailer>=4.0.3",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
@@ -32,6 +32,11 @@ test = [
     "pytest-timeout>=2.2.0",
     "httpx>=0.26.0",
 ]
+
+[tool.pdm.scripts]
+start-server = "app/server.py"
+start-worker = "celery -A app.worker worker"
+test = "pytest -vv"
 
 [tool.setuptools.packages.find]
 where = ["."] # list of folders that contain the packages (["."] by default)

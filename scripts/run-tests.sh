@@ -1,2 +1,2 @@
 #!/bin/sh
-pdm run pytest -v
+pdm run test
