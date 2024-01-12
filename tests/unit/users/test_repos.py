@@ -1,10 +1,9 @@
 from uuid import uuid4
 
 import pytest
-from argon2 import PasswordHasher
-
 from app.users.models import User
 from app.users.repos import UserRepo
+from argon2 import PasswordHasher
 
 pytestmark = [pytest.mark.anyio]
 

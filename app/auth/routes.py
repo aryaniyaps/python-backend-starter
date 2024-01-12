@@ -76,7 +76,8 @@ async def login_user(
 ) -> dict[str, Any]:
     """Login the current user."""
     authentication_token, user = await auth_service.login_user(
-        login=data.login, password=data.password
+        login=data.login,
+        password=data.password,
     )
     return {
         "authentication_token": authentication_token,

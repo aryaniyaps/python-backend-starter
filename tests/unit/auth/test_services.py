@@ -3,16 +3,15 @@ from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
 import pytest
-from argon2 import PasswordHasher
-from argon2.exceptions import HashingError
-from user_agents.parsers import UserAgent
-
 from app.auth.models import PasswordResetToken
 from app.auth.repos import AuthRepo
 from app.auth.services import AuthService
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
 from app.users.models import User
 from app.users.repos import UserRepo
+from argon2 import PasswordHasher
+from argon2.exceptions import HashingError
+from user_agents.parsers import UserAgent
 
 pytestmark = [pytest.mark.anyio]
 
@@ -50,7 +49,8 @@ async def test_register_user_existing_email(auth_service: AuthService) -> None:
     """Ensure we cannot create an user with an existing email."""
     with patch.object(UserRepo, "get_user_by_email", return_value=MagicMock(spec=User)):
         with pytest.raises(
-            InvalidInputError, match="User with that email already exists."
+            InvalidInputError,
+            match="User with that email already exists.",
         ):
             await auth_service.register_user(
                 username="new_user",
@@ -67,7 +67,8 @@ async def test_register_user_existing_username(auth_service: AuthService) -> Non
         return_value=MagicMock(spec=User),
     ):
         with pytest.raises(
-            InvalidInputError, match="User with that username already exists."
+            InvalidInputError,
+            match="User with that username already exists.",
         ):
             await auth_service.register_user(
                 username="new_user",
@@ -96,7 +97,8 @@ async def test_register_user_hashing_error(auth_service: AuthService) -> None:
         return_value="fake_token",
     ):
         with pytest.raises(
-            UnexpectedError, match="Could not create user. Please try again."
+            UnexpectedError,
+            match="Could not create user. Please try again.",
         ):
             await auth_service.register_user(
                 username="new_user",
@@ -237,7 +239,7 @@ async def test_verify_authentication_token_valid_token(
     """Ensure we can verify a valid authentication token."""
     user_id = uuid4()
     with patch(
-        "app.auth.services.AuthRepo.get_user_id_from_authentication_token"
+        "app.auth.services.AuthRepo.get_user_id_from_authentication_token",
     ) as mock_get_user_id_from_token:
         mock_get_user_id_from_token.return_value = user_id
 
@@ -252,7 +254,7 @@ async def test_verify_authentication_token_invalid_token(
 ) -> None:
     """Ensure we cannot verify an invalid authentication token."""
     with patch(
-        "app.auth.services.AuthRepo.get_user_id_from_authentication_token"
+        "app.auth.services.AuthRepo.get_user_id_from_authentication_token",
     ) as mock_get_user_id_from_token:
         mock_get_user_id_from_token.return_value = None
 
@@ -265,7 +267,7 @@ async def test_remove_authentication_token(auth_service: AuthService) -> None:
     """Ensure we can remove an authentication token."""
     mock_user = MagicMock(spec=User, id=uuid4())
     with patch(
-        "app.auth.services.AuthRepo.remove_authentication_token"
+        "app.auth.services.AuthRepo.remove_authentication_token",
     ) as mock_remove_token:
         # Perform token removal
         await auth_service.remove_authentication_token(
@@ -300,7 +302,9 @@ async def test_send_password_reset_request_success(auth_service: AuthService) ->
         "get_user_by_email",
         return_value=mock_user,
     ), patch.object(
-        AuthRepo, "create_password_reset_token", return_value="reset_token"
+        AuthRepo,
+        "create_password_reset_token",
+        return_value="reset_token",
     ), patch(
         "app.auth.tasks.send_password_reset_request_email.delay",
         return_value=None,
@@ -330,9 +334,10 @@ async def test_send_password_reset_request_user_not_found(
     )
 
     with patch.object(UserRepo, "get_user_by_email", return_value=None), patch(
-        "app.auth.tasks.send_password_reset_request_email"
+        "app.auth.tasks.send_password_reset_request_email",
     ) as mock_send_email, patch.object(
-        AuthRepo, "create_password_reset_token"
+        AuthRepo,
+        "create_password_reset_token",
     ) as mock_create_password_reset_token:
         await auth_service.send_password_reset_request(
             email="nonexistent@example.com",
@@ -405,7 +410,8 @@ async def test_reset_password_invalid_token(auth_service: AuthService) -> None:
         return_value=None,
     ):
         with pytest.raises(
-            InvalidInputError, match="Invalid password reset token or email."
+            InvalidInputError,
+            match="Invalid password reset token or email.",
         ):
             await auth_service.reset_password(
                 email="user@example.com",
@@ -433,7 +439,8 @@ async def test_reset_password_expired_token(auth_service: AuthService) -> None:
         ),
     ):
         with pytest.raises(
-            InvalidInputError, match="Invalid password reset token or email."
+            InvalidInputError,
+            match="Invalid password reset token or email.",
         ):
             await auth_service.reset_password(
                 email="user@example.com",
@@ -466,7 +473,8 @@ async def test_reset_password_after_login(auth_service: AuthService) -> None:
         ),
     ):
         with pytest.raises(
-            InvalidInputError, match="Invalid password reset token or email."
+            InvalidInputError,
+            match="Invalid password reset token or email.",
         ):
             await auth_service.reset_password(
                 email="user@example.com",
@@ -480,7 +488,8 @@ async def test_reset_password_user_not_found(auth_service: AuthService) -> None:
 
     with patch.object(UserRepo, "get_user_by_email", return_value=None):
         with pytest.raises(
-            InvalidInputError, match="Invalid password reset token or email."
+            InvalidInputError,
+            match="Invalid password reset token or email.",
         ):
             await auth_service.reset_password(
                 email="nonexistent@example.com",

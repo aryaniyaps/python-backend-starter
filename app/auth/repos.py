@@ -75,7 +75,7 @@ class AuthRepo:
                 authentication_token_hash=self.hash_authentication_token(
                     authentication_token=authentication_token,
                 ),
-            )
+            ),
         )
         if user_id is not None:
             return UUID(bytes=user_id)
@@ -109,11 +109,11 @@ class AuthRepo:
         authentication_token_hashes = await self._redis_client.smembers(
             name=self.generate_token_owner_key(
                 user_id=user_id,
-            )
+            ),
         )  # type: ignore
         authentication_token_keys = [
             self.generate_authentication_token_key(
-                authentication_token_hash=authentication_token_hash
+                authentication_token_hash=authentication_token_hash,
             )
             for authentication_token_hash in authentication_token_hashes
         ]
@@ -143,7 +143,7 @@ class AuthRepo:
     ) -> str:
         """Create a new password reset token."""
         expires_at = text(
-            f"NOW() + INTERVAL '{PASSWORD_RESET_TOKEN_EXPIRES_IN} SECOND'"
+            f"NOW() + INTERVAL '{PASSWORD_RESET_TOKEN_EXPIRES_IN} SECOND'",
         )
 
         reset_token = self.generate_password_reset_token()
@@ -158,7 +158,7 @@ class AuthRepo:
                 token_hash=reset_token_hash,
                 expires_at=expires_at,
                 last_login_at=last_login_at,
-            )
+            ),
         )
         await self._session.commit()
         return reset_token

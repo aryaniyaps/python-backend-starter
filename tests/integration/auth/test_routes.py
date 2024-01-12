@@ -1,9 +1,8 @@
 import pytest
-from fastapi import status
-from httpx import AsyncClient
-
 from app.auth.repos import AuthRepo
 from app.users.schemas import UserSchema
+from fastapi import status
+from httpx import AsyncClient
 
 pytestmark = [pytest.mark.anyio]
 
@@ -22,7 +21,8 @@ async def test_register_success(test_client: AsyncClient) -> None:
 
 
 async def test_register_existing_email(
-    test_client: AsyncClient, user: UserSchema
+    test_client: AsyncClient,
+    user: UserSchema,
 ) -> None:
     """Ensure we cannot register an user with an existing email."""
     response = await test_client.post(
@@ -38,7 +38,8 @@ async def test_register_existing_email(
 
 
 async def test_register_existing_username(
-    test_client: AsyncClient, user: UserSchema
+    test_client: AsyncClient,
+    user: UserSchema,
 ) -> None:
     """Ensure we cannot register an user with an existing username."""
     response = await test_client.post(
@@ -54,7 +55,8 @@ async def test_register_existing_username(
 
 
 async def test_login_valid_credentials(
-    test_client: AsyncClient, user: UserSchema
+    test_client: AsyncClient,
+    user: UserSchema,
 ) -> None:
     """Ensure we can login a user with valid credentials."""
     response = await test_client.post(
@@ -84,7 +86,8 @@ async def test_login_invalid_credentials(
 
 
 async def test_login_password_mismatch(
-    test_client: AsyncClient, user: UserSchema
+    test_client: AsyncClient,
+    user: UserSchema,
 ) -> None:
     """Ensure we cannot login a user with the wrong password."""
     response = await test_client.post(
@@ -117,7 +120,8 @@ async def test_logout_unauthenticated_user(
 
 
 async def test_reset_password_request_success(
-    test_client: AsyncClient, user: UserSchema
+    test_client: AsyncClient,
+    user: UserSchema,
 ) -> None:
     """Ensure we can successfully send a password reset request."""
     response = await test_client.post(
@@ -147,7 +151,9 @@ async def test_reset_password_request_nonexistent_user(
 
 
 async def test_reset_password_success(
-    test_client: AsyncClient, user: UserSchema, auth_repo: AuthRepo
+    test_client: AsyncClient,
+    user: UserSchema,
+    auth_repo: AuthRepo,
 ) -> None:
     """Ensure we can successfully reset a user's password."""
     reset_token = await auth_repo.create_password_reset_token(

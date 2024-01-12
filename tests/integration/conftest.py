@@ -1,12 +1,12 @@
-from typing import Any, AsyncGenerator, Generator
+from collections.abc import AsyncGenerator, Generator
+from typing import Any
 
 import pytest
+from app import create_app
+from app.core.database import get_database_session
 from fastapi import FastAPI
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from app import create_app
-from app.core.database import get_database_session
 
 
 @pytest.fixture(scope="session")
@@ -38,7 +38,8 @@ async def test_client(app: FastAPI) -> AsyncGenerator[AsyncClient, None]:
 
 @pytest.fixture
 async def auth_test_client(
-    app: FastAPI, authentication_token: str
+    app: FastAPI,
+    authentication_token: str,
 ) -> AsyncGenerator[AsyncClient, None]:
     """Initialize an authenticated test client for testing."""
     async with AsyncClient(

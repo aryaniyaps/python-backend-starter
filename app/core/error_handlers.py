@@ -27,7 +27,8 @@ async def handle_validation_error(
 
 
 async def handle_http_exception(
-    _request: Request, exception: HTTPException
+    _request: Request,
+    exception: HTTPException,
 ) -> ORJSONResponse:
     """Handle HTTPExceptions."""
     return ORJSONResponse(

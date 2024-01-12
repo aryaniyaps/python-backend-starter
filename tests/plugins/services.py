@@ -1,10 +1,9 @@
 import pytest
-from argon2 import PasswordHasher
-
 from app.auth.repos import AuthRepo
 from app.auth.services import AuthService
 from app.users.repos import UserRepo
 from app.users.services import UserService
+from argon2 import PasswordHasher
 
 
 @pytest.fixture

@@ -1,6 +1,5 @@
 from datetime import UTC, datetime
 from hashlib import sha256
-from typing import Tuple
 from uuid import UUID
 
 from argon2 import PasswordHasher
@@ -30,7 +29,7 @@ class AuthService:
         email: str,
         username: str,
         password: str,
-    ) -> Tuple[str, User]:
+    ) -> tuple[str, User]:
         """Register a new user."""
         try:
             if (
@@ -62,11 +61,11 @@ class AuthService:
             ) from exception
 
         authentication_token = await self._auth_repo.create_authentication_token(
-            user_id=user.id
+            user_id=user.id,
         )
         return authentication_token, user
 
-    async def login_user(self, login: str, password: str) -> Tuple[str, User]:
+    async def login_user(self, login: str, password: str) -> tuple[str, User]:
         """
         Check the given credentials and return the
         relevant user if they are valid.
@@ -97,7 +96,7 @@ class AuthService:
 
         # create authentication token
         authentication_token = await self._auth_repo.create_authentication_token(
-            user_id=user.id
+            user_id=user.id,
         )
 
         if self._password_hasher.check_needs_rehash(
@@ -105,7 +104,9 @@ class AuthService:
         ):
             # update user's password hash and last login timestamp
             user = await self._user_repo.update_user(
-                user=user, password=password, update_last_login=True
+                user=user,
+                password=password,
+                update_last_login=True,
             )
         else:
             # update user's last login timestamp
@@ -173,27 +174,27 @@ class AuthService:
 
         existing_user = await self._user_repo.get_user_by_email(email=email)
         password_reset_token = await self._auth_repo.get_password_reset_token(
-            reset_token_hash=reset_token_hash
+            reset_token_hash=reset_token_hash,
         )
 
         if not (
             existing_user and password_reset_token and existing_user.email == email
         ):
             raise InvalidInputError(
-                message="Invalid password reset token or email provided."
+                message="Invalid password reset token or email provided.",
             )
 
         if datetime.now(UTC) > password_reset_token.expires_at:
             # password reset token has expired.
             raise InvalidInputError(
-                message="Invalid password reset token or email provided."
+                message="Invalid password reset token or email provided.",
             )
 
         if existing_user.last_login_at > password_reset_token.last_login_at:
             # If the user has logged in again after generating the password
             # reset token, the generated token becomes invalid.
             raise InvalidInputError(
-                message="Invalid password reset token or email provided."
+                message="Invalid password reset token or email provided.",
             )
 
         await self._user_repo.update_user(

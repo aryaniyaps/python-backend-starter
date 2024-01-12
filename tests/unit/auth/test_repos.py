@@ -2,12 +2,11 @@ from datetime import timedelta
 from hashlib import sha256
 
 import pytest
-from redis.asyncio import Redis
-
 from app.auth.models import PasswordResetToken
 from app.auth.repos import AuthRepo
 from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
 from app.users.models import User
+from redis.asyncio import Redis
 
 pytestmark = [pytest.mark.anyio]
 
@@ -20,7 +19,9 @@ async def test_create_authentication_token(user: User, auth_repo: AuthRepo) -> N
 
 
 async def test_get_user_id_from_authentication_token_valid(
-    user: User, authentication_token: str, auth_repo: AuthRepo
+    user: User,
+    authentication_token: str,
+    auth_repo: AuthRepo,
 ) -> None:
     """Ensure we can get the user ID from an authentication token."""
     # Perform token verification
@@ -40,7 +41,9 @@ async def test_get_user_id_from_authentication_token_invalid(
 
 
 async def test_remove_authentication_token(
-    user: User, auth_repo: AuthRepo, redis_client: Redis
+    user: User,
+    auth_repo: AuthRepo,
+    redis_client: Redis,
 ) -> None:
     """Ensure we can remove an authentication token."""
     token = await auth_repo.create_authentication_token(user_id=user.id)
@@ -61,7 +64,9 @@ async def test_remove_authentication_token(
 
 
 async def test_remove_all_authentication_tokens(
-    user: User, auth_repo: AuthRepo, redis_client: Redis
+    user: User,
+    auth_repo: AuthRepo,
+    redis_client: Redis,
 ) -> None:
     """Ensure all authentication tokens for a user are removed."""
     first_token = await auth_repo.create_authentication_token(user_id=user.id)

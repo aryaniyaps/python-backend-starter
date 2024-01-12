@@ -5,7 +5,8 @@ Revises:
 Create Date: 2024-01-12 13:01:17.198610
 
 """
-from typing import Sequence, Union
+from collections.abc import Sequence
+from typing import Union
 
 import sqlalchemy as sa
 from alembic import op
@@ -21,7 +22,10 @@ def upgrade() -> None:
     op.create_table(
         "users",
         sa.Column(
-            "id", sa.Uuid(), server_default=sa.text("gen_random_uuid()"), nullable=False
+            "id",
+            sa.Uuid(),
+            server_default=sa.text("gen_random_uuid()"),
+            nullable=False,
         ),
         sa.Column("username", sa.String(length=32), nullable=False),
         sa.Column("email", sa.String(length=250), nullable=False),
@@ -46,7 +50,10 @@ def upgrade() -> None:
     op.create_table(
         "password_reset_tokens",
         sa.Column(
-            "id", sa.Uuid(), server_default=sa.text("gen_random_uuid()"), nullable=False
+            "id",
+            sa.Uuid(),
+            server_default=sa.text("gen_random_uuid()"),
+            nullable=False,
         ),
         sa.Column("token_hash", sa.String(length=128), nullable=False),
         sa.Column("user_id", sa.Uuid(), nullable=False),
@@ -59,7 +66,9 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.ForeignKeyConstraint(
-            ["user_id"], ["users.id"], name=op.f("password_reset_tokens_user_id_fkey")
+            ["user_id"],
+            ["users.id"],
+            name=op.f("password_reset_tokens_user_id_fkey"),
         ),
         sa.PrimaryKeyConstraint("id", name=op.f("password_reset_tokens_pkey")),
     )
@@ -73,7 +82,8 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.drop_index(
-        op.f("password_reset_tokens_token_hash_idx"), table_name="password_reset_tokens"
+        op.f("password_reset_tokens_token_hash_idx"),
+        table_name="password_reset_tokens",
     )
     op.drop_table("password_reset_tokens")
     op.drop_index(op.f("users_username_idx"), table_name="users")

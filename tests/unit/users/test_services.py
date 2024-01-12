@@ -2,7 +2,6 @@ from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
 import pytest
-
 from app.core.errors import InvalidInputError, ResourceNotFoundError
 from app.users.models import User
 from app.users.repos import UserRepo
@@ -86,7 +85,8 @@ async def test_update_user_email_exists(user_service: UserService) -> None:
         ),
     ):
         with pytest.raises(
-            InvalidInputError, match="User with that email already exists."
+            InvalidInputError,
+            match="User with that email already exists.",
         ):
             await user_service.update_user(
                 user_id=user_id,
@@ -101,9 +101,12 @@ async def test_update_user_username_exists(user_service: UserService) -> None:
     existing_user = MagicMock(spec=User, id=user_id)
     with patch.object(UserService, "get_user_by_id", return_value=existing_user):
         with patch.object(
-            UserRepo, "get_user_by_username", return_value=MagicMock()
+            UserRepo,
+            "get_user_by_username",
+            return_value=MagicMock(),
         ), pytest.raises(
-            InvalidInputError, match="User with that username already exists."
+            InvalidInputError,
+            match="User with that username already exists.",
         ):
             await user_service.update_user(
                 user_id=user_id,

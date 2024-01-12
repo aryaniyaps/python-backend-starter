@@ -10,7 +10,7 @@ def create_worker() -> Celery:
         {
             "broker_url": str(settings.celery_broker_url),
             "imports": ("app.auth.tasks",),
-        }
+        },
     )
 
     return celery

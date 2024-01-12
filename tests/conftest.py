@@ -1,8 +1,14 @@
-from typing import AsyncGenerator, AsyncIterator, Iterator
+from collections.abc import AsyncGenerator, AsyncIterator, Iterator
 
 import pytest
 from alembic import command
 from alembic.config import Config
+from app.auth.repos import AuthRepo
+from app.config import settings
+from app.core.redis_client import get_redis_client
+from app.core.security import get_password_hasher
+from app.users.models import User
+from app.users.repos import UserRepo
 from argon2 import PasswordHasher
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import (
@@ -11,13 +17,6 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
-
-from app.auth.repos import AuthRepo
-from app.config import settings
-from app.core.redis_client import get_redis_client
-from app.core.security import get_password_hasher
-from app.users.models import User
-from app.users.repos import UserRepo
 
 pytest_plugins = [
     "anyio",

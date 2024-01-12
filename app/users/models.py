@@ -1,6 +1,5 @@
 import typing
 from datetime import datetime
-from typing import List
 from uuid import UUID
 
 from sqlalchemy import String, text
@@ -51,8 +50,9 @@ class User(Base):
         onupdate=now(),
     )
 
-    password_reset_tokens: Mapped[List["PasswordResetToken"]] = relationship(
-        back_populates="user", cascade="all, delete-orphan"
+    password_reset_tokens: Mapped[list["PasswordResetToken"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
     )
 
     __mapper_args__ = {"eager_defaults": True}

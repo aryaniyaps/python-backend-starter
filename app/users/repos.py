@@ -3,7 +3,6 @@ from uuid import UUID
 from argon2 import PasswordHasher
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.sql.functions import now
 
 from app.users.models import User
 

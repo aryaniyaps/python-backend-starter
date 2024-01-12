@@ -29,7 +29,7 @@ def send_password_reset_request_email(
             {
                 "email": receiver,
                 "reset_token": password_reset_token,
-            }
+            },
         )
     )
 

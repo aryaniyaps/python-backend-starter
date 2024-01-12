@@ -99,7 +99,7 @@ def create_app() -> FastAPI:
             status.HTTP_422_UNPROCESSABLE_ENTITY: {
                 "model": ValidationErrorResult,
                 "description": "Validation Error",
-            }
+            },
         },
         contact={
             "email": SUPPORT_EMAIL,

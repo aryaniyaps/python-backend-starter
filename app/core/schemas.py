@@ -1,4 +1,4 @@
-from typing import Annotated, List
+from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -19,7 +19,7 @@ class BaseSchema(BaseModel):
 
 class ValidationError(BaseSchema):
     loc: Annotated[
-        List[str] | None,
+        list[str] | None,
         Field(
             default=None,
             description="The location of the validation error.",
@@ -52,7 +52,7 @@ class ValidationErrorResult(BaseSchema):
         ),
     ]
     errors: Annotated[
-        List[ValidationError],
+        list[ValidationError],
         Field(
             description="A list of validation errors.",
         ),

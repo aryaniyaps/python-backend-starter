@@ -1,8 +1,6 @@
 from unittest.mock import MagicMock, patch
 from urllib.parse import urlencode, urljoin
 
-from redmail.email.sender import EmailSender
-
 from app.auth.tasks import send_password_reset_request_email
 from app.config import settings
 from app.core.constants import APP_URL
@@ -12,6 +10,7 @@ from app.core.templates import (
     reset_password_text,
 )
 from app.users.schemas import UserSchema
+from redmail.email.sender import EmailSender
 
 
 def test_send_password_reset_request_email() -> None:
@@ -52,7 +51,7 @@ def test_send_password_reset_request_email() -> None:
             {
                 "email": mock_user.email,
                 "reset_token": password_reset_token,
-            }
+            },
         )
     )
 

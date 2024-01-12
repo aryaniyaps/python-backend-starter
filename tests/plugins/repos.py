@@ -1,10 +1,9 @@
 import pytest
+from app.auth.repos import AuthRepo
+from app.users.repos import UserRepo
 from argon2 import PasswordHasher
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.auth.repos import AuthRepo
-from app.users.repos import UserRepo
 
 
 @pytest.fixture

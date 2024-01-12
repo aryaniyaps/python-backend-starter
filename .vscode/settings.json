@@ -6,7 +6,6 @@
       "source.organizeImports": "explicit"
     }
   },
-  "isort.args":["--profile", "black"],
   "python.analysis.autoImportCompletions": true,
   "python.analysis.typeCheckingMode": "basic",
   "python.analysis.autoFormatStrings": true,

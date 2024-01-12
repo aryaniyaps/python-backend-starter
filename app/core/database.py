@@ -1,5 +1,5 @@
+from collections.abc import AsyncGenerator
 from datetime import datetime
-from typing import AsyncGenerator
 
 from sqlalchemy import DateTime, MetaData
 from sqlalchemy.ext.asyncio import (
@@ -32,7 +32,7 @@ database_metadata = MetaData(
         "ck": "%(table_name)s_%(constraint_name)s_check",
         "fk": "%(table_name)s_%(column_0_name)s_fkey",
         "pk": "%(table_name)s_pkey",
-    }
+    },
 )
 
 
