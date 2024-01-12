@@ -86,7 +86,7 @@ async def test_update_user_last_login_at(
         update_last_login=True,
     )
 
-    # FIXME: this assertion fails
+    # FIXME: this assertion fails (last_login_at is not updated)
     print("FINAL LAST LOGIN AT: ", updated_user.last_login_at)
     assert updated_user.last_login_at > initial_last_login_at
     assert updated_user.updated_at is not None

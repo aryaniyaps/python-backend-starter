@@ -25,30 +25,25 @@ class User(Base):
 
     username: Mapped[str] = mapped_column(
         String(32),
-        nullable=False,
         unique=True,
         index=True,
     )
 
     email: Mapped[str] = mapped_column(
         String(250),
-        nullable=False,
         unique=True,
         index=True,
     )
 
     password_hash: Mapped[str] = mapped_column(
         String(128),
-        nullable=False,
     )
 
     last_login_at: Mapped[datetime] = mapped_column(
         server_default=now(),
-        nullable=False,
     )
 
     created_at: Mapped[datetime] = mapped_column(
-        nullable=False,
         server_default=now(),
     )
 

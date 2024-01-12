@@ -1,17 +1,18 @@
 """initial migration
 
-Revision ID: 0e35c3f00d03
+Revision ID: a41c3d075424
 Revises:
-Create Date: 2024-01-12 07:09:54.228859
+Create Date: 2024-01-12 09:40:24.343263
 
 """
 from typing import Sequence, Union
 
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = "0e35c3f00d03"
+revision: str = "a41c3d075424"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -28,17 +29,17 @@ def upgrade() -> None:
         sa.Column("password_hash", sa.String(length=128), nullable=False),
         sa.Column(
             "last_login_at",
-            sa.TIMESTAMP(timezone=True),
+            postgresql.TIMESTAMP(timezone=True),
             server_default=sa.text("now()"),
             nullable=False,
         ),
         sa.Column(
             "created_at",
-            sa.TIMESTAMP(timezone=True),
+            postgresql.TIMESTAMP(timezone=True),
             server_default=sa.text("now()"),
             nullable=False,
         ),
-        sa.Column("updated_at", sa.TIMESTAMP(timezone=True), nullable=True),
+        sa.Column("updated_at", postgresql.TIMESTAMP(timezone=True), nullable=True),
         sa.PrimaryKeyConstraint("id", name=op.f("users_pkey")),
     )
     op.create_index(op.f("users_email_idx"), "users", ["email"], unique=True)
@@ -50,11 +51,11 @@ def upgrade() -> None:
         ),
         sa.Column("token_hash", sa.String(length=128), nullable=False),
         sa.Column("user_id", sa.UUID(), nullable=False),
-        sa.Column("expires_at", sa.TIMESTAMP(timezone=True), nullable=False),
-        sa.Column("last_login_at", sa.TIMESTAMP(timezone=True), nullable=False),
+        sa.Column("expires_at", postgresql.TIMESTAMP(timezone=True), nullable=False),
+        sa.Column("last_login_at", postgresql.TIMESTAMP(timezone=True), nullable=False),
         sa.Column(
             "created_at",
-            sa.TIMESTAMP(timezone=True),
+            postgresql.TIMESTAMP(timezone=True),
             server_default=sa.text("now()"),
             nullable=False,
         ),

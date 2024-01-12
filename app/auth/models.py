@@ -24,26 +24,19 @@ class PasswordResetToken(Base):
 
     token_hash: Mapped[str] = mapped_column(
         String(128),
-        nullable=False,
         unique=True,
         index=True,
     )
 
     user_id: Mapped[UUID] = mapped_column(
         ForeignKey("users.id"),
-        nullable=False,
     )
 
-    expires_at: Mapped[datetime] = mapped_column(
-        nullable=False,
-    )
+    expires_at: Mapped[datetime]
 
-    last_login_at: Mapped[datetime] = mapped_column(
-        nullable=False,
-    )
+    last_login_at: Mapped[datetime]
 
     created_at: Mapped[datetime] = mapped_column(
-        nullable=False,
         server_default=now(),
     )
 
