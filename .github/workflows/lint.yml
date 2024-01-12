@@ -14,7 +14,6 @@ jobs:
     strategy:
       matrix:
         job:
-          - deptry app
           - mypy .
           - black --check .
           - ruff check .

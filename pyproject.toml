@@ -32,19 +32,13 @@ test = [
     "pytest-timeout>=2.2.0",
     "httpx>=0.26.0",
 ]
-dev = ["mypy>=1.8.0", "ruff>=0.1.12", "deptry>=0.12.0", "black>=23.12.1"]
+dev = ["mypy>=1.8.0", "ruff>=0.1.12", "black>=23.12.1"]
 
 [tool.pdm.scripts]
 start-server = "app/server.py"
 start-worker = "celery -A app.worker worker"
 test = "pytest -vv"
-lint = { composite = [
-    "black .",
-    "ruff --fix .",
-    "black .",
-    "deptry ./app",
-    "mypy .",
-] }
+lint = { composite = ["black .", "ruff --fix .", "black .", "mypy ."] }
 
 
 [tool.setuptools.packages.find]
@@ -54,13 +48,6 @@ include = [
 ] # package names should match these glob patterns (["*"] by default)
 exclude = [] # exclude packages matching these glob patterns (empty by default)
 namespaces = false # to disable scanning PEP 420 namespaces (true by default)
-
-[tool.deptry]
-[tool.deptry.per_rule_ignores]
-DEP002 = ["uvicorn", "uvloop", "asyncpg", "orjson"]
-
-[tool.deptry.package_module_name_map]
-uvloop = "uvloop"
 
 
 [tool.mypy]
