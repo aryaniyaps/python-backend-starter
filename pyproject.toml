@@ -112,7 +112,12 @@ mark-parentheses = false
 max-complexity = 6
 
 [tool.ruff.flake8-bugbear]
-extend-immutable-calls = []
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.params.Depends",
+    "fastapi.Query",
+    "fastapi.params.Query",
+]
 
 [tool.ruff.pep8-naming]
 classmethod-decorators = ["classmethod"]
