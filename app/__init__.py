@@ -56,6 +56,7 @@ def add_error_handlers(app: FastAPI) -> None:
         RequestValidationError,
         handler=handle_validation_error,  # type: ignore
     )
+
     app.add_exception_handler(
         HTTPException,
         handler=handle_http_exception,  # type: ignore
