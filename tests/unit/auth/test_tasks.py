@@ -12,7 +12,6 @@ from app.core.templates import (
     reset_password_text,
 )
 from app.users.schemas import UserSchema
-from tests.unit.mock_smtp import MockSMTP
 
 
 def test_send_password_reset_request_email() -> None:
@@ -26,13 +25,6 @@ def test_send_password_reset_request_email() -> None:
     password_reset_token = "fake_token"
     operating_system = "Windows"
     browser_name = "Chrome"
-
-    mock_email_sender = EmailSender(
-        host=settings.email_host,
-        port=settings.email_port,
-        use_starttls=False,
-        cls_smtp=MockSMTP,  # type: ignore
-    )
 
     mock_email_sender = MagicMock(
         spec=EmailSender,
