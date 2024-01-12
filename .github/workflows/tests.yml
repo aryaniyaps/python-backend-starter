@@ -12,18 +12,18 @@ jobs:
   tests:
     runs-on: ubuntu-20.04
     env:
-      DEBUG: true
-      DATABASE_URL: "postgresql+asyncpg://user:pass@localhost:5432/starter"
-      DATABASE_POOL_SIZE: 20
-      OPENAPI_URL:
-      CORS_ALLOW_ORIGINS:
-      REDIS_URL: "redis://:pass@localhost:6379/1"
-      CELERY_BROKER_URL: "redis://:pass@localhost:6379/1"
-      EMAIL_HOST: "localhost"
-      EMAIL_PORT: 1025
-      EMAIL_USERNAME:
-      EMAIL_PASSWORD:
-      EMAIL_FROM: "noreply@example.com"
+      SERVER_DEBUG: true
+      SERVER_DATABASE_URL: "postgresql+asyncpg://user:pass@localhost:5432/starter"
+      SERVER_DATABASE_POOL_SIZE: 20
+      SERVER_OPENAPI_URL:
+      SERVER_CORS_ALLOW_ORIGINS:
+      SERVER_REDIS_URL: "redis://:pass@localhost:6379/1"
+      SERVER_CELERY_BROKER_URL: "redis://:pass@localhost:6379/1"
+      SERVER_EMAIL_HOST: "localhost"
+      SERVER_EMAIL_PORT: 1025
+      SERVER_EMAIL_USERNAME:
+      SERVER_SERVER_EMAIL_PASSWORD:
+      SERVER_EMAIL_FROM: "noreply@example.com"
 
 
     services:
