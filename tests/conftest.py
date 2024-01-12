@@ -27,14 +27,13 @@ pytest_plugins = [
 
 @pytest.fixture(scope="session")
 def anyio_backend() -> str:
-    """Get the anyio backend"""
+    """Get the anyio backend."""
     return "asyncio"
 
 
 @pytest.fixture(scope="session", autouse=True)
-def setup_test_database() -> Iterator[None]:
+def _setup_test_database() -> Iterator[None]:
     """Set up the test database."""
-
     alembic_cfg = Config("alembic.ini")
 
     # apply migrations to the test database

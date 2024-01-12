@@ -79,6 +79,7 @@ class AuthRepo:
         )
         if user_id is not None:
             return UUID(bytes=user_id)
+        return None
 
     async def remove_authentication_token(
         self,

@@ -1,9 +1,10 @@
+from typing import Any
 from uuid import uuid4
 
-from fastapi import Request
+from fastapi import Request, Response
 
 
-async def set_request_id(request: Request, call_next):
+async def set_request_id(request: Request, call_next: Any) -> Response:
     """Set a unique ID for each request."""
     # Generate a unique request ID
     request_id = uuid4()

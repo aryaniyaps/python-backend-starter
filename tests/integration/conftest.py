@@ -16,11 +16,11 @@ def app() -> FastAPI:
 
 
 @pytest.fixture(autouse=True)
-def setup_dependency_overrides(
+def _setup_dependency_overrides(
     app: FastAPI,
     test_database_session: AsyncSession,
 ) -> None:
-    """Setup dependency overrides for the application."""
+    """Set up dependency overrides for the application."""
 
     def get_test_database_session() -> Generator[AsyncSession, Any, None]:
         """Get the test database session."""

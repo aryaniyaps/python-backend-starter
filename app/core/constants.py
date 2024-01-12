@@ -17,10 +17,7 @@ PASSWORD_RESET_TOKEN_EXPIRES_IN = 300  # 5 minutes
 
 
 class OpenAPITag(Enum):
-    """
-    Enumeration representing tags used for
-    OpenAPI path operations.
-    """
+    """Enumeration representing tags used for OpenAPI path operations."""
 
     USERS = "users"
     AUTHENTICATION = "authentication"

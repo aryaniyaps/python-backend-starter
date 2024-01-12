@@ -19,8 +19,7 @@ def send_password_reset_request_email(
     operating_system: str,
     browser_name: str,
 ) -> None:
-    """Sends a password reset request email to the given user."""
-
+    """Send a password reset request email to the given user."""
     # point action URL to a frontend page
     action_url = (
         urljoin(APP_URL, "/auth/reset-password")

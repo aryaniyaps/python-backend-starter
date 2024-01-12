@@ -35,7 +35,7 @@ async def test_get_user_id_from_authentication_token_valid(
 async def test_get_user_id_from_authentication_token_invalid(
     auth_repo: AuthRepo,
 ) -> None:
-    """Ensure we don't get an user ID from an invalid token"""
+    """Ensure we don't get an user ID from an invalid token."""
     user_id = await auth_repo.get_user_id_from_authentication_token("invalid_token")
     assert user_id is None
 
@@ -118,7 +118,6 @@ def test_hash_password_reset_token() -> None:
 
 async def test_create_password_reset_token(user: User, auth_repo: AuthRepo) -> None:
     """Ensure a password reset token is created."""
-
     reset_token = await auth_repo.create_password_reset_token(
         user_id=user.id,
         last_login_at=user.last_login_at,
@@ -153,7 +152,6 @@ async def test_get_password_reset_token(user: User, auth_repo: AuthRepo) -> None
 
 async def test_get_password_reset_token_not_found(auth_repo: AuthRepo) -> None:
     """Ensure getting a non-existent password reset token returns None."""
-
     reset_token = await auth_repo.get_password_reset_token(
         reset_token_hash="nonexistent_token",
     )

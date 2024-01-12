@@ -66,10 +66,7 @@ class AuthService:
         return authentication_token, user
 
     async def login_user(self, login: str, password: str) -> tuple[str, User]:
-        """
-        Check the given credentials and return the
-        relevant user if they are valid.
-        """
+        """Check the given credentials and return the relevant user if they are valid."""
         if "@" in login:
             # if "@" is present, assume it's an email
             user = await self._user_repo.get_user_by_email(
@@ -118,10 +115,7 @@ class AuthService:
         return authentication_token, user
 
     async def verify_authentication_token(self, authentication_token: str) -> UUID:
-        """
-        Verify the given authentication token and
-        return the corresponding user ID.
-        """
+        """Verify the given authentication token and return the corresponding user ID."""
         user_id = await self._auth_repo.get_user_id_from_authentication_token(
             authentication_token=authentication_token,
         )
