@@ -77,6 +77,7 @@ async def test_database_engine() -> AsyncIterator[AsyncEngine]:
         echo=True,
         pool_use_lifo=True,
         pool_pre_ping=True,
+        isolation_level="READ COMMITTED",
     )
     yield engine
     await engine.dispose()
