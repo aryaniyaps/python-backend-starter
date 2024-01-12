@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from pydantic import AnyUrl, Field, PostgresDsn, RedisDsn, UrlConstraints
+from pydantic import Field, PostgresDsn, RedisDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 

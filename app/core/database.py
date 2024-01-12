@@ -1,10 +1,7 @@
 from datetime import datetime
 from typing import AsyncGenerator
-from uuid import UUID
 
-from sqlalchemy import MetaData
-from sqlalchemy.dialects.postgresql import TIMESTAMP
-from sqlalchemy.dialects.postgresql import UUID as UUIDColumn
+from sqlalchemy import DateTime, MetaData
 from sqlalchemy.ext.asyncio import (
     AsyncAttrs,
     AsyncSession,
@@ -44,11 +41,8 @@ class Base(AsyncAttrs, DeclarativeBase):
 
     registry = registry(
         type_annotation_map={
-            datetime: TIMESTAMP(
+            datetime: DateTime(
                 timezone=True,
-            ),
-            UUID: UUIDColumn(
-                as_uuid=True,
             ),
         },
     )
