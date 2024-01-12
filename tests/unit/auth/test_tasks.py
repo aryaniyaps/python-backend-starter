@@ -34,6 +34,13 @@ def test_send_password_reset_request_email() -> None:
         cls_smtp=MockSMTP,  # type: ignore
     )
 
+    mock_email_sender = MagicMock(
+        spec=EmailSender,
+        send=MagicMock(
+            return_value=None,
+        ),
+    )
+
     with patch(
         "app.auth.tasks.email_sender",
         mock_email_sender,
@@ -57,33 +64,22 @@ def test_send_password_reset_request_email() -> None:
         )
     )
 
-    last_message = next(iter(MockSMTP.messages))
-
-    subject = last_message.get("Subject")
-
-    html_body = None
-    text_body = None
-
-    for part in last_message.walk():
-        if part.get_content_type() == "text/plain":
-            text_body = part.get_payload()
-        elif part.get_content_type() == "text/html":
-            html_body = part.get_payload()
-
-    assert subject == reset_password_subject.render(
-        username=mock_user.username,
-    )
-
-    assert html_body == reset_password_html.render(
-        action_url=action_url,
-        operating_system=operating_system,
-        browser_name=browser_name,
-        username=mock_user.username,
-    )
-
-    assert text_body == reset_password_text.render(
-        action_url=action_url,
-        operating_system=operating_system,
-        browser_name=browser_name,
-        username=mock_user.username,
+    mock_email_sender.send.assert_called_with(
+        sender=settings.email_from,
+        receivers=[mock_user.email],
+        subject=reset_password_subject.render(
+            username=mock_user.username,
+        ),
+        text=reset_password_text.render(
+            action_url=action_url,
+            operating_system=operating_system,
+            browser_name=browser_name,
+            username=mock_user.username,
+        ),
+        html=reset_password_html.render(
+            action_url=action_url,
+            operating_system=operating_system,
+            browser_name=browser_name,
+            username=mock_user.username,
+        ),
     )

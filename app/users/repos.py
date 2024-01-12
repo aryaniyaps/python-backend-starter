@@ -1,9 +1,9 @@
-from datetime import UTC, datetime
 from uuid import UUID
 
 from argon2 import PasswordHasher
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.functions import now
 
 from app.users.models import User
 
@@ -60,9 +60,10 @@ class UserRepo:
                 password=password,
             )
         if update_last_login:
-            user.last_login_at = datetime.now(UTC)
+            user.last_login_at = now()
 
-        self._session.add(user)
+        # self._session.add(user)
+        await self._session.flush()
         await self._session.commit()
         return user
 

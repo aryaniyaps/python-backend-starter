@@ -1,3 +1,5 @@
+from datetime import UTC, datetime
+from imp import init_builtin
 from uuid import uuid4
 
 import pytest
@@ -79,6 +81,7 @@ async def test_update_user_last_login_at(
 ) -> None:
     """Ensure we can update a user's last login timestamp."""
     initial_last_login = user.last_login_at
+
     updated_user = await user_repo.update_user(
         user=user,
         update_last_login=True,

@@ -74,6 +74,9 @@ async def test_database_engine() -> AsyncIterator[AsyncEngine]:
     """Get the test database engine."""
     engine = create_async_engine(
         url=str(settings.database_url),
+        echo=True,
+        pool_use_lifo=True,
+        pool_pre_ping=True,
     )
     yield engine
     await engine.dispose()
@@ -85,7 +88,6 @@ def test_sessionmaker(
 ) -> async_sessionmaker[AsyncSession]:
     """Get the test session maker."""
     return async_sessionmaker(
-        autocommit=False,
         autoflush=False,
         expire_on_commit=False,
         bind=test_database_engine,

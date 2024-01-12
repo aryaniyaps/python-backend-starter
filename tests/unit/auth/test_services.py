@@ -279,44 +279,44 @@ async def test_remove_authentication_token(auth_service: AuthService) -> None:
     )
 
 
-# async def test_send_password_reset_request_success(auth_service: AuthService) -> None:
-#     """Ensure we can send a password reset request successfully."""
-#     user_agent = MagicMock(
-#         spec=UserAgent,
-#         get_os=MagicMock(return_value="Windows"),
-#         get_browser=MagicMock(return_value="Chrome"),
-#     )
+async def test_send_password_reset_request_success(auth_service: AuthService) -> None:
+    """Ensure we can send a password reset request successfully."""
+    user_agent = MagicMock(
+        spec=UserAgent,
+        get_os=MagicMock(return_value="Windows"),
+        get_browser=MagicMock(return_value="Chrome"),
+    )
 
-#     mock_user = MagicMock(
-#         spec=User,
-#         id=uuid4(),
-#         email="user@example.com",
-#         username="username",
-#         last_login_at=datetime.now(UTC),
-#     )
+    mock_user = MagicMock(
+        spec=User,
+        id=uuid4(),
+        email="user@example.com",
+        username="username",
+        last_login_at=datetime.now(UTC),
+    )
 
-#     with patch.object(
-#         UserRepo,
-#         "get_user_by_email",
-#         return_value=mock_user,
-#     ), patch.object(
-#         AuthRepo, "create_password_reset_token", return_value="reset_token"
-#     ), patch(
-#         "app.auth.tasks.send_password_reset_request_email.delay",
-#         return_value=None,
-#     ) as mock_send_email:
-#         await auth_service.send_password_reset_request(
-#             email=mock_user.email,
-#             user_agent=user_agent,
-#         )
+    with patch.object(
+        UserRepo,
+        "get_user_by_email",
+        return_value=mock_user,
+    ), patch.object(
+        AuthRepo, "create_password_reset_token", return_value="reset_token"
+    ), patch(
+        "app.auth.tasks.send_password_reset_request_email.delay",
+        return_value=None,
+    ) as mock_send_email:
+        await auth_service.send_password_reset_request(
+            email=mock_user.email,
+            user_agent=user_agent,
+        )
 
-#     mock_send_email.assert_called_once_with(
-#         to=mock_user.email,
-#         username=mock_user.username,
-#         password_reset_token="reset_token",
-#         operating_system=user_agent.get_os(),
-#         browser_name=user_agent.get_browser(),
-#     )
+    mock_send_email.assert_called_once_with(
+        receiver=mock_user.email,
+        username=mock_user.username,
+        password_reset_token="reset_token",
+        operating_system=user_agent.get_os(),
+        browser_name=user_agent.get_browser(),
+    )
 
 
 async def test_send_password_reset_request_user_not_found(
