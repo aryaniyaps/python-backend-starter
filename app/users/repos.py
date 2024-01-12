@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from argon2 import PasswordHasher
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.functions import now
 
@@ -60,8 +60,8 @@ class UserRepo:
                 password=password,
             )
         if update_last_login:
-            print("UPDATING LAST LOGIN AT")
-            user.last_login_at = now()
+            # user.last_login_at = now()
+            user.last_login_at = text("statement_timestamp()")
 
         self._session.add(user)
         await self._session.commit()

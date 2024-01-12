@@ -1,4 +1,3 @@
-import asyncio
 from uuid import uuid4
 
 import pytest
@@ -80,14 +79,19 @@ async def test_update_user_last_login_at(
 ) -> None:
     """Ensure we can update a user's last login timestamp."""
     initial_last_login_at = user.last_login_at
-    print("INITIAL LAST LOGIN AT: ", initial_last_login_at)
     updated_user = await user_repo.update_user(
         user=user,
         update_last_login=True,
     )
 
-    # FIXME: this assertion fails (last_login_at is not updated)
-    print("FINAL LAST LOGIN AT: ", updated_user.last_login_at)
+    # THIS TEST CASE IS FAILING BECAUSE THE USER FIXTURE CREATE STATEMENT AND
+    # THE UPDATE STATEMENT ARE EXECUTED WITHIN THE SAME TRANSACTION. THEREFORE
+    # NOW() RETURNS THE SAME TIMESTAMP
+    # FOR A DIFFERENT TIMESTAMP WE MUST USE `clock_timestamp()` OR `statement_timestamp()`
+    # GIVEN BY POSTGRESQL
+
+    # ALTERNATIVELY, WE CAN CREATE THE USER IN A DIFFERENT TRANSACTION ITSELF
+    # THIS MIMICKS THE REAL LIFE SCENARIO MORE CORRECTLY
     assert updated_user.last_login_at > initial_last_login_at
     assert updated_user.updated_at is not None
 
