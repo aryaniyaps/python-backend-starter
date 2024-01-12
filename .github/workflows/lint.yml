@@ -16,7 +16,7 @@ jobs:
         job:
           - mypy .
           - black --check .
-          - ruff check .
+          - ruff check --output-format=github .
 
     steps:
       - uses: actions/checkout@v3
