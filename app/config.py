@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Sequence
 
 from pydantic import Field, PostgresDsn, RedisDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -13,9 +13,8 @@ class Settings(BaseSettings):
             examples=[
                 "127.0.0.1",
             ],
-            default="127.0.0.1",
         ),
-    ]
+    ] = "127.0.0.1"
 
     port: Annotated[
         int,
@@ -23,9 +22,8 @@ class Settings(BaseSettings):
             examples=[
                 8000,
             ],
-            default=8000,
         ),
-    ]
+    ] = 8000
 
     openapi_url: str | None = "/openapi.json"
 
@@ -46,10 +44,9 @@ class Settings(BaseSettings):
             examples=[
                 20,
             ],
-            default=20,
             gt=0,
         ),
-    ]
+    ] = 20
 
     redis_url: Annotated[
         RedisDsn,
@@ -70,27 +67,24 @@ class Settings(BaseSettings):
     ]
 
     cors_allow_origins: Annotated[
-        set[str] | str,
+        Sequence[str],
         Field(
             examples=[
                 {
                     "example.com",
                 },
-                "*",
             ],
-            default="*",
         ),
-    ]
+    ] = ("*",)
 
     email_port: Annotated[
         int,
         Field(
-            default=587,
             examples=[
                 587,
             ],
         ),
-    ]
+    ] = 587
 
     email_host: Annotated[
         str,
