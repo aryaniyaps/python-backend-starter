@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 @pytest.fixture
 def auth_repo(
     test_database_session: AsyncSession,
-    redis_client: Redis[bytes],
+    redis_client: Redis,
 ) -> AuthRepo:
     """Get the authentication repository."""
     return AuthRepo(

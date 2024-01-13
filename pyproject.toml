@@ -31,12 +31,12 @@ test = [
     "anyio>=4.2.0",
     "pytest-timeout>=2.2.0",
     "httpx>=0.26.0",
+    "pytest-sugar>=0.9.7",
 ]
 dev = [
     "mypy>=1.8.0",
     "ruff>=0.1.12",
     "black>=23.12.1",
-    "types-redis>=4.6.0.20240106",
 ]
 
 [tool.pdm.scripts]
@@ -84,17 +84,18 @@ init_typed = true
 src = ["app", "tests"]
 fixable = ["F", "E", "W", "I", "COM", "UP", "RUF"]
 unfixable = [
-    "F841", # Variable  is assigned to but never used
+    "F841", # variable  is assigned to but never used
 ]
 select = ["ALL"]
 ignore = [
-    "E501",   # Line Length
+    "E501",    # line length
     "ANN101",
     "ANN102",
-    "D10",    # Disable mandatory docstrings
-    "D203",   # one-blank-line-before-class
-    "D212",   # multi-line-summary-first-line
-    "PD",     # pandas-vet
+    "D10",     # disable mandatory docstrings
+    "D203",    # one-blank-line-before-class
+    "D212",    # multi-line-summary-first-line
+    "PD",      # pandas-vet
+    "PLR0913", # too many arguments
     "TCH001",
     "TCH002",
     "TCH003",

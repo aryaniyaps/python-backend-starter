@@ -110,7 +110,7 @@ async def test_database_session(
 
 
 @pytest.fixture
-def redis_client() -> Redis[bytes]:
+def redis_client() -> Redis:
     """Get the redis client."""
     return get_redis_client()
 

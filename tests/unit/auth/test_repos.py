@@ -43,7 +43,7 @@ async def test_get_user_id_from_authentication_token_invalid(
 async def test_remove_authentication_token(
     user: User,
     auth_repo: AuthRepo,
-    redis_client: Redis[bytes],
+    redis_client: Redis,
 ) -> None:
     """Ensure we can remove an authentication token."""
     token = await auth_repo.create_authentication_token(user_id=user.id)
@@ -66,7 +66,7 @@ async def test_remove_authentication_token(
 async def test_remove_all_authentication_tokens(
     user: User,
     auth_repo: AuthRepo,
-    redis_client: Redis[bytes],
+    redis_client: Redis,
 ) -> None:
     """Ensure all authentication tokens for a user are removed."""
     first_token = await auth_repo.create_authentication_token(user_id=user.id)

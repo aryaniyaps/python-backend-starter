@@ -60,8 +60,8 @@ class UserRepo:
                 password=password,
             )
         if update_last_login:
-            # TODO(aryaniyaps): set the last_login_at timestamp to now()
-            # after transactions have been isolated for test cases (user.last_login_at = now())
+            # we use `statement_timestamp()` here instead of `now()`
+            # to set the current datetime even inside a transaction.
             user.last_login_at = text("statement_timestamp()")
 
         self._session.add(user)

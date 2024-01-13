@@ -15,7 +15,7 @@ class AuthRepo:
     def __init__(
         self,
         session: AsyncSession,
-        redis_client: Redis[bytes],
+        redis_client: Redis,
     ) -> None:
         self._session = session
         self._redis_client = redis_client
