@@ -14,7 +14,7 @@ async def test_register_success(test_client: AsyncClient) -> None:
         json={
             "username": "user",
             "email": "user@example.com",
-            "password": "password",
+            "password": "Password12!",
         },
     )
     assert response.status_code == status.HTTP_201_CREATED
@@ -30,7 +30,7 @@ async def test_register_existing_email(
         json={
             "username": "user",
             "email": user.email,
-            "password": "password",
+            "password": "Password12!",
         },
     )
 
@@ -47,7 +47,7 @@ async def test_register_existing_username(
         json={
             "username": user.username,
             "email": "user@example.com",
-            "password": "password",
+            "password": "Password12!",
         },
     )
 
@@ -166,7 +166,7 @@ async def test_reset_password_success(
         json={
             "email": user.email,
             "reset_token": reset_token,
-            "new_password": "new_password",
+            "new_password": "newPassword12!",
         },
     )
 
@@ -182,7 +182,7 @@ async def test_reset_password_invalid_token(
         json={
             "email": "user@example.com",
             "reset_token": "invalid_token",
-            "new_password": "new_password",
+            "new_password": "newPassword12!",
         },
     )
 
@@ -198,7 +198,7 @@ async def test_reset_password_user_not_found(
         json={
             "email": "nonexistent@example.com",
             "reset_token": "fake_token",
-            "new_password": "new_password",
+            "new_password": "newPassword12!",
         },
     )
 

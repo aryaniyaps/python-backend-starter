@@ -77,8 +77,7 @@ class RegisterUserInput(BaseSchema):
         Field(
             min_length=8,
             max_length=32,
-            # TODO: fix regex issues with pydantic
-            # pattern=r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()-_+=]).+",
+            pattern=r"(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W])",
             examples=[
                 "my_super_secret",
             ],
@@ -138,8 +137,7 @@ class PasswordResetInput(BaseSchema):
         Field(
             min_length=8,
             max_length=32,
-            # TODO: fix regex issues with pydantic
-            # pattern=r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()-_+=]).+",
+            pattern=r"(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W])",
             examples=[
                 "my_super_secret",
             ],

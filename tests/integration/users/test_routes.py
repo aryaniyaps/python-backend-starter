@@ -52,7 +52,7 @@ async def test_update_current_user_authenticated(auth_test_client: AsyncClient) 
         json={
             "username": "new_username",
             "email": "new_email@example.com",
-            "password": "new_password",
+            "password": "newPassword12!",
         },
     )
 
@@ -70,7 +70,7 @@ async def test_update_current_user_unauthenticated(
     new_data = {
         "username": "new_username",
         "email": "new_email@example.com",
-        "password": "new_password",
+        "password": "newPassword12!",
     }
     response = await test_client.patch("/users/@me", json=new_data)
 
