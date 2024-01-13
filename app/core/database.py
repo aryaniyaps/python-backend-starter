@@ -47,6 +47,8 @@ class Base(AsyncAttrs, DeclarativeBase):
         },
     )
 
+    __mapper_args__ = {"eager_defaults": True}  # noqa: RUF012
+
 
 async def get_database_session() -> AsyncGenerator[AsyncSession, None]:
     """Get the database session."""

@@ -54,28 +54,28 @@ def add_error_handlers(app: FastAPI) -> None:
     """Register error handlers for the app."""
     app.add_exception_handler(
         RequestValidationError,
-        handler=handle_validation_error,  # type: ignore
+        handler=handle_validation_error,
     )
 
     app.add_exception_handler(
         HTTPException,
-        handler=handle_http_exception,  # type: ignore
+        handler=handle_http_exception,
     )
     app.add_exception_handler(
         InvalidInputError,
-        handler=handle_invalid_input_error,  # type: ignore
+        handler=handle_invalid_input_error,
     )
     app.add_exception_handler(
         ResourceNotFoundError,
-        handler=handle_resource_not_found_error,  # type: ignore
+        handler=handle_resource_not_found_error,
     )
     app.add_exception_handler(
         UnauthenticatedError,
-        handler=handle_unauthenticated_error,  # type: ignore
+        handler=handle_unauthenticated_error,
     )
     app.add_exception_handler(
         UnexpectedError,
-        handler=handle_unexpected_error,  # type: ignore
+        handler=handle_unexpected_error,
     )
 
 

@@ -44,6 +44,7 @@ class UserRepo:
     async def update_user(
         self,
         user: User,
+        *,
         username: str | None = None,
         email: str | None = None,
         password: str | None = None,
@@ -59,7 +60,8 @@ class UserRepo:
                 password=password,
             )
         if update_last_login:
-            # user.last_login_at = now()
+            # TODO(aryaniyaps): set the last_login_at timestamp to now()
+            # after transactions have been isolated for test cases (user.last_login_at = now())
             user.last_login_at = text("statement_timestamp()")
 
         self._session.add(user)

@@ -1,5 +1,5 @@
-import typing
 from datetime import datetime
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import ForeignKey, String, text
@@ -8,7 +8,7 @@ from sqlalchemy.sql.functions import now
 
 from app.core.database import Base
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from app.users.models import User
 
 
@@ -43,5 +43,3 @@ class PasswordResetToken(Base):
     user: Mapped["User"] = relationship(
         back_populates="password_reset_tokens",
     )
-
-    __mapper_args__ = {"eager_defaults": True}
