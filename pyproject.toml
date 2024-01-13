@@ -32,7 +32,12 @@ test = [
     "pytest-timeout>=2.2.0",
     "httpx>=0.26.0",
 ]
-dev = ["mypy>=1.8.0", "ruff>=0.1.12", "black>=23.12.1"]
+dev = [
+    "mypy>=1.8.0",
+    "ruff>=0.1.12",
+    "black>=23.12.1",
+    "types-redis>=4.6.0.20240106",
+]
 
 [tool.pdm.scripts]
 start-server = "app/server.py"
