@@ -50,35 +50,6 @@ def add_middleware(app: FastAPI) -> None:
     )
 
 
-def add_error_handlers(app: FastAPI) -> None:
-    """Register error handlers for the app."""
-    app.add_exception_handler(
-        RequestValidationError,
-        handler=handle_validation_error,
-    )
-
-    app.add_exception_handler(
-        HTTPException,
-        handler=handle_http_exception,
-    )
-    app.add_exception_handler(
-        InvalidInputError,
-        handler=handle_invalid_input_error,
-    )
-    app.add_exception_handler(
-        ResourceNotFoundError,
-        handler=handle_resource_not_found_error,
-    )
-    app.add_exception_handler(
-        UnauthenticatedError,
-        handler=handle_unauthenticated_error,
-    )
-    app.add_exception_handler(
-        UnexpectedError,
-        handler=handle_unexpected_error,
-    )
-
-
 def create_app() -> FastAPI:
     """Initialize an app instance."""
     app = FastAPI(
@@ -102,11 +73,21 @@ def create_app() -> FastAPI:
                 "description": "Validation Error",
             },
         },
+        # TODO @aryaniyaps: add error handlers via `app.add_exception_handler` after
+        # a generic ExceptionHandler type is implemented.
+        # https://github.com/encode/starlette/pull/2403
+        exception_handlers={
+            RequestValidationError: handle_validation_error,
+            HTTPException: handle_http_exception,
+            InvalidInputError: handle_invalid_input_error,
+            ResourceNotFoundError: handle_resource_not_found_error,
+            UnauthenticatedError: handle_unauthenticated_error,
+            UnexpectedError: handle_unexpected_error,
+        },
         contact={
             "email": SUPPORT_EMAIL,
         },
     )
     add_middleware(app)
-    add_error_handlers(app)
     add_routes(app)
     return app
