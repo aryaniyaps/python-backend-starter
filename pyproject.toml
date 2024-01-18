@@ -33,7 +33,11 @@ test = [
     "httpx>=0.26.0",
     "pytest-sugar>=0.9.7",
 ]
-dev = ["mypy>=1.8.0", "ruff>=0.1.12", "black>=23.12.1"]
+dev = [
+    "mypy>=1.8.0",
+    "ruff>=0.1.12",
+    "black>=23.12.1",
+]
 
 [tool.pdm.scripts]
 start-server = "app/server.py"

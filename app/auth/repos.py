@@ -41,7 +41,7 @@ class AuthRepo:
                 user_id=user_id,
             ),
             authentication_token_hash,
-        )
+        )  # type: ignore[misc]
         return authentication_token
 
     @staticmethod
@@ -100,7 +100,7 @@ class AuthRepo:
                 user_id=user_id,
             ),
             authentication_token_hash,
-        )
+        )  # type: ignore[misc]
 
     async def remove_all_authentication_tokens(
         self,
@@ -111,7 +111,7 @@ class AuthRepo:
             name=self.generate_token_owner_key(
                 user_id=user_id,
             ),
-        )
+        )  # type: ignore[misc]
         authentication_token_keys = [
             self.generate_authentication_token_key(
                 authentication_token_hash=str(authentication_token_hash),
