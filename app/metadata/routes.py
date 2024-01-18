@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from app.core.constants import OpenAPITag
-from app.metadata.models import HealthCheckResult
+from app.metadata.schemas import HealthCheckResult
 
 metadata_router = APIRouter(
     prefix="/meta",
