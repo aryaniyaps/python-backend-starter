@@ -58,7 +58,7 @@ class Settings(BaseSettings):
         ),
     ]
 
-    celery_broker_url: Annotated[
+    dramatiq_broker_url: Annotated[
         RedisDsn,
         Field(
             examples=[

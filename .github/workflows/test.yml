@@ -19,7 +19,7 @@ jobs:
       SERVER_SERVER_URL: 'http://localhost:8000'
       SERVER_OPENAPI_URL:
       SERVER_REDIS_URL: "redis://:pass@localhost:6379/1"
-      SERVER_CELERY_BROKER_URL: "redis://:pass@localhost:6379/1"
+      SERVER_DRAMATIQ_BROKER_URL: "redis://:pass@localhost:6379/1"
       SERVER_EMAIL_HOST: "localhost"
       SERVER_EMAIL_PORT: 1025
       SERVER_EMAIL_USERNAME:

@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 from urllib.parse import urlencode, urljoin
 
-from app.auth.tasks import send_password_reset_request_email
+from app.auth.actors import send_password_reset_request_email
 from app.config import settings
 from app.core.constants import APP_URL
 from app.core.templates import (

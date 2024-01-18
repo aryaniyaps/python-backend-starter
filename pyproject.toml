@@ -18,8 +18,8 @@ dependencies = [
     "user-agents>=2.2.0",
     "humanize>=4.9.0",
     "orjson>=3.9.10",
-    "celery>=5.3.6",
     "redmail>=0.6.0",
+    "dramatiq[watch]>=1.15.0",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
@@ -33,15 +33,11 @@ test = [
     "httpx>=0.26.0",
     "pytest-sugar>=0.9.7",
 ]
-dev = [
-    "mypy>=1.8.0",
-    "ruff>=0.1.12",
-    "black>=23.12.1",
-]
+dev = ["mypy>=1.8.0", "ruff>=0.1.12", "black>=23.12.1"]
 
 [tool.pdm.scripts]
 start-server = "app/server.py"
-start-worker = "celery -A app.worker worker"
+start-worker = "dramatiq app.worker:setup_broker"
 test = "pytest -vv"
 lint = { composite = ["black .", "ruff --fix .", "black .", "mypy ."] }
 
@@ -57,6 +53,7 @@ namespaces = false # to disable scanning PEP 420 namespaces (true by default)
 
 [tool.mypy]
 plugins = ["pydantic.mypy"]
+exclude = ["^.venv/"]
 
 strict = true
 follow_imports = "normal"
@@ -75,6 +72,10 @@ warn_unreachable = true
 pretty = true
 show_column_numbers = true
 show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = ["celery.*", "kombu.*", "user_agents.*"]
+ignore_missing_imports = true
 
 [tool.pydantic-mypy]
 init_forbid_extra = true

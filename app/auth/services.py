@@ -6,8 +6,8 @@ from argon2 import PasswordHasher
 from argon2.exceptions import HashingError, VerifyMismatchError
 from user_agents.parsers import UserAgent
 
+from app.auth.actors import send_password_reset_request_email
 from app.auth.repos import AuthRepo
-from app.auth.tasks import send_password_reset_request_email
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
 from app.users.models import User
 from app.users.repos import UserRepo
@@ -149,7 +149,7 @@ class AuthService:
                 user_id=existing_user.id,
                 last_login_at=existing_user.last_login_at,
             )
-            send_password_reset_request_email.delay(
+            send_password_reset_request_email.send(
                 receiver=existing_user.email,
                 username=existing_user.username,
                 password_reset_token=reset_token,
