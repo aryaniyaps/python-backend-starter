@@ -4,7 +4,10 @@ from dramatiq.brokers.redis import RedisBroker
 from app.auth.actors import send_password_reset_request_email
 from app.config import settings
 
-__all__ = ("send_password_reset_request_email",)
+__all__ = (
+    "send_password_reset_request_email",
+    "setup_broker",
+)
 
 
 def setup_broker() -> None:
