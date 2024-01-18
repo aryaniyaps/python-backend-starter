@@ -17,12 +17,18 @@ from app.users.repos import UserRepo
 
 
 def get_auth_repo(
-    session: AsyncSession = Depends(
-        dependency=get_database_session,
-    ),
-    redis_client: Redis = Depends(
-        dependency=get_redis_client,
-    ),
+    session: Annotated[
+        AsyncSession,
+        Depends(
+            dependency=get_database_session,
+        ),
+    ],
+    redis_client: Annotated[
+        Redis,
+        Depends(
+            dependency=get_redis_client,
+        ),
+    ],
 ) -> AuthRepo:
     """Get the auth repo."""
     return AuthRepo(
@@ -32,15 +38,24 @@ def get_auth_repo(
 
 
 def get_auth_service(
-    auth_repo: AuthRepo = Depends(
-        dependency=get_auth_repo,
-    ),
-    user_repo: UserRepo = Depends(
-        dependency=get_user_repo,
-    ),
-    password_hasher: PasswordHasher = Depends(
-        dependency=get_password_hasher,
-    ),
+    auth_repo: Annotated[
+        AuthRepo,
+        Depends(
+            dependency=get_auth_repo,
+        ),
+    ],
+    user_repo: Annotated[
+        UserRepo,
+        Depends(
+            dependency=get_user_repo,
+        ),
+    ],
+    password_hasher: Annotated[
+        PasswordHasher,
+        Depends(
+            dependency=get_password_hasher,
+        ),
+    ],
 ) -> AuthService:
     """Get the auth service."""
     return AuthService(

@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from argon2 import PasswordHasher
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,12 +11,18 @@ from app.users.services import UserService
 
 
 def get_user_repo(
-    session: AsyncSession = Depends(
-        dependency=get_database_session,
-    ),
-    password_hasher: PasswordHasher = Depends(
-        dependency=get_password_hasher,
-    ),
+    session: Annotated[
+        AsyncSession,
+        Depends(
+            dependency=get_database_session,
+        ),
+    ],
+    password_hasher: Annotated[
+        PasswordHasher,
+        Depends(
+            dependency=get_password_hasher,
+        ),
+    ],
 ) -> UserRepo:
     """Get the user repo."""
     return UserRepo(
@@ -24,9 +32,12 @@ def get_user_repo(
 
 
 def get_user_service(
-    user_repo: UserRepo = Depends(
-        dependency=get_user_repo,
-    ),
+    user_repo: Annotated[
+        UserRepo,
+        Depends(
+            dependency=get_user_repo,
+        ),
+    ],
 ) -> UserService:
     """Get the user service."""
     return UserService(user_repo=user_repo)
