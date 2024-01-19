@@ -1,7 +1,5 @@
 from urllib.parse import urlencode, urljoin
 
-import dramatiq
-
 from app.config import settings
 from app.core.constants import APP_URL
 from app.core.emails import email_sender
@@ -12,7 +10,6 @@ from app.core.templates import (
 )
 
 
-@dramatiq.actor
 def send_password_reset_request_email(
     receiver: str,
     username: str,

@@ -9,6 +9,7 @@ from app.auth.services import AuthService
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
 from app.users.models import User
 from app.users.repos import UserRepo
+from app.worker import task_queue
 from argon2 import PasswordHasher
 from argon2.exceptions import HashingError
 from user_agents.parsers import UserAgent
@@ -303,7 +304,7 @@ async def test_send_password_reset_request_success(auth_service: AuthService) ->
         "create_password_reset_token",
         return_value="reset_token",
     ), patch(
-        "app.auth.tasks.send_password_reset_request_email.delay",
+        "app.auth.tasks.send_password_reset_request_email",
         return_value=None,
     ) as mock_send_email:
         await auth_service.send_password_reset_request(
@@ -330,7 +331,11 @@ async def test_send_password_reset_request_user_not_found(
         get_browser=MagicMock(return_value="Chrome"),
     )
 
-    with patch.object(UserRepo, "get_user_by_email", return_value=None), patch(
+    with patch.object(
+        UserRepo,
+        "get_user_by_email",
+        return_value=None,
+    ), patch(
         "app.auth.tasks.send_password_reset_request_email",
     ) as mock_send_email, patch.object(
         AuthRepo,

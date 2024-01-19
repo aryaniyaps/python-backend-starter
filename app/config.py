@@ -58,7 +58,7 @@ class Settings(BaseSettings):
         ),
     ]
 
-    dramatiq_broker_url: Annotated[
+    rq_broker_url: Annotated[
         RedisDsn,
         Field(
             examples=[

@@ -9,8 +9,11 @@ from app.core.redis_client import get_redis_client
 from app.core.security import get_password_hasher
 from app.users.models import User
 from app.users.repos import UserRepo
+from app.worker import task_queue
 from argon2 import PasswordHasher
+from redis import Redis as SyncRedis
 from redis.asyncio import Redis
+from rq import SimpleWorker
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -49,6 +52,23 @@ def _setup_test_database() -> Iterator[None]:
         alembic_cfg,
         revision="base",
     )
+
+
+@pytest.fixture(autouse=True)
+def _setup_test_worker() -> None:
+    """Set up the test worker."""
+    worker = SimpleWorker(
+        queues=[
+            task_queue,
+        ],
+        connection=SyncRedis.from_url(
+            url=str(settings.rq_broker_url),
+        ),
+    )
+
+    yield
+
+    worker.work(burst=True)
 
 
 @pytest.fixture

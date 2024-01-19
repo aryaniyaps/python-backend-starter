@@ -1,19 +1,27 @@
-import dramatiq
-from dramatiq.brokers.redis import RedisBroker
+from redis import Redis
+from rq import Queue, Worker
 
-from app.auth.actors import send_password_reset_request_email
 from app.config import settings
 
-__all__ = (
-    "send_password_reset_request_email",
-    "setup_broker",
+task_queue = Queue(
+    name="tasks",
+    connection=Redis.from_url(
+        url=str(
+            settings.rq_broker_url,
+        ),
+    ),
 )
 
-
-def setup_broker() -> None:
-    """Configure the dramatiq broker."""
-    dramatiq.set_broker(
-        broker=RedisBroker(
-            url=str(settings.dramatiq_broker_url),
-        )  # type: ignore[no-untyped-call]
+if __name__ == "__main__":
+    worker = Worker(
+        queues=[
+            task_queue,
+        ],
+        connection=Redis.from_url(
+            url=str(
+                settings.rq_broker_url,
+            ),
+        ),
     )
+
+    worker.work()
