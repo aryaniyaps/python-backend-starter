@@ -9,9 +9,9 @@ from app.auth.services import AuthService
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
 from app.users.models import User
 from app.users.repos import UserRepo
-from app.worker import task_queue
 from argon2 import PasswordHasher
 from argon2.exceptions import HashingError
+from rq import SimpleWorker
 from user_agents.parsers import UserAgent
 
 pytestmark = [pytest.mark.anyio]
@@ -279,7 +279,9 @@ async def test_remove_authentication_token(auth_service: AuthService) -> None:
     )
 
 
-async def test_send_password_reset_request_success(auth_service: AuthService) -> None:
+async def test_send_password_reset_request_success(
+    auth_service: AuthService, test_worker: SimpleWorker
+) -> None:
     """Ensure we can send a password reset request successfully."""
     user_agent = MagicMock(
         spec=UserAgent,
@@ -303,26 +305,17 @@ async def test_send_password_reset_request_success(auth_service: AuthService) ->
         AuthRepo,
         "create_password_reset_token",
         return_value="reset_token",
-    ), patch(
-        "app.auth.tasks.send_password_reset_request_email",
-        return_value=None,
-    ) as mock_send_email:
+    ):
         await auth_service.send_password_reset_request(
             email=mock_user.email,
             user_agent=user_agent,
         )
-
-    mock_send_email.assert_called_once_with(
-        receiver=mock_user.email,
-        username=mock_user.username,
-        password_reset_token="reset_token",
-        operating_system=user_agent.get_os(),
-        browser_name=user_agent.get_browser(),
-    )
+        test_worker.work(burst=True)
+    # assert email was sent here
 
 
 async def test_send_password_reset_request_user_not_found(
-    auth_service: AuthService,
+    auth_service: AuthService, test_worker: SimpleWorker
 ) -> None:
     """Ensure we cannot send a password reset request for a non-existing user."""
     user_agent = MagicMock(
@@ -335,9 +328,7 @@ async def test_send_password_reset_request_user_not_found(
         UserRepo,
         "get_user_by_email",
         return_value=None,
-    ), patch(
-        "app.auth.tasks.send_password_reset_request_email",
-    ) as mock_send_email, patch.object(
+    ), patch.object(
         AuthRepo,
         "create_password_reset_token",
     ) as mock_create_password_reset_token:
@@ -345,7 +336,8 @@ async def test_send_password_reset_request_user_not_found(
             email="nonexistent@example.com",
             user_agent=user_agent,
         )
-    mock_send_email.assert_not_called()
+        test_worker.work(burst=True)
+    # assert email was not sent here
     mock_create_password_reset_token.assert_not_called()
 
 

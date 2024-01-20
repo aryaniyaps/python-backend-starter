@@ -11,7 +11,6 @@ from app.users.models import User
 from app.users.repos import UserRepo
 from app.worker import task_queue
 from argon2 import PasswordHasher
-from redis import Redis as SyncRedis
 from redis.asyncio import Redis
 from rq import SimpleWorker
 from sqlalchemy.ext.asyncio import (
@@ -54,21 +53,19 @@ def _setup_test_database() -> Iterator[None]:
     )
 
 
-@pytest.fixture(autouse=True)
-def _setup_test_worker() -> None:
-    """Set up the test worker."""
+@pytest.fixture
+def test_worker() -> Iterator[SimpleWorker]:
+    """Get the test worker."""
     worker = SimpleWorker(
         queues=[
             task_queue,
         ],
-        connection=SyncRedis.from_url(
-            url=str(settings.rq_broker_url),
-        ),
+        connection=task_queue.connection,
     )
 
-    yield
+    yield worker
 
-    worker.work(burst=True)
+    worker.teardown()
 
 
 @pytest.fixture
