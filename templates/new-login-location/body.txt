@@ -12,6 +12,8 @@ Hi {{ username }},
 
 We noticed a new login to your {{ app_name }} account on {{ login_timestamp }}.
 
+Where this happened:
+
 Device: {{ device }}
 
 Browser: {{ browser_name }}
