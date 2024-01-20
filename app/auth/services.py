@@ -30,6 +30,7 @@ class AuthService:
         email: str,
         username: str,
         password: str,
+        login_ip: str,
     ) -> tuple[str, User]:
         """Register a new user."""
         try:
@@ -55,6 +56,7 @@ class AuthService:
                 username=username,
                 email=email,
                 password=password,
+                login_ip=login_ip,
             )
         except HashingError as exception:
             raise UnexpectedError(
@@ -64,9 +66,16 @@ class AuthService:
         authentication_token = await self._auth_repo.create_authentication_token(
             user_id=user.id,
         )
+
+        # TODO: send onboarding email here
         return authentication_token, user
 
-    async def login_user(self, login: str, password: str) -> tuple[str, User]:
+    async def login_user(
+        self,
+        login: str,
+        password: str,
+        login_ip: str,
+    ) -> tuple[str, User]:
         """Check the given credentials and return the relevant user if they are valid."""
         if "@" in login:
             # if "@" is present, assume it's an email
@@ -97,19 +106,25 @@ class AuthService:
             user_id=user.id,
         )
 
+        if user.last_login_at != login_ip:
+            # TODO: send new login location detected mail
+            pass
+
         if self._password_hasher.check_needs_rehash(
             hash=user.password_hash,
         ):
-            # update user's password hash and last login timestamp
+            # update user's password hash, last login timestamp and login IP
             user = await self._user_repo.update_user(
                 user=user,
                 password=password,
+                last_login_ip=login_ip,
                 update_last_login=True,
             )
         else:
-            # update user's last login timestamp
+            # update user's last login timestamp and login IP
             user = await self._user_repo.update_user(
                 user=user,
+                last_login_ip=login_ip,
                 update_last_login=True,
             )
 
@@ -142,6 +157,7 @@ class AuthService:
         self,
         email: str,
         user_agent: UserAgent,
+        request_ip: str,
     ) -> None:
         """Send a password reset request to the given email."""
         existing_user = await self._user_repo.get_user_by_email(email=email)
@@ -150,6 +166,7 @@ class AuthService:
                 user_id=existing_user.id,
                 last_login_at=existing_user.last_login_at,
             )
+            # TODO: pass information about where this request took place from the IP address.
             task_queue.enqueue(
                 send_password_reset_request_email,
                 receiver=existing_user.email,

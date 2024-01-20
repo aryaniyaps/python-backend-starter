@@ -1,0 +1,20 @@
+{% extends "base/body.txt" %}
+
+{% block title %}
+Welcome to {{ app_name }}!
+{% endblock%}
+
+
+{% block content %}
+************
+Dear {{ username }},
+************
+
+We are delighted to welcome you to {{ app_name }}! Thank you for choosing us as your partner on this exciting journey.
+We are thrilled to have you on board, and we look forward to working together to achieve your goals.
+
+Feel free to contact support ( {{ support_email }} ) if you have questions.
+
+Thanks,
+The {{ app_name }} team
+{% endblock%}

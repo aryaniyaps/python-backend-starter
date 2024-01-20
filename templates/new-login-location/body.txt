@@ -1,0 +1,29 @@
+{% extends "base/body.txt" %}
+
+{% block title %}
+New login to your {{ app_name }} account from {{ device }}
+{% endblock%}
+
+
+{% block content %}
+************
+Hi {{ username }},
+************
+
+We noticed a new login to your {{ app_name }} account on {{ login_timestamp }}.
+
+Device: {{ device }}
+
+Browser: {{ browser_name }}
+
+IP Address: {{ ip_address }}
+
+Location: {{ Location }}
+
+If this wasn't you, you need to change your {{ app_name }} password to protect your account.
+
+Please contact support ( {{ support_email }} ) for any assistance.
+
+Thanks,
+The {{ app_name }} team
+{% endblock%}

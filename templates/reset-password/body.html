@@ -60,13 +60,20 @@ https://litmus.com/blog/a-guide-to-bulletproof-buttons-in-email-design -->
             </td>
           </tr>
         </table>
-        <p>
-          For security, this request was received from a {{operating_system}}
-          device using {{browser_name}}. If you did not request a password
-          reset, please ignore this email or
-          <a href="{{ support_email }}">contact support</a> if you have
-          questions.
-        </p>
+        <h3>Where this happened:</h3>
+          <p>
+          Device: {{ device }}<br/>
+
+          Browser: {{ browser_name }}<br/>
+
+          IP Address: {{ ip_address }}<br/>
+
+          Location: {{ Location }}
+          </p>
+          <p>
+          If you did not request a password reset, please ignore this email or
+          <a href="{{ support_email }}">contact support</a> if you have questions.
+          </p>
         <p>Thanks, <br />The {{ app_name }} team</p>
         <!-- Sub copy -->
         <table class="body-sub" role="presentation">

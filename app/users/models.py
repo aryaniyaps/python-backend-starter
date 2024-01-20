@@ -42,6 +42,10 @@ class User(Base):
         server_default=now(),
     )
 
+    last_login_ip: Mapped[str] = mapped_column(
+        String(40),
+    )
+
     created_at: Mapped[datetime] = mapped_column(
         server_default=now(),
     )

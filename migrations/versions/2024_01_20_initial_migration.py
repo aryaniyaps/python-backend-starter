@@ -1,9 +1,9 @@
 """
 initial migration
 
-Revision ID: 8d653fefd9db
+Revision ID: 140748b4a732
 Revises:
-Create Date: 2024-01-12 15:08:55.544485
+Create Date: 2024-01-20 14:00:46.704030
 
 """
 from collections.abc import Sequence
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "8d653fefd9db"
+revision: str = "140748b4a732"
 down_revision: str | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -33,6 +33,7 @@ def upgrade() -> None:
             server_default=sa.text("now()"),
             nullable=False,
         ),
+        sa.Column("last_login_ip", sa.String(length=40), nullable=False),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),

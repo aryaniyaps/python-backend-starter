@@ -1,0 +1,35 @@
+{% extends "base/body.html" %}
+
+{% block title %}
+Welcome to {{ app_name }}!
+{% endblock%}
+
+{% block content %}
+<table
+  class="email-body_inner"
+  align="center"
+  width="570"
+  cellpadding="0"
+  cellspacing="0"
+  role="presentation"
+>
+  <!-- Body content -->
+  <tr>
+    <td class="content-cell">
+      <div class="f-fallback">
+        <h1>Dear {{ username }},</h1>
+        <p>
+            We are delighted to welcome you to {{ app_name }}! Thank you for choosing us as your partner
+            on this exciting journey. We are thrilled to have you on board, and we look forward to working
+            together to achieve your goals.
+        </p>
+
+        <p>
+          Feel free to <a href="{{ support_email }}">contact support</a> if you have questions.
+        </p>
+        <p>Thanks, <br />The {{ app_name }} team</p>
+      </div>
+    </td>
+  </tr>
+</table>
+{% endblock %}
