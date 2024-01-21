@@ -1,7 +1,7 @@
 from typing import Annotated, Any
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Header, Request, status
+from fastapi import APIRouter, Depends, Header, status
 from user_agents import parse
 
 from app.auth.dependencies import (
@@ -19,6 +19,7 @@ from app.auth.schemas import (
 )
 from app.auth.services import AuthService
 from app.core.constants import OpenAPITag
+from app.core.dependencies import get_ip_address
 
 auth_router = APIRouter(
     prefix="/auth",
@@ -37,7 +38,12 @@ auth_router = APIRouter(
 )
 async def register_user(
     data: RegisterUserInput,
-    request: Request,
+    login_ip: Annotated[
+        str,
+        Depends(
+            dependency=get_ip_address,
+        ),
+    ],
     auth_service: Annotated[
         AuthService,
         Depends(
@@ -46,7 +52,6 @@ async def register_user(
     ],
 ) -> dict[str, Any]:
     """Register a new user."""
-    login_ip = request.client.host if request.client else "unknown"
     authentication_token, user = await auth_service.register_user(
         email=data.email,
         username=data.username,
@@ -70,7 +75,12 @@ async def register_user(
 )
 async def login_user(
     data: LoginUserInput,
-    request: Request,
+    login_ip: Annotated[
+        str,
+        Depends(
+            dependency=get_ip_address,
+        ),
+    ],
     auth_service: Annotated[
         AuthService,
         Depends(
@@ -79,7 +89,6 @@ async def login_user(
     ],
 ) -> dict[str, Any]:
     """Login the current user."""
-    login_ip = request.client.host if request.client else "unknown"
     authentication_token, user = await auth_service.login_user(
         login=data.login,
         password=data.password,
@@ -137,7 +146,12 @@ async def logout_user(
 )
 async def request_password_reset(
     data: PasswordResetRequestInput,
-    request: Request,
+    request_ip: Annotated[
+        str,
+        Depends(
+            dependency=get_ip_address,
+        ),
+    ],
     user_agent: Annotated[str, Header()],
     auth_service: Annotated[
         AuthService,
@@ -147,7 +161,6 @@ async def request_password_reset(
     ],
 ) -> None:
     """Send a password reset request to the given email."""
-    request_ip = request.client.host if request.client else "unknown"
     await auth_service.send_password_reset_request(
         email=data.email,
         user_agent=parse(user_agent),
