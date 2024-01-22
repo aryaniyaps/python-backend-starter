@@ -1,7 +1,11 @@
 from unittest.mock import MagicMock, patch
 from urllib.parse import urlencode, urljoin
 
-from app.auth.tasks import send_password_reset_request_email
+from app.auth.tasks import (
+    send_new_login_location_detected_email,
+    send_onboarding_email,
+    send_password_reset_request_email,
+)
 from app.config import settings
 from app.core.constants import APP_URL
 from app.core.templates import (
@@ -11,6 +15,112 @@ from app.core.templates import (
 )
 from app.users.schemas import UserSchema
 from redmail.email.sender import EmailSender
+
+
+def test_send_onboarding_email() -> None:
+    """Ensure we can send an onboarding email."""
+    # Mock the required objects
+    mock_user = MagicMock(
+        spec=UserSchema,
+        email="user@example.com",
+        username="testuser",
+    )
+
+    mock_email_sender = MagicMock(
+        spec=EmailSender,
+        send=MagicMock(
+            return_value=None,
+        ),
+    )
+
+    with patch(
+        "app.auth.tasks.email_sender",
+        mock_email_sender,
+    ):
+        send_onboarding_email(
+            receiver=mock_user.email,
+            username=mock_user.username,
+        )
+
+    mock_email_sender.send.assert_called_with(
+        sender=settings.email_from,
+        receivers=[mock_user.email],
+        subject=reset_password_subject.render(
+            username=mock_user.username,
+        ),
+        text=reset_password_text.render(
+            username=mock_user.username,
+        ),
+        html=reset_password_html.render(
+            username=mock_user.username,
+        ),
+    )
+
+
+def test_send_new_login_location_detected_email() -> None:
+    """Ensure we can send a new login location detected email."""
+    # Mock the required objects
+    mock_user = MagicMock(
+        spec=UserSchema,
+        email="user@example.com",
+        username="testuser",
+    )
+
+    login_timestamp = "12:10 PM, Monday, 22nd of January 2024"
+
+    device = "Sample Device"
+
+    browser_name = "Chrome"
+
+    ip_address = "127.0.0.1"
+
+    location = "Chennai, India"
+
+    mock_email_sender = MagicMock(
+        spec=EmailSender,
+        send=MagicMock(
+            return_value=None,
+        ),
+    )
+
+    with patch(
+        "app.auth.tasks.email_sender",
+        mock_email_sender,
+    ):
+        send_new_login_location_detected_email(
+            receiver=mock_user.email,
+            username=mock_user.username,
+            login_timestamp=login_timestamp,
+            device=device,
+            browser_name=browser_name,
+            ip_address=ip_address,
+            location=location,
+        )
+
+    mock_email_sender.send.assert_called_with(
+        sender=settings.email_from,
+        receivers=[mock_user.email],
+        subject=reset_password_subject.render(
+            username=mock_user.username,
+            device=device,
+        ),
+        text=reset_password_text.render(
+            username=mock_user.username,
+            login_timestamp=login_timestamp,
+            device=device,
+            browser_name=browser_name,
+            ip_address=ip_address,
+            location=location,
+        ),
+        html=reset_password_html.render(
+            username=mock_user.username,
+            login_timestamp=login_timestamp,
+            device=device,
+            browser_name=browser_name,
+            ip_address=ip_address,
+            location=location,
+        ),
+    )
 
 
 def test_send_password_reset_request_email() -> None:
