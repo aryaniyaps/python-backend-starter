@@ -38,7 +38,7 @@ auth_router = APIRouter(
 )
 async def register_user(
     data: RegisterUserInput,
-    login_ip: Annotated[
+    request_ip: Annotated[
         str,
         Depends(
             dependency=get_ip_address,
@@ -56,7 +56,7 @@ async def register_user(
         email=data.email,
         username=data.username,
         password=data.password,
-        login_ip=login_ip,
+        request_ip=request_ip,
     )
 
     return {
@@ -75,7 +75,8 @@ async def register_user(
 )
 async def login_user(
     data: LoginUserInput,
-    login_ip: Annotated[
+    user_agent: Annotated[str, Header()],
+    request_ip: Annotated[
         str,
         Depends(
             dependency=get_ip_address,
@@ -92,7 +93,8 @@ async def login_user(
     authentication_token, user = await auth_service.login_user(
         login=data.login,
         password=data.password,
-        login_ip=login_ip,
+        user_agent=parse(user_agent),
+        request_ip=request_ip,
     )
     return {
         "authentication_token": authentication_token,
@@ -105,8 +107,7 @@ async def login_user(
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Logout the current user.",
     description="""Logs out the currently authenticated user by invalidating
-    the authentication token associated with the user. Requires the user's
-    authentication token and user ID for security validation.""",
+    the authentication token associated with the user.""",
 )
 async def logout_user(
     auth_service: Annotated[

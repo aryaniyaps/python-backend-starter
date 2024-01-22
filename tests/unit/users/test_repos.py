@@ -17,11 +17,13 @@ async def test_create_user(
         username="new_user",
         email="new@example.com",
         password="password",
+        login_ip="127.0.0.1",
     )
     assert isinstance(user, User)
     assert user.id is not None
     assert user.username == "new_user"
     assert user.email == "new@example.com"
+    assert user.last_login_ip == "127.0.0.1"
     assert password_hasher.verify(
         hash=user.password_hash,
         password="password",
@@ -66,9 +68,21 @@ async def test_update_user_email(
     updated_user = await user_repo.update_user(
         user=user,
         email="new_email@example.com",
-        update_last_login=True,
     )
     assert updated_user.email == "new_email@example.com"
+    assert updated_user.updated_at is not None
+
+
+async def test_update_user_last_login_ip(
+    user: User,
+    user_repo: UserRepo,
+) -> None:
+    """Ensure we can update a user's last login IP."""
+    updated_user = await user_repo.update_user(
+        user=user,
+        last_login_ip="208.80.154.224",
+    )
+    assert updated_user.last_login_ip == "208.80.154.224"
     assert updated_user.updated_at is not None
 
 

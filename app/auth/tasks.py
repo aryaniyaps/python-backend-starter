@@ -13,23 +13,8 @@ from app.core.templates import (
 def send_onboarding_email(
     receiver: str,
     username: str,
-    password_reset_token: str,
-    operating_system: str,
-    browser_name: str,
 ) -> None:
     """Send an onboarding email to the given user."""
-    # point action URL to a frontend page
-    action_url = (
-        urljoin(APP_URL, "/auth/reset-password")
-        + "?"
-        + urlencode(
-            {
-                "email": receiver,
-                "reset_token": password_reset_token,
-            },
-        )
-    )
-
     email_sender.send(
         sender=settings.email_from,
         receivers=[receiver],
@@ -37,15 +22,9 @@ def send_onboarding_email(
             username=username,
         ),
         text=reset_password_text.render(
-            action_url=action_url,
-            operating_system=operating_system,
-            browser_name=browser_name,
             username=username,
         ),
         html=reset_password_html.render(
-            action_url=action_url,
-            operating_system=operating_system,
-            browser_name=browser_name,
             username=username,
         ),
     )
@@ -54,40 +33,34 @@ def send_onboarding_email(
 def send_new_login_location_detected_email(
     receiver: str,
     username: str,
-    password_reset_token: str,
-    operating_system: str,
+    login_timestamp: str,
+    device: str,
     browser_name: str,
+    ip_address: str,
+    location: str,
 ) -> None:
     """Send a new login location detected email to the given user."""
-    # point action URL to a frontend page
-    action_url = (
-        urljoin(APP_URL, "/auth/reset-password")
-        + "?"
-        + urlencode(
-            {
-                "email": receiver,
-                "reset_token": password_reset_token,
-            },
-        )
-    )
-
     email_sender.send(
         sender=settings.email_from,
         receivers=[receiver],
         subject=reset_password_subject.render(
-            username=username,
+            device=device,
         ),
         text=reset_password_text.render(
-            action_url=action_url,
-            operating_system=operating_system,
-            browser_name=browser_name,
             username=username,
+            login_timestamp=login_timestamp,
+            device=device,
+            browser_name=browser_name,
+            ip_address=ip_address,
+            location=location,
         ),
         html=reset_password_html.render(
-            action_url=action_url,
-            operating_system=operating_system,
-            browser_name=browser_name,
             username=username,
+            login_timestamp=login_timestamp,
+            device=device,
+            browser_name=browser_name,
+            ip_address=ip_address,
+            location=location,
         ),
     )
 
@@ -96,8 +69,10 @@ def send_password_reset_request_email(
     receiver: str,
     username: str,
     password_reset_token: str,
-    operating_system: str,
+    device: str,
     browser_name: str,
+    ip_address: str,
+    location: str,
 ) -> None:
     """Send a password reset request email to the given user."""
     # point action URL to a frontend page
@@ -120,14 +95,18 @@ def send_password_reset_request_email(
         ),
         text=reset_password_text.render(
             action_url=action_url,
-            operating_system=operating_system,
+            device=device,
             browser_name=browser_name,
             username=username,
+            ip_address=ip_address,
+            location=location,
         ),
         html=reset_password_html.render(
             action_url=action_url,
-            operating_system=operating_system,
+            device=device,
             browser_name=browser_name,
             username=username,
+            ip_address=ip_address,
+            location=location,
         ),
     )

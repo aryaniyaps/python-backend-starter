@@ -7,7 +7,11 @@ from argon2.exceptions import HashingError, VerifyMismatchError
 from user_agents.parsers import UserAgent
 
 from app.auth.repos import AuthRepo
-from app.auth.tasks import send_password_reset_request_email
+from app.auth.tasks import (
+    send_new_login_location_detected_email,
+    send_onboarding_email,
+    send_password_reset_request_email,
+)
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
 from app.users.models import User
 from app.users.repos import UserRepo
@@ -30,7 +34,7 @@ class AuthService:
         email: str,
         username: str,
         password: str,
-        login_ip: str,
+        request_ip: str,
     ) -> tuple[str, User]:
         """Register a new user."""
         try:
@@ -56,7 +60,7 @@ class AuthService:
                 username=username,
                 email=email,
                 password=password,
-                login_ip=login_ip,
+                login_ip=request_ip,
             )
         except HashingError as exception:
             raise UnexpectedError(
@@ -67,14 +71,20 @@ class AuthService:
             user_id=user.id,
         )
 
-        # TODO: send onboarding email here
+        task_queue.enqueue(
+            send_onboarding_email,
+            receiver=user.email,
+            username=user.username,
+        )
+
         return authentication_token, user
 
     async def login_user(
         self,
         login: str,
         password: str,
-        login_ip: str,
+        user_agent: UserAgent,
+        request_ip: str,
     ) -> tuple[str, User]:
         """Check the given credentials and return the relevant user if they are valid."""
         if "@" in login:
@@ -106,9 +116,7 @@ class AuthService:
             user_id=user.id,
         )
 
-        if user.last_login_at != login_ip:
-            # TODO: send new login location detected mail
-            pass
+        previous_login_ip = user.last_login_ip
 
         if self._password_hasher.check_needs_rehash(
             hash=user.password_hash,
@@ -117,15 +125,28 @@ class AuthService:
             user = await self._user_repo.update_user(
                 user=user,
                 password=password,
-                last_login_ip=login_ip,
+                last_login_ip=request_ip,
                 update_last_login=True,
             )
         else:
             # update user's last login timestamp and login IP
             user = await self._user_repo.update_user(
                 user=user,
-                last_login_ip=login_ip,
+                last_login_ip=request_ip,
                 update_last_login=True,
+            )
+
+        if previous_login_ip != request_ip:
+            task_queue.enqueue(
+                send_new_login_location_detected_email,
+                receiver=user.email,
+                username=user.username,
+                login_timestamp=user.last_login_at,
+                device=user_agent.get_device(),
+                browser_name=user_agent.get_browser(),
+                # TODO: pass information about where this request took place from the IP address.
+                location="",
+                ip_address=request_ip,
             )
 
         return authentication_token, user
@@ -166,14 +187,17 @@ class AuthService:
                 user_id=existing_user.id,
                 last_login_at=existing_user.last_login_at,
             )
-            # TODO: pass information about where this request took place from the IP address.
+
             task_queue.enqueue(
                 send_password_reset_request_email,
                 receiver=existing_user.email,
                 username=existing_user.username,
                 password_reset_token=reset_token,
-                operating_system=user_agent.get_os(),
+                device=user_agent.get_device(),
                 browser_name=user_agent.get_browser(),
+                # TODO: pass information about where this request took place from the IP address.
+                location="",
+                ip_address=request_ip,
             )
 
     async def reset_password(

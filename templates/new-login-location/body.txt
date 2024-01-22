@@ -20,7 +20,7 @@ Browser: {{ browser_name }}
 
 IP Address: {{ ip_address }}
 
-Location: {{ Location }}
+Location: {{ location }}
 
 If this wasn't you, you need to change your {{ app_name }} password to protect your account.
 

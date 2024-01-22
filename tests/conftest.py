@@ -75,6 +75,7 @@ async def user(user_repo: UserRepo) -> User:
         username="tester",
         email="tester@example.org",
         password="password",
+        login_ip="127.0.0.1",
     )
 
 
