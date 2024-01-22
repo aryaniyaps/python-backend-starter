@@ -59,3 +59,32 @@ reset_password_text = environment.get_template(
         ),
     },
 )
+
+# onboarding templates
+
+onboarding_subject = environment.get_template(
+    name="onboarding/subject.txt",
+)
+
+onboarding_html = environment.get_template(
+    name="onboarding/body.html",
+)
+
+onboarding_text = environment.get_template(
+    name="onboarding/body.txt",
+)
+
+
+# new login location detected templates
+
+new_login_location_subject = environment.get_template(
+    name="new-login-location/subject.txt",
+)
+
+new_login_location_html = environment.get_template(
+    name="new-login-location/body.html",
+)
+
+new_login_location_text = environment.get_template(
+    name="new-login-location/body.txt",
+)

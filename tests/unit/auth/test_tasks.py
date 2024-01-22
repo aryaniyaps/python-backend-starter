@@ -9,6 +9,12 @@ from app.auth.tasks import (
 from app.config import settings
 from app.core.constants import APP_URL
 from app.core.templates import (
+    new_login_location_html,
+    new_login_location_subject,
+    new_login_location_text,
+    onboarding_html,
+    onboarding_subject,
+    onboarding_text,
     reset_password_html,
     reset_password_subject,
     reset_password_text,
@@ -45,13 +51,13 @@ def test_send_onboarding_email() -> None:
     mock_email_sender.send.assert_called_with(
         sender=settings.email_from,
         receivers=[mock_user.email],
-        subject=reset_password_subject.render(
+        subject=onboarding_subject.render(
             username=mock_user.username,
         ),
-        text=reset_password_text.render(
+        text=onboarding_text.render(
             username=mock_user.username,
         ),
-        html=reset_password_html.render(
+        html=onboarding_html.render(
             username=mock_user.username,
         ),
     )
@@ -100,11 +106,11 @@ def test_send_new_login_location_detected_email() -> None:
     mock_email_sender.send.assert_called_with(
         sender=settings.email_from,
         receivers=[mock_user.email],
-        subject=reset_password_subject.render(
+        subject=new_login_location_subject.render(
             username=mock_user.username,
             device=device,
         ),
-        text=reset_password_text.render(
+        text=new_login_location_text.render(
             username=mock_user.username,
             login_timestamp=login_timestamp,
             device=device,
@@ -112,7 +118,7 @@ def test_send_new_login_location_detected_email() -> None:
             ip_address=ip_address,
             location=location,
         ),
-        html=reset_password_html.render(
+        html=new_login_location_html.render(
             username=mock_user.username,
             login_timestamp=login_timestamp,
             device=device,

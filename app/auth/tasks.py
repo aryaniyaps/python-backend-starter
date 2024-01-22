@@ -4,6 +4,12 @@ from app.config import settings
 from app.core.constants import APP_URL
 from app.core.emails import email_sender
 from app.core.templates import (
+    new_login_location_html,
+    new_login_location_subject,
+    new_login_location_text,
+    onboarding_html,
+    onboarding_subject,
+    onboarding_text,
     reset_password_html,
     reset_password_subject,
     reset_password_text,
@@ -18,13 +24,13 @@ def send_onboarding_email(
     email_sender.send(
         sender=settings.email_from,
         receivers=[receiver],
-        subject=reset_password_subject.render(
+        subject=onboarding_subject.render(
             username=username,
         ),
-        text=reset_password_text.render(
+        text=onboarding_text.render(
             username=username,
         ),
-        html=reset_password_html.render(
+        html=onboarding_html.render(
             username=username,
         ),
     )
@@ -43,10 +49,10 @@ def send_new_login_location_detected_email(
     email_sender.send(
         sender=settings.email_from,
         receivers=[receiver],
-        subject=reset_password_subject.render(
+        subject=new_login_location_subject.render(
             device=device,
         ),
-        text=reset_password_text.render(
+        text=new_login_location_text.render(
             username=username,
             login_timestamp=login_timestamp,
             device=device,
@@ -54,7 +60,7 @@ def send_new_login_location_detected_email(
             ip_address=ip_address,
             location=location,
         ),
-        html=reset_password_html.render(
+        html=new_login_location_html.render(
             username=username,
             login_timestamp=login_timestamp,
             device=device,
