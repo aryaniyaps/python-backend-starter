@@ -21,9 +21,16 @@ def test_send_password_reset_request_email() -> None:
         email="user@example.com",
         username="testuser",
     )
+
     password_reset_token = "fake_token"
-    operating_system = "Windows"
+
+    device = "Sample Device"
+
     browser_name = "Chrome"
+
+    ip_address = "127.0.0.1"
+
+    location = "Chennai, India"
 
     mock_email_sender = MagicMock(
         spec=EmailSender,
@@ -40,8 +47,10 @@ def test_send_password_reset_request_email() -> None:
             receiver=mock_user.email,
             username=mock_user.username,
             password_reset_token=password_reset_token,
-            operating_system=operating_system,
+            device=device,
             browser_name=browser_name,
+            ip_address=ip_address,
+            location=location,
         )
 
     action_url = (
@@ -63,14 +72,18 @@ def test_send_password_reset_request_email() -> None:
         ),
         text=reset_password_text.render(
             action_url=action_url,
-            operating_system=operating_system,
+            device=device,
             browser_name=browser_name,
             username=mock_user.username,
+            ip_address=ip_address,
+            location=location,
         ),
         html=reset_password_html.render(
             action_url=action_url,
-            operating_system=operating_system,
+            device=device,
             browser_name=browser_name,
             username=mock_user.username,
+            ip_address=ip_address,
+            location=location,
         ),
     )

@@ -6,6 +6,6 @@ def get_ip_address(request: Request) -> str:
     if request.client is None:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Client IP not available",
+            detail="Client IP not available.",
         )
     return request.client.host
