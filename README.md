@@ -1,12 +1,13 @@
 # Python Backend Starter
 
 ## Tech Stack
-This backend starter is built on the following main stack:
 
-- [Python](https://www.python.org) – Languages
-- [Mako](https://github.com/zzzeek/mako) – Templating Languages & Extensions
-- [Shell](https://en.wikipedia.org/wiki/Shell_script) – Shells
-- [GitHub Actions](https://github.com/features/actions) – Continuous Integration
-- [FastAPI](https://fastapi.tiangolo.com/) – Microframeworks (Backend)
-
-Full tech stack [here](/techstack.md)
+- [FastAPI](https://fastapi.tiangolo.com/)
+- [Pydantic](https://docs.pydantic.dev/latest/)
+- [Uvicorn](https://www.uvicorn.org/)
+- [Jinja2](https://jinja.palletsprojects.com/en/latest/)
+- [SQLAlchemy](https://www.sqlalchemy.org/)
+- [Alembic](https://alembic.sqlalchemy.org/en/latest/)
+- [Pytest](https://docs.pytest.org/en/latest/)
+- [PostgreSQL](https://www.postgresql.org/)
+- [Redis](https://redis.io/)
