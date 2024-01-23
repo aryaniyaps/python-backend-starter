@@ -119,6 +119,12 @@ class AuthService:
         # TODO: (check if login session already exists with IP address?)
         # This can happen in scenarios where user logs in, (via api), forgets password
         # and also forgets to logout. so the session wont be deleted.
+
+        # solution: Login sessions need to be persisted across logins for devices (only then we can notify on new logins)
+        # upon each login, the last_login_at alone needs to change
+
+        # when users logout we delete the authentication tokens
+        # we should also set a flag like `is_logged_out` = True on the login session
         login_session = await self._auth_repo.create_login_session(
             user_id=user.id,
             ip_address=request_ip,
