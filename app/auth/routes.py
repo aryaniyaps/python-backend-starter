@@ -2,6 +2,7 @@ from typing import Annotated, Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, Request, status
+from fastapi.responses import RedirectResponse
 from user_agents import parse
 
 from app.auth.dependencies import (
@@ -196,8 +197,8 @@ async def reset_password(
     )
 
 
-@auth_router.post("/google/login")
-async def google_login(request: Request) -> None:
+@auth_router.post("/google/login", include_in_schema=False)
+async def google_login(request: Request) -> RedirectResponse:
     callback_uri = request.url_for("google_callback")
     return await oauth_client.google.authorize_redirect(
         request,
@@ -205,7 +206,7 @@ async def google_login(request: Request) -> None:
     )
 
 
-@auth_router.post("/google/callback")
+@auth_router.post("/google/callback", include_in_schema=False)
 async def google_callback(request: Request) -> None:
     token = await oauth_client.google.authorize_access_token(request)
     user = token.get("userinfo")
