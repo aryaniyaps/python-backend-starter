@@ -1,18 +1,19 @@
 """
 initial migration
 
-Revision ID: 76efd7c9eb10
+Revision ID: 7a87e7431893
 Revises:
-Create Date: 2024-01-23 08:55:30.782047
+Create Date: 2024-01-23 09:16:02.576363
 
 """
 from collections.abc import Sequence
 
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = "76efd7c9eb10"
+revision: str = "7a87e7431893"
 down_revision: str | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -24,8 +25,8 @@ def upgrade() -> None:
         sa.Column(
             "id", sa.Uuid(), server_default=sa.text("gen_random_uuid()"), nullable=False
         ),
-        sa.Column("username", sa.String(length=32), nullable=False),
-        sa.Column("email", sa.String(length=250), nullable=False),
+        sa.Column("username", postgresql.CITEXT(length=32), nullable=False),
+        sa.Column("email", postgresql.CITEXT(length=250), nullable=False),
         sa.Column("password_hash", sa.String(length=128), nullable=False),
         sa.Column(
             "last_login_at",
@@ -42,12 +43,6 @@ def upgrade() -> None:
         ),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=True),
         sa.PrimaryKeyConstraint("id", name=op.f("users_pkey")),
-    )
-    op.create_index(
-        "users_email_case_insensitive_idx",
-        "users",
-        [sa.text("lower(email)")],
-        unique=True,
     )
     op.create_index(op.f("users_email_idx"), "users", ["email"], unique=True)
     op.create_index(op.f("users_username_idx"), "users", ["username"], unique=True)
@@ -86,5 +81,4 @@ def downgrade() -> None:
     op.drop_table("password_reset_tokens")
     op.drop_index(op.f("users_username_idx"), table_name="users")
     op.drop_index(op.f("users_email_idx"), table_name="users")
-    op.drop_index("users_email_case_insensitive_idx", table_name="users")
     op.drop_table("users")
