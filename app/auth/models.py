@@ -12,6 +12,31 @@ if TYPE_CHECKING:
     from app.users.models import User
 
 
+class LoginSession(Base):
+    __tablename__ = "login_sessions"
+
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True,
+        server_default=text(
+            "gen_random_uuid()",
+        ),
+    )
+
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey("users.id"),
+    )
+
+    ip_address: Mapped[str] = mapped_column(
+        String(40),
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        server_default=now(),
+    )
+
+    user = relationship("User", back_populates="login_sessions")
+
+
 class PasswordResetToken(Base):
     __tablename__ = "password_reset_tokens"
 

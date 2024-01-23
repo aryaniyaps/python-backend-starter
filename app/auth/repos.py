@@ -25,6 +25,7 @@ class AuthRepo:
         user_id: UUID,
     ) -> str:
         """Create a new authentication token."""
+        # TODO: store the login session ID along with the user ID here
         authentication_token = self.generate_authentication_token()
         # hash authentication token before storing
         authentication_token_hash = self.hash_authentication_token(
@@ -87,6 +88,7 @@ class AuthRepo:
         user_id: UUID,
     ) -> None:
         """Remove the given authentication token."""
+        # TODO: remove the login session ID along with the user ID here
         authentication_token_hash = self.hash_authentication_token(
             authentication_token=authentication_token,
         )

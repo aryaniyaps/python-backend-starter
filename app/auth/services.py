@@ -153,6 +153,7 @@ class AuthService:
 
     async def verify_authentication_token(self, authentication_token: str) -> UUID:
         """Verify the given authentication token and return the corresponding user ID."""
+        # TODO: return the login session ID along with the user ID here
         user_id = await self._auth_repo.get_user_id_from_authentication_token(
             authentication_token=authentication_token,
         )
