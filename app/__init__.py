@@ -25,6 +25,7 @@ from app.core.errors import (
 from app.core.middleware.request_id import set_request_id
 from app.core.schemas import ValidationErrorResult
 from app.health.routes import health_router
+from app.oauth.routes import oauth_router
 from app.users.routes import users_router
 
 
@@ -33,6 +34,7 @@ def add_routes(app: FastAPI) -> None:
     app.include_router(health_router)
     app.include_router(users_router)
     app.include_router(auth_router)
+    app.include_router(oauth_router)
 
 
 def add_middleware(app: FastAPI) -> None:
