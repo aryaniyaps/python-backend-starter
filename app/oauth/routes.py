@@ -4,7 +4,7 @@ from app.core.constants import OpenAPITag
 from app.core.oauth import oauth_client
 
 oauth_router = APIRouter(
-    prefix="/auth",
+    prefix="/oauth",
     tags=[OpenAPITag.INTERNAL],
 )
 
