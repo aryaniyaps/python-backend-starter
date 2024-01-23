@@ -5,11 +5,11 @@ from app.core.oauth import oauth_client
 
 oauth_router = APIRouter(
     prefix="/auth",
-    tags=[OpenAPITag.AUTHENTICATION],
+    tags=[OpenAPITag.INTERNAL],
 )
 
 
-@oauth_router.post("/google/login", include_in_schema=False)
+@oauth_router.post("/google/login")
 async def google_login(request: Request) -> None:
     callback_uri = request.url_for("google_callback")
     return await oauth_client.google.authorize_redirect(
@@ -18,7 +18,7 @@ async def google_login(request: Request) -> None:
     )
 
 
-@oauth_router.post("/google/callback", include_in_schema=False)
+@oauth_router.post("/google/callback")
 async def google_callback(request: Request) -> None:
     token = await oauth_client.google.authorize_access_token(request)
     user = token.get("userinfo")
