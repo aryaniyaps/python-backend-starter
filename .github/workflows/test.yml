@@ -25,6 +25,8 @@ jobs:
       SERVER_EMAIL_USERNAME:
       SERVER_SERVER_EMAIL_PASSWORD:
       SERVER_EMAIL_FROM: "noreply@example.com"
+      SERVER_GOOGLE_CLIENT_ID: "client-id"
+      SERVER_GOOGLE_CLIENT_SECRET: "client-secret"
 
 
     services:
