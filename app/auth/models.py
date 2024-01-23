@@ -2,8 +2,9 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import ForeignKey, String, text
+from sqlalchemy import Column, ForeignKey, String, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.schema import Index, UniqueConstraint
 from sqlalchemy.sql.functions import now
 
 from app.core.database import Base
@@ -15,6 +16,19 @@ if TYPE_CHECKING:
 class LoginSession(Base):
     __tablename__ = "login_sessions"
 
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id",
+            "ip_address",
+        ),
+        Index(
+            "login_sessions_user_id_ip_address_idx",
+            Column("user_id"),
+            Column("ip_address"),
+            unique=True,
+        ),
+    )
+
     id: Mapped[UUID] = mapped_column(
         primary_key=True,
         server_default=text(
@@ -24,6 +38,7 @@ class LoginSession(Base):
 
     user_id: Mapped[UUID] = mapped_column(
         ForeignKey("users.id"),
+        index=True,
     )
 
     ip_address: Mapped[str] = mapped_column(
@@ -58,8 +73,6 @@ class PasswordResetToken(Base):
     )
 
     expires_at: Mapped[datetime]
-
-    last_login_at: Mapped[datetime]
 
     created_at: Mapped[datetime] = mapped_column(
         server_default=now(),

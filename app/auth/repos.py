@@ -1,4 +1,3 @@
-from datetime import datetime
 from hashlib import sha256
 from secrets import token_hex
 from uuid import UUID
@@ -34,39 +33,55 @@ class AuthRepo:
         await self._session.commit()
         return login_session
 
+    async def get_login_session(
+        self,
+        user_id: UUID,
+        ip_address: str,
+    ) -> LoginSession | None:
+        """Get a login session with the given user ID and IP address."""
+        return await self._session.scalar(
+            select(LoginSession).where(
+                LoginSession.user_id == user_id
+                and LoginSession.ip_address == ip_address
+            ),
+        )
+
     async def get_login_sessions(self, user_id: UUID) -> ScalarResult[LoginSession]:
-        """Ge login sessions for the given user ID."""
+        """Get login sessions for the given user ID."""
         return await self._session.scalars(
             select(LoginSession).where(
                 LoginSession.user_id == user_id,
             ),
         )
 
-    async def delete_login_session(self, session_id: UUID) -> None:
+    async def delete_login_session(self, login_session_id: UUID) -> None:
         """Delete a login session."""
         await self._session.scalar(
             delete(LoginSession).where(
-                LoginSession.id == session_id,
+                LoginSession.id == login_session_id,
             ),
         )
 
     async def create_authentication_token(
         self,
         user_id: UUID,
+        login_session_id: UUID,
     ) -> str:
         """Create a new authentication token."""
-        # TODO: store the login session ID along with the user ID here
         authentication_token = self.generate_authentication_token()
         # hash authentication token before storing
         authentication_token_hash = self.hash_authentication_token(
             authentication_token=authentication_token,
         )
-        await self._redis_client.set(
+        await self._redis_client.hset(
             name=self.generate_authentication_token_key(
                 authentication_token_hash=authentication_token_hash,
             ),
-            value=user_id.bytes,
-        )
+            mapping={
+                "user_id": user_id.bytes,
+                "login_session_id": login_session_id,
+            },
+        )  # type: ignore[misc]
         await self._redis_client.sadd(
             self.generate_token_owner_key(
                 user_id=user_id,
@@ -96,20 +111,26 @@ class AuthRepo:
         """Hash the given authentication token."""
         return sha256(authentication_token.encode()).hexdigest()
 
-    async def get_user_id_from_authentication_token(
+    async def get_user_info_for_authentication_token(
         self,
         authentication_token: str,
-    ) -> UUID | None:
-        """Get the user ID from the authentication token."""
-        user_id = await self._redis_client.get(
+    ) -> tuple[UUID, UUID] | None:
+        """Get the user ID and login session ID for the authentication token."""
+        user_info = await self._redis_client.hmget(
             name=self.generate_authentication_token_key(
                 authentication_token_hash=self.hash_authentication_token(
                     authentication_token=authentication_token,
                 ),
             ),
-        )
-        if user_id is not None:
-            return UUID(bytes=user_id)
+            keys=[
+                "user_id",
+                "login_session_id",
+            ],
+        )  # type: ignore[misc]
+        if user_info is not None:
+            return UUID(bytes=user_info.get("user_id")), UUID(
+                bytes=user_info.get("login_session_id")
+            )
         return None
 
     async def remove_authentication_token(
@@ -118,7 +139,6 @@ class AuthRepo:
         user_id: UUID,
     ) -> None:
         """Remove the given authentication token."""
-        # TODO: remove the login session ID along with the user ID here
         authentication_token_hash = self.hash_authentication_token(
             authentication_token=authentication_token,
         )
@@ -172,7 +192,6 @@ class AuthRepo:
     async def create_password_reset_token(
         self,
         user_id: UUID,
-        last_login_at: datetime,
     ) -> str:
         """Create a new password reset token."""
         expires_at = text(
@@ -190,7 +209,6 @@ class AuthRepo:
                 user_id=user_id,
                 token_hash=reset_token_hash,
                 expires_at=expires_at,
-                last_login_at=last_login_at,
             ),
         )
         await self._session.commit()
@@ -204,5 +222,16 @@ class AuthRepo:
         return await self._session.scalar(
             select(PasswordResetToken).where(
                 PasswordResetToken.token_hash == reset_token_hash,
+            ),
+        )
+
+    async def delete_password_reset_tokens(
+        self,
+        user_id: UUID,
+    ) -> None:
+        """Delete password reset tokens for the given user ID."""
+        return await self._session.scalar(
+            delete(PasswordResetToken).where(
+                PasswordResetToken.user_id == user_id,
             ),
         )

@@ -60,7 +60,11 @@ class AuthService:
                 username=username,
                 email=email,
                 password=password,
-                login_ip=request_ip,
+            )
+
+            login_session = await self._auth_repo.create_login_session(
+                user_id=user.id,
+                ip_address=request_ip,
             )
         except HashingError as exception:
             raise UnexpectedError(
@@ -69,6 +73,7 @@ class AuthService:
 
         authentication_token = await self._auth_repo.create_authentication_token(
             user_id=user.id,
+            login_session_id=login_session.id,
         )
 
         task_queue.enqueue(
@@ -86,7 +91,7 @@ class AuthService:
         user_agent: UserAgent,
         request_ip: str,
     ) -> tuple[str, User]:
-        """Check the given credentials and return the relevant user if they are valid."""
+        """Check the given credentials and return the relevant authentication token and user and if they are valid."""
         if "@" in login:
             # if "@" is present, assume it's an email
             user = await self._user_repo.get_user_by_email(
@@ -111,9 +116,18 @@ class AuthService:
                 message="Invalid credentials provided.",
             ) from exception
 
+        # TODO: (check if login session already exists with IP address?)
+        # This can happen in scenarios where user logs in, (via api), forgets password
+        # and also forgets to logout. so the session wont be deleted.
+        login_session = await self._auth_repo.create_login_session(
+            user_id=user.id,
+            ip_address=request_ip,
+        )
+
         # create authentication token
         authentication_token = await self._auth_repo.create_authentication_token(
             user_id=user.id,
+            login_session_id=login_session.id,
         )
 
         previous_login_ip = user.last_login_ip
@@ -121,19 +135,10 @@ class AuthService:
         if self._password_hasher.check_needs_rehash(
             hash=user.password_hash,
         ):
-            # update user's password hash, last login timestamp and login IP
+            # update user's password hash
             user = await self._user_repo.update_user(
                 user=user,
                 password=password,
-                last_login_ip=request_ip,
-                update_last_login=True,
-            )
-        else:
-            # update user's last login timestamp and login IP
-            user = await self._user_repo.update_user(
-                user=user,
-                last_login_ip=request_ip,
-                update_last_login=True,
             )
 
         if previous_login_ip != request_ip:
@@ -141,7 +146,7 @@ class AuthService:
                 send_new_login_location_detected_email,
                 receiver=user.email,
                 username=user.username,
-                login_timestamp=user.last_login_at,
+                login_timestamp=login_session.created_at,
                 device=user_agent.get_device(),
                 browser_name=user_agent.get_browser(),
                 # TODO: pass information about where this request took place from the IP address.
@@ -151,18 +156,19 @@ class AuthService:
 
         return authentication_token, user
 
-    async def verify_authentication_token(self, authentication_token: str) -> UUID:
+    async def get_user_info_for_authentication_token(
+        self, authentication_token: str
+    ) -> tuple[UUID, UUID]:
         """Verify the given authentication token and return the corresponding user ID."""
-        # TODO: return the login session ID along with the user ID here
-        user_id = await self._auth_repo.get_user_id_from_authentication_token(
+        user_info = await self._auth_repo.get_user_info_for_authentication_token(
             authentication_token=authentication_token,
         )
 
-        if not user_id:
+        if not user_info:
             raise UnauthenticatedError(
                 message="Invalid authentication token provided.",
             )
-        return user_id
+        return user_info
 
     async def remove_authentication_token(
         self,
@@ -186,7 +192,6 @@ class AuthService:
         if existing_user is not None:
             reset_token = await self._auth_repo.create_password_reset_token(
                 user_id=existing_user.id,
-                last_login_at=existing_user.last_login_at,
             )
 
             task_queue.enqueue(
@@ -228,7 +233,7 @@ class AuthService:
                 message="Invalid password reset token or email provided.",
             )
 
-        if existing_user.last_login_at > password_reset_token.last_login_at:
+        if existing_user.last_login_at > password_reset_token.created_at:
             # If the user has logged in again after generating the password
             # reset token, the generated token becomes invalid.
             raise InvalidInputError(
@@ -242,5 +247,10 @@ class AuthService:
 
         # logout user everywhere
         await self._auth_repo.remove_all_authentication_tokens(
+            user_id=existing_user.id,
+        )
+
+        # delete all pending password reset tokens
+        await self._auth_repo.delete_password_reset_tokens(
             user_id=existing_user.id,
         )

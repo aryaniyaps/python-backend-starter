@@ -92,6 +92,10 @@ async def get_current_user_id(
 ) -> UUID:
     """Get the current user ID."""
     # Verify the token and get the current user ID
-    return await auth_service.verify_authentication_token(
+    (
+        user_id,
+        login_session_id,
+    ) = await auth_service.get_user_info_for_authentication_token(
         authentication_token=authentication_token,
     )
+    return user_id

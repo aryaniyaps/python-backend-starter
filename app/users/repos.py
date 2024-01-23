@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from argon2 import PasswordHasher
-from sqlalchemy import select, text
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.users.models import User
@@ -21,7 +21,6 @@ class UserRepo:
         username: str,
         email: str,
         password: str,
-        login_ip: str,
     ) -> User:
         """Create a new user."""
         user = User(
@@ -31,7 +30,6 @@ class UserRepo:
             password_hash=self.hash_password(
                 password=password,
             ),
-            last_login_ip=login_ip,
         )
         self._session.add(user)
         await self._session.commit()
@@ -50,8 +48,6 @@ class UserRepo:
         username: str | None = None,
         email: str | None = None,
         password: str | None = None,
-        last_login_ip: str | None = None,
-        update_last_login: bool = False,
     ) -> User:
         """Update the user with the given ID."""
         if username is not None:
@@ -62,12 +58,6 @@ class UserRepo:
             user.password_hash = self.hash_password(
                 password=password,
             )
-        if last_login_ip is not None:
-            user.last_login_ip = last_login_ip
-        if update_last_login:
-            # we use `statement_timestamp()` here instead of `now()`
-            # to set the current datetime even inside a transaction.
-            user.last_login_at = text("statement_timestamp()")
 
         self._session.add(user)
         await self._session.commit()
