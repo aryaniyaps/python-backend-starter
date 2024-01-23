@@ -116,6 +116,20 @@ async def test_get_user_by_username(user: User, user_repo: UserRepo) -> None:
     assert retrieved_user == user
 
 
+async def test_get_user_by_username_case_insensitive(
+    user: User, user_repo: UserRepo
+) -> None:
+    """Ensure retrieving a user by username is case-insensitive."""
+    retrieved_user_lower = await user_repo.get_user_by_username(
+        username=user.username.lower()
+    )
+    retrieved_user_upper = await user_repo.get_user_by_username(
+        username=user.username.upper()
+    )
+
+    assert retrieved_user_lower == retrieved_user_upper == user
+
+
 async def test_get_user_by_unknown_username(user_repo: UserRepo) -> None:
     """Ensure we cannot get a user by unknown username."""
     retrieved_user = await user_repo.get_user_by_username(username="unknown_username")
@@ -140,6 +154,16 @@ async def test_get_user_by_email(user: User, user_repo: UserRepo) -> None:
     retrieved_user = await user_repo.get_user_by_email(email=user.email)
     assert retrieved_user is not None
     assert retrieved_user == user
+
+
+async def test_get_user_by_email_case_insensitive(
+    user: User, user_repo: UserRepo
+) -> None:
+    """Ensure retrieving a user by email is case-insensitive."""
+    retrieved_user_lower = await user_repo.get_user_by_email(email=user.email.lower())
+    retrieved_user_upper = await user_repo.get_user_by_email(email=user.email.upper())
+
+    assert retrieved_user_lower == retrieved_user_upper == user
 
 
 async def test_get_user_by_unknown_email(user_repo: UserRepo) -> None:
