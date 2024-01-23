@@ -24,13 +24,13 @@ from app.core.errors import (
 )
 from app.core.middleware.request_id import set_request_id
 from app.core.schemas import ValidationErrorResult
-from app.metadata.routes import metadata_router
+from app.health.routes import health_router
 from app.users.routes import users_router
 
 
 def add_routes(app: FastAPI) -> None:
     """Register routes for the app."""
-    app.include_router(metadata_router)
+    app.include_router(health_router)
     app.include_router(users_router)
     app.include_router(auth_router)
 

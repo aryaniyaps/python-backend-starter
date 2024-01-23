@@ -1,15 +1,14 @@
 from fastapi import APIRouter
 
 from app.core.constants import OpenAPITag
-from app.metadata.schemas import HealthCheckResult
+from app.health.schemas import HealthCheckResult
 
-metadata_router = APIRouter(
-    prefix="/meta",
+health_router = APIRouter(
     tags=[OpenAPITag.METADATA],
 )
 
 
-@metadata_router.get(
+@health_router.get(
     "/health",
     response_model=HealthCheckResult,
     summary="Check the health status of the application.",
