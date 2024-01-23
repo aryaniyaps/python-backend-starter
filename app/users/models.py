@@ -39,10 +39,14 @@ class User(Base):
         String(128),
     )
 
+    # TODO: remove this field after switching over to
+    # usage of login sessions
     last_login_at: Mapped[datetime] = mapped_column(
         server_default=now(),
     )
 
+    # TODO: remove this field after switching over to
+    # usage of login sessions
     last_login_ip: Mapped[str] = mapped_column(
         String(40),
     )

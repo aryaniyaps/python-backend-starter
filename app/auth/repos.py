@@ -4,10 +4,10 @@ from secrets import token_hex
 from uuid import UUID
 
 from redis.asyncio import Redis
-from sqlalchemy import select, text
+from sqlalchemy import ScalarResult, delete, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.models import PasswordResetToken
+from app.auth.models import LoginSession, PasswordResetToken
 from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
 
 
@@ -19,6 +19,36 @@ class AuthRepo:
     ) -> None:
         self._session = session
         self._redis_client = redis_client
+
+    async def create_login_session(
+        self,
+        user_id: UUID,
+        ip_address: str,
+    ) -> LoginSession:
+        """Create a new login session."""
+        login_session = LoginSession(
+            user_id=user_id,
+            ip_address=ip_address,
+        )
+        self._session.add(login_session)
+        await self._session.commit()
+        return login_session
+
+    async def get_login_sessions(self, user_id: UUID) -> ScalarResult[LoginSession]:
+        """Ge login sessions for the given user ID."""
+        return await self._session.scalars(
+            select(LoginSession).where(
+                LoginSession.user_id == user_id,
+            ),
+        )
+
+    async def delete_login_session(self, session_id: UUID) -> None:
+        """Delete a login session."""
+        await self._session.scalar(
+            delete(LoginSession).where(
+                LoginSession.id == session_id,
+            ),
+        )
 
     async def create_authentication_token(
         self,

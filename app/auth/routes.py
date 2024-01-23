@@ -160,6 +160,29 @@ async def get_login_sessions(
     raise NotImplementedError
 
 
+@auth_router.delete(
+    "/sessions/{session_id}",
+    summary="Delete the login session with the given ID.",
+)
+async def delete_login_session(
+    session_id: UUID,
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=get_auth_service,
+        ),
+    ],
+    current_user_id: Annotated[
+        UUID,
+        Depends(
+            dependency=get_current_user_id,
+        ),
+    ],
+) -> None:
+    """Delete the login session with the given ID."""
+    raise NotImplementedError
+
+
 @auth_router.post(
     "/reset-password-request",
     status_code=status.HTTP_204_NO_CONTENT,
