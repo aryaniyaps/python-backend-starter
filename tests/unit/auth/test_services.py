@@ -40,6 +40,7 @@ async def test_register_user_success(auth_service: AuthService) -> None:
             username="new_user",
             email="new_user@example.com",
             password="password",
+            request_ip="127.0.0.1",
         )
 
     assert authentication_token == "fake_token"
@@ -58,6 +59,7 @@ async def test_register_user_existing_email(auth_service: AuthService) -> None:
             username="new_user",
             email="new_user@example.com",
             password="password",
+            request_ip="127.0.0.1",
         )
 
 
@@ -75,6 +77,7 @@ async def test_register_user_existing_username(auth_service: AuthService) -> Non
             username="new_user",
             email="new_user@example.com",
             password="password",
+            request_ip="127.0.0.1",
         )
 
 
@@ -104,6 +107,7 @@ async def test_register_user_hashing_error(auth_service: AuthService) -> None:
             username="new_user",
             email="new_user@example.com",
             password="password",
+            request_ip="127.0.0.1",
         )
 
 
@@ -112,6 +116,11 @@ async def test_login_user_valid_credentials(
     password_hasher: PasswordHasher,
 ) -> None:
     """Ensure we can login a user with valid credentials."""
+    user_agent = MagicMock(
+        spec=UserAgent,
+        get_device=MagicMock(return_value="Sample device"),
+        get_browser=MagicMock(return_value="Chrome"),
+    )
     with patch.object(
         UserRepo,
         "get_user_by_email",
@@ -136,18 +145,26 @@ async def test_login_user_valid_credentials(
         authentication_token, user = await auth_service.login_user(
             login="user@example.com",
             password="password",
+            request_ip="127.0.0.1",
+            user_agent=user_agent,
         )
 
     assert authentication_token == "fake_token"
     assert user == mock_user
     mock_update_user.assert_called_once_with(
         user=mock_user,
+        last_login_ip="127.0.0.1",
         update_last_login=True,
     )
 
 
 async def test_login_user_invalid_credentials(auth_service: AuthService) -> None:
     """Ensure we cannot login an user with invalid credentials."""
+    user_agent = MagicMock(
+        spec=UserAgent,
+        get_device=MagicMock(return_value="Sample device"),
+        get_browser=MagicMock(return_value="Chrome"),
+    )
     with patch.object(
         UserRepo,
         "get_user_by_email",
@@ -156,6 +173,8 @@ async def test_login_user_invalid_credentials(auth_service: AuthService) -> None
         await auth_service.login_user(
             login="invalid_user@example.com",
             password="invalid_password",
+            request_ip="127.0.0.1",
+            user_agent=user_agent,
         )
 
 
@@ -164,6 +183,11 @@ async def test_login_user_password_mismatch(
     password_hasher: PasswordHasher,
 ) -> None:
     """Ensure we cannot login an existing user with the wrong password."""
+    user_agent = MagicMock(
+        spec=UserAgent,
+        get_device=MagicMock(return_value="Sample device"),
+        get_browser=MagicMock(return_value="Chrome"),
+    )
     with patch("app.auth.services.UserRepo.get_user_by_email") as mock_get_user:
         mock_user = MagicMock(spec=User)
         mock_user.id = uuid4()
@@ -175,6 +199,8 @@ async def test_login_user_password_mismatch(
             await auth_service.login_user(
                 login="user@example.com",
                 password="wrong_password",
+                request_ip="127.0.0.1",
+                user_agent=user_agent,
             )
 
 
@@ -188,6 +214,12 @@ async def test_login_user_password_rehash(
         check_needs_rehash=MagicMock(
             return_value=True,
         ),
+    )
+
+    user_agent = MagicMock(
+        spec=UserAgent,
+        get_device=MagicMock(return_value="Sample device"),
+        get_browser=MagicMock(return_value="Chrome"),
     )
 
     with patch.object(
@@ -217,6 +249,8 @@ async def test_login_user_password_rehash(
         authentication_token, user = await auth_service.login_user(
             login="user@example.com",
             password="password",
+            request_ip="127.0.0.1",
+            user_agent=user_agent,
         )
 
     assert authentication_token == "fake_token"
@@ -226,6 +260,7 @@ async def test_login_user_password_rehash(
     mock_update_user.assert_called_with(
         user=mock_user,
         password="password",
+        last_login_ip="127.0.0.1",
         update_last_login=True,
     )
 
@@ -285,7 +320,7 @@ async def test_send_password_reset_request_success(
     """Ensure we can send a password reset request successfully."""
     user_agent = MagicMock(
         spec=UserAgent,
-        get_os=MagicMock(return_value="Windows"),
+        get_device=MagicMock(return_value="Sample device"),
         get_browser=MagicMock(return_value="Chrome"),
     )
 
@@ -309,6 +344,7 @@ async def test_send_password_reset_request_success(
         await auth_service.send_password_reset_request(
             email=mock_user.email,
             user_agent=user_agent,
+            request_ip="127.0.0.1",
         )
         test_worker.work(burst=True)
     # assert email was sent here
@@ -320,7 +356,7 @@ async def test_send_password_reset_request_user_not_found(
     """Ensure we cannot send a password reset request for a non-existing user."""
     user_agent = MagicMock(
         spec=UserAgent,
-        get_os=MagicMock(return_value="Windows"),
+        get_device=MagicMock(return_value="Sample device"),
         get_browser=MagicMock(return_value="Chrome"),
     )
 
@@ -335,6 +371,7 @@ async def test_send_password_reset_request_user_not_found(
         await auth_service.send_password_reset_request(
             email="nonexistent@example.com",
             user_agent=user_agent,
+            request_ip="127.0.0.1",
         )
         test_worker.work(burst=True)
     # assert email was not sent here

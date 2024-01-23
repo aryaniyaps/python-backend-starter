@@ -1,9 +1,9 @@
 """
 initial migration
 
-Revision ID: 7a87e7431893
-Revises:
-Create Date: 2024-01-23 09:16:02.576363
+Revision ID: eaa0144fd294
+Revises: e404ef6a54b5
+Create Date: 2024-01-23 09:43:49.340731
 
 """
 from collections.abc import Sequence
@@ -13,8 +13,8 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = "7a87e7431893"
-down_revision: str | None = None
+revision: str = "eaa0144fd294"
+down_revision: str | None = "e404ef6a54b5"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
