@@ -109,6 +109,10 @@ class Settings(BaseSettings):
         ),
     ]
 
+    google_client_id: str
+
+    google_client_secret: str
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_prefix="server_",
