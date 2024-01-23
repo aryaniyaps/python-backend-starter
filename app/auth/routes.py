@@ -138,6 +138,28 @@ async def logout_user(
     )
 
 
+@auth_router.get(
+    "/sessions",
+    summary="Get the current user's login sessions.",
+)
+async def get_login_sessions(
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=get_auth_service,
+        ),
+    ],
+    current_user_id: Annotated[
+        UUID,
+        Depends(
+            dependency=get_current_user_id,
+        ),
+    ],
+) -> None:
+    """Get the current user's login sessions."""
+    raise NotImplementedError
+
+
 @auth_router.post(
     "/reset-password-request",
     status_code=status.HTTP_204_NO_CONTENT,
