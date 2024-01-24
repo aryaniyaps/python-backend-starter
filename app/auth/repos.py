@@ -2,6 +2,7 @@ from hashlib import sha256
 from secrets import token_hex
 from uuid import UUID
 
+from geoip2.database import Reader
 from redis.asyncio import Redis
 from sqlalchemy import ScalarResult, delete, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,9 +16,11 @@ class AuthRepo:
         self,
         session: AsyncSession,
         redis_client: Redis,
+        geoip_reader: Reader,
     ) -> None:
         self._session = session
         self._redis_client = redis_client
+        self._geoip_reader = geoip_reader
 
     async def create_login_session(
         self,
@@ -25,9 +28,11 @@ class AuthRepo:
         ip_address: str,
     ) -> LoginSession:
         """Create a new login session."""
+        location = self._geoip_reader.city(ip_address)
         login_session = LoginSession(
             user_id=user_id,
             ip_address=ip_address,
+            location=f"{location.city.name}, {location.subdivisions.most_specific.name} ({location.country.iso_code})",
         )
         self._session.add(login_session)
         await self._session.commit()

@@ -160,7 +160,7 @@ class AuthService:
                 login_timestamp=login_session.created_at,
                 device=user_agent.get_device(),
                 browser_name=user_agent.get_browser(),
-                location=f"{location.city.name}, {location.country.name}",
+                location=f"{location.city.name}, {location.subdivisions.most_specific.name} ({location.country.iso_code})",
                 ip_address=request_ip,
             )
 
@@ -213,7 +213,7 @@ class AuthService:
                 password_reset_token=reset_token,
                 device=user_agent.get_device(),
                 browser_name=user_agent.get_browser(),
-                location=f"{location.city.name}, {location.country.name}",
+                location=f"{location.city.name}, {location.subdivisions.most_specific.name} ({location.country.iso_code})",
                 ip_address=request_ip,
             )
 

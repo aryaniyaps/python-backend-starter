@@ -31,11 +31,18 @@ def get_auth_repo(
             dependency=get_redis_client,
         ),
     ],
+    geoip_reader: Annotated[
+        Reader,
+        Depends(
+            dependency=get_geoip_reader,
+        ),
+    ],
 ) -> AuthRepo:
     """Get the auth repo."""
     return AuthRepo(
         session=session,
         redis_client=redis_client,
+        geoip_reader=geoip_reader,
     )
 
 

@@ -45,6 +45,10 @@ class LoginSession(Base):
         String(40),
     )
 
+    location: Mapped[str] = mapped_column(
+        String(256),
+    )
+
     created_at: Mapped[datetime] = mapped_column(
         server_default=now(),
     )
