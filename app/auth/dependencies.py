@@ -3,6 +3,7 @@ from uuid import UUID
 
 from argon2 import PasswordHasher
 from fastapi import Depends, Header
+from geoip2.database import Reader
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,6 +11,7 @@ from app.auth.repos import AuthRepo
 from app.auth.services import AuthService
 from app.core.database import get_database_session
 from app.core.errors import UnauthenticatedError
+from app.core.geo_ip import get_geoip_reader
 from app.core.redis_client import get_redis_client
 from app.core.security import get_password_hasher
 from app.users.dependencies import get_user_repo
@@ -56,12 +58,19 @@ def get_auth_service(
             dependency=get_password_hasher,
         ),
     ],
+    geoip_reader: Annotated[
+        Reader,
+        Depends(
+            dependency=get_geoip_reader,
+        ),
+    ],
 ) -> AuthService:
     """Get the auth service."""
     return AuthService(
         auth_repo=auth_repo,
         user_repo=user_repo,
         password_hasher=password_hasher,
+        geoip_reader=geoip_reader,
     )
 
 

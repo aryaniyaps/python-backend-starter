@@ -3,14 +3,17 @@ from collections.abc import AsyncGenerator, AsyncIterator, Iterator
 import pytest
 from alembic import command
 from alembic.config import Config
+from app.auth.models import LoginSession
 from app.auth.repos import AuthRepo
 from app.config import settings
+from app.core.geo_ip import get_geoip_reader
 from app.core.redis_client import get_redis_client
 from app.core.security import get_password_hasher
 from app.users.models import User
 from app.users.repos import UserRepo
 from app.worker import task_queue
 from argon2 import PasswordHasher
+from geoip2.database import Reader
 from redis.asyncio import Redis
 from rq import SimpleWorker
 from sqlalchemy.ext.asyncio import (
@@ -75,14 +78,25 @@ async def user(user_repo: UserRepo) -> User:
         username="tester",
         email="tester@example.org",
         password="password",
-        login_ip="127.0.0.1",
     )
 
 
 @pytest.fixture
-async def authentication_token(user: User, auth_repo: AuthRepo) -> str:
+async def login_session(user: User, auth_repo: AuthRepo) -> LoginSession:
+    """Create a login session for the user."""
+    return await auth_repo.create_login_session(
+        user_id=user.id,
+        ip_address="127.0.0.1",
+    )
+
+
+@pytest.fixture
+async def authentication_token(login_session: LoginSession, auth_repo: AuthRepo) -> str:
     """Create an authentication token for the user."""
-    return await auth_repo.create_authentication_token(user_id=user.id)
+    return await auth_repo.create_authentication_token(
+        user_id=login_session.user_id,
+        login_session_id=login_session.id,
+    )
 
 
 @pytest.fixture(scope="session")
@@ -137,3 +151,9 @@ def redis_client() -> Redis:
 def password_hasher() -> PasswordHasher:
     """Get the password hasher."""
     return get_password_hasher()
+
+
+@pytest.fixture(scope="session")
+def geoip_reader() -> Reader:
+    """Get the GeoIP database reader."""
+    return get_geoip_reader()

@@ -21,6 +21,7 @@ dependencies = [
     "redmail>=0.6.0",
     "rq>=1.15.1",
     "httpx-oauth>=0.13.1",
+    "geoip2>=4.8.0",
 ]
 requires-python = ">=3.11"
 readme = "README.md"

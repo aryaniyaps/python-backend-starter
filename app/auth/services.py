@@ -4,6 +4,7 @@ from uuid import UUID
 
 from argon2 import PasswordHasher
 from argon2.exceptions import HashingError, VerifyMismatchError
+from geoip2.database import Reader
 from user_agents.parsers import UserAgent
 
 from app.auth.repos import AuthRepo
@@ -24,10 +25,12 @@ class AuthService:
         auth_repo: AuthRepo,
         user_repo: UserRepo,
         password_hasher: PasswordHasher,
+        geoip_reader: Reader,
     ) -> None:
         self._auth_repo = auth_repo
         self._user_repo = user_repo
         self._password_hasher = password_hasher
+        self._geoip_reader = geoip_reader
 
     async def register_user(
         self,
@@ -147,6 +150,8 @@ class AuthService:
                 password=password,
             )
 
+        location = self._geoip_reader.city(request_ip)
+
         if previous_login_ip != request_ip:
             task_queue.enqueue(
                 send_new_login_location_detected_email,
@@ -155,8 +160,7 @@ class AuthService:
                 login_timestamp=login_session.created_at,
                 device=user_agent.get_device(),
                 browser_name=user_agent.get_browser(),
-                # TODO: pass information about where this request took place from the IP address.
-                location="",
+                location=f"{location.city.name}, {location.country.name}",
                 ip_address=request_ip,
             )
 
@@ -200,6 +204,8 @@ class AuthService:
                 user_id=existing_user.id,
             )
 
+            location = self._geoip_reader.city(request_ip)
+
             task_queue.enqueue(
                 send_password_reset_request_email,
                 receiver=existing_user.email,
@@ -207,8 +213,7 @@ class AuthService:
                 password_reset_token=reset_token,
                 device=user_agent.get_device(),
                 browser_name=user_agent.get_browser(),
-                # TODO: pass information about where this request took place from the IP address.
-                location="",
+                location=f"{location.city.name}, {location.country.name}",
                 ip_address=request_ip,
             )
 

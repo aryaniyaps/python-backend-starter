@@ -109,6 +109,15 @@ class Settings(BaseSettings):
         ),
     ]
 
+    geolite2_database_path: Annotated[
+        str,
+        Field(
+            examples=[
+                "/path/to/GeoLite2-City.mmdb",
+            ],
+        ),
+    ]
+
     google_client_id: str
 
     google_client_secret: str
