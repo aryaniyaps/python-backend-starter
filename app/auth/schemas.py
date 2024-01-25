@@ -1,9 +1,42 @@
+from datetime import datetime
 from typing import Annotated
+from uuid import UUID
 
 from pydantic import EmailStr, Field
+from pydantic.networks import IPvAnyAddress
 
 from app.core.schemas import BaseSchema
 from app.users.schemas import UserSchema
+
+
+class LoginSessionSchema(BaseSchema):
+    id: Annotated[
+        UUID,
+        Field(
+            description="The ID of the login session.",
+        ),
+    ]
+
+    ip_address: Annotated[
+        IPvAnyAddress,
+        Field(
+            description="The IP address of the login session.",
+        ),
+    ]
+
+    location: Annotated[
+        str,
+        Field(
+            description="The location of the login session.",
+        ),
+    ]
+
+    created_at: Annotated[
+        datetime,
+        Field(
+            description="When the login session was created.",
+        ),
+    ]
 
 
 class LoginUserInput(BaseSchema):

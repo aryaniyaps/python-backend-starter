@@ -1,3 +1,4 @@
+from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import FastAPI, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,7 +23,7 @@ from app.core.errors import (
     UnauthenticatedError,
     UnexpectedError,
 )
-from app.core.middleware.request_id import set_request_id
+from app.core.middleware.logging import logging_middleware
 from app.core.schemas import ValidationErrorResult
 from app.health.routes import health_router
 from app.oauth.routes import oauth_router
@@ -48,8 +49,9 @@ def add_middleware(app: FastAPI) -> None:
     )
     app.add_middleware(
         BaseHTTPMiddleware,
-        dispatch=set_request_id,
+        dispatch=logging_middleware,
     )
+    app.add_middleware(CorrelationIdMiddleware)
 
 
 def create_app() -> FastAPI:
