@@ -14,7 +14,6 @@ async def logging_middleware(
 ) -> Response:
     """Set structlog context variables for the request."""
     request_id = correlation_id.get()
-
     structlog.contextvars.clear_contextvars()
     structlog.contextvars.bind_contextvars(
         request_id=request_id,

@@ -14,5 +14,5 @@ if __name__ == "__main__":
         port=settings.port,
         server_header=settings.debug,
         reload=settings.debug,
-        log_level=settings.log_level,
+        log_config=None,
     )
