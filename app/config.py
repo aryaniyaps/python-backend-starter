@@ -26,6 +26,17 @@ class Settings(BaseSettings):
         ),
     ] = 8000
 
+    log_level: Annotated[
+        str,
+        Field(
+            examples=[
+                "INFO",
+                "NOTSET",
+                "DEBUG",
+            ],
+        ),
+    ] = "INFO"
+
     openapi_url: str | None = "/openapi.json"
 
     server_url: str = "http://localhost:8000"
