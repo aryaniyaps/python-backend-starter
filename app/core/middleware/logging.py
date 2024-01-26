@@ -20,6 +20,4 @@ async def logging_middleware(
         request_id=request_id,
     )
 
-    response: Response = await call_next(request)
-
-    return response
+    return await call_next(request)
