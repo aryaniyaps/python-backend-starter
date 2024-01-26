@@ -3,6 +3,8 @@ import uvicorn
 from app.config import settings
 
 if __name__ == "__main__":
+    # TODO: instead of setting up logging within create_app,
+    # we can pass the log config directly to uvicorn
     uvicorn.run(
         app="app:create_app",
         factory=True,
