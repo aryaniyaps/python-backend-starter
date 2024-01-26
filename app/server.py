@@ -1,7 +1,6 @@
 import uvicorn
 
 from app.config import settings
-from app.logger import logging_config
 
 if __name__ == "__main__":
     uvicorn.run(
@@ -11,6 +10,6 @@ if __name__ == "__main__":
         port=settings.port,
         server_header=settings.debug,
         reload=settings.debug,
-        log_config=logging_config,
         access_log=settings.debug,
+        log_config=None,
     )
