@@ -35,7 +35,7 @@ class Settings(BaseSettings):
                 "DEBUG",
             ],
         ),
-    ] = "INFO"
+    ] = "DEBUG"
 
     openapi_url: str | None = "/openapi.json"
 
