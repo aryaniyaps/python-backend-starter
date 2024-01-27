@@ -4,7 +4,7 @@ from redis import Redis
 from rq import Queue, Worker
 
 from app.config import settings
-from app.logger import build_log_config, setup_logging
+from app.logger import build_worker_log_config, setup_logging
 
 task_queue = Queue(
     name="tasks",
@@ -21,7 +21,7 @@ if __name__ == "__main__":
         human_readable=settings.debug,
     )
     dictConfig(
-        build_log_config(
+        build_worker_log_config(
             log_level=settings.log_level,
             human_readable=settings.debug,
         ),

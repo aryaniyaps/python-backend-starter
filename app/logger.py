@@ -48,10 +48,8 @@ def build_shared_processors(*, human_readable: bool) -> list[Processor]:
     return shared_processors
 
 
-# TODO: build log config for server and worker separately
-def build_log_config(log_level: str, *, human_readable: bool) -> dict[str, Any]:
-    """Build application logging config."""
-    # Define custom logging configuration
+def build_base_log_config(log_level: str, *, human_readable: bool) -> dict[str, Any]:
+    """Build base logging config."""
     return {
         "version": 1,
         "disable_existing_loggers": False,
@@ -75,6 +73,21 @@ def build_log_config(log_level: str, *, human_readable: bool) -> dict[str, Any]:
             },
         },
         "loggers": {
+            "sqlalchemy": {
+                "handlers": ["default"],
+                "level": log_level,
+                "propagate": False,
+            },
+        },
+    }
+
+
+def build_server_log_config(log_level: str, *, human_readable: bool) -> dict[str, Any]:
+    """Build server logging config."""
+    base_config = build_base_log_config(log_level, human_readable=human_readable)
+    # Extend base config with server-specific loggers
+    base_config["loggers"].update(
+        {
             "uvicorn": {
                 "handlers": ["default"],
                 "level": log_level,
@@ -95,18 +108,31 @@ def build_log_config(log_level: str, *, human_readable: bool) -> dict[str, Any]:
                 "level": log_level,
                 "propagate": False,
             },
+            # RQ queue logs go in the server logs
+            "rq.queue": {
+                "handlers": ["default"],
+                "level": log_level,
+                "propagate": False,
+            },
+        }
+    )
+    return base_config
+
+
+def build_worker_log_config(log_level: str, *, human_readable: bool) -> dict[str, Any]:
+    """Build worker logging config."""
+    base_config = build_base_log_config(log_level, human_readable=human_readable)
+    # Extend base config with worker-specific loggers
+    base_config["loggers"].update(
+        {
             "rq.worker": {
                 "handlers": ["default"],
                 "level": log_level,
                 "propagate": False,
             },
-            "sqlalchemy": {
-                "handlers": ["default"],
-                "level": log_level,
-                "propagate": False,
-            },
-        },
-    }
+        }
+    )
+    return base_config
 
 
 def setup_logging(*, human_readable: bool) -> None:
