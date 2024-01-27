@@ -48,6 +48,7 @@ def build_shared_processors(*, json_logs: bool) -> list[Processor]:
     return shared_processors
 
 
+# TODO: build log config for server and worker separately
 def build_log_config(log_level: str, *, json_logs: bool) -> dict[str, Any]:
     """Build application logging config."""
     # Define custom logging configuration
@@ -90,6 +91,11 @@ def build_log_config(log_level: str, *, json_logs: bool) -> dict[str, Any]:
                 "propagate": False,
             },
             "fastapi": {
+                "handlers": ["default"],
+                "level": log_level,
+                "propagate": False,
+            },
+            "rq.worker": {
                 "handlers": ["default"],
                 "level": log_level,
                 "propagate": False,
