@@ -5,8 +5,6 @@ from structlog.dev import ConsoleRenderer
 from structlog.processors import JSONRenderer
 from structlog.types import EventDict, Processor, WrappedLogger
 
-from app.config import settings
-
 
 def remove_color_message(
     _logger: WrappedLogger, _method_name: str, event_dict: EventDict
@@ -21,9 +19,9 @@ def remove_color_message(
     return event_dict
 
 
-def get_logging_renderer() -> JSONRenderer | ConsoleRenderer:
+def get_logging_renderer(*, human_readable: bool) -> JSONRenderer | ConsoleRenderer:
     """Get the logging renderer."""
-    if settings.debug:
+    if human_readable:
         return ConsoleRenderer()
     return JSONRenderer(indent=1, sort_keys=True)
 
@@ -58,7 +56,9 @@ def build_base_log_config(log_level: str, *, human_readable: bool) -> dict[str, 
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processors": [
                     structlog.stdlib.ProcessorFormatter.remove_processors_meta,
-                    get_logging_renderer(),
+                    get_logging_renderer(
+                        human_readable=human_readable,
+                    ),
                 ],
                 "foreign_pre_chain": build_shared_processors(
                     human_readable=human_readable,
