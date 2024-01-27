@@ -26,7 +26,6 @@ from app.core.errors import (
 from app.core.middleware.logging import logging_middleware
 from app.core.schemas import ValidationErrorResult
 from app.health.routes import health_router
-from app.logger import setup_logging
 from app.oauth.routes import oauth_router
 from app.users.routes import users_router
 
@@ -57,7 +56,6 @@ def add_middleware(app: FastAPI) -> None:
 
 def create_app() -> FastAPI:
     """Initialize an app instance."""
-    setup_logging()
     app = FastAPI(
         version="0.0.1",
         debug=settings.debug,

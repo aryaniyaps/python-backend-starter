@@ -1,4 +1,4 @@
-from logging.config import dictConfig
+from typing import Any
 
 import structlog
 from structlog.dev import ConsoleRenderer
@@ -28,8 +28,7 @@ def get_logging_renderer() -> JSONRenderer | ConsoleRenderer:
     return JSONRenderer(indent=1, sort_keys=True)
 
 
-def setup_logging() -> None:
-    """Set up application logging."""
+def build_shared_processors() -> list[Processor]:
     timestamper = structlog.processors.TimeStamper(fmt="iso", utc=True)
     shared_processors: list[Processor] = [
         structlog.contextvars.merge_contextvars,  # Merge context variables
@@ -46,9 +45,13 @@ def setup_logging() -> None:
         # Format the exception only in production
         # (we want to pretty-print them when using the ConsoleRenderer in development)
         shared_processors.append(structlog.processors.format_exc_info)
+    return shared_processors
 
+
+def build_log_config() -> dict[str, Any]:
+    """Build application logging config."""
     # Define custom logging configuration
-    logging_config = {
+    return {
         "version": 1,
         "disable_existing_loggers": False,
         "formatters": {
@@ -58,7 +61,7 @@ def setup_logging() -> None:
                     structlog.stdlib.ProcessorFormatter.remove_processors_meta,
                     get_logging_renderer(),
                 ],
-                "foreign_pre_chain": shared_processors,
+                "foreign_pre_chain": build_shared_processors(),
             },
         },
         "handlers": {
@@ -102,11 +105,11 @@ def setup_logging() -> None:
         },
     }
 
-    # Configure logging using custom configuration
-    dictConfig(logging_config)
 
+def setup_logging() -> None:
+    """Set up application logging."""
     structlog_processors = [
-        *shared_processors,
+        *build_shared_processors(),
         # Prepare event dict for `ProcessorFormatter`.
         structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
     ]

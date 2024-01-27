@@ -1,10 +1,10 @@
 import uvicorn
 
 from app.config import settings
+from app.logger import build_log_config, setup_logging
 
 if __name__ == "__main__":
-    # TODO: instead of setting up logging within create_app,
-    # we can pass the log config directly to uvicorn
+    setup_logging()
     uvicorn.run(
         app="app:create_app",
         factory=True,
@@ -13,5 +13,5 @@ if __name__ == "__main__":
         server_header=settings.debug,
         reload=settings.debug,
         access_log=settings.debug,
-        log_config=None,
+        log_config=build_log_config(),
     )
