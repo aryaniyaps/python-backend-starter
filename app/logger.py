@@ -72,11 +72,6 @@ def build_log_config(log_level: str, *, json_logs: bool) -> dict[str, Any]:
                 "class": "logging.StreamHandler",
                 "stream": "ext://sys.stdout",
             },
-            "access": {
-                "formatter": "structlog",
-                "class": "logging.StreamHandler",
-                "stream": "ext://sys.stdout",
-            },
         },
         "loggers": {
             "uvicorn": {
@@ -90,7 +85,7 @@ def build_log_config(log_level: str, *, json_logs: bool) -> dict[str, Any]:
                 "propagate": False,
             },
             "uvicorn.access": {
-                "handlers": ["access"],
+                "handlers": ["default"],
                 "level": log_level,
                 "propagate": False,
             },
