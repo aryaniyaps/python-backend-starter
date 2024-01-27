@@ -28,7 +28,7 @@ def get_logging_renderer() -> JSONRenderer | ConsoleRenderer:
     return JSONRenderer(indent=1, sort_keys=True)
 
 
-def build_shared_processors(*, json_logs: bool) -> list[Processor]:
+def build_shared_processors(*, human_readable: bool) -> list[Processor]:
     timestamper = structlog.processors.TimeStamper(fmt="iso", utc=True)
     shared_processors: list[Processor] = [
         structlog.contextvars.merge_contextvars,  # Merge context variables
@@ -41,7 +41,7 @@ def build_shared_processors(*, json_logs: bool) -> list[Processor]:
         timestamper,  # Add timestamps
     ]
 
-    if not json_logs:
+    if not human_readable:
         # Format the exception only in production
         # (we want to pretty-print them when using the ConsoleRenderer in development)
         shared_processors.append(structlog.processors.format_exc_info)
@@ -49,7 +49,7 @@ def build_shared_processors(*, json_logs: bool) -> list[Processor]:
 
 
 # TODO: build log config for server and worker separately
-def build_log_config(log_level: str, *, json_logs: bool) -> dict[str, Any]:
+def build_log_config(log_level: str, *, human_readable: bool) -> dict[str, Any]:
     """Build application logging config."""
     # Define custom logging configuration
     return {
@@ -63,7 +63,7 @@ def build_log_config(log_level: str, *, json_logs: bool) -> dict[str, Any]:
                     get_logging_renderer(),
                 ],
                 "foreign_pre_chain": build_shared_processors(
-                    json_logs=json_logs,
+                    human_readable=human_readable,
                 ),
             },
         },
@@ -109,11 +109,11 @@ def build_log_config(log_level: str, *, json_logs: bool) -> dict[str, Any]:
     }
 
 
-def setup_logging(*, json_logs: bool) -> None:
+def setup_logging(*, human_readable: bool) -> None:
     """Set up application logging."""
     structlog_processors = [
         *build_shared_processors(
-            json_logs=json_logs,
+            human_readable=human_readable,
         ),
         # Prepare event dict for `ProcessorFormatter`.
         structlog.stdlib.ProcessorFormatter.wrap_for_formatter,

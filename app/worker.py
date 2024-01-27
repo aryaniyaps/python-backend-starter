@@ -18,12 +18,12 @@ task_queue = Queue(
 if __name__ == "__main__":
     # set up logging
     setup_logging(
-        json_logs=(not settings.debug),
+        human_readable=settings.debug,
     )
     dictConfig(
         build_log_config(
             log_level=settings.log_level,
-            json_logs=(not settings.debug),
+            human_readable=settings.debug,
         ),
     )
 
