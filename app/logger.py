@@ -28,7 +28,7 @@ def get_logging_renderer() -> JSONRenderer | ConsoleRenderer:
     return JSONRenderer(indent=1, sort_keys=True)
 
 
-def build_shared_processors() -> list[Processor]:
+def build_shared_processors(*, json_logs: bool) -> list[Processor]:
     timestamper = structlog.processors.TimeStamper(fmt="iso", utc=True)
     shared_processors: list[Processor] = [
         structlog.contextvars.merge_contextvars,  # Merge context variables
@@ -41,14 +41,14 @@ def build_shared_processors() -> list[Processor]:
         timestamper,  # Add timestamps
     ]
 
-    if settings.debug:
+    if not json_logs:
         # Format the exception only in production
         # (we want to pretty-print them when using the ConsoleRenderer in development)
         shared_processors.append(structlog.processors.format_exc_info)
     return shared_processors
 
 
-def build_log_config() -> dict[str, Any]:
+def build_log_config(log_level: str, *, json_logs: bool) -> dict[str, Any]:
     """Build application logging config."""
     # Define custom logging configuration
     return {
@@ -61,7 +61,9 @@ def build_log_config() -> dict[str, Any]:
                     structlog.stdlib.ProcessorFormatter.remove_processors_meta,
                     get_logging_renderer(),
                 ],
-                "foreign_pre_chain": build_shared_processors(),
+                "foreign_pre_chain": build_shared_processors(
+                    json_logs=json_logs,
+                ),
             },
         },
         "handlers": {
@@ -79,37 +81,39 @@ def build_log_config() -> dict[str, Any]:
         "loggers": {
             "uvicorn": {
                 "handlers": ["default"],
-                "level": settings.log_level,
+                "level": log_level,
                 "propagate": False,
             },
             "uvicorn.error": {
                 "handlers": ["default"],
-                "level": settings.log_level,
+                "level": log_level,
                 "propagate": False,
             },
             "uvicorn.access": {
                 "handlers": ["access"],
-                "level": settings.log_level,
+                "level": log_level,
                 "propagate": False,
             },
             "fastapi": {
                 "handlers": ["default"],
-                "level": settings.log_level,
+                "level": log_level,
                 "propagate": False,
             },
             "sqlalchemy": {
                 "handlers": ["default"],
-                "level": settings.log_level,
+                "level": log_level,
                 "propagate": False,
             },
         },
     }
 
 
-def setup_logging() -> None:
+def setup_logging(*, json_logs: bool) -> None:
     """Set up application logging."""
     structlog_processors = [
-        *build_shared_processors(),
+        *build_shared_processors(
+            json_logs=json_logs,
+        ),
         # Prepare event dict for `ProcessorFormatter`.
         structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
     ]
