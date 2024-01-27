@@ -12,7 +12,7 @@ def remove_color_message(
     _logger: WrappedLogger, _method_name: str, event_dict: EventDict
 ) -> EventDict:
     """
-    remove `color_message` from the event dict.
+    Remove `color_message` from the event dict.
 
     Uvicorn logs the message a second time in the extra `color_message`, but we don't
     need it. This processor removes the key from the event dict if it exists.
