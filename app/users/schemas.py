@@ -7,7 +7,7 @@ from pydantic import EmailStr, Field
 from app.core.schemas import BaseSchema
 
 
-class UserSchema(BaseSchema):
+class PartialUserSchema(BaseSchema):
     id: Annotated[
         UUID,
         Field(
@@ -25,23 +25,6 @@ class UserSchema(BaseSchema):
         ),
     ]
 
-    email: Annotated[
-        str,
-        Field(
-            examples=[
-                "aryaniyaps@example.com",
-            ],
-            description="The email of the user.",
-        ),
-    ]
-
-    last_login_at: Annotated[
-        datetime,
-        Field(
-            description="When the user last logged in.",
-        ),
-    ]
-
     created_at: Annotated[
         datetime,
         Field(
@@ -53,6 +36,18 @@ class UserSchema(BaseSchema):
         datetime | None,
         Field(
             description="When the user was last updated.",
+        ),
+    ]
+
+
+class UserSchema(PartialUserSchema):
+    email: Annotated[
+        str,
+        Field(
+            examples=[
+                "aryaniyaps@example.com",
+            ],
+            description="The email of the user.",
         ),
     ]
 

@@ -7,7 +7,7 @@ from app.auth.dependencies import get_current_user_id
 from app.core.constants import OpenAPITag
 from app.users.dependencies import get_user_service
 from app.users.models import User
-from app.users.schemas import UpdateUserInput, UserSchema
+from app.users.schemas import PartialUserSchema, UpdateUserInput, UserSchema
 from app.users.services import UserService
 
 users_router = APIRouter(
@@ -75,7 +75,7 @@ async def update_current_user(
 
 @users_router.get(
     "/{user_id}",
-    response_model=UserSchema,
+    response_model=PartialUserSchema,
     summary="Get the user with the given ID.",
     description="""Retrieves information about a user based on the
     provided user ID. The user ID is expected to be a valid UUID.
