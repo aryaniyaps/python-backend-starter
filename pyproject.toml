@@ -37,7 +37,13 @@ test = [
     "anyio>=4.2.0",
     "httpx>=0.25.0",
 ]
-dev = ["mypy>=1.8.0", "ruff>=0.1.12", "black>=23.12.1"]
+dev = [
+    "mypy>=1.8.0",
+    "ruff>=0.1.12",
+    "black>=23.12.1",
+    # for console exception formatting
+    "rich>=13.7.0",
+]
 
 [tool.pdm.scripts]
 start-server = "app/server.py"
