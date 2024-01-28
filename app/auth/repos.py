@@ -59,11 +59,11 @@ class AuthRepo:
             ),
         )
 
-    async def delete_login_session(self, login_session_id: UUID) -> None:
+    async def delete_login_session(self, login_session_id: UUID, user_id: UUID) -> None:
         """Delete a login session."""
         await self._session.scalar(
             delete(LoginSession).where(
-                LoginSession.id == login_session_id,
+                LoginSession.id == login_session_id and LoginSession.user_id == user_id,
             ),
         )
 

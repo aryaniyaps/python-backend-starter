@@ -5,8 +5,10 @@ from uuid import UUID
 from argon2 import PasswordHasher
 from argon2.exceptions import HashingError, VerifyMismatchError
 from geoip2.database import Reader
+from sqlalchemy import ScalarResult
 from user_agents.parsers import UserAgent
 
+from app.auth.models import LoginSession
 from app.auth.repos import AuthRepo
 from app.auth.tasks import (
     send_new_login_location_detected_email,
@@ -165,6 +167,19 @@ class AuthService:
             )
 
         return authentication_token, user
+
+    async def get_login_sessions(self, user_id: UUID) -> ScalarResult[LoginSession]:
+        """Get login sessions for the given user ID."""
+        return await self._auth_repo.get_login_sessions(
+            user_id=user_id,
+        )
+
+    async def delete_login_session(self, login_session_id: UUID, user_id: UUID) -> None:
+        """Delete a login session."""
+        await self._auth_repo.delete_login_session(
+            login_session_id=login_session_id,
+            user_id=user_id,
+        )
 
     async def verify_authentication_token(
         self, authentication_token: str

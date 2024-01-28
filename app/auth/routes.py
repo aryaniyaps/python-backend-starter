@@ -2,6 +2,7 @@ from typing import Annotated, Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, Path, Security, status
+from sqlalchemy import ScalarResult
 from user_agents import parse
 
 from app.auth.dependencies import (
@@ -9,7 +10,9 @@ from app.auth.dependencies import (
     get_auth_service,
     get_current_user_id,
 )
+from app.auth.models import LoginSession
 from app.auth.schemas import (
+    LoginSessionSchema,
     LoginUserInput,
     LoginUserResult,
     PasswordResetInput,
@@ -131,6 +134,7 @@ async def logout_user(
 @auth_router.get(
     "/sessions",
     summary="Get the current user's login sessions.",
+    response_model=list[LoginSessionSchema],
 )
 async def get_login_sessions(
     auth_service: Annotated[
@@ -145,9 +149,9 @@ async def get_login_sessions(
             dependency=get_current_user_id,
         ),
     ],
-) -> None:
+) -> ScalarResult[LoginSession]:
     """Get the current user's login sessions."""
-    raise NotImplementedError
+    return await auth_service.get_login_sessions(user_id=current_user_id)
 
 
 @auth_router.delete(
@@ -175,7 +179,10 @@ async def delete_login_session(
     ],
 ) -> None:
     """Delete the login session with the given ID."""
-    raise NotImplementedError
+    await auth_service.delete_login_session(
+        login_session_id=session_id,
+        user_id=current_user_id,
+    )
 
 
 @auth_router.post(
