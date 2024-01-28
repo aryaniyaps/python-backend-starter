@@ -271,12 +271,12 @@ class AuthService:
             password=new_password,
         )
 
-        # logout user everywhere
-        await self._auth_repo.remove_all_authentication_tokens(
+        # delete all other password reset tokens for user
+        await self._auth_repo.delete_password_reset_tokens(
             user_id=existing_user.id,
         )
 
-        # delete all pending password reset tokens
-        await self._auth_repo.delete_password_reset_tokens(
+        # logout user everywhere
+        await self._auth_repo.remove_all_authentication_tokens(
             user_id=existing_user.id,
         )

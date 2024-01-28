@@ -18,7 +18,7 @@ class BaseSchema(BaseModel):
     )
 
 
-class ValidationError(BaseSchema):
+class ValidationErrorSchema(BaseSchema):
     loc: Annotated[
         list[str] | None,
         Field(
@@ -53,7 +53,7 @@ class ValidationErrorResult(BaseSchema):
         ),
     ]
     errors: Annotated[
-        list[ValidationError],
+        list[ValidationErrorSchema],
         Field(
             description="A list of validation errors.",
         ),
