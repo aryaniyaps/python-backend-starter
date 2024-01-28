@@ -101,11 +101,7 @@ class UpdateUserInput(BaseSchema):
 
     @field_validator("current_password")
     @classmethod
-    def check_current_password(
-        cls,
-        current_password: str,
-        info: ValidationInfo,
-    ) -> str:
+    def check_current_password(cls, current_password: str, info: ValidationInfo) -> str:
         """Ensure that the password exists when the current password is provided."""
         if info.data.get("password") and not current_password:
             message = "Current password is required when password is provided."
@@ -114,11 +110,7 @@ class UpdateUserInput(BaseSchema):
 
     @field_validator("password")
     @classmethod
-    def check_password(
-        cls,
-        password: str,
-        info: ValidationInfo,
-    ) -> str:
+    def check_password(cls, password: str, info: ValidationInfo) -> str:
         """Ensure that the current password exists when the password is provided."""
         if info.data.get("current_password") and not password:
             message = "Password is required when current password is provided."
