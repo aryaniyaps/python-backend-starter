@@ -32,9 +32,6 @@ auth_router = APIRouter(
     response_model=RegisterUserResult,
     status_code=status.HTTP_201_CREATED,
     summary="Register a new user.",
-    description="""Allows users to register a new account by providing the
-    required user registration information. Upon successful registration,
-    it returns details about the registered user.""",
 )
 async def register_user(
     data: RegisterUserInput,
@@ -69,9 +66,6 @@ async def register_user(
     "/login",
     response_model=LoginUserResult,
     summary="Login the current user.",
-    description="""Handles user login by validating the provided login credentials.
-    If the credentials are valid, it returns information about the authenticated user,
-    including an authentication token for future requests.""",
 )
 async def login_user(
     data: LoginUserInput,
@@ -106,8 +100,6 @@ async def login_user(
     "/logout",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Logout the current user.",
-    description="""Logs out the currently authenticated user by invalidating
-    the authentication token associated with the user.""",
 )
 async def logout_user(
     auth_service: Annotated[
@@ -190,9 +182,6 @@ async def delete_login_session(
     "/reset-password-request",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Send a password reset request.",
-    description="""Initiates the process of resetting a user's password
-    by sending a reset request to the provided email address. The user
-    agent information is also captured for security purposes.""",
     response_model=None,
 )
 async def request_password_reset(
@@ -223,9 +212,6 @@ async def request_password_reset(
     "/reset-password",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Reset user password.",
-    description="""Allows users to reset their password by providing the
-    necessary information, including a valid reset token. After successful
-    validation, the user's password is updated.""",
     response_model=None,
 )
 async def reset_password(

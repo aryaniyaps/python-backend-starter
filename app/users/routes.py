@@ -20,9 +20,6 @@ users_router = APIRouter(
     "/@me",
     response_model=UserSchema,
     summary="Get the current user.",
-    description="""Retrieves information about the currently authenticated
-    user based on their user ID. Requires the authentication token to be
-    included in the request headers for security validation.""",
 )
 async def get_current_user(
     current_user_id: Annotated[
@@ -77,10 +74,6 @@ async def update_current_user(
     "/{user_id}",
     response_model=PartialUserSchema,
     summary="Get the user with the given ID.",
-    description="""Retrieves information about a user based on the
-    provided user ID. The user ID is expected to be a valid UUID.
-    This endpoint is useful for fetching details about specific users
-    in the system.""",
 )
 async def get_user(
     user_id: Annotated[
