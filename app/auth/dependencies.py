@@ -2,7 +2,8 @@ from typing import Annotated
 from uuid import UUID
 
 from argon2 import PasswordHasher
-from fastapi import Depends, Header
+from fastapi import Depends, Security
+from fastapi.security import APIKeyHeader
 from geoip2.database import Reader
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,12 +11,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.repos import AuthRepo
 from app.auth.services import AuthService
 from app.core.database import get_database_session
-from app.core.errors import UnauthenticatedError
 from app.core.geo_ip import get_geoip_reader
 from app.core.redis_client import get_redis_client
 from app.core.security import get_password_hasher
 from app.users.dependencies import get_user_repo
 from app.users.repos import UserRepo
+
+authentication_token_header = APIKeyHeader(name="X-Authentication-Token")
 
 
 def get_auth_repo(
@@ -81,17 +83,6 @@ def get_auth_service(
     )
 
 
-async def get_authentication_token(
-    x_authentication_token: Annotated[str | None, Header()] = None,
-) -> str:
-    """Get the authentication token."""
-    if not x_authentication_token:
-        raise UnauthenticatedError(
-            message="Authentication token is missing.",
-        )
-    return x_authentication_token
-
-
 async def get_current_user_id(
     auth_service: Annotated[
         AuthService,
@@ -101,8 +92,8 @@ async def get_current_user_id(
     ],
     authentication_token: Annotated[
         str,
-        Depends(
-            dependency=get_authentication_token,
+        Security(
+            authentication_token_header,
         ),
     ],
 ) -> UUID:
@@ -111,7 +102,7 @@ async def get_current_user_id(
     (
         user_id,
         login_session_id,
-    ) = await auth_service.get_user_info_for_authentication_token(
+    ) = await auth_service.verify_authentication_token(
         authentication_token=authentication_token,
     )
     return user_id

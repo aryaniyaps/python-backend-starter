@@ -1,12 +1,12 @@
 from typing import Annotated, Any
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Header, Path, status
+from fastapi import APIRouter, Depends, Header, Path, Security, status
 from user_agents import parse
 
 from app.auth.dependencies import (
+    authentication_token_header,
     get_auth_service,
-    get_authentication_token,
     get_current_user_id,
 )
 from app.auth.schemas import (
@@ -118,8 +118,8 @@ async def logout_user(
     ],
     authentication_token: Annotated[
         str,
-        Depends(
-            dependency=get_authentication_token,
+        Security(
+            authentication_token_header,
         ),
     ],
     current_user_id: Annotated[

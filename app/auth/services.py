@@ -166,7 +166,7 @@ class AuthService:
 
         return authentication_token, user
 
-    async def get_user_info_for_authentication_token(
+    async def verify_authentication_token(
         self, authentication_token: str
     ) -> tuple[UUID, UUID]:
         """Verify the given authentication token and return the corresponding user ID."""
