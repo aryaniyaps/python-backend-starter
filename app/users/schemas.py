@@ -106,6 +106,7 @@ class UpdateUserInput(BaseSchema):
         current_password: str,
         info: ValidationInfo,
     ) -> str:
+        """Ensure that the password exists when the current password is provided."""
         if info.data.get("password") and not current_password:
             message = "Current password is required when password is provided."
             raise ValueError(message)
@@ -118,6 +119,7 @@ class UpdateUserInput(BaseSchema):
         password: str,
         info: ValidationInfo,
     ) -> str:
+        """Ensure that the current password exists when the password is provided."""
         if info.data.get("current_password") and not password:
             message = "Password is required when current password is provided."
             raise ValueError(message)
