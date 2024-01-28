@@ -51,7 +51,10 @@ def add_middleware(app: FastAPI) -> None:
         BaseHTTPMiddleware,
         dispatch=logging_middleware,
     )
-    app.add_middleware(CorrelationIdMiddleware)
+    app.add_middleware(
+        CorrelationIdMiddleware,
+        header_name="X-Request-ID",
+    )
 
 
 def create_app() -> FastAPI:
