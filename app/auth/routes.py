@@ -66,7 +66,7 @@ async def register_user(
 
 
 @auth_router.post(
-    "/login",
+    "/sessions",
     response_model=LoginUserResult,
     summary="Login the current user.",
 )
@@ -99,8 +99,8 @@ async def login_user(
     }
 
 
-@auth_router.post(
-    "/logout",
+@auth_router.delete(
+    "/sessions/@me",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Logout the current user.",
 )
@@ -154,9 +154,10 @@ async def get_login_sessions(
     return await auth_service.get_login_sessions(user_id=current_user_id)
 
 
+# TODO: add route to delete all login sessions at once?
 @auth_router.delete(
     "/sessions/{session_id}",
-    summary="Delete the login session with the given ID.",
+    summary="Logout the session with the given ID.",
 )
 async def delete_login_session(
     session_id: Annotated[
@@ -178,7 +179,7 @@ async def delete_login_session(
         ),
     ],
 ) -> None:
-    """Delete the login session with the given ID."""
+    """Logout the session with the given ID."""
     await auth_service.delete_login_session(
         login_session_id=session_id,
         user_id=current_user_id,
