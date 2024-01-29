@@ -163,3 +163,7 @@ cython_debug/
 
 # Ruff
 .ruff_cache
+
+
+# Docker secrets
+secrets

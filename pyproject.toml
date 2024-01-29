@@ -42,6 +42,7 @@ dev = [
     "ruff>=0.1.12",
     "black>=23.12.1",
     # for console exception formatting
+    # (used by structlog)
     "rich>=13.7.0",
 ]
 
