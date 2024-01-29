@@ -2,7 +2,7 @@ from urllib.parse import urlencode, urljoin
 
 from app.config import settings
 from app.core.constants import APP_URL
-from app.core.emails import email_sender
+from app.core.emails import email_sender, resend_client
 from app.core.templates import (
     new_login_location_html,
     new_login_location_subject,
@@ -21,9 +21,9 @@ def send_onboarding_email(
     username: str,
 ) -> None:
     """Send an onboarding email to the given user."""
-    email_sender.send(
+    resend_client.send_email(
         sender=settings.email_from,
-        receivers=[receiver],
+        to=receiver,
         subject=onboarding_subject.render(
             username=username,
         ),

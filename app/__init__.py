@@ -2,6 +2,7 @@ from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import FastAPI, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import ORJSONResponse
 from starlette.exceptions import HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -47,6 +48,7 @@ def add_middleware(app: FastAPI) -> None:
         allow_headers=["X-Requested-With", "X-Request-ID"],
         expose_headers=["X-Request-ID"],
     )
+    app.add_middleware(GZipMiddleware)
     app.add_middleware(
         BaseHTTPMiddleware,
         dispatch=logging_middleware,
