@@ -106,3 +106,28 @@ async def get_current_user_id(
         authentication_token=authentication_token,
     )
     return user_id
+
+
+async def get_current_login_session_id(
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=get_auth_service,
+        ),
+    ],
+    authentication_token: Annotated[
+        str,
+        Security(
+            authentication_token_header,
+        ),
+    ],
+) -> UUID:
+    """Get the current login session ID."""
+    # Verify the token and get the login session ID
+    (
+        user_id,
+        login_session_id,
+    ) = await auth_service.verify_authentication_token(
+        authentication_token=authentication_token,
+    )
+    return login_session_id

@@ -61,9 +61,22 @@ class AuthRepo:
 
     async def delete_login_session(self, login_session_id: UUID, user_id: UUID) -> None:
         """Delete a login session."""
-        await self._session.scalar(
+        await self._session.execute(
             delete(LoginSession).where(
                 LoginSession.id == login_session_id and LoginSession.user_id == user_id,
+            ),
+        )
+
+    async def delete_login_sessions(
+        self,
+        user_id: UUID,
+        except_login_session_id: UUID,
+    ) -> None:
+        """Delete all login sessions for the user except for the given login session ID."""
+        await self._session.execute(
+            delete(LoginSession).where(
+                LoginSession.user_id == user_id
+                and LoginSession.id != except_login_session_id
             ),
         )
 
@@ -79,7 +92,8 @@ class AuthRepo:
             authentication_token=authentication_token,
         )
         await self._redis_client.hset(
-            name=self.generate_authentication_token_key(
+            name="auth_tokens",
+            key=self.generate_authentication_token_key(
                 authentication_token_hash=authentication_token_hash,
             ),
             mapping={
@@ -235,7 +249,7 @@ class AuthRepo:
         user_id: UUID,
     ) -> None:
         """Delete password reset tokens for the given user ID."""
-        return await self._session.scalar(
+        return await self._session.execute(
             delete(PasswordResetToken).where(
                 PasswordResetToken.user_id == user_id,
             ),

@@ -155,6 +155,7 @@ class AuthService:
         location = self._geoip_reader.city(request_ip)
 
         if previous_login_ip != request_ip:
+            # TODO: send new login detected based on the device, and not the IP address
             task_queue.enqueue(
                 send_new_login_location_detected_email,
                 receiver=user.email,
@@ -178,6 +179,17 @@ class AuthService:
         """Delete a login session."""
         await self._auth_repo.delete_login_session(
             login_session_id=login_session_id,
+            user_id=user_id,
+        )
+
+    async def delete_login_sessions(
+        self,
+        user_id: UUID,
+        except_login_session_id: UUID,
+    ) -> None:
+        """Delete all login sessions for the user except for the given login session ID."""
+        await self._auth_repo.delete_login_sessions(
+            except_login_session_id=except_login_session_id,
             user_id=user_id,
         )
 

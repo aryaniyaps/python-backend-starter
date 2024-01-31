@@ -8,6 +8,7 @@ from user_agents import parse
 from app.auth.dependencies import (
     authentication_token_header,
     get_auth_service,
+    get_current_login_session_id,
     get_current_user_id,
 )
 from app.auth.models import LoginSession
@@ -201,6 +202,12 @@ async def delete_login_sessions(
             dependency=get_auth_service,
         ),
     ],
+    current_login_session_id: Annotated[
+        UUID,
+        Depends(
+            dependency=get_current_login_session_id,
+        ),
+    ],
     current_user_id: Annotated[
         UUID,
         Depends(
@@ -209,7 +216,10 @@ async def delete_login_sessions(
     ],
 ) -> None:
     """Logout every other session except for the current session."""
-    raise NotImplementedError
+    await auth_service.delete_login_sessions(
+        user_id=current_user_id,
+        except_login_session_id=current_login_session_id,
+    )
 
 
 @auth_router.post(
