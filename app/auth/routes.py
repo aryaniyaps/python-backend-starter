@@ -15,6 +15,7 @@ from app.auth.schemas import (
     LoginSessionSchema,
     LoginUserInput,
     LoginUserResult,
+    LogoutInput,
     PasswordResetInput,
     PasswordResetRequestInput,
     RegisterUserInput,
@@ -104,7 +105,8 @@ async def login_user(
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Logout the current user.",
 )
-async def logout_user(
+async def delete_current_login_session(
+    data: LogoutInput,
     auth_service: Annotated[
         AuthService,
         Depends(
@@ -125,6 +127,9 @@ async def logout_user(
     ],
 ) -> None:
     """Logout the current user."""
+    # TODO: use data.remember_device here
+    # Upon logout, delete the login session but keep the Device stored for the user.
+    # this way if a new device login is detected, we can notify the user (we dont check for IP addresses for new login, it makes sense as IP addresses can change based on location)
     await auth_service.remove_authentication_token(
         authentication_token=authentication_token,
         user_id=current_user_id,
@@ -154,7 +159,6 @@ async def get_login_sessions(
     return await auth_service.get_login_sessions(user_id=current_user_id)
 
 
-# TODO: add route to delete all login sessions at once?
 @auth_router.delete(
     "/sessions/{session_id}",
     summary="Logout the session with the given ID.",
@@ -184,6 +188,28 @@ async def delete_login_session(
         login_session_id=session_id,
         user_id=current_user_id,
     )
+
+
+@auth_router.delete(
+    "/sessions/",
+    summary="Logout every other session except for the current session.",
+)
+async def delete_login_sessions(
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=get_auth_service,
+        ),
+    ],
+    current_user_id: Annotated[
+        UUID,
+        Depends(
+            dependency=get_current_user_id,
+        ),
+    ],
+) -> None:
+    """Logout every other session except for the current session."""
+    raise NotImplementedError
 
 
 @auth_router.post(

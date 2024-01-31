@@ -138,6 +138,15 @@ class RegisterUserResult(BaseSchema):
     ]
 
 
+class LogoutInput(BaseSchema):
+    remember_device: Annotated[
+        bool,
+        Field(
+            description="Whether the current user's device should be remembered.",
+        ),
+    ] = True
+
+
 class PasswordResetRequestInput(BaseSchema):
     email: Annotated[
         EmailStr,
