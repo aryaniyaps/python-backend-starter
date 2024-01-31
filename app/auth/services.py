@@ -16,7 +16,7 @@ from app.auth.tasks import (
     send_password_reset_request_email,
 )
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
-from app.core.geo_ip import format_city_location
+from app.core.geo_ip import format_geoip_city
 from app.users.models import User
 from app.users.repos import UserRepo
 from app.worker import task_queue
@@ -164,7 +164,7 @@ class AuthService:
                 login_timestamp=login_session.created_at,
                 device=user_agent.get_device(),
                 browser_name=user_agent.get_browser(),
-                location=format_city_location(city),
+                location=format_geoip_city(city),
                 ip_address=request_ip,
             )
 
@@ -241,7 +241,7 @@ class AuthService:
                 password_reset_token=reset_token,
                 device=user_agent.get_device(),
                 browser_name=user_agent.get_browser(),
-                location=format_city_location(city),
+                location=format_geoip_city(city),
                 ip_address=request_ip,
             )
 

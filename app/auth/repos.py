@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.models import LoginSession, PasswordResetToken
 from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
-from app.core.geo_ip import format_city_location
+from app.core.geo_ip import format_geoip_city
 
 
 class AuthRepo:
@@ -33,7 +33,7 @@ class AuthRepo:
         login_session = LoginSession(
             user_id=user_id,
             ip_address=ip_address,
-            location=format_city_location(city),
+            location=format_geoip_city(city),
         )
         self._session.add(login_session)
         await self._session.commit()
