@@ -2,13 +2,14 @@ from hashlib import sha256
 from secrets import token_hex
 from uuid import UUID
 
-from geoip2.database import Reader, format_city_location
+from geoip2.database import Reader
 from redis.asyncio import Redis
 from sqlalchemy import ScalarResult, delete, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.models import LoginSession, PasswordResetToken
 from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
+from app.core.geo_ip import format_city_location
 
 
 class AuthRepo:

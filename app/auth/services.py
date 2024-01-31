@@ -4,7 +4,7 @@ from uuid import UUID
 
 from argon2 import PasswordHasher
 from argon2.exceptions import HashingError, VerifyMismatchError
-from geoip2.database import Reader, format_city_location
+from geoip2.database import Reader
 from sqlalchemy import ScalarResult
 from user_agents.parsers import UserAgent
 
@@ -16,6 +16,7 @@ from app.auth.tasks import (
     send_password_reset_request_email,
 )
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
+from app.core.geo_ip import format_city_location
 from app.users.models import User
 from app.users.repos import UserRepo
 from app.worker import task_queue
