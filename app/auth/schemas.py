@@ -139,10 +139,10 @@ class RegisterUserResult(BaseSchema):
 
 
 class LogoutInput(BaseSchema):
-    remember_device: Annotated[
+    remember_session: Annotated[
         bool,
         Field(
-            description="Whether the current user's device should be remembered.",
+            description="Whether the current user's session should be remembered.",
         ),
     ] = True
 

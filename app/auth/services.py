@@ -41,6 +41,7 @@ class AuthService:
         username: str,
         password: str,
         request_ip: str,
+        user_agent: UserAgent,
     ) -> tuple[str, User]:
         """Register a new user."""
         try:
@@ -71,6 +72,7 @@ class AuthService:
             login_session = await self._auth_repo.create_login_session(
                 user_id=user.id,
                 ip_address=request_ip,
+                user_agent=user_agent,
             )
         except HashingError as exception:
             raise UnexpectedError(
@@ -122,18 +124,27 @@ class AuthService:
                 message="Invalid credentials provided.",
             ) from exception
 
-        # TODO: (check if login session already exists with IP address?)
-        # This can happen in scenarios where user logs in, (via api), forgets password
-        # and also forgets to logout. so the session wont be deleted.
+        if not await self._auth_repo.check_login_session_exists(
+            user_id=user.id,
+            user_agent=str(user_agent),
+            ip_address=request_ip,
+        ):
+            city = self._geoip_reader.city(request_ip)
+            task_queue.enqueue(
+                send_new_login_location_detected_email,
+                receiver=user.email,
+                username=user.username,
+                login_timestamp=datetime.now(UTC),
+                device=user_agent.get_device(),
+                browser_name=user_agent.get_browser(),
+                location=format_geoip_city(city),
+                ip_address=request_ip,
+            )
 
-        # solution: Login sessions need to be persisted across logins for devices (only then we can notify on new logins)
-        # upon each login, the last_login_at alone needs to change
-
-        # when users logout we delete the authentication tokens
-        # we should also set a flag like `is_logged_out` = True on the login session
         login_session = await self._auth_repo.create_login_session(
             user_id=user.id,
             ip_address=request_ip,
+            user_agent=user_agent,
         )
 
         # create authentication token
@@ -141,8 +152,6 @@ class AuthService:
             user_id=user.id,
             login_session_id=login_session.id,
         )
-
-        previous_login_ip = user.last_login_ip
 
         if self._password_hasher.check_needs_rehash(
             hash=user.password_hash,
@@ -153,21 +162,6 @@ class AuthService:
                 password=password,
             )
 
-        city = self._geoip_reader.city(request_ip)
-
-        if previous_login_ip != request_ip:
-            # TODO: send new login detected based on the device, and not the IP address
-            task_queue.enqueue(
-                send_new_login_location_detected_email,
-                receiver=user.email,
-                username=user.username,
-                login_timestamp=login_session.created_at,
-                device=user_agent.get_device(),
-                browser_name=user_agent.get_browser(),
-                location=format_geoip_city(city),
-                ip_address=request_ip,
-            )
-
         return authentication_token, user
 
     async def get_login_sessions(self, user_id: UUID) -> ScalarResult[LoginSession]:
@@ -176,12 +170,25 @@ class AuthService:
             user_id=user_id,
         )
 
-    async def delete_login_session(self, login_session_id: UUID, user_id: UUID) -> None:
+    async def logout_login_session(
+        self,
+        login_session_id: UUID,
+        user_id: UUID,
+        *,
+        remember_session: bool,
+    ) -> None:
         """Delete a login session."""
-        await self._auth_repo.delete_login_session(
+        if not remember_session:
+            return await self._auth_repo.delete_login_session(
+                login_session_id=login_session_id,
+                user_id=user_id,
+            )
+        return await self._auth_repo.update_login_session(
             login_session_id=login_session_id,
-            user_id=user_id,
+            logged_out_at=datetime.now(UTC),
         )
+
+        # TODO: delete relevant auth tokens here
 
     async def delete_login_sessions(
         self,
@@ -193,11 +200,12 @@ class AuthService:
             except_login_session_id=except_login_session_id,
             user_id=user_id,
         )
+        # TODO: delete relevant auth tokens here
 
     async def verify_authentication_token(
         self, authentication_token: str
     ) -> tuple[UUID, UUID]:
-        """Verify the given authentication token and return the corresponding user ID."""
+        """Verify the given authentication token and return the corresponding user info."""
         user_info = await self._auth_repo.get_user_info_for_authentication_token(
             authentication_token=authentication_token,
         )

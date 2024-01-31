@@ -1,11 +1,13 @@
+from datetime import datetime
 from hashlib import sha256
 from secrets import token_hex
 from uuid import UUID
 
 from geoip2.database import Reader
 from redis.asyncio import Redis
-from sqlalchemy import ScalarResult, delete, select, text
+from sqlalchemy import ScalarResult, delete, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from user_agents.parsers import UserAgent
 
 from app.auth.models import LoginSession, PasswordResetToken
 from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
@@ -27,6 +29,7 @@ class AuthRepo:
         self,
         user_id: UUID,
         ip_address: str,
+        user_agent: UserAgent,
     ) -> LoginSession:
         """Create a new login session."""
         city = self._geoip_reader.city(ip_address)
@@ -34,6 +37,7 @@ class AuthRepo:
             user_id=user_id,
             ip_address=ip_address,
             location=format_geoip_city(city),
+            user_agent=str(user_agent),
         )
         self._session.add(login_session)
         await self._session.commit()
@@ -45,12 +49,29 @@ class AuthRepo:
         ip_address: str,
     ) -> LoginSession | None:
         """Get a login session with the given user ID and IP address."""
+        # TODO: include user agent to fetch session here?
         return await self._session.scalar(
             select(LoginSession).where(
                 LoginSession.user_id == user_id
                 and LoginSession.ip_address == ip_address
             ),
         )
+
+    async def check_login_session_exists(
+        self,
+        user_id: UUID,
+        user_agent: str,
+        ip_address: str,
+    ) -> bool:
+        """Check whether login sessions for the user exist with the given user agent and IP address."""
+        results = await self._session.scalars(
+            select(LoginSession).where(
+                LoginSession.user_id == user_id
+                and LoginSession.user_agent == user_agent
+                and LoginSession.ip_address == ip_address
+            ),
+        )
+        return results.first() is not None
 
     async def get_login_sessions(self, user_id: UUID) -> ScalarResult[LoginSession]:
         """Get login sessions for the given user ID."""
@@ -60,12 +81,30 @@ class AuthRepo:
             ),
         )
 
-    async def delete_login_session(self, login_session_id: UUID, user_id: UUID) -> None:
+    async def delete_login_session(
+        self,
+        login_session_id: UUID,
+        user_id: UUID,
+    ) -> None:
         """Delete a login session."""
         await self._session.execute(
             delete(LoginSession).where(
                 LoginSession.id == login_session_id and LoginSession.user_id == user_id,
             ),
+        )
+
+    async def update_login_session(
+        self,
+        login_session_id: UUID,
+        logged_out_at: datetime | None,
+    ) -> None:
+        """Delete a login session."""
+        await self._session.execute(
+            update(LoginSession)
+            .where(LoginSession.id == login_session_id)
+            .values(
+                logged_out_at=logged_out_at,
+            )
         )
 
     async def delete_login_sessions(

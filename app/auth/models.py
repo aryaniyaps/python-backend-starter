@@ -17,15 +17,10 @@ class LoginSession(Base):
     __tablename__ = "login_sessions"
 
     __table_args__ = (
-        UniqueConstraint(
-            "user_id",
-            "ip_address",
-        ),
         Index(
             "login_sessions_user_id_ip_address_idx",
             Column("user_id"),
             Column("ip_address"),
-            unique=True,
         ),
     )
 
@@ -48,6 +43,12 @@ class LoginSession(Base):
     location: Mapped[str] = mapped_column(
         String(256),
     )
+
+    user_agent: Mapped[str] = mapped_column(
+        String(256),
+    )
+
+    logged_out_at: Mapped[datetime | None]
 
     created_at: Mapped[datetime] = mapped_column(
         server_default=now(),

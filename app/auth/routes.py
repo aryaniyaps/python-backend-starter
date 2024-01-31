@@ -40,6 +40,7 @@ auth_router = APIRouter(
 )
 async def register_user(
     data: RegisterUserInput,
+    user_agent: Annotated[str, Header()],
     request_ip: Annotated[
         str,
         Depends(
@@ -59,6 +60,7 @@ async def register_user(
         username=data.username,
         password=data.password,
         request_ip=request_ip,
+        user_agent=parse(user_agent),
     )
 
     return {
@@ -120,6 +122,12 @@ async def delete_current_login_session(
             authentication_token_header,
         ),
     ],
+    current_login_session_id: Annotated[
+        UUID,
+        Depends(
+            dependency=get_current_login_session_id,
+        ),
+    ],
     current_user_id: Annotated[
         UUID,
         Depends(
@@ -128,9 +136,12 @@ async def delete_current_login_session(
     ],
 ) -> None:
     """Logout the current user."""
-    # TODO: use data.remember_device here
-    # Upon logout, delete the login session but keep the Device stored for the user.
-    # this way if a new device login is detected, we can notify the user (we dont check for IP addresses for new login, it makes sense as IP addresses can change based on location)
+    await auth_service.logout_login_session(
+        login_session_id=current_login_session_id,
+        user_id=current_user_id,
+        remember_session=data.remember_session,
+    )
+    # TODO: move auth token removal into service
     await auth_service.remove_authentication_token(
         authentication_token=authentication_token,
         user_id=current_user_id,
@@ -158,37 +169,6 @@ async def get_login_sessions(
 ) -> ScalarResult[LoginSession]:
     """Get the current user's login sessions."""
     return await auth_service.get_login_sessions(user_id=current_user_id)
-
-
-@auth_router.delete(
-    "/sessions/{session_id}",
-    summary="Logout the session with the given ID.",
-)
-async def delete_login_session(
-    session_id: Annotated[
-        UUID,
-        Path(
-            title="The ID of the login session to delete.",
-        ),
-    ],
-    auth_service: Annotated[
-        AuthService,
-        Depends(
-            dependency=get_auth_service,
-        ),
-    ],
-    current_user_id: Annotated[
-        UUID,
-        Depends(
-            dependency=get_current_user_id,
-        ),
-    ],
-) -> None:
-    """Logout the session with the given ID."""
-    await auth_service.delete_login_session(
-        login_session_id=session_id,
-        user_id=current_user_id,
-    )
 
 
 @auth_router.delete(
