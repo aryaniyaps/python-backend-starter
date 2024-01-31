@@ -1,7 +1,7 @@
 from typing import Annotated, Any
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Header, Path, Security, status
+from fastapi import APIRouter, Depends, Header, Security, status
 from sqlalchemy import ScalarResult
 from user_agents import parse
 

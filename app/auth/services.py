@@ -280,9 +280,14 @@ class AuthService:
                 message="Invalid password reset token or email provided.",
             )
 
-        if existing_user.last_login_at > password_reset_token.created_at:
+        if await self._auth_repo.check_login_session_exists_after(
+            user_id=existing_user.id,
+            timestamp=password_reset_token.created_at,
+        ):
             # If the user has logged in again after generating the password
             # reset token, the generated token becomes invalid.
+
+            # TODO: delete the password reset token here
             raise InvalidInputError(
                 message="Invalid password reset token or email provided.",
             )

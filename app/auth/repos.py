@@ -73,6 +73,17 @@ class AuthRepo:
         )
         return results.first() is not None
 
+    async def check_login_session_exists_after(
+        self, user_id: UUID, timestamp: datetime
+    ) -> bool:
+        """Check whether login sessions for the user which are created after the given timestamp exist."""
+        results = await self._session.scalars(
+            select(LoginSession).where(
+                LoginSession.user_id == user_id and LoginSession.created_at > timestamp
+            ),
+        )
+        return results.first() is not None
+
     async def get_login_sessions(self, user_id: UUID) -> ScalarResult[LoginSession]:
         """Get login sessions for the given user ID."""
         return await self._session.scalars(
