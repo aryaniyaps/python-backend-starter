@@ -2,7 +2,7 @@ from hashlib import sha256
 from secrets import token_hex
 from uuid import UUID
 
-from geoip2.database import Reader
+from geoip2.database import Reader, format_city_location
 from redis.asyncio import Redis
 from sqlalchemy import ScalarResult, delete, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,11 +28,11 @@ class AuthRepo:
         ip_address: str,
     ) -> LoginSession:
         """Create a new login session."""
-        location = self._geoip_reader.city(ip_address)
+        city = self._geoip_reader.city(ip_address)
         login_session = LoginSession(
             user_id=user_id,
             ip_address=ip_address,
-            location=f"{location.city.name}, {location.subdivisions.most_specific.name} ({location.country.iso_code})",
+            location=format_city_location(city),
         )
         self._session.add(login_session)
         await self._session.commit()
@@ -249,7 +249,7 @@ class AuthRepo:
         user_id: UUID,
     ) -> None:
         """Delete password reset tokens for the given user ID."""
-        return await self._session.execute(
+        await self._session.execute(
             delete(PasswordResetToken).where(
                 PasswordResetToken.user_id == user_id,
             ),

@@ -4,7 +4,7 @@ from uuid import UUID
 
 from argon2 import PasswordHasher
 from argon2.exceptions import HashingError, VerifyMismatchError
-from geoip2.database import Reader
+from geoip2.database import Reader, format_city_location
 from sqlalchemy import ScalarResult
 from user_agents.parsers import UserAgent
 
@@ -152,7 +152,7 @@ class AuthService:
                 password=password,
             )
 
-        location = self._geoip_reader.city(request_ip)
+        city = self._geoip_reader.city(request_ip)
 
         if previous_login_ip != request_ip:
             # TODO: send new login detected based on the device, and not the IP address
@@ -163,7 +163,7 @@ class AuthService:
                 login_timestamp=login_session.created_at,
                 device=user_agent.get_device(),
                 browser_name=user_agent.get_browser(),
-                location=f"{location.city.name}, {location.subdivisions.most_specific.name} ({location.country.iso_code})",
+                location=format_city_location(city),
                 ip_address=request_ip,
             )
 
@@ -231,7 +231,7 @@ class AuthService:
                 user_id=existing_user.id,
             )
 
-            location = self._geoip_reader.city(request_ip)
+            city = self._geoip_reader.city(request_ip)
 
             task_queue.enqueue(
                 send_password_reset_request_email,
@@ -240,7 +240,7 @@ class AuthService:
                 password_reset_token=reset_token,
                 device=user_agent.get_device(),
                 browser_name=user_agent.get_browser(),
-                location=f"{location.city.name}, {location.subdivisions.most_specific.name} ({location.country.iso_code})",
+                location=format_city_location(city),
                 ip_address=request_ip,
             )
 
