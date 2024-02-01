@@ -131,8 +131,9 @@ class AuthRepo:
             authentication_token=authentication_token,
         )
         await self._redis_client.hset(
-            name="auth_tokens",
-            key=authentication_token_hash,
+            name=self.generate_authentication_token_key(
+                authentication_token_hash=authentication_token_hash,
+            ),
             mapping={
                 "user_id": user_id.bytes,
                 "login_session_id": login_session_id,
@@ -153,6 +154,11 @@ class AuthRepo:
         return token_hex(32)
 
     @staticmethod
+    def generate_authentication_token_key(authentication_token_hash: str) -> str:
+        """Generate a token key for the authentication token hash."""
+        return f"auth-tokens:${authentication_token_hash}"
+
+    @staticmethod
     def generate_token_owner_key(user_id: UUID) -> str:
         """Generate a token owner key for the user ID."""
         return f"auth-token-owners:${user_id}"
@@ -167,10 +173,11 @@ class AuthRepo:
         authentication_token: str,
     ) -> UserInfo | None:
         """Get the user ID and login session ID for the authentication token."""
-        user_info = await self._redis_client.hget(
-            name="auth_tokens",
-            key=self.hash_authentication_token(
-                authentication_token=authentication_token,
+        user_info = await self._redis_client.hgetall(
+            name=self.generate_authentication_token_key(
+                authentication_token_hash=self.hash_authentication_token(
+                    authentication_token=authentication_token,
+                ),
             ),
         )  # type: ignore[misc]
         if user_info is not None:
@@ -212,7 +219,14 @@ class AuthRepo:
             ),
         )  # type: ignore[misc]
         if authentication_token_hashes:
-            await self._redis_client.delete(*authentication_token_hashes)
+            await self._redis_client.delete(
+                *[
+                    self.generate_authentication_token_key(
+                        authentication_token_hash=authentication_token_hash,
+                    )
+                    for authentication_token_hash in authentication_token_hashes
+                ]
+            )
         await self._redis_client.delete(
             self.generate_token_owner_key(
                 user_id=user_id,
