@@ -148,6 +148,7 @@ class AuthService:
                 ip_address=request_ip,
             )
 
+        # TODO: check if max number of user sessions is exceeded
         user_session = await self._auth_repo.create_user_session(
             user_id=user.id,
             ip_address=request_ip,
