@@ -5,7 +5,7 @@
 groups = ["default", "test", "dev"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:26200eb32d2555da1e65509e2075b9f23f211c61ba4efef89fe44cb12bff965e"
+content_hash = "sha256:1b720833ae06843971fcdbd270499a2c7bdf1327927557e633219058b9adf786"
 
 [[package]]
 name = "aiohttp"
@@ -404,6 +404,23 @@ files = [
 ]
 
 [[package]]
+name = "fastapi-sso"
+version = "0.10.0"
+requires_python = ">=3.8,<4.0"
+summary = "FastAPI plugin to enable SSO to most common providers (such as Facebook login, Google login and login via Microsoft Office 365 Account)"
+groups = ["default"]
+dependencies = [
+    "fastapi>=0.80",
+    "httpx>=0.23.0",
+    "oauthlib>=3.1.0",
+    "pydantic[email]>=1.8.0",
+]
+files = [
+    {file = "fastapi_sso-0.10.0-py3-none-any.whl", hash = "sha256:579bbcf84157f394a9b30a45dbca74e623cd432054c6f63c55996a775711388e"},
+    {file = "fastapi_sso-0.10.0.tar.gz", hash = "sha256:8029c2c58abd861268edc3710ac45827699789bae062a5be52bbbb7a6918c637"},
+]
+
+[[package]]
 name = "frozenlist"
 version = "1.4.1"
 requires_python = ">=3.8"
@@ -556,20 +573,6 @@ dependencies = [
 files = [
     {file = "httpx-0.25.2-py3-none-any.whl", hash = "sha256:a05d3d052d9b2dfce0e3896636467f8a5342fb2b902c819428e1ac65413ca118"},
     {file = "httpx-0.25.2.tar.gz", hash = "sha256:8b8fcaa0c8ea7b05edd69a094e63a2094c4efcb48129fb757361bc423c0ad9e8"},
-]
-
-[[package]]
-name = "httpx-oauth"
-version = "0.13.1"
-requires_python = ">=3.8"
-summary = "Async OAuth client using HTTPX"
-groups = ["default"]
-dependencies = [
-    "httpx<0.26,>=0.18",
-]
-files = [
-    {file = "httpx_oauth-0.13.1-py3-none-any.whl", hash = "sha256:819573a72052b3d11d65d0382f97fad2ac81df477d6555e1043fadd44c196ec5"},
-    {file = "httpx_oauth-0.13.1.tar.gz", hash = "sha256:7222efba23badbeeed5a7d9622bb3ddeaea554152131a830fc2e9e7e0c03bdad"},
 ]
 
 [[package]]
@@ -786,6 +789,17 @@ groups = ["dev"]
 files = [
     {file = "mypy_extensions-1.0.0-py3-none-any.whl", hash = "sha256:4392f6c0eb8a5668a69e23d168ffa70f0be9ccfd32b5cc2d26a34ae5b844552d"},
     {file = "mypy_extensions-1.0.0.tar.gz", hash = "sha256:75dbf8955dc00442a438fc4d0666508a9a97b6bd41aa2f0ffe9d2f2725af0782"},
+]
+
+[[package]]
+name = "oauthlib"
+version = "3.2.2"
+requires_python = ">=3.6"
+summary = "A generic, spec-compliant, thorough implementation of the OAuth request-signing logic"
+groups = ["default"]
+files = [
+    {file = "oauthlib-3.2.2-py3-none-any.whl", hash = "sha256:8139f29aac13e25d502680e9e19963e83f16838d48a0d71c287fe40e7067fbca"},
+    {file = "oauthlib-3.2.2.tar.gz", hash = "sha256:9859c40929662bec5d64f34d01c99e093149682a3f38915dc0655d5a633dd918"},
 ]
 
 [[package]]

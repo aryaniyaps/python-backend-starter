@@ -21,9 +21,9 @@ dependencies = [
     "user-agents>=2.2.0",
     "humanize>=4.9.0",
     "orjson>=3.9.10",
-    "httpx-oauth>=0.13.1",
     "geoip2>=4.8.0",
     "structlog>=24.1.0",
+    "fastapi-sso>=0.10.0",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
