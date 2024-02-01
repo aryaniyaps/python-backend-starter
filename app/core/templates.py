@@ -11,8 +11,8 @@ from app.core.constants import (
 )
 
 
-def add_globals(environment: Environment) -> None:
-    """Add global variables to the environment."""
+def register_globals(environment: Environment) -> None:
+    """Register global variables for the environment."""
     environment.globals["app_name"] = APP_NAME
     environment.globals["app_url"] = APP_URL
     environment.globals["support_email"] = SUPPORT_EMAIL
@@ -26,11 +26,39 @@ def create_environment() -> Environment:
         ),
         autoescape=select_autoescape(),
     )
-    add_globals(environment)
+    register_globals(environment)
     return environment
 
 
 environment = create_environment()
+
+# password reset request templates
+
+reset_password_request_subject = environment.get_template(
+    name="emails/reset-password-request/subject.txt",
+)
+
+reset_password_request_html = environment.get_template(
+    name="emails/reset-password-request/body.html",
+    globals={
+        "token_expires_in": naturaldelta(
+            timedelta(
+                seconds=PASSWORD_RESET_TOKEN_EXPIRES_IN,
+            ),
+        ),
+    },
+)
+
+reset_password_request_text = environment.get_template(
+    name="emails/reset-password-request/body.txt",
+    globals={
+        "token_expires_in": naturaldelta(
+            timedelta(
+                seconds=PASSWORD_RESET_TOKEN_EXPIRES_IN,
+            ),
+        ),
+    },
+)
 
 # password reset templates
 

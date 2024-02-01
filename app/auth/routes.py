@@ -129,15 +129,11 @@ async def delete_current_login_session(
     ],
 ) -> None:
     """Logout the current user."""
-    await auth_service.logout_login_session(
+    await auth_service.logout_user(
+        authentication_token=authentication_token,
         login_session_id=user_info.login_session_id,
         user_id=user_info.user_id,
         remember_session=data.remember_session,
-    )
-    # TODO: move auth token removal into service
-    await auth_service.remove_authentication_token(
-        authentication_token=authentication_token,
-        user_id=user_info.user_id,
     )
 
 
@@ -227,6 +223,13 @@ async def request_password_reset(
 )
 async def reset_password(
     data: PasswordResetInput,
+    request_ip: Annotated[
+        str,
+        Depends(
+            dependency=get_ip_address,
+        ),
+    ],
+    user_agent: Annotated[str, Header()],
     auth_service: Annotated[
         AuthService,
         Depends(
@@ -239,4 +242,6 @@ async def reset_password(
         reset_token=data.reset_token,
         email=data.email,
         new_password=data.new_password,
+        request_ip=request_ip,
+        user_agent=parse(user_agent),
     )

@@ -16,7 +16,7 @@ from app.core.templates import (
     onboarding_subject,
     onboarding_text,
     reset_password_html,
-    reset_password_subject,
+    reset_password_request_subject,
     reset_password_text,
 )
 from app.users.schemas import UserSchema
@@ -183,7 +183,7 @@ def test_send_password_reset_request_email() -> None:
     mock_email_sender.send.assert_called_with(
         sender=settings.email_from,
         receivers=[mock_user.email],
-        subject=reset_password_subject.render(
+        subject=reset_password_request_subject.render(
             username=mock_user.username,
         ),
         text=reset_password_text.render(

@@ -97,7 +97,7 @@ async def get_user_info(
         ),
     ],
 ) -> UserInfo:
-    """Get user info from the authentication token."""
-    return await auth_service.user_info_from_authentication_token(
+    """Get the user info from the authentication token."""
+    return await auth_service.get_user_info_from_authentication_token(
         authentication_token=authentication_token,
     )

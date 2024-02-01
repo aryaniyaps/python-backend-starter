@@ -1,1 +1,1 @@
-Password reset request for {{ username }}
+Your {{ app_name }} password has been reset

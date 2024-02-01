@@ -44,20 +44,6 @@ class AuthRepo:
         await self._session.commit()
         return login_session
 
-    async def get_login_session(
-        self,
-        user_id: UUID,
-        ip_address: str,
-    ) -> LoginSession | None:
-        """Get a login session with the given user ID and IP address."""
-        # TODO: include user agent to fetch session here?
-        return await self._session.scalar(
-            select(LoginSession).where(
-                LoginSession.user_id == user_id
-                and LoginSession.ip_address == ip_address
-            ),
-        )
-
     async def check_login_session_exists(
         self,
         user_id: UUID,
@@ -65,6 +51,7 @@ class AuthRepo:
         ip_address: str,
     ) -> bool:
         """Check whether login sessions for the user exist with the given user agent and IP address."""
+        # FIXME: dont check IP addresses too strictly, they can be dynamic in some environments
         results = await self._session.scalars(
             select(LoginSession).where(
                 LoginSession.user_id == user_id
@@ -145,9 +132,7 @@ class AuthRepo:
         )
         await self._redis_client.hset(
             name="auth_tokens",
-            key=self.generate_authentication_token_key(
-                authentication_token_hash=authentication_token_hash,
-            ),
+            key=authentication_token_hash,
             mapping={
                 "user_id": user_id.bytes,
                 "login_session_id": login_session_id,
@@ -168,11 +153,6 @@ class AuthRepo:
         return token_hex(32)
 
     @staticmethod
-    def generate_authentication_token_key(authentication_token_hash: str) -> str:
-        """Generate a key for the authentication token's hash."""
-        return f"auth-tokens:${authentication_token_hash}"
-
-    @staticmethod
     def generate_token_owner_key(user_id: UUID) -> str:
         """Generate a token owner key for the user ID."""
         return f"auth-token-owners:${user_id}"
@@ -189,10 +169,8 @@ class AuthRepo:
         """Get the user ID and login session ID for the authentication token."""
         user_info = await self._redis_client.hget(
             name="auth_tokens",
-            key=self.generate_authentication_token_key(
-                authentication_token_hash=self.hash_authentication_token(
-                    authentication_token=authentication_token,
-                ),
+            key=self.hash_authentication_token(
+                authentication_token=authentication_token,
             ),
         )  # type: ignore[misc]
         if user_info is not None:
@@ -215,11 +193,7 @@ class AuthRepo:
         authentication_token_hash = self.hash_authentication_token(
             authentication_token=authentication_token,
         )
-        await self._redis_client.delete(
-            self.generate_authentication_token_key(
-                authentication_token_hash=authentication_token_hash,
-            ),
-        )
+        await self._redis_client.delete(authentication_token_hash)
         await self._redis_client.srem(
             self.generate_token_owner_key(
                 user_id=user_id,
@@ -237,14 +211,8 @@ class AuthRepo:
                 user_id=user_id,
             ),
         )  # type: ignore[misc]
-        authentication_token_keys = [
-            self.generate_authentication_token_key(
-                authentication_token_hash=str(authentication_token_hash),
-            )
-            for authentication_token_hash in authentication_token_hashes
-        ]
-        if authentication_token_keys:
-            await self._redis_client.delete(*authentication_token_keys)
+        if authentication_token_hashes:
+            await self._redis_client.delete(*authentication_token_hashes)
         await self._redis_client.delete(
             self.generate_token_owner_key(
                 user_id=user_id,
@@ -272,15 +240,14 @@ class AuthRepo:
         )
 
         reset_token = self.generate_password_reset_token()
-        # hash password reset token before storing
-        reset_token_hash = self.hash_password_reset_token(
-            password_reset_token=reset_token,
-        )
 
         self._session.add(
             PasswordResetToken(
                 user_id=user_id,
-                token_hash=reset_token_hash,
+                # hash password reset token before storing
+                token_hash=self.hash_password_reset_token(
+                    password_reset_token=reset_token,
+                ),
                 expires_at=expires_at,
             ),
         )

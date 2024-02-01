@@ -31,6 +31,13 @@ class LoginSessionSchema(BaseSchema):
         ),
     ]
 
+    user_agent: Annotated[
+        str,
+        Field(
+            description="The user agent of the login session.",
+        ),
+    ]
+
     created_at: Annotated[
         datetime,
         Field(

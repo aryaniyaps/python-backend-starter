@@ -2,7 +2,7 @@ from urllib.parse import urlencode, urljoin
 
 from app.config import settings
 from app.core.constants import APP_URL
-from app.core.emails import email_sender, resend_client
+from app.core.emails import email_sender
 from app.core.templates import (
     new_login_location_html,
     new_login_location_subject,
@@ -11,6 +11,9 @@ from app.core.templates import (
     onboarding_subject,
     onboarding_text,
     reset_password_html,
+    reset_password_request_html,
+    reset_password_request_subject,
+    reset_password_request_text,
     reset_password_subject,
     reset_password_text,
 )
@@ -21,9 +24,9 @@ def send_onboarding_email(
     username: str,
 ) -> None:
     """Send an onboarding email to the given user."""
-    resend_client.send_email(
+    email_sender.send(
         sender=settings.email_from,
-        to=receiver,
+        receivers=[receiver],
         subject=onboarding_subject.render(
             username=username,
         ),
@@ -96,10 +99,10 @@ def send_password_reset_request_email(
     email_sender.send(
         sender=settings.email_from,
         receivers=[receiver],
-        subject=reset_password_subject.render(
+        subject=reset_password_request_subject.render(
             username=username,
         ),
-        text=reset_password_text.render(
+        text=reset_password_request_text.render(
             action_url=action_url,
             device=device,
             browser_name=browser_name,
@@ -107,8 +110,40 @@ def send_password_reset_request_email(
             ip_address=ip_address,
             location=location,
         ),
-        html=reset_password_html.render(
+        html=reset_password_request_html.render(
             action_url=action_url,
+            device=device,
+            browser_name=browser_name,
+            username=username,
+            ip_address=ip_address,
+            location=location,
+        ),
+    )
+
+
+def send_password_reset_email(
+    receiver: str,
+    username: str,
+    device: str,
+    browser_name: str,
+    ip_address: str,
+    location: str,
+) -> None:
+    """Send a password reset email to the given user."""
+    # point action URL to a frontend page
+
+    email_sender.send(
+        sender=settings.email_from,
+        receivers=[receiver],
+        subject=reset_password_subject.render(),
+        text=reset_password_text.render(
+            device=device,
+            browser_name=browser_name,
+            username=username,
+            ip_address=ip_address,
+            location=location,
+        ),
+        html=reset_password_html.render(
             device=device,
             browser_name=browser_name,
             username=username,

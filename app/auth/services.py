@@ -13,6 +13,7 @@ from app.auth.repos import AuthRepo
 from app.auth.tasks import (
     send_new_login_location_detected_email,
     send_onboarding_email,
+    send_password_reset_email,
     send_password_reset_request_email,
 )
 from app.auth.types import UserInfo
@@ -100,7 +101,12 @@ class AuthService:
         user_agent: UserAgent,
         request_ip: str,
     ) -> tuple[str, User]:
-        """Check the given credentials and return the relevant authentication token and user and if they are valid."""
+        """
+        Login a user.
+
+        Check the given credentials and return the relevant authentication
+        token and user and if they are valid.
+        """
         if "@" in login:
             # if "@" is present, assume it's an email
             user = await self._user_repo.get_user_by_email(
@@ -171,14 +177,19 @@ class AuthService:
             user_id=user_id,
         )
 
-    async def logout_login_session(
+    async def logout_user(
         self,
+        authentication_token: str,
         login_session_id: UUID,
         user_id: UUID,
         *,
         remember_session: bool,
     ) -> None:
-        """Delete a login session."""
+        """Logout the user."""
+        await self._auth_repo.remove_authentication_token(
+            authentication_token=authentication_token,
+            user_id=user_id,
+        )
         if not remember_session:
             return await self._auth_repo.delete_login_session(
                 login_session_id=login_session_id,
@@ -188,8 +199,6 @@ class AuthService:
             login_session_id=login_session_id,
             logged_out_at=datetime.now(UTC),
         )
-
-        # TODO: delete relevant auth tokens here
 
     async def delete_login_sessions(
         self,
@@ -203,7 +212,7 @@ class AuthService:
         )
         # TODO: delete relevant auth tokens here
 
-    async def user_info_from_authentication_token(
+    async def get_user_info_from_authentication_token(
         self, authentication_token: str
     ) -> UserInfo:
         """Verify the given authentication token and return the corresponding user info."""
@@ -217,24 +226,13 @@ class AuthService:
             )
         return user_info
 
-    async def remove_authentication_token(
-        self,
-        authentication_token: str,
-        user_id: UUID,
-    ) -> None:
-        """Remove the authentication token for the given user ID."""
-        await self._auth_repo.remove_authentication_token(
-            authentication_token=authentication_token,
-            user_id=user_id,
-        )
-
     async def send_password_reset_request(
         self,
         email: str,
         user_agent: UserAgent,
         request_ip: str,
     ) -> None:
-        """Send a password reset request to the given email."""
+        """Send a password reset request to the given user if they exist."""
         existing_user = await self._user_repo.get_user_by_email(email=email)
         if existing_user is not None:
             reset_token = await self._auth_repo.create_password_reset_token(
@@ -259,6 +257,8 @@ class AuthService:
         email: str,
         reset_token: str,
         new_password: str,
+        request_ip: str,
+        user_agent: UserAgent,
     ) -> None:
         """Reset the relevant user's password with the given credentials."""
         reset_token_hash = sha256(reset_token.encode()).hexdigest()
@@ -306,4 +306,19 @@ class AuthService:
         # logout user everywhere
         await self._auth_repo.remove_all_authentication_tokens(
             user_id=existing_user.id,
+        )
+
+        # TODO: invalidate all login sessions here
+
+        # send password reset mail
+        city = self._geoip_reader.city(request_ip)
+
+        task_queue.enqueue(
+            send_password_reset_email,
+            receiver=existing_user.email,
+            username=existing_user.username,
+            device=user_agent.get_device(),
+            browser_name=user_agent.get_browser(),
+            location=format_geoip_city(city),
+            ip_address=request_ip,
         )
