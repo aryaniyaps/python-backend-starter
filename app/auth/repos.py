@@ -9,7 +9,7 @@ from sqlalchemy import ScalarResult, delete, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from user_agents.parsers import UserAgent
 
-from app.auth.models import LoginSession, PasswordResetToken
+from app.auth.models import PasswordResetToken, UserSession
 from app.auth.types import UserInfo
 from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
 from app.core.geo_ip import format_geoip_city
@@ -26,103 +26,103 @@ class AuthRepo:
         self._redis_client = redis_client
         self._geoip_reader = geoip_reader
 
-    async def create_login_session(
+    async def create_user_session(
         self,
         user_id: UUID,
         ip_address: str,
         user_agent: UserAgent,
-    ) -> LoginSession:
-        """Create a new login session."""
+    ) -> UserSession:
+        """Create a new user session."""
         city = self._geoip_reader.city(ip_address)
-        login_session = LoginSession(
+        user_session = UserSession(
             user_id=user_id,
             ip_address=ip_address,
             location=format_geoip_city(city),
             user_agent=str(user_agent),
         )
-        self._session.add(login_session)
+        self._session.add(user_session)
         await self._session.commit()
-        return login_session
+        return user_session
 
-    async def check_login_session_exists(
+    async def check_user_session_exists(
         self,
         user_id: UUID,
         user_agent: str,
         ip_address: str,
     ) -> bool:
-        """Check whether login sessions for the user exist with the given user agent and IP address."""
+        """Check whether user sessions for the user exist with the given user agent and IP address."""
         # FIXME: dont check IP addresses too strictly, they can be dynamic in some environments
         results = await self._session.scalars(
-            select(LoginSession).where(
-                LoginSession.user_id == user_id
-                and LoginSession.user_agent == user_agent
-                and LoginSession.ip_address == ip_address
+            select(UserSession).where(
+                UserSession.user_id == user_id
+                and UserSession.user_agent == user_agent
+                and UserSession.ip_address == ip_address
             ),
         )
         return results.first() is not None
 
-    async def check_login_session_exists_after(
+    async def check_user_session_exists_after(
         self, user_id: UUID, timestamp: datetime
     ) -> bool:
-        """Check whether login sessions for the user which are created after the given timestamp exist."""
+        """Check whether user sessions for the user which are created after the given timestamp exist."""
         results = await self._session.scalars(
-            select(LoginSession).where(
-                LoginSession.user_id == user_id and LoginSession.created_at > timestamp
+            select(UserSession).where(
+                UserSession.user_id == user_id and UserSession.created_at > timestamp
             ),
         )
         return results.first() is not None
 
-    async def get_login_sessions(self, user_id: UUID) -> ScalarResult[LoginSession]:
-        """Get login sessions for the given user ID."""
+    async def get_user_sessions(self, user_id: UUID) -> ScalarResult[UserSession]:
+        """Get user sessions for the given user ID."""
         return await self._session.scalars(
-            select(LoginSession).where(
-                LoginSession.user_id == user_id,
+            select(UserSession).where(
+                UserSession.user_id == user_id,
             ),
         )
 
-    async def delete_login_session(
+    async def delete_user_session(
         self,
-        login_session_id: UUID,
+        user_session_id: UUID,
         user_id: UUID,
     ) -> None:
-        """Delete a login session."""
+        """Delete a user session."""
         await self._session.execute(
-            delete(LoginSession).where(
-                LoginSession.id == login_session_id and LoginSession.user_id == user_id,
+            delete(UserSession).where(
+                UserSession.id == user_session_id and UserSession.user_id == user_id,
             ),
         )
 
-    async def update_login_session(
+    async def update_user_session(
         self,
-        login_session_id: UUID,
+        user_session_id: UUID,
         logged_out_at: datetime | None,
     ) -> None:
-        """Delete a login session."""
+        """Delete a user session."""
         await self._session.execute(
-            update(LoginSession)
-            .where(LoginSession.id == login_session_id)
+            update(UserSession)
+            .where(UserSession.id == user_session_id)
             .values(
                 logged_out_at=logged_out_at,
             )
         )
 
-    async def delete_login_sessions(
+    async def delete_user_sessions(
         self,
         user_id: UUID,
-        except_login_session_id: UUID,
+        except_user_session_id: UUID,
     ) -> None:
-        """Delete all login sessions for the user except for the given login session ID."""
+        """Delete all user sessions for the user except for the given user session ID."""
         await self._session.execute(
-            delete(LoginSession).where(
-                LoginSession.user_id == user_id
-                and LoginSession.id != except_login_session_id
+            delete(UserSession).where(
+                UserSession.user_id == user_id
+                and UserSession.id != except_user_session_id
             ),
         )
 
     async def create_authentication_token(
         self,
         user_id: UUID,
-        login_session_id: UUID,
+        user_session_id: UUID,
     ) -> str:
         """Create a new authentication token."""
         authentication_token = self.generate_authentication_token()
@@ -136,7 +136,7 @@ class AuthRepo:
             ),
             mapping={
                 "user_id": user_id.bytes,
-                "login_session_id": login_session_id,
+                "user_session_id": user_session_id,
             },
         )  # type: ignore[misc]
         await self._redis_client.sadd(
@@ -172,7 +172,7 @@ class AuthRepo:
         self,
         authentication_token: str,
     ) -> UserInfo | None:
-        """Get the user ID and login session ID for the authentication token."""
+        """Get the user ID and user session ID for the authentication token."""
         user_info = await self._redis_client.hgetall(
             name=self.generate_authentication_token_key(
                 authentication_token_hash=self.hash_authentication_token(
@@ -185,8 +185,8 @@ class AuthRepo:
                 user_id=UUID(
                     bytes=user_info.get("user_id"),
                 ),
-                login_session_id=UUID(
-                    bytes=user_info.get("login_session_id"),
+                user_session_id=UUID(
+                    bytes=user_info.get("user_session_id"),
                 ),
             )
         return None

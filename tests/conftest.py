@@ -3,7 +3,7 @@ from collections.abc import AsyncGenerator, AsyncIterator, Iterator
 import pytest
 from alembic import command
 from alembic.config import Config
-from app.auth.models import LoginSession
+from app.auth.models import UserSession
 from app.auth.repos import AuthRepo
 from app.config import settings
 from app.core.geo_ip import get_geoip_reader
@@ -82,7 +82,7 @@ async def user(user_repo: UserRepo) -> User:
 
 
 @pytest.fixture
-async def login_session(user: User, auth_repo: AuthRepo) -> LoginSession:
+async def login_session(user: User, auth_repo: AuthRepo) -> UserSession:
     """Create a login session for the user."""
     return await auth_repo.create_login_session(
         user_id=user.id,
@@ -91,7 +91,7 @@ async def login_session(user: User, auth_repo: AuthRepo) -> LoginSession:
 
 
 @pytest.fixture
-async def authentication_token(login_session: LoginSession, auth_repo: AuthRepo) -> str:
+async def authentication_token(login_session: UserSession, auth_repo: AuthRepo) -> str:
     """Create an authentication token for the user."""
     return await auth_repo.create_authentication_token(
         user_id=login_session.user_id,

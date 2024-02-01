@@ -8,7 +8,7 @@ from geoip2.database import Reader
 from sqlalchemy import ScalarResult
 from user_agents.parsers import UserAgent
 
-from app.auth.models import LoginSession
+from app.auth.models import UserSession
 from app.auth.repos import AuthRepo
 from app.auth.tasks import (
     send_new_login_location_detected_email,
@@ -71,7 +71,7 @@ class AuthService:
                 password=password,
             )
 
-            login_session = await self._auth_repo.create_login_session(
+            user_session = await self._auth_repo.create_user_session(
                 user_id=user.id,
                 ip_address=request_ip,
                 user_agent=user_agent,
@@ -83,7 +83,7 @@ class AuthService:
 
         authentication_token = await self._auth_repo.create_authentication_token(
             user_id=user.id,
-            login_session_id=login_session.id,
+            user_session_id=user_session.id,
         )
 
         task_queue.enqueue(
@@ -131,7 +131,7 @@ class AuthService:
                 message="Invalid credentials provided.",
             ) from exception
 
-        if not await self._auth_repo.check_login_session_exists(
+        if not await self._auth_repo.check_user_session_exists(
             user_id=user.id,
             user_agent=str(user_agent),
             ip_address=request_ip,
@@ -148,7 +148,7 @@ class AuthService:
                 ip_address=request_ip,
             )
 
-        login_session = await self._auth_repo.create_login_session(
+        user_session = await self._auth_repo.create_user_session(
             user_id=user.id,
             ip_address=request_ip,
             user_agent=user_agent,
@@ -157,7 +157,7 @@ class AuthService:
         # create authentication token
         authentication_token = await self._auth_repo.create_authentication_token(
             user_id=user.id,
-            login_session_id=login_session.id,
+            user_session_id=user_session.id,
         )
 
         if self._password_hasher.check_needs_rehash(
@@ -171,16 +171,16 @@ class AuthService:
 
         return authentication_token, user
 
-    async def get_login_sessions(self, user_id: UUID) -> ScalarResult[LoginSession]:
-        """Get login sessions for the given user ID."""
-        return await self._auth_repo.get_login_sessions(
+    async def get_user_sessions(self, user_id: UUID) -> ScalarResult[UserSession]:
+        """Get user sessions for the given user ID."""
+        return await self._auth_repo.get_user_sessions(
             user_id=user_id,
         )
 
     async def logout_user(
         self,
         authentication_token: str,
-        login_session_id: UUID,
+        user_session_id: UUID,
         user_id: UUID,
         *,
         remember_session: bool,
@@ -191,23 +191,23 @@ class AuthService:
             user_id=user_id,
         )
         if not remember_session:
-            return await self._auth_repo.delete_login_session(
-                login_session_id=login_session_id,
+            return await self._auth_repo.delete_user_session(
+                user_session_id=user_session_id,
                 user_id=user_id,
             )
-        return await self._auth_repo.update_login_session(
-            login_session_id=login_session_id,
+        return await self._auth_repo.update_user_session(
+            user_session_id=user_session_id,
             logged_out_at=datetime.now(UTC),
         )
 
-    async def delete_login_sessions(
+    async def delete_user_sessions(
         self,
         user_id: UUID,
-        except_login_session_id: UUID,
+        except_user_session_id: UUID,
     ) -> None:
-        """Delete all login sessions for the user except for the given login session ID."""
-        await self._auth_repo.delete_login_sessions(
-            except_login_session_id=except_login_session_id,
+        """Delete all user sessions for the user except for the given user session ID."""
+        await self._auth_repo.delete_user_sessions(
+            except_user_session_id=except_user_session_id,
             user_id=user_id,
         )
         # TODO: delete relevant auth tokens here
@@ -281,7 +281,7 @@ class AuthService:
                 message="Invalid password reset token or email provided.",
             )
 
-        if await self._auth_repo.check_login_session_exists_after(
+        if await self._auth_repo.check_user_session_exists_after(
             user_id=existing_user.id,
             timestamp=password_reset_token.created_at,
         ):
@@ -308,7 +308,8 @@ class AuthService:
             user_id=existing_user.id,
         )
 
-        # TODO: invalidate all login sessions here
+        # TODO: invalidate all user sessions here
+        # or should we delete the sessions here?
 
         # send password reset mail
         city = self._geoip_reader.city(request_ip)

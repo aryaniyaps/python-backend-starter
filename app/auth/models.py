@@ -13,12 +13,12 @@ if TYPE_CHECKING:
     from app.users.models import User
 
 
-class LoginSession(Base):
-    __tablename__ = "login_sessions"
+class UserSession(Base):
+    __tablename__ = "user_sessions"
 
     __table_args__ = (
         Index(
-            "login_sessions_user_id_ip_address_idx",
+            "user_sessions_user_id_ip_address_idx",
             Column("user_id"),
             Column("ip_address"),
         ),
@@ -54,7 +54,7 @@ class LoginSession(Base):
         server_default=now(),
     )
 
-    user = relationship("User", back_populates="login_sessions")
+    user = relationship("User", back_populates="user_sessions")
 
 
 class PasswordResetToken(Base):

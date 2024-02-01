@@ -9,7 +9,7 @@ from app.auth.dependencies import (
     get_auth_service,
     get_user_info,
 )
-from app.auth.models import LoginSession
+from app.auth.models import UserSession
 from app.auth.schemas import (
     LoginSessionSchema,
     LoginUserInput,
@@ -107,7 +107,7 @@ async def login_user(
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Logout the current user.",
 )
-async def delete_current_login_session(
+async def delete_current_user_session(
     data: LogoutInput,
     auth_service: Annotated[
         AuthService,
@@ -131,7 +131,7 @@ async def delete_current_login_session(
     """Logout the current user."""
     await auth_service.logout_user(
         authentication_token=authentication_token,
-        login_session_id=user_info.login_session_id,
+        user_session_id=user_info.user_session_id,
         user_id=user_info.user_id,
         remember_session=data.remember_session,
     )
@@ -139,10 +139,10 @@ async def delete_current_login_session(
 
 @auth_router.get(
     "/sessions",
-    summary="Get the current user's login sessions.",
+    summary="Get the current user's sessions.",
     response_model=list[LoginSessionSchema],
 )
-async def get_login_sessions(
+async def get_user_sessions(
     auth_service: Annotated[
         AuthService,
         Depends(
@@ -155,16 +155,16 @@ async def get_login_sessions(
             dependency=get_user_info,
         ),
     ],
-) -> ScalarResult[LoginSession]:
-    """Get the current user's login sessions."""
-    return await auth_service.get_login_sessions(user_id=user_info.user_id)
+) -> ScalarResult[UserSession]:
+    """Get the current user's user sessions."""
+    return await auth_service.get_user_sessions(user_id=user_info.user_id)
 
 
 @auth_router.delete(
     "/sessions/",
-    summary="Logout every other session except for the current session.",
+    summary="Logout every other session for the user except for the current session.",
 )
-async def delete_login_sessions(
+async def delete_user_sessions(
     auth_service: Annotated[
         AuthService,
         Depends(
@@ -179,9 +179,9 @@ async def delete_login_sessions(
     ],
 ) -> None:
     """Logout every other session except for the current session."""
-    await auth_service.delete_login_sessions(
+    await auth_service.delete_user_sessions(
         user_id=user_info.user_id,
-        except_login_session_id=user_info.login_session_id,
+        except_user_session_id=user_info.user_session_id,
     )
 
 
