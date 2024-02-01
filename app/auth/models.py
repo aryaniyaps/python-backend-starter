@@ -4,7 +4,7 @@ from uuid import UUID
 
 from sqlalchemy import Column, ForeignKey, String, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.schema import Index, UniqueConstraint
+from sqlalchemy.schema import Index
 from sqlalchemy.sql.functions import now
 
 from app.core.database import Base

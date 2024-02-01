@@ -109,7 +109,7 @@ class RegisterUserInput(BaseSchema):
         str,
         Field(
             min_length=8,
-            max_length=32,
+            max_length=64,
             pattern=r"(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W])",
             examples=[
                 "my_super_secret",
@@ -178,7 +178,7 @@ class PasswordResetInput(BaseSchema):
         str,
         Field(
             min_length=8,
-            max_length=32,
+            max_length=64,
             pattern=r"(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W])",
             examples=[
                 "my_super_secret",

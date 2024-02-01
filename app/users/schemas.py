@@ -80,7 +80,7 @@ class UpdateUserInput(BaseSchema):
         str | None,
         Field(
             min_length=8,
-            max_length=32,
+            max_length=64,
             pattern=r"(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W])",
             examples=[
                 "my_new_super_secret",
