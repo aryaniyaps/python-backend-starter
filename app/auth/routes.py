@@ -1,6 +1,6 @@
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, Header, Security, status
+from fastapi import APIRouter, Depends, Header, status
 from sqlalchemy import ScalarResult
 from user_agents import parse
 
@@ -117,7 +117,7 @@ async def delete_current_user_session(
     ],
     authentication_token: Annotated[
         str,
-        Security(
+        Depends(
             authentication_token_header,
         ),
     ],
