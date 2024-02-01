@@ -7,7 +7,7 @@ from user_agents import parse
 from app.auth.dependencies import (
     authentication_token_header,
     get_auth_service,
-    get_user_info,
+    get_viewer_info,
 )
 from app.auth.models import UserSession
 from app.auth.schemas import (
@@ -121,18 +121,18 @@ async def delete_current_user_session(
             authentication_token_header,
         ),
     ],
-    user_info: Annotated[
+    viewer_info: Annotated[
         UserInfo,
         Depends(
-            dependency=get_user_info,
+            dependency=get_viewer_info,
         ),
     ],
 ) -> None:
     """Logout the current user."""
     await auth_service.logout_user(
         authentication_token=authentication_token,
-        user_session_id=user_info.user_session_id,
-        user_id=user_info.user_id,
+        user_session_id=viewer_info.user_session_id,
+        user_id=viewer_info.user_id,
         remember_session=data.remember_session,
     )
 
@@ -149,15 +149,15 @@ async def get_user_sessions(
             dependency=get_auth_service,
         ),
     ],
-    user_info: Annotated[
+    viewer_info: Annotated[
         UserInfo,
         Depends(
-            dependency=get_user_info,
+            dependency=get_viewer_info,
         ),
     ],
 ) -> ScalarResult[UserSession]:
     """Get the current user's user sessions."""
-    return await auth_service.get_user_sessions(user_id=user_info.user_id)
+    return await auth_service.get_user_sessions(user_id=viewer_info.user_id)
 
 
 @auth_router.delete(
@@ -171,17 +171,17 @@ async def delete_user_sessions(
             dependency=get_auth_service,
         ),
     ],
-    user_info: Annotated[
+    viewer_info: Annotated[
         UserInfo,
         Depends(
-            dependency=get_user_info,
+            dependency=get_viewer_info,
         ),
     ],
 ) -> None:
     """Logout every other session except for the current session."""
     await auth_service.delete_user_sessions(
-        user_id=user_info.user_id,
-        except_user_session_id=user_info.user_session_id,
+        user_id=viewer_info.user_id,
+        except_user_session_id=viewer_info.user_session_id,
     )
 
 
