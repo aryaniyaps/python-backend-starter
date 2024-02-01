@@ -3,7 +3,8 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Path
 
-from app.auth.dependencies import get_current_user_id
+from app.auth.dependencies import get_user_info
+from app.auth.types import UserInfo
 from app.core.constants import OpenAPITag
 from app.users.dependencies import get_user_service
 from app.users.models import User
@@ -26,10 +27,10 @@ users_router = APIRouter(
     summary="Get the current user.",
 )
 async def get_current_user(
-    current_user_id: Annotated[
-        UUID,
+    user_info: Annotated[
+        UserInfo,
         Depends(
-            dependency=get_current_user_id,
+            dependency=get_user_info,
         ),
     ],
     user_service: Annotated[
@@ -41,7 +42,7 @@ async def get_current_user(
 ) -> User:
     """Get the current user."""
     return await user_service.get_user_by_id(
-        user_id=current_user_id,
+        user_id=user_info.user_id,
     )
 
 
@@ -52,10 +53,10 @@ async def get_current_user(
 )
 async def update_current_user(
     data: UpdateUserInput,
-    current_user_id: Annotated[
-        UUID,
+    user_info: Annotated[
+        UserInfo,
         Depends(
-            dependency=get_current_user_id,
+            dependency=get_user_info,
         ),
     ],
     user_service: Annotated[
@@ -67,7 +68,7 @@ async def update_current_user(
 ) -> User:
     """Get the current user."""
     return await user_service.update_user(
-        user_id=current_user_id,
+        user_id=user_info.user_id,
         username=data.username,
         email=data.email,
         new_password=data.password,

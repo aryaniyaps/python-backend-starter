@@ -15,6 +15,7 @@ from app.auth.tasks import (
     send_onboarding_email,
     send_password_reset_request_email,
 )
+from app.auth.types import UserInfo
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
 from app.core.geo_ip import format_geoip_city
 from app.users.models import User
@@ -202,9 +203,9 @@ class AuthService:
         )
         # TODO: delete relevant auth tokens here
 
-    async def verify_authentication_token(
+    async def user_info_from_authentication_token(
         self, authentication_token: str
-    ) -> tuple[UUID, UUID]:
+    ) -> UserInfo:
         """Verify the given authentication token and return the corresponding user info."""
         user_info = await self._auth_repo.get_user_info_for_authentication_token(
             authentication_token=authentication_token,

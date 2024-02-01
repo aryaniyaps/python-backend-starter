@@ -1,5 +1,4 @@
 from typing import Annotated, Any
-from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, Security, status
 from sqlalchemy import ScalarResult
@@ -8,8 +7,7 @@ from user_agents import parse
 from app.auth.dependencies import (
     authentication_token_header,
     get_auth_service,
-    get_current_login_session_id,
-    get_current_user_id,
+    get_user_info,
 )
 from app.auth.models import LoginSession
 from app.auth.schemas import (
@@ -23,6 +21,7 @@ from app.auth.schemas import (
     RegisterUserResult,
 )
 from app.auth.services import AuthService
+from app.auth.types import UserInfo
 from app.core.constants import OpenAPITag
 from app.core.dependencies import get_ip_address
 
@@ -122,29 +121,23 @@ async def delete_current_login_session(
             authentication_token_header,
         ),
     ],
-    current_login_session_id: Annotated[
-        UUID,
+    user_info: Annotated[
+        UserInfo,
         Depends(
-            dependency=get_current_login_session_id,
-        ),
-    ],
-    current_user_id: Annotated[
-        UUID,
-        Depends(
-            dependency=get_current_user_id,
+            dependency=get_user_info,
         ),
     ],
 ) -> None:
     """Logout the current user."""
     await auth_service.logout_login_session(
-        login_session_id=current_login_session_id,
-        user_id=current_user_id,
+        login_session_id=user_info.login_session_id,
+        user_id=user_info.user_id,
         remember_session=data.remember_session,
     )
     # TODO: move auth token removal into service
     await auth_service.remove_authentication_token(
         authentication_token=authentication_token,
-        user_id=current_user_id,
+        user_id=user_info.user_id,
     )
 
 
@@ -160,15 +153,15 @@ async def get_login_sessions(
             dependency=get_auth_service,
         ),
     ],
-    current_user_id: Annotated[
-        UUID,
+    user_info: Annotated[
+        UserInfo,
         Depends(
-            dependency=get_current_user_id,
+            dependency=get_user_info,
         ),
     ],
 ) -> ScalarResult[LoginSession]:
     """Get the current user's login sessions."""
-    return await auth_service.get_login_sessions(user_id=current_user_id)
+    return await auth_service.get_login_sessions(user_id=user_info.user_id)
 
 
 @auth_router.delete(
@@ -182,23 +175,17 @@ async def delete_login_sessions(
             dependency=get_auth_service,
         ),
     ],
-    current_login_session_id: Annotated[
-        UUID,
+    user_info: Annotated[
+        UserInfo,
         Depends(
-            dependency=get_current_login_session_id,
-        ),
-    ],
-    current_user_id: Annotated[
-        UUID,
-        Depends(
-            dependency=get_current_user_id,
+            dependency=get_user_info,
         ),
     ],
 ) -> None:
     """Logout every other session except for the current session."""
     await auth_service.delete_login_sessions(
-        user_id=current_user_id,
-        except_login_session_id=current_login_session_id,
+        user_id=user_info.user_id,
+        except_login_session_id=user_info.login_session_id,
     )
 
 

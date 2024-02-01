@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from user_agents.parsers import UserAgent
 
 from app.auth.models import LoginSession, PasswordResetToken
+from app.auth.types import UserInfo
 from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
 from app.core.geo_ip import format_geoip_city
 
@@ -184,22 +185,24 @@ class AuthRepo:
     async def get_user_info_for_authentication_token(
         self,
         authentication_token: str,
-    ) -> tuple[UUID, UUID] | None:
+    ) -> UserInfo | None:
         """Get the user ID and login session ID for the authentication token."""
-        user_info = await self._redis_client.hmget(
-            name=self.generate_authentication_token_key(
+        user_info = await self._redis_client.hget(
+            name="auth_tokens",
+            key=self.generate_authentication_token_key(
                 authentication_token_hash=self.hash_authentication_token(
                     authentication_token=authentication_token,
                 ),
             ),
-            keys=[
-                "user_id",
-                "login_session_id",
-            ],
         )  # type: ignore[misc]
         if user_info is not None:
-            return UUID(bytes=user_info.get("user_id")), UUID(
-                bytes=user_info.get("login_session_id")
+            return UserInfo(
+                user_id=UUID(
+                    bytes=user_info.get("user_id"),
+                ),
+                login_session_id=UUID(
+                    bytes=user_info.get("login_session_id"),
+                ),
             )
         return None
 
