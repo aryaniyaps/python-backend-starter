@@ -276,7 +276,7 @@ async def test_verify_authentication_token_valid_token(
         return_value=user_id,
     ):
         # Perform token verification
-        retrieved_user_id = await auth_service.get_user_info_from_authentication_token(
+        retrieved_user_id = await auth_service.get_user_info_for_authentication_token(
             "valid_token"
         )
 
@@ -292,7 +292,7 @@ async def test_verify_authentication_token_invalid_token(
         "get_user_id_from_authentication_token",
         return_value=None,
     ), pytest.raises(UnauthenticatedError):
-        await auth_service.get_user_info_from_authentication_token("invalid_token")
+        await auth_service.get_user_info_for_authentication_token("invalid_token")
 
 
 async def test_remove_authentication_token(auth_service: AuthService) -> None:

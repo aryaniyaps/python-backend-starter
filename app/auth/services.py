@@ -212,7 +212,7 @@ class AuthService:
         )
         # TODO: delete relevant auth tokens here
 
-    async def get_user_info_from_authentication_token(
+    async def get_user_info_for_authentication_token(
         self, authentication_token: str
     ) -> UserInfo:
         """Verify the given authentication token and return the corresponding user info."""
