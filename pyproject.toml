@@ -5,6 +5,7 @@ description = "Backend starter using Python."
 authors = [{ name = "Aryan Iyappan", email = "aryaniyappan2006@gmail.com" }]
 dependencies = [
     "fastapi>=0.109.0",
+    "fastapi-sso>=0.10.0",
     "starlette>=0.35.1",
     "asgi-correlation-id>=4.3.0",
     "uvicorn[standard]>=0.26.0",
@@ -23,7 +24,7 @@ dependencies = [
     "orjson>=3.9.10",
     "geoip2>=4.8.0",
     "structlog>=24.1.0",
-    "fastapi-sso>=0.10.0",
+
 ]
 requires-python = ">=3.11"
 readme = "README.md"
