@@ -1,7 +1,8 @@
+from http import HTTPStatus
+
 import pytest
 from app.auth.repos import AuthRepo
 from app.users.schemas import UserSchema
-from fastapi import status
 from httpx import AsyncClient
 
 pytestmark = [pytest.mark.anyio]
@@ -17,7 +18,7 @@ async def test_register_success(test_client: AsyncClient) -> None:
             "password": "Password12!",
         },
     )
-    assert response.status_code == status.HTTP_201_CREATED
+    assert response.status_code == HTTPStatus.CREATED
 
 
 async def test_register_existing_email(
@@ -34,7 +35,7 @@ async def test_register_existing_email(
         },
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
 async def test_register_existing_username(
@@ -51,7 +52,7 @@ async def test_register_existing_username(
         },
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
 async def test_login_valid_credentials(
@@ -67,7 +68,7 @@ async def test_login_valid_credentials(
         },
     )
 
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == HTTPStatus.OK
 
 
 async def test_login_invalid_credentials(
@@ -82,7 +83,7 @@ async def test_login_invalid_credentials(
         },
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
 async def test_login_password_mismatch(
@@ -98,7 +99,7 @@ async def test_login_password_mismatch(
         },
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
 async def test_logout_authenticated_user(
@@ -186,7 +187,7 @@ async def test_reset_password_invalid_token(
         },
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
 async def test_reset_password_user_not_found(
@@ -202,4 +203,4 @@ async def test_reset_password_user_not_found(
         },
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == HTTPStatus.BAD_REQUEST

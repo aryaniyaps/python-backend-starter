@@ -1,6 +1,7 @@
+from http import HTTPStatus
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, Header, status
+from fastapi import APIRouter, Depends, Header
 from sqlalchemy import ScalarResult
 from user_agents import parse
 
@@ -34,7 +35,7 @@ auth_router = APIRouter(
 @auth_router.post(
     "/register",
     response_model=RegisterUserResult,
-    status_code=status.HTTP_201_CREATED,
+    status_code=HTTPStatus.CREATED,
     summary="Register a new user.",
 )
 async def register_user(
@@ -104,7 +105,7 @@ async def login_user(
 
 @auth_router.delete(
     "/sessions/@me",
-    status_code=status.HTTP_204_NO_CONTENT,
+    status_code=HTTPStatus.NO_CONTENT,
     summary="Logout the current user.",
 )
 async def delete_current_user_session(
@@ -187,7 +188,7 @@ async def delete_user_sessions(
 
 @auth_router.post(
     "/reset-password-request",
-    status_code=status.HTTP_204_NO_CONTENT,
+    status_code=HTTPStatus.NO_CONTENT,
     summary="Send a password reset request.",
     response_model=None,
 )
@@ -217,7 +218,7 @@ async def request_password_reset(
 
 @auth_router.post(
     "/reset-password",
-    status_code=status.HTTP_204_NO_CONTENT,
+    status_code=HTTPStatus.NO_CONTENT,
     summary="Reset user password.",
     response_model=None,
 )

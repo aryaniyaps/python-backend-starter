@@ -1,8 +1,8 @@
+from http import HTTPStatus
 from uuid import uuid4
 
 import pytest
 from app.users.schemas import UserSchema
-from fastapi import status
 from httpx import AsyncClient
 
 pytestmark = [pytest.mark.anyio]
@@ -14,7 +14,7 @@ async def test_get_current_user_authenticated(
     """Ensure we can successfully get the current user when authenticated."""
     response = await auth_test_client.get("/users/@me")
 
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == HTTPStatus.OK
 
 
 async def test_get_current_user_unauthenticated(
@@ -23,7 +23,7 @@ async def test_get_current_user_unauthenticated(
     """Ensure we cannot get the current user when unauthenticated."""
     response = await test_client.get("/users/@me")
 
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
 
 
 async def test_get_user_authenticated(
@@ -33,7 +33,7 @@ async def test_get_user_authenticated(
     """Ensure we can successfully get a user by ID when authenticated."""
     response = await auth_test_client.get(f"/users/{user.id}")
 
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == HTTPStatus.OK
 
 
 async def test_get_user_not_found(auth_test_client: AsyncClient) -> None:
@@ -42,7 +42,7 @@ async def test_get_user_not_found(auth_test_client: AsyncClient) -> None:
         f"/users/{uuid4()}",
     )  # Assuming generated UUID doesn't exist
 
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.status_code == HTTPStatus.NOT_FOUND
 
 
 async def test_update_current_user_authenticated(auth_test_client: AsyncClient) -> None:
@@ -58,7 +58,7 @@ async def test_update_current_user_authenticated(auth_test_client: AsyncClient) 
 
     data = response.json()
 
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == HTTPStatus.OK
     assert data["username"] == "new_username"
     assert data["email"] == "new_email@example.com"
 
@@ -74,7 +74,7 @@ async def test_update_current_user_unauthenticated(
     }
     response = await test_client.patch("/users/@me", json=new_data)
 
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
 
 
 async def test_update_current_user_invalid_input(auth_test_client: AsyncClient) -> None:
@@ -86,7 +86,7 @@ async def test_update_current_user_invalid_input(auth_test_client: AsyncClient) 
         },  # Assuming this is an invalid email
     )
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
 async def test_update_current_user_existing_email(
@@ -101,7 +101,7 @@ async def test_update_current_user_existing_email(
         },
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
 async def test_update_current_user_existing_username(
@@ -116,4 +116,4 @@ async def test_update_current_user_existing_username(
         },
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == HTTPStatus.BAD_REQUEST
