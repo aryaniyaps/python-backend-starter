@@ -9,39 +9,39 @@ from app.core.schemas import BaseSchema
 from app.users.schemas import UserSchema
 
 
-class LoginSessionSchema(BaseSchema):
+class UserSessionSchema(BaseSchema):
     id: Annotated[
         UUID,
         Field(
-            description="The ID of the login session.",
+            description="The ID of the user session.",
         ),
     ]
 
     ip_address: Annotated[
         IPvAnyAddress,
         Field(
-            description="The IP address of the login session.",
+            description="The IP address of the user session.",
         ),
     ]
 
     location: Annotated[
         str,
         Field(
-            description="The location of the login session.",
+            description="The location of the user session.",
         ),
     ]
 
     user_agent: Annotated[
         str,
         Field(
-            description="The user agent of the login session.",
+            description="The user agent of the user session.",
         ),
     ]
 
     created_at: Annotated[
         datetime,
         Field(
-            description="When the login session was created.",
+            description="When the user session was created.",
         ),
     ]
 

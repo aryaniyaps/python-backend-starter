@@ -12,7 +12,6 @@ from app.auth.dependencies import (
 )
 from app.auth.models import UserSession
 from app.auth.schemas import (
-    LoginSessionSchema,
     LoginUserInput,
     LoginUserResult,
     LogoutInput,
@@ -20,6 +19,7 @@ from app.auth.schemas import (
     PasswordResetRequestInput,
     RegisterUserInput,
     RegisterUserResult,
+    UserSessionSchema,
 )
 from app.auth.services import AuthService
 from app.auth.types import UserInfo
@@ -141,7 +141,7 @@ async def delete_current_user_session(
 @auth_router.get(
     "/sessions",
     summary="Get the current user's sessions.",
-    response_model=list[LoginSessionSchema],
+    response_model=list[UserSessionSchema],
 )
 async def get_user_sessions(
     auth_service: Annotated[
