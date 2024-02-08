@@ -25,6 +25,7 @@ from app.auth.services import AuthService
 from app.auth.types import UserInfo
 from app.core.constants import OpenAPITag
 from app.core.dependencies import get_ip_address
+from app.core.ratelimiter import RateLimiter
 
 auth_router = APIRouter(
     prefix="/auth",
@@ -37,6 +38,13 @@ auth_router = APIRouter(
     response_model=RegisterUserResult,
     status_code=HTTPStatus.CREATED,
     summary="Register a new user.",
+    dependencies=[
+        Depends(
+            dependency=RateLimiter(
+                limit="15/hour",
+            ),
+        ),
+    ],
 )
 async def register_user(
     data: RegisterUserInput,
@@ -73,6 +81,13 @@ async def register_user(
     "/sessions",
     response_model=LoginUserResult,
     summary="Login the current user.",
+    dependencies=[
+        Depends(
+            dependency=RateLimiter(
+                limit="100/hour",
+            ),
+        ),
+    ],
 )
 async def login_user(
     data: LoginUserInput,
@@ -107,6 +122,13 @@ async def login_user(
     "/sessions/@me",
     status_code=HTTPStatus.NO_CONTENT,
     summary="Logout the current user.",
+    dependencies=[
+        Depends(
+            dependency=RateLimiter(
+                limit="50/hour",
+            ),
+        ),
+    ],
 )
 async def delete_current_user_session(
     data: LogoutInput,
@@ -191,6 +213,13 @@ async def delete_user_sessions(
     status_code=HTTPStatus.NO_CONTENT,
     summary="Send a password reset request.",
     response_model=None,
+    dependencies=[
+        Depends(
+            dependency=RateLimiter(
+                limit="20/hour",
+            ),
+        ),
+    ],
 )
 async def request_password_reset(
     data: PasswordResetRequestInput,
@@ -221,6 +250,13 @@ async def request_password_reset(
     status_code=HTTPStatus.NO_CONTENT,
     summary="Reset user password.",
     response_model=None,
+    dependencies=[
+        Depends(
+            dependency=RateLimiter(
+                limit="20/hour",
+            ),
+        ),
+    ],
 )
 async def reset_password(
     data: PasswordResetInput,

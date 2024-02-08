@@ -1,4 +1,6 @@
-from fastapi import Request, status
+from http import HTTPStatus
+
+from fastapi import Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import ORJSONResponse, Response
@@ -6,6 +8,7 @@ from starlette.exceptions import HTTPException
 
 from app.core.errors import (
     InvalidInputError,
+    RateLimitExceededError,
     ResourceNotFoundError,
     UnauthenticatedError,
     UnexpectedError,
@@ -18,11 +21,24 @@ async def handle_validation_error(
 ) -> Response:
     """Handle ValidationError exceptions."""
     return ORJSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
         content={
             "message": "Invalid input detected.",
             "errors": jsonable_encoder(exception.errors()),
         },
+    )
+
+
+async def handle_ratelimit_exceeded_error(
+    _request: Request,
+    _exception: RateLimitExceededError,
+) -> Response:
+    """Handle RateLimitExceededError expections."""
+    return ORJSONResponse(
+        content={
+            "message": "You are being ratelimited.",
+        },
+        status_code=HTTPStatus.TOO_MANY_REQUESTS,
     )
 
 
@@ -48,7 +64,7 @@ async def handle_invalid_input_error(
         content={
             "message": exception.message,
         },
-        status_code=status.HTTP_400_BAD_REQUEST,
+        status_code=HTTPStatus.BAD_REQUEST,
     )
 
 
@@ -61,7 +77,7 @@ async def handle_resource_not_found_error(
         content={
             "message": exception.message,
         },
-        status_code=status.HTTP_404_NOT_FOUND,
+        status_code=HTTPStatus.NOT_FOUND,
     )
 
 
@@ -74,7 +90,7 @@ async def handle_unauthenticated_error(
         content={
             "message": exception.message,
         },
-        status_code=status.HTTP_401_UNAUTHORIZED,
+        status_code=HTTPStatus.UNAUTHORIZED,
     )
 
 
@@ -87,5 +103,5 @@ async def handle_unexpected_error(
         content={
             "message": exception.message,
         },
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
     )

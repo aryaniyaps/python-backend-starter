@@ -27,7 +27,7 @@ from app.core.errors import (
     UnexpectedError,
 )
 from app.core.middleware.logging import logging_middleware
-from app.core.middleware.rateimit import ratelimit_middleware
+from app.core.middleware.ratelimit import ratelimit_middleware
 from app.core.schemas import ValidationErrorResult
 from app.health.routes import health_router
 from app.oauth.routes import oauth_router
@@ -48,7 +48,10 @@ def add_middleware(app: FastAPI) -> None:
         CORSMiddleware,
         allow_origins=settings.cors_allow_origins,
         allow_credentials=True,
-        allow_headers=["X-Requested-With", "X-Request-ID"],
+        allow_headers=[
+            "X-Requested-With",
+            "X-Request-ID",
+        ],
         expose_headers=[
             "X-Request-ID",
             "X-Ratelimit-Remaining",

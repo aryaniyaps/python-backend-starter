@@ -19,4 +19,8 @@ class UnauthenticatedError(BaseError):
 
 
 class UnexpectedError(BaseError):
-    """Indicate that an unexpectederror has occurred."""
+    """Indicate that an unexpected error has occurred."""
+
+
+class RateLimitExceededError(BaseError):
+    """Indicate that the rate limit has been exceeded."""

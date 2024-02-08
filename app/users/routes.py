@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Path
 from app.auth.dependencies import get_viewer_info
 from app.auth.types import UserInfo
 from app.core.constants import OpenAPITag
+from app.core.ratelimiter import RateLimiter
 from app.users.dependencies import get_user_service
 from app.users.models import User
 from app.users.schemas import (
@@ -25,6 +26,13 @@ users_router = APIRouter(
     "/@me",
     response_model=UserSchema,
     summary="Get the current user.",
+    dependencies=[
+        Depends(
+            dependency=RateLimiter(
+                limit="1000/hour",
+            ),
+        ),
+    ],
 )
 async def get_current_user(
     viewer_info: Annotated[
@@ -50,6 +58,13 @@ async def get_current_user(
     "/@me",
     response_model=UserSchema,
     summary="Update the current user.",
+    dependencies=[
+        Depends(
+            dependency=RateLimiter(
+                limit="100/hour",
+            ),
+        ),
+    ],
 )
 async def update_current_user(
     data: UpdateUserInput,
@@ -80,6 +95,13 @@ async def update_current_user(
     "/{user_id}",
     response_model=PartialUserSchema,
     summary="Get the user with the given ID.",
+    dependencies=[
+        Depends(
+            dependency=RateLimiter(
+                limit="2500/hour",
+            ),
+        ),
+    ],
 )
 async def get_user(
     user_id: Annotated[

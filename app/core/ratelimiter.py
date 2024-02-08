@@ -1,11 +1,10 @@
-from http import HTTPStatus
-
-from fastapi import HTTPException, Request
+from fastapi import Request
 from limits import parse
 from limits.storage import RedisStorage
 from limits.strategies import MovingWindowRateLimiter
 
 from app.config import settings
+from app.core.errors import RateLimitExceededError
 
 rate_limiter = MovingWindowRateLimiter(
     storage=RedisStorage(uri=settings.redis_url),
@@ -43,9 +42,4 @@ class RateLimiter:
             ),
             cost=self._cost,
         ):
-            raise HTTPException(
-                status_code=HTTPStatus.TOO_MANY_REQUESTS,
-                detail={
-                    "message": "You are being ratelimited",
-                },
-            )
+            raise RateLimitExceededError
