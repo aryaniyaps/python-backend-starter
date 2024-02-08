@@ -76,6 +76,8 @@ async def google_callback(
 
     # TODO: We should probably have a SocialConnection/ Identity model that allows
     # users to connect to multiple social accounts
+    # TODO: check if the ip address and user agent are that of google's servers or
+    # of the client that initiated the oauth workflow
     authentication_token, user = await oauth_service.login_or_register_user(
         openid_user=openid_user,
         request_ip=request_ip,
