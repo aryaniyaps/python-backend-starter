@@ -44,4 +44,6 @@ class RateLimiter:
             ),
             cost=self._cost,
         ):
-            raise RateLimitExceededError
+            raise RateLimitExceededError(
+                message="You are being ratelimited.",
+            )

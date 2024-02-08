@@ -31,12 +31,12 @@ async def handle_validation_error(
 
 async def handle_ratelimit_exceeded_error(
     _request: Request,
-    _exception: RateLimitExceededError,
+    exception: RateLimitExceededError,
 ) -> Response:
     """Handle RateLimitExceededError expections."""
     return ORJSONResponse(
         content={
-            "message": "You are being ratelimited.",
+            "message": exception.message,
         },
         status_code=HTTPStatus.TOO_MANY_REQUESTS,
     )
