@@ -31,7 +31,7 @@ class RateLimiter:
         request.state["route_rate_limit"] = self._rate_limit
 
         # TODO: move rate limiting logic to middleware, set request state attributes
-        # alone here.
+        # alone here. (but will the request be executed before we check if its valid or not w.r.t the ratelimit?)
 
         # TODO: add ability to exempt route from ratelimits
 
