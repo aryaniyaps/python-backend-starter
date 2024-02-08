@@ -27,6 +27,7 @@ def get_logging_renderer(*, human_readable: bool) -> JSONRenderer | ConsoleRende
 
 
 def build_shared_processors(*, human_readable: bool) -> list[Processor]:
+    """Build shared logging processors."""
     timestamper = structlog.processors.TimeStamper(fmt="iso", utc=True)
     shared_processors: list[Processor] = [
         structlog.contextvars.merge_contextvars,  # Merge context variables
