@@ -17,10 +17,12 @@ class RateLimiter:
         self._cost = cost
 
     def _get_request_identifier(self, request: Request) -> str:
+        """Get the unique identifier for the request."""
         return request.client.host
 
     def _get_path_identifier(self, request: Request) -> str:
-        return request.url.path
+        """Get the unique identifier for the path operation."""
+        return f"{request.method}/{request.url.path}"
 
     def __call__(self, request: Request) -> None:
         request.state["ratelimit_window_stats"] = rate_limiter.get_window_stats(
