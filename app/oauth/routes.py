@@ -34,6 +34,8 @@ async def google_login(
     ],
 ) -> RedirectResponse:
     """Redirect the user to the Google sign in URL."""
+    # TODO: pass the request ip_address and useragent also in the state
+    # after signing it with itsdangerous. This will be needed for user creation/ login
     return await google_sso.get_login_redirect(
         state=dumps({"redirect_to": redirect_to}),
         redirect_uri=str(
