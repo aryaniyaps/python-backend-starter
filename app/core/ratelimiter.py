@@ -28,17 +28,24 @@ class RateLimiter:
         request_identifier = self._get_request_identifier(request=request)
         path_identifier = self._get_path_identifier(request=request)
 
-        request.state["ratelimit_window_stats"] = rate_limiter.get_window_stats(
-            self._rate_limit,
-            request_identifier,
-            path_identifier,
-        )
-        if not rate_limiter.hit(
-            self._rate_limit,
-            request_identifier,
-            path_identifier,
-            cost=self._cost,
-        ):
-            raise RateLimitExceededError(
-                message="You are being ratelimited.",
-            )
+        request.state["route_rate_limit"] = self._rate_limit
+
+        # TODO: move rate limiting logic to middleware, set request state attributes
+        # alone here.
+
+        # TODO: add ability to exempt route from ratelimits
+
+        # request.state["ratelimit_window_stats"] = rate_limiter.get_window_stats(
+        #     self._rate_limit,
+        #     request_identifier,
+        #     path_identifier,
+        # )
+        # if not rate_limiter.hit(
+        #     self._rate_limit,
+        #     request_identifier,
+        #     path_identifier,
+        #     cost=self._cost,
+        # ):
+        #     raise RateLimitExceededError(
+        #         message="You are being ratelimited.",
+        #     )

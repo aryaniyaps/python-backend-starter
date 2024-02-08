@@ -14,13 +14,16 @@ async def ratelimit_middleware(
     """Set ratelimit headers for the request."""
     response = await call_next(request)
 
-    # Add rate limit headers if they are available in the request state
-    if "ratelimit_window_stats" in request.state:
-        window_stats: WindowStats = request.state["ratelimit_window_stats"]
-        response.headers["X-Ratelimit-Remaining"] = window_stats.remaining
-        response.headers["X-Ratelimit-Reset"] = window_stats.reset_time
-    else:
-        # TODO: add global ratelimit here?
+    # TODO: check global rate limit here and raise exception
+
+    if "route_rate_limit" in request.state:
+        # TODO: check route rate limit here and raise exception
         pass
+
+    # Add rate limit headers if they are available in the request state
+    # if "ratelimit_window_stats" in request.state:
+    #     window_stats: WindowStats = request.state["ratelimit_window_stats"]
+    #     response.headers["X-Ratelimit-Remaining"] = window_stats.remaining
+    #     response.headers["X-Ratelimit-Reset"] = window_stats.reset_time
 
     return response
