@@ -15,7 +15,9 @@
 
 ## Project Setup
 
-This project uses the Maxmind GeoLite2-City database (for getting the locations of IP addresses).
+### Maxmind GeoLite2-City database
+
+This project uses the Maxmind GeoLite2-City database (to extract geolocation data from IP addresses).
 
 To setup the project for downloading and automatically updating the Maxmind GeoLite2-City database, follow these steps:
 
@@ -25,10 +27,8 @@ To setup the project for downloading and automatically updating the Maxmind GeoL
 
     ```
     /project_root
-    │
     ├── secrets
     │   ├── GEOIPUPDATE_ACCOUNT_ID.txt
     │   └── GEOIPUPDATE_LICENSE_KEY.txt
-    │
     └── ...
     ```
