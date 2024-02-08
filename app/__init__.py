@@ -1,5 +1,7 @@
+from http import HTTPStatus
+
 from asgi_correlation_id import CorrelationIdMiddleware
-from fastapi import FastAPI, status
+from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
@@ -25,6 +27,7 @@ from app.core.errors import (
     UnexpectedError,
 )
 from app.core.middleware.logging import logging_middleware
+from app.core.middleware.rateimit import ratelimit_middleware
 from app.core.schemas import ValidationErrorResult
 from app.health.routes import health_router
 from app.oauth.routes import oauth_router
@@ -46,9 +49,17 @@ def add_middleware(app: FastAPI) -> None:
         allow_origins=settings.cors_allow_origins,
         allow_credentials=True,
         allow_headers=["X-Requested-With", "X-Request-ID"],
-        expose_headers=["X-Request-ID"],
+        expose_headers=[
+            "X-Request-ID",
+            "X-Ratelimit-Remaining",
+            "X-Ratelimit-Reset",
+        ],
     )
     app.add_middleware(GZipMiddleware)
+    app.add_middleware(
+        BaseHTTPMiddleware,
+        dispatch=ratelimit_middleware,
+    )
     app.add_middleware(
         BaseHTTPMiddleware,
         dispatch=logging_middleware,
@@ -77,7 +88,7 @@ def create_app() -> FastAPI:
             "displayRequestDuration": True,
         },
         responses={
-            status.HTTP_422_UNPROCESSABLE_ENTITY: {
+            HTTPStatus.UNPROCESSABLE_ENTITY: {
                 "model": ValidationErrorResult,
                 "description": "Validation Error",
             },
