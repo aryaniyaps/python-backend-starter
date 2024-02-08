@@ -19,5 +19,8 @@ async def ratelimit_middleware(
         window_stats: WindowStats = request.state["ratelimit_window_stats"]
         response.headers["X-Ratelimit-Remaining"] = window_stats.remaining
         response.headers["X-Ratelimit-Reset"] = window_stats.reset_time
+    else:
+        # TODO: add global ratelimit here?
+        pass
 
     return response

@@ -25,23 +25,18 @@ class RateLimiter:
         return f"{request.method}/{request.url.path}"
 
     def __call__(self, request: Request) -> None:
+        request_identifier = self._get_request_identifier(request=request)
+        path_identifier = self._get_path_identifier(request=request)
+
         request.state["ratelimit_window_stats"] = rate_limiter.get_window_stats(
             self._rate_limit,
-            self._get_request_identifier(
-                request=request,
-            ),
-            self._get_path_identifier(
-                request=request,
-            ),
+            request_identifier,
+            path_identifier,
         )
         if not rate_limiter.hit(
             self._rate_limit,
-            self._get_request_identifier(
-                request=request,
-            ),
-            self._get_path_identifier(
-                request=request,
-            ),
+            request_identifier,
+            path_identifier,
             cost=self._cost,
         ):
             raise RateLimitExceededError(
