@@ -28,7 +28,7 @@ services:
 
   geoipupdate:
     image: ghcr.io/maxmind/geoipupdate
-    restart: unless-stopped
+    restart: on-failure
     environment:
       - GEOIPUPDATE_ACCOUNT_ID_FILE=/run/secrets/GEOIPUPDATE_ACCOUNT_ID
       - GEOIPUPDATE_LICENSE_KEY_FILE=/run/secrets/GEOIPUPDATE_LICENSE_KEY
@@ -36,6 +36,10 @@ services:
       - GEOIPUPDATE_FREQUENCY=168
     volumes:
       - "geoipupdate_data:/usr/share/GeoIP"
+    secrets:
+      - GEOIPUPDATE_ACCOUNT_ID
+      - GEOIPUPDATE_LICENSE_KEY
+
 
 
 secrets:
