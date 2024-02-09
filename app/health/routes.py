@@ -4,7 +4,7 @@ from app.core.constants import OpenAPITag
 from app.health.schemas import HealthCheckResult
 
 health_router = APIRouter(
-    tags=[OpenAPITag.METADATA],
+    tags=[OpenAPITag.HEALTH],
 )
 
 

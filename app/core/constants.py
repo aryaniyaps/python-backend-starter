@@ -21,5 +21,5 @@ class OpenAPITag(Enum):
 
     USERS = "users"
     AUTHENTICATION = "authentication"
-    METADATA = "metadata"
+    HEALTH = "health"
     INTERNAL = "internal"
