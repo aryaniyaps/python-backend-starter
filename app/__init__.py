@@ -28,8 +28,8 @@ from app.core.errors import (
     UnauthenticatedError,
     UnexpectedError,
 )
-from app.core.middleware.logging import logging_middleware
-from app.core.middleware.ratelimit import ratelimit_middleware
+from app.core.middleware.logger import logger_middleware
+from app.core.middleware.rate_limiter import rate_limiter_middleware
 from app.core.schemas import RateLimitExceededErrorResult, ValidationErrorResult
 from app.health.routes import health_router
 from app.oauth.routes import oauth_router
@@ -63,11 +63,11 @@ def add_middleware(app: FastAPI) -> None:
     app.add_middleware(GZipMiddleware)
     app.add_middleware(
         BaseHTTPMiddleware,
-        dispatch=ratelimit_middleware,
+        dispatch=rate_limiter_middleware,
     )
     app.add_middleware(
         BaseHTTPMiddleware,
-        dispatch=logging_middleware,
+        dispatch=logger_middleware,
     )
     app.add_middleware(
         CorrelationIdMiddleware,

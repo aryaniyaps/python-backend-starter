@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, Path
 from app.auth.dependencies import get_viewer_info
 from app.auth.types import UserInfo
 from app.core.constants import OpenAPITag
-from app.core.ratelimiter import RateLimiter
+from app.core.rate_limiter import RateLimiter
 from app.core.schemas import ResourceNotFoundErrorResult
 from app.users.dependencies import get_user_service
 from app.users.models import User

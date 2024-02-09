@@ -5,14 +5,18 @@ from asgi_correlation_id.context import correlation_id
 from fastapi import Request, Response
 
 
-async def logging_middleware(
+async def logger_middleware(
     request: Request,
     call_next: Callable[
         [Request],
         Awaitable[Response],
     ],
 ) -> Response:
-    """Set structlog context variables for the request."""
+    """
+    Logger middleware.
+
+    Sets structlog context variables for the request.
+    """
     request_id = correlation_id.get()
     structlog.contextvars.clear_contextvars()
     structlog.contextvars.bind_contextvars(

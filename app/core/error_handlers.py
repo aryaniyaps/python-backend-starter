@@ -37,6 +37,7 @@ async def handle_ratelimit_exceeded_error(
     return ORJSONResponse(
         content={
             "message": exception.message,
+            "is_primary": exception.is_primary,
         },
         status_code=HTTPStatus.TOO_MANY_REQUESTS,
     )

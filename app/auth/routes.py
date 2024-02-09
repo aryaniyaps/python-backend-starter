@@ -25,7 +25,7 @@ from app.auth.services import AuthService
 from app.auth.types import UserInfo
 from app.core.constants import OpenAPITag
 from app.core.dependencies import get_ip_address
-from app.core.ratelimiter import RateLimiter
+from app.core.rate_limiter import RateLimiter
 
 auth_router = APIRouter(
     prefix="/auth",

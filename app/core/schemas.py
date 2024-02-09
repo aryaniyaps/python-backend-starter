@@ -131,3 +131,10 @@ class RateLimitExceededErrorResult(BaseErrorResult):
             description="A human readable message describing the error.",
         ),
     ]
+    is_primary: Annotated[
+        bool,
+        Field(
+            title="Is Primary",
+            description="Whether the primary rate limiter was exceeded.",
+        ),
+    ]
