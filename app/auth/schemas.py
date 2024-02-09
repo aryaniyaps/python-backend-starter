@@ -1,10 +1,12 @@
 from datetime import datetime
+from secrets import token_hex
 from typing import Annotated
 from uuid import UUID
 
 from pydantic import EmailStr, Field
 from pydantic.networks import IPvAnyAddress
 
+from app.auth.repos import AuthRepo
 from app.core.schemas import BaseSchema
 from app.users.schemas import UserSchema
 
@@ -77,7 +79,7 @@ class LoginUserResult(BaseSchema):
         str,
         Field(
             examples=[
-                "authentication_token",
+                AuthRepo.generate_authentication_token(),
             ],
             title="Authentication Token",
             description="The authentication token generated upon successful login.",
@@ -137,7 +139,7 @@ class RegisterUserResult(BaseSchema):
             title="Authentication Token",
             description="The authentication token obtained after registration.",
             examples=[
-                "authentication_token",
+                AuthRepo.generate_authentication_token(),
             ],
         ),
     ]
