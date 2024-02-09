@@ -55,6 +55,16 @@ class BaseErrorResult(BaseSchema):
 
 
 class ValidationErrorResult(BaseErrorResult):
+    message: Annotated[
+        str,
+        Field(
+            examples=[
+                "Invalid input detected.",
+            ],
+            description="A human readable message describing the error.",
+        ),
+    ]
+
     errors: Annotated[
         list[ValidationErrorSchema],
         Field(
@@ -64,20 +74,60 @@ class ValidationErrorResult(BaseErrorResult):
 
 
 class InvalidInputErrorResult(BaseErrorResult):
-    pass
+    message: Annotated[
+        str,
+        Field(
+            examples=[
+                "Invalid input detected.",
+            ],
+            description="A human readable message describing the error.",
+        ),
+    ]
 
 
 class ResourceNotFoundErrorResult(BaseErrorResult):
-    pass
+    message: Annotated[
+        str,
+        Field(
+            examples=[
+                "Resource with ID 123 not found.",
+            ],
+            description="A human readable message describing the error.",
+        ),
+    ]
 
 
 class UnauthenticatedErrorResult(BaseErrorResult):
-    pass
+    message: Annotated[
+        str,
+        Field(
+            examples=[
+                "Invalid authentication token provided.",
+            ],
+            description="A human readable message describing the error.",
+        ),
+    ]
 
 
 class UnexpectedErrorResult(BaseErrorResult):
-    pass
+    message: Annotated[
+        str,
+        Field(
+            examples=[
+                "An unexpected error occured.",
+            ],
+            description="A human readable message describing the error.",
+        ),
+    ]
 
 
 class RateLimitExceededErrorResult(BaseErrorResult):
-    pass
+    message: Annotated[
+        str,
+        Field(
+            examples=[
+                "You are being ratelimited.",
+            ],
+            description="A human readable message describing the error.",
+        ),
+    ]

@@ -28,6 +28,7 @@ class PartialUserSchema(BaseSchema):
     created_at: Annotated[
         datetime,
         Field(
+            title="Created At",
             description="When the user was created.",
         ),
     ]
@@ -35,6 +36,7 @@ class PartialUserSchema(BaseSchema):
     updated_at: Annotated[
         datetime | None,
         Field(
+            title="Updated At",
             description="When the user was last updated.",
         ),
     ]
@@ -95,6 +97,7 @@ class UpdateUserInput(BaseSchema):
             examples=[
                 "my_super_secret",
             ],
+            title="Current Password",
             description="The password associated with the user account.",
         ),
     ] = None

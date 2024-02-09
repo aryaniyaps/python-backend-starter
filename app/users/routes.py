@@ -99,7 +99,7 @@ async def update_current_user(
     summary="Get the user with the given ID.",
     responses={
         HTTPStatus.NOT_FOUND: {
-            "description": "User not found.",
+            "description": "Resource Not Found Error",
             "model": ResourceNotFoundErrorResult,
         },
     },

@@ -15,9 +15,9 @@ async def ratelimit_middleware(
     # TODO: check global rate limit here and raise exception
     response = await call_next(request)
 
-    if "route_rate_limit" in request.state:
-        # TODO: check route rate limit here and raise exception
-        pass
+    # if "route_rate_limit" in request.state:
+    # TODO: check route rate limit here and raise exception
+    # pass
 
     # Add rate limit headers if they are available in the request state
     # if "ratelimit_window_stats" in request.state:

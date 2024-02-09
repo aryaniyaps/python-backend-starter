@@ -7,7 +7,7 @@ from app.config import settings
 from app.core.errors import RateLimitExceededError
 
 rate_limiter = MovingWindowRateLimiter(
-    storage=RedisStorage(uri=settings.redis_url),
+    storage=RedisStorage(uri=str(settings.redis_url)),
 )
 
 

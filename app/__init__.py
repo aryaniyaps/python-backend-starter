@@ -30,7 +30,7 @@ from app.core.errors import (
 )
 from app.core.middleware.logging import logging_middleware
 from app.core.middleware.ratelimit import ratelimit_middleware
-from app.core.schemas import ValidationErrorResult
+from app.core.schemas import RateLimitExceededErrorResult, ValidationErrorResult
 from app.health.routes import health_router
 from app.oauth.routes import oauth_router
 from app.users.routes import users_router
@@ -96,6 +96,10 @@ def create_app() -> FastAPI:
             HTTPStatus.UNPROCESSABLE_ENTITY: {
                 "model": ValidationErrorResult,
                 "description": "Validation Error",
+            },
+            HTTPStatus.TOO_MANY_REQUESTS: {
+                "model": RateLimitExceededErrorResult,
+                "description": "Rate Limit Exceeded Error",
             },
         },
         # TODO @aryaniyaps: add error handlers via `app.add_exception_handler` after

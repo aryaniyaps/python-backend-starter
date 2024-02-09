@@ -20,6 +20,7 @@ class UserSessionSchema(BaseSchema):
     ip_address: Annotated[
         IPvAnyAddress,
         Field(
+            title="IP Address",
             description="The IP address of the user session.",
         ),
     ]
@@ -34,6 +35,7 @@ class UserSessionSchema(BaseSchema):
     user_agent: Annotated[
         str,
         Field(
+            title="User Agent",
             description="The user agent of the user session.",
         ),
     ]
@@ -41,6 +43,7 @@ class UserSessionSchema(BaseSchema):
     created_at: Annotated[
         datetime,
         Field(
+            title="Created At",
             description="When the user session was created.",
         ),
     ]
@@ -76,6 +79,7 @@ class LoginUserResult(BaseSchema):
             examples=[
                 "authentication_token",
             ],
+            title="Authentication Token",
             description="The authentication token generated upon successful login.",
         ),
     ]
@@ -130,6 +134,7 @@ class RegisterUserResult(BaseSchema):
     authentication_token: Annotated[
         str,
         Field(
+            title="Authentication Token",
             description="The authentication token obtained after registration.",
             examples=[
                 "authentication_token",
@@ -149,6 +154,7 @@ class LogoutInput(BaseSchema):
     remember_session: Annotated[
         bool,
         Field(
+            title="Remember Session",
             description="Whether the current user's session should be remembered.",
         ),
     ] = True
@@ -190,6 +196,7 @@ class PasswordResetInput(BaseSchema):
             examples=[
                 "my_super_secret",
             ],
+            title="New Password",
             description="The new password for the user account.",
         ),
     ]
@@ -200,6 +207,7 @@ class PasswordResetInput(BaseSchema):
             examples=[
                 "my_reset_token",
             ],
+            title="Reset Token",
             description="""The token used to verify the user's identity
             during the password reset process.""",
         ),
