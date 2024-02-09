@@ -43,21 +43,27 @@ async def rate_limiter_middleware(
 
     try:
         # get secondary rate limit stats if they exist
-        secondary_window_stats: WindowStats = request.state[
-            "secondary_rate_limit_window_stats"
-        ]
+        secondary_window_stats: WindowStats = (
+            request.state.secondary_rate_limit_window_stats
+        )
     except AttributeError:
         secondary_window_stats = None
 
-    response.headers["X-Ratelimit-Primary-Remaining"] = primary_window_stats.remaining
-    response.headers["X-Ratelimit-Primary-Reset"] = primary_window_stats.reset_time
+    response.headers["X-Ratelimit-Primary-Remaining"] = str(
+        primary_window_stats.remaining,
+    )
+
+    response.headers["X-Ratelimit-Primary-Reset"] = str(
+        primary_window_stats.reset_time,
+    )
 
     if secondary_window_stats is not None:
-        response.headers["X-Ratelimit-Secondary-Remaining"] = (
-            secondary_window_stats.remaining
+        response.headers["X-Ratelimit-Secondary-Remaining"] = str(
+            secondary_window_stats.remaining,
         )
-        response.headers["X-Ratelimit-Secondary-Reset"] = (
-            secondary_window_stats.reset_time
+
+        response.headers["X-Ratelimit-Secondary-Reset"] = str(
+            secondary_window_stats.reset_time,
         )
 
     return response

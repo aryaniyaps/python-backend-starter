@@ -1,7 +1,6 @@
 from http import HTTPStatus
 
 from fastapi import Request
-from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import ORJSONResponse, Response
 from starlette.exceptions import HTTPException
@@ -13,6 +12,26 @@ from app.core.errors import (
     UnauthenticatedError,
     UnexpectedError,
 )
+from app.core.schemas import (
+    BaseErrorResult,
+    InvalidInputErrorResult,
+    RateLimitExceededErrorResult,
+    ResourceNotFoundErrorResult,
+    UnauthenticatedErrorResult,
+    UnexpectedErrorResult,
+    ValidationErrorResult,
+)
+
+
+def _create_error_response(
+    error_result: BaseErrorResult,
+    status_code: HTTPStatus,
+) -> ORJSONResponse:
+    """Create an error response from the given error result."""
+    return ORJSONResponse(
+        status_code=status_code,
+        content=error_result.model_dump(mode="json"),
+    )
 
 
 async def handle_validation_error(
@@ -20,12 +39,12 @@ async def handle_validation_error(
     exception: RequestValidationError,
 ) -> Response:
     """Handle ValidationError exceptions."""
-    return ORJSONResponse(
+    return _create_error_response(
+        error_result=ValidationErrorResult(
+            message="Invalid input detected.",
+            errors=exception.errors(),
+        ),
         status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-        content={
-            "message": "Invalid input detected.",
-            "errors": jsonable_encoder(exception.errors()),
-        },
     )
 
 
@@ -34,11 +53,11 @@ async def handle_ratelimit_exceeded_error(
     exception: RateLimitExceededError,
 ) -> Response:
     """Handle RateLimitExceededError expections."""
-    return ORJSONResponse(
-        content={
-            "message": exception.message,
-            "is_primary": exception.is_primary,
-        },
+    return _create_error_response(
+        error_result=RateLimitExceededErrorResult(
+            message=exception.message,
+            is_primary=exception.is_primary,
+        ),
         status_code=HTTPStatus.TOO_MANY_REQUESTS,
     )
 
@@ -47,12 +66,12 @@ async def handle_http_exception(
     _request: Request,
     exception: HTTPException,
 ) -> Response:
-    """Handle HTTPExceptions."""
-    return ORJSONResponse(
+    """Handle HTTPException exceptions."""
+    return _create_error_response(
+        error_result=BaseErrorResult(
+            message=exception.message,
+        ),
         status_code=exception.status_code,
-        content={
-            "message": exception.detail,
-        },
     )
 
 
@@ -61,10 +80,10 @@ async def handle_invalid_input_error(
     exception: InvalidInputError,
 ) -> Response:
     """Handle InvalidInputError expections."""
-    return ORJSONResponse(
-        content={
-            "message": exception.message,
-        },
+    return _create_error_response(
+        error_result=InvalidInputErrorResult(
+            message=exception.message,
+        ),
         status_code=HTTPStatus.BAD_REQUEST,
     )
 
@@ -74,10 +93,10 @@ async def handle_resource_not_found_error(
     exception: ResourceNotFoundError,
 ) -> Response:
     """Handle ResourceNotFound expections."""
-    return ORJSONResponse(
-        content={
-            "message": exception.message,
-        },
+    return _create_error_response(
+        error_result=ResourceNotFoundErrorResult(
+            message=exception.message,
+        ),
         status_code=HTTPStatus.NOT_FOUND,
     )
 
@@ -87,10 +106,10 @@ async def handle_unauthenticated_error(
     exception: UnauthenticatedError,
 ) -> Response:
     """Handle UnauthenticatedError expections."""
-    return ORJSONResponse(
-        content={
-            "message": exception.message,
-        },
+    return _create_error_response(
+        error_result=UnauthenticatedErrorResult(
+            message=exception.message,
+        ),
         status_code=HTTPStatus.UNAUTHORIZED,
     )
 
@@ -100,9 +119,9 @@ async def handle_unexpected_error(
     exception: UnexpectedError,
 ) -> Response:
     """Handle UnexpectedError expections."""
-    return ORJSONResponse(
-        content={
-            "message": exception.message,
-        },
+    return _create_error_response(
+        error_result=UnexpectedErrorResult(
+            message=exception.message,
+        ),
         status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
     )

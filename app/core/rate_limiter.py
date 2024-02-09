@@ -35,12 +35,13 @@ class RateLimiter:
         request_identifier = get_request_identifier(request)
         path_identifier = get_path_identifier(request)
 
-        request.state["secondary_rate_limit_window_stats"] = (
-            rate_limiter.get_window_stats(
-                self._rate_limit,
-                request_identifier,
-                path_identifier,
-            )
+        # set rate limit stats on the request's state.
+        # this is used by the rate limiter middleware to
+        # set metadata on the response headers.
+        request.state.secondary_rate_limit_window_stats = rate_limiter.get_window_stats(
+            self._rate_limit,
+            request_identifier,
+            path_identifier,
         )
 
         # perform secondary rate limiting

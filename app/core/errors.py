@@ -6,6 +6,14 @@ class BaseError(Exception):
         super().__init__(self.message)
 
 
+class RateLimitExceededError(BaseError):
+    """Indicate that the rate limit has been exceeded."""
+
+    def __init__(self, message: str, *, is_primary: bool) -> None:
+        super().__init__(message)
+        self.is_primary = is_primary
+
+
 class InvalidInputError(BaseError):
     """Indicate that the client has issued an invalid request."""
 
@@ -20,11 +28,3 @@ class UnauthenticatedError(BaseError):
 
 class UnexpectedError(BaseError):
     """Indicate that an unexpected error has occurred."""
-
-
-class RateLimitExceededError(BaseError):
-    """Indicate that the rate limit has been exceeded."""
-
-    def __init__(self, message: str, *, is_primary: bool) -> None:
-        super().__init__(message)
-        self.is_primary = is_primary
