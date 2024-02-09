@@ -40,11 +40,9 @@ async def rate_limiter_middleware(
         get_request_identifier(request),
     )
 
-    secondary_window_stats: WindowStats | None
-
     try:
         # get secondary rate limit stats if they exist
-        secondary_window_stats: WindowStats = (
+        secondary_window_stats: WindowStats | None = (
             request.state.secondary_rate_limit_window_stats
         )
     except AttributeError:
