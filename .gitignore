@@ -167,3 +167,7 @@ cython_debug/
 
 # Docker secrets
 secrets
+
+# Docker volumes
+# (mounted in current directory)
+data
