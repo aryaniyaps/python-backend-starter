@@ -56,8 +56,10 @@ def add_middleware(app: FastAPI) -> None:
         ],
         expose_headers=[
             "X-Request-ID",
-            "X-Ratelimit-Remaining",
-            "X-Ratelimit-Reset",
+            "X-Ratelimit-Secondary-Remaining",
+            "X-Ratelimit-Secondary-Reset",
+            "X-Ratelimit-Primary-Remaining",
+            "X-Ratelimit-Primary-Reset",
         ],
     )
     app.add_middleware(GZipMiddleware)
