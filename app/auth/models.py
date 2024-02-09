@@ -54,7 +54,10 @@ class UserSession(Base):
         server_default=now(),
     )
 
-    user = relationship("User", back_populates="user_sessions")
+    user: Mapped["User"] = relationship(
+        "User",
+        back_populates="user_sessions",
+    )
 
 
 class PasswordResetToken(Base):

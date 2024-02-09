@@ -10,7 +10,7 @@ from sqlalchemy.sql.functions import now
 from app.core.database import Base
 
 if TYPE_CHECKING:
-    from app.auth.models import PasswordResetToken
+    from app.auth.models import PasswordResetToken, UserSession
 
 
 class User(Base):
@@ -48,6 +48,11 @@ class User(Base):
     )
 
     password_reset_tokens: Mapped[list["PasswordResetToken"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
+    user_sessions: Mapped[list["UserSession"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
     )

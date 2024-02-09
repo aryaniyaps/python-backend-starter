@@ -16,6 +16,7 @@ if __name__ == "__main__":
         host=settings.host,
         port=settings.port,
         server_header=False,
+        date_header=False,
         reload=settings.debug,
         access_log=settings.debug,
         log_config=build_server_log_config(

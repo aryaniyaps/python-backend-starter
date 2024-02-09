@@ -85,7 +85,7 @@ class UpdateUserInput(BaseSchema):
             max_length=64,
             pattern=r"(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W])",
             examples=[
-                "my_new_super_secret",
+                "new-super-Secret12!",
             ],
             description="The new password for the user.",
         ),
@@ -95,7 +95,7 @@ class UpdateUserInput(BaseSchema):
         str | None,
         Field(
             examples=[
-                "my_super_secret",
+                "super-Secret12!",
             ],
             title="Current Password",
             description="The password associated with the user account.",

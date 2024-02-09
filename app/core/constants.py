@@ -21,7 +21,7 @@ PRIMARY_RATE_LIMIT = "5000/hour"
 
 
 class OpenAPITag(Enum):
-    """Enumeration representing tags used for OpenAPI path operations."""
+    """Tags used for OpenAPI path operations."""
 
     USERS = "users"
     AUTHENTICATION = "authentication"

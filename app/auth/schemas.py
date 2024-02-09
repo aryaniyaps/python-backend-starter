@@ -65,7 +65,7 @@ class LoginUserInput(BaseSchema):
         str,
         Field(
             examples=[
-                "my_super_secret",
+                "super-Secret12!",
             ],
             description="The password associated with the user account.",
         ),
@@ -123,7 +123,7 @@ class RegisterUserInput(BaseSchema):
             max_length=64,
             pattern=r"(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W])",
             examples=[
-                "my_super_secret",
+                "super-Secret12!",
             ],
             description="The password for the new user account.",
         ),
@@ -194,7 +194,7 @@ class PasswordResetInput(BaseSchema):
             max_length=64,
             pattern=r"(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W])",
             examples=[
-                "my_super_secret",
+                "super-Secret12!",
             ],
             title="New Password",
             description="The new password for the user account.",
