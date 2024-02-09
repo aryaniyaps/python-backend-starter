@@ -55,7 +55,7 @@ async def handle_ratelimit_exceeded_error(
     """Handle RateLimitExceededError expections."""
     return _create_error_response(
         error_result=RateLimitExceededErrorResult(
-            message=exception.message,
+            message=str(exception),
             is_primary=exception.is_primary,
         ),
         status_code=HTTPStatus.TOO_MANY_REQUESTS,
@@ -69,7 +69,7 @@ async def handle_http_exception(
     """Handle HTTPException exceptions."""
     return _create_error_response(
         error_result=BaseErrorResult(
-            message=exception.message,
+            message=exception.detail,
         ),
         status_code=exception.status_code,
     )
@@ -82,7 +82,7 @@ async def handle_invalid_input_error(
     """Handle InvalidInputError expections."""
     return _create_error_response(
         error_result=InvalidInputErrorResult(
-            message=exception.message,
+            message=str(exception),
         ),
         status_code=HTTPStatus.BAD_REQUEST,
     )
@@ -95,7 +95,7 @@ async def handle_resource_not_found_error(
     """Handle ResourceNotFound expections."""
     return _create_error_response(
         error_result=ResourceNotFoundErrorResult(
-            message=exception.message,
+            message=str(exception),
         ),
         status_code=HTTPStatus.NOT_FOUND,
     )
@@ -108,7 +108,7 @@ async def handle_unauthenticated_error(
     """Handle UnauthenticatedError expections."""
     return _create_error_response(
         error_result=UnauthenticatedErrorResult(
-            message=exception.message,
+            message=str(exception),
         ),
         status_code=HTTPStatus.UNAUTHORIZED,
     )
@@ -121,7 +121,7 @@ async def handle_unexpected_error(
     """Handle UnexpectedError expections."""
     return _create_error_response(
         error_result=UnexpectedErrorResult(
-            message=exception.message,
+            message=str(exception),
         ),
         status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
     )
