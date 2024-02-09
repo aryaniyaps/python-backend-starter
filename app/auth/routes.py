@@ -274,7 +274,7 @@ async def reset_password(
         ),
     ],
 ) -> None:
-    """Send a password reset request to the given email."""
+    """Reset the user's password."""
     await auth_service.reset_password(
         reset_token=data.reset_token,
         email=data.email,
