@@ -12,6 +12,10 @@ APP_URL = "https://example.com"  # frontend app URL
 
 PASSWORD_RESET_TOKEN_EXPIRES_IN = 300  # 5 minutes
 
+# Rate limiting
+
+PRIMARY_RATE_LIMIT = "5000/hour"
+
 
 # OpenAPI Tags
 
