@@ -42,7 +42,7 @@ class ValidationErrorSchema(BaseSchema):
     ]
 
 
-class ValidationErrorResult(BaseSchema):
+class BaseErrorResult(BaseSchema):
     message: Annotated[
         str,
         Field(
@@ -52,9 +52,32 @@ class ValidationErrorResult(BaseSchema):
             description="A human readable message describing the error.",
         ),
     ]
+
+
+class ValidationErrorResult(BaseErrorResult):
     errors: Annotated[
         list[ValidationErrorSchema],
         Field(
             description="A list of validation errors.",
         ),
     ]
+
+
+class InvalidInputErrorResult(BaseErrorResult):
+    pass
+
+
+class ResourceNotFoundErrorResult(BaseErrorResult):
+    pass
+
+
+class UnauthenticatedErrorResult(BaseErrorResult):
+    pass
+
+
+class UnexpectedErrorResult(BaseErrorResult):
+    pass
+
+
+class RateLimitExceededErrorResult(BaseErrorResult):
+    pass

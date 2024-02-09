@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Annotated
 from uuid import UUID
 
@@ -7,6 +8,7 @@ from app.auth.dependencies import get_viewer_info
 from app.auth.types import UserInfo
 from app.core.constants import OpenAPITag
 from app.core.ratelimiter import RateLimiter
+from app.core.schemas import ResourceNotFoundErrorResult
 from app.users.dependencies import get_user_service
 from app.users.models import User
 from app.users.schemas import (
@@ -95,6 +97,12 @@ async def update_current_user(
     "/{user_id}",
     response_model=PartialUserSchema,
     summary="Get the user with the given ID.",
+    responses={
+        HTTPStatus.NOT_FOUND: {
+            "description": "User not found.",
+            "model": ResourceNotFoundErrorResult,
+        },
+    },
     dependencies=[
         Depends(
             dependency=RateLimiter(
