@@ -15,6 +15,14 @@
 
 ## Project Setup
 
+### Environment variables
+
+To set up environment variables for the project, follow these steps:
+
+1. Create a `.env` file in the root directory.
+2. Use the [`.env.example`](./.env.example) file provided in the root directory as a template for defining your environment variables.
+3. Ensure that you fill in the required values for each environment variable according to your setup and configuration needs.
+
 ### Maxmind GeoLite2-City database
 
 This project uses the Maxmind GeoLite2-City database (to extract geolocation data from IP addresses).
