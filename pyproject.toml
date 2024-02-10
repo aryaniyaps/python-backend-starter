@@ -48,8 +48,8 @@ dev = [
 ]
 
 [tool.pdm.scripts]
-start-server = "app/server.py"
-start-worker = "app/worker.py"
+server = "app/server.py"
+worker = "app/worker.py"
 test = "pytest -vv"
 lint = { composite = ["black .", "ruff --fix .", "black .", "mypy ."] }
 

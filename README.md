@@ -97,10 +97,10 @@ To run the project, follow these steps:
 2. To start the server, run the following command:
 
    ```
-    pdm run start-server
+    pdm run server
    ```
 3. To start the worker, run the following command:
 
    ```
-   pdm run start-worker
+   pdm run worker
    ```
