@@ -78,7 +78,7 @@ async def register_user(
 
 
 @auth_router.post(
-    "/sessions",
+    "/login",
     response_model=LoginUserResult,
     summary="Login the current user.",
     dependencies=[
@@ -118,8 +118,8 @@ async def login_user(
     }
 
 
-@auth_router.delete(
-    "/sessions/@me",
+@auth_router.post(
+    "/logout",
     status_code=HTTPStatus.NO_CONTENT,
     summary="Logout the current user.",
     dependencies=[

@@ -1,12 +1,10 @@
 from datetime import datetime
-from secrets import token_hex
 from typing import Annotated
 from uuid import UUID
 
 from pydantic import EmailStr, Field
 from pydantic.networks import IPvAnyAddress
 
-from app.auth.repos import AuthRepo
 from app.core.schemas import BaseSchema
 from app.users.schemas import UserSchema
 
@@ -24,6 +22,9 @@ class UserSessionSchema(BaseSchema):
         Field(
             title="IP Address",
             description="The IP address of the user session.",
+            examples=[
+                "192.158.1.38",
+            ],
         ),
     ]
 
@@ -31,6 +32,9 @@ class UserSessionSchema(BaseSchema):
         str,
         Field(
             description="The location of the user session.",
+            examples=[
+                "Los Angeles, California (US)",
+            ],
         ),
     ]
 
@@ -39,6 +43,9 @@ class UserSessionSchema(BaseSchema):
         Field(
             title="User Agent",
             description="The user agent of the user session.",
+            examples=[
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36",
+            ],
         ),
     ]
 
@@ -79,7 +86,7 @@ class LoginUserResult(BaseSchema):
         str,
         Field(
             examples=[
-                AuthRepo.generate_authentication_token(),
+                "6fa74977e2a810ea95ef22f5f09d887337070ae0aacdf19d411bbe78fb98bdfa",
             ],
             title="Authentication Token",
             description="The authentication token generated upon successful login.",
@@ -139,7 +146,7 @@ class RegisterUserResult(BaseSchema):
             title="Authentication Token",
             description="The authentication token obtained after registration.",
             examples=[
-                AuthRepo.generate_authentication_token(),
+                "6fa74977e2a810ea95ef22f5f09d887337070ae0aacdf19d411bbe78fb98bdfa",
             ],
         ),
     ]
