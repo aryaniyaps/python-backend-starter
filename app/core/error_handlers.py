@@ -13,7 +13,8 @@ from app.core.errors import (
     UnexpectedError,
 )
 from app.core.schemas import (
-    BaseErrorResult,
+    BaseSchema,
+    HTTPExceptionResult,
     InvalidInputErrorResult,
     RateLimitExceededErrorResult,
     ResourceNotFoundErrorResult,
@@ -24,8 +25,8 @@ from app.core.schemas import (
 
 
 def _create_error_response(
-    error_result: BaseErrorResult,
-    status_code: HTTPStatus,
+    error_result: BaseSchema,
+    status_code: HTTPStatus | int,
 ) -> ORJSONResponse:
     """Create an error response from the given error result."""
     return ORJSONResponse(
@@ -68,7 +69,7 @@ async def handle_http_exception(
 ) -> Response:
     """Handle HTTPException exceptions."""
     return _create_error_response(
-        error_result=BaseErrorResult(
+        error_result=HTTPExceptionResult(
             message=exception.detail,
         ),
         status_code=exception.status_code,

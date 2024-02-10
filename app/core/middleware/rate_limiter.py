@@ -23,6 +23,7 @@ async def rate_limiter_middleware(
     Performs primary (API-wide) rate limiting and sets rate
     limiting metadata on the response headers.
     """
+    # TODO: exempt certain routes from rate limiting
     # perform primary rate limiting
     if not rate_limiter.hit(
         primary_rate_limit,

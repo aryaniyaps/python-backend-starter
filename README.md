@@ -13,7 +13,29 @@
 - [PostgreSQL](https://www.postgresql.org/)
 - [Redis](https://redis.io/)
 
+## Prerequisites
+
+Make sure you have the following installed:
+
+- [Python 3.11](https://www.python.org/downloads/)
+- [Docker Engine](https://docs.docker.com/engine/install/)
+
 ## Project Setup
+
+### Dependency management
+
+To install dependencies, follow these steps:
+
+1. Ensure that pdm is installed. You can install it via pip:
+
+    ```
+    pip install -U pdm
+    ```
+2. Install project dependencies with the following command:
+
+   ```
+   pdm install
+   ```
 
 ### Environment variables
 
@@ -40,3 +62,45 @@ To setup the project for downloading and automatically updating the Maxmind GeoL
     │   └── GEOIPUPDATE_LICENSE_KEY.txt
     └── ...
     ```
+
+### Oauth2 app configuration (Google)
+
+To obtain the Google Client ID and Client Secret, follow these steps:
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
+2. [Create a new project](https://console.cloud.google.com/projectcreate) or select an existing one.
+3. Navigate to the *Credentials* tab.
+4. Click on *Create credentials* and select *OAuth client ID*.
+5. Choose *Web application* as the application type.
+6. Enter the appropriate information for your application.
+   The authorized redirect URIs used when creating the credentials must include the following URL *(assuming you are running at port 8000 on localhost)*:
+
+   **http://localhost:8000/api/oauth/google/callback**
+
+7. Once created, copy the generated Client ID and Client Secret.
+8. Paste the Client ID and Client secret into the `.env` file as follows:
+
+    ```
+    SERVER_GOOGLE_CLIENT_ID=<Client ID>
+    SERVER_GOOGLE_CLIENT_SECRET=<Client Secret>
+    ```
+
+## Running the project
+
+To run the project, follow these steps:
+
+1. Start all services with the following command:
+
+   ```
+   docker compose up -d
+   ```
+2. To start the server, run the following command:
+
+   ```
+    pdm run start-server
+   ```
+3. To start the worker, run the following command:
+
+   ```
+   pdm run start-worker
+   ```

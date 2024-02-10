@@ -42,19 +42,19 @@ class ValidationErrorSchema(BaseSchema):
     ]
 
 
-class BaseErrorResult(BaseSchema):
+class UnexpectedErrorResult(BaseSchema):
     message: Annotated[
         str,
         Field(
             examples=[
-                "Invalid input detected.",
+                "An unexpected error occured.",
             ],
             description="A human readable message describing the error.",
         ),
     ]
 
 
-class ValidationErrorResult(BaseErrorResult):
+class ValidationErrorResult(BaseSchema):
     message: Annotated[
         str,
         Field(
@@ -73,7 +73,7 @@ class ValidationErrorResult(BaseErrorResult):
     ]
 
 
-class InvalidInputErrorResult(BaseErrorResult):
+class HTTPExceptionResult(BaseSchema):
     message: Annotated[
         str,
         Field(
@@ -85,7 +85,19 @@ class InvalidInputErrorResult(BaseErrorResult):
     ]
 
 
-class ResourceNotFoundErrorResult(BaseErrorResult):
+class InvalidInputErrorResult(BaseSchema):
+    message: Annotated[
+        str,
+        Field(
+            examples=[
+                "Invalid input detected.",
+            ],
+            description="A human readable message describing the error.",
+        ),
+    ]
+
+
+class ResourceNotFoundErrorResult(BaseSchema):
     message: Annotated[
         str,
         Field(
@@ -97,7 +109,7 @@ class ResourceNotFoundErrorResult(BaseErrorResult):
     ]
 
 
-class UnauthenticatedErrorResult(BaseErrorResult):
+class UnauthenticatedErrorResult(BaseSchema):
     message: Annotated[
         str,
         Field(
@@ -109,7 +121,7 @@ class UnauthenticatedErrorResult(BaseErrorResult):
     ]
 
 
-class UnexpectedErrorResult(BaseErrorResult):
+class UnexpectedErrorResult(BaseSchema):
     message: Annotated[
         str,
         Field(
@@ -121,7 +133,7 @@ class UnexpectedErrorResult(BaseErrorResult):
     ]
 
 
-class RateLimitExceededErrorResult(BaseErrorResult):
+class RateLimitExceededErrorResult(BaseSchema):
     message: Annotated[
         str,
         Field(
@@ -131,6 +143,7 @@ class RateLimitExceededErrorResult(BaseErrorResult):
             description="A human readable message describing the error.",
         ),
     ]
+
     is_primary: Annotated[
         bool,
         Field(

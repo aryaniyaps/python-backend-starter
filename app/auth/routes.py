@@ -26,7 +26,6 @@ from app.auth.types import UserInfo
 from app.core.constants import OpenAPITag
 from app.core.dependencies import get_ip_address
 from app.core.rate_limiter import RateLimiter
-from app.core.schemas import ValidationErrorResult
 
 auth_router = APIRouter(
     prefix="/auth",
@@ -39,12 +38,6 @@ auth_router = APIRouter(
     response_model=RegisterUserResult,
     status_code=HTTPStatus.CREATED,
     summary="Register a new user.",
-    responses={
-        HTTPStatus.UNPROCESSABLE_ENTITY: {
-            "model": ValidationErrorResult,
-            "description": "Validation Error",
-        },
-    },
     dependencies=[
         Depends(
             dependency=RateLimiter(
@@ -88,12 +81,6 @@ async def register_user(
     "/sessions",
     response_model=LoginUserResult,
     summary="Login the current user.",
-    responses={
-        HTTPStatus.UNPROCESSABLE_ENTITY: {
-            "model": ValidationErrorResult,
-            "description": "Validation Error",
-        },
-    },
     dependencies=[
         Depends(
             dependency=RateLimiter(
@@ -135,12 +122,6 @@ async def login_user(
     "/sessions/@me",
     status_code=HTTPStatus.NO_CONTENT,
     summary="Logout the current user.",
-    responses={
-        HTTPStatus.UNPROCESSABLE_ENTITY: {
-            "model": ValidationErrorResult,
-            "description": "Validation Error",
-        },
-    },
     dependencies=[
         Depends(
             dependency=RateLimiter(
@@ -231,12 +212,6 @@ async def delete_user_sessions(
     "/reset-password-request",
     status_code=HTTPStatus.NO_CONTENT,
     summary="Send a password reset request.",
-    responses={
-        HTTPStatus.UNPROCESSABLE_ENTITY: {
-            "model": ValidationErrorResult,
-            "description": "Validation Error",
-        },
-    },
     response_model=None,
     dependencies=[
         Depends(
@@ -274,12 +249,6 @@ async def request_password_reset(
     "/reset-password",
     status_code=HTTPStatus.NO_CONTENT,
     summary="Reset user password.",
-    responses={
-        HTTPStatus.UNPROCESSABLE_ENTITY: {
-            "model": ValidationErrorResult,
-            "description": "Validation Error",
-        },
-    },
     response_model=None,
     dependencies=[
         Depends(
