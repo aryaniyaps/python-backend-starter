@@ -1,1 +1,0 @@
-pdm run start-worker

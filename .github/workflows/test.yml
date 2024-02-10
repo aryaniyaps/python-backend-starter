@@ -69,4 +69,4 @@ jobs:
         run: pdm install -G test
 
       - name: Run Tests
-        run: sh ./scripts/run-tests.sh
+        run: pdm run test
