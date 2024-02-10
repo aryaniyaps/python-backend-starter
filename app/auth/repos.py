@@ -12,7 +12,7 @@ from user_agents.parsers import UserAgent
 from app.auth.models import PasswordResetToken, UserSession
 from app.auth.types import UserInfo
 from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
-from app.core.geo_ip import format_geoip_city
+from app.core.geo_ip import get_ip_location
 
 
 class AuthRepo:
@@ -33,11 +33,13 @@ class AuthRepo:
         user_agent: UserAgent,
     ) -> UserSession:
         """Create a new user session."""
-        city = self._geoip_reader.city(ip_address)
         user_session = UserSession(
             user_id=user_id,
             ip_address=ip_address,
-            location=format_geoip_city(city),
+            location=get_ip_location(
+                ip_address=ip_address,
+                geoip_reader=self._geoip_reader,
+            ),
             user_agent=str(user_agent),
         )
         self._session.add(user_session)
@@ -136,7 +138,7 @@ class AuthRepo:
             ),
             mapping={
                 "user_id": user_id.bytes,
-                "user_session_id": user_session_id,
+                "user_session_id": user_session_id.bytes,
             },
         )  # type: ignore[misc]
         await self._redis_client.sadd(

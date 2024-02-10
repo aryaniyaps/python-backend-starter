@@ -18,7 +18,7 @@ from app.auth.tasks import (
 )
 from app.auth.types import UserInfo
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
-from app.core.geo_ip import format_geoip_city
+from app.core.geo_ip import get_ip_location
 from app.users.models import User
 from app.users.repos import UserRepo
 from app.worker import task_queue
@@ -136,7 +136,6 @@ class AuthService:
             user_agent=str(user_agent),
             ip_address=request_ip,
         ):
-            city = self._geoip_reader.city(request_ip)
             task_queue.enqueue(
                 send_new_login_location_detected_email,
                 receiver=user.email,
@@ -144,7 +143,10 @@ class AuthService:
                 login_timestamp=datetime.now(UTC),
                 device=user_agent.get_device(),
                 browser_name=user_agent.get_browser(),
-                location=format_geoip_city(city),
+                location=get_ip_location(
+                    ip_address=request_ip,
+                    geoip_reader=self._geoip_reader,
+                ),
                 ip_address=request_ip,
             )
 
@@ -240,8 +242,6 @@ class AuthService:
                 user_id=existing_user.id,
             )
 
-            city = self._geoip_reader.city(request_ip)
-
             task_queue.enqueue(
                 send_password_reset_request_email,
                 receiver=existing_user.email,
@@ -249,7 +249,10 @@ class AuthService:
                 password_reset_token=reset_token,
                 device=user_agent.get_device(),
                 browser_name=user_agent.get_browser(),
-                location=format_geoip_city(city),
+                location=get_ip_location(
+                    ip_address=request_ip,
+                    geoip_reader=self._geoip_reader,
+                ),
                 ip_address=request_ip,
             )
 
@@ -313,14 +316,15 @@ class AuthService:
         # or should we delete the sessions here?
 
         # send password reset mail
-        city = self._geoip_reader.city(request_ip)
-
         task_queue.enqueue(
             send_password_reset_email,
             receiver=existing_user.email,
             username=existing_user.username,
             device=user_agent.get_device(),
             browser_name=user_agent.get_browser(),
-            location=format_geoip_city(city),
+            location=get_ip_location(
+                ip_address=request_ip,
+                geoip_reader=self._geoip_reader,
+            ),
             ip_address=request_ip,
         )

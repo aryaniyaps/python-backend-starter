@@ -99,7 +99,7 @@ To run the project, follow these steps:
    ```
     pdm run server
    ```
-3. To start the worker, run the following command:
+3. To start the worker, open another terminal and run the following command:
 
    ```
    pdm run worker
