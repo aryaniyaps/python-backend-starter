@@ -142,6 +142,15 @@ class Settings(BaseSettings):
 
     google_client_secret: str
 
+    sentry_dsn: Annotated[
+        str,
+        Field(
+            examples=[
+                "https://public@sentry.example.com/1",
+            ],
+        ),
+    ]
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_prefix="server_",

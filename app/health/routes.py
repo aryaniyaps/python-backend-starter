@@ -17,4 +17,5 @@ health_router = APIRouter(
 )
 async def healthcheck() -> HealthCheckResult:
     """Get the health status of the application."""
+    division_by_zero = 1 / 0
     return HealthCheckResult(status="OK")

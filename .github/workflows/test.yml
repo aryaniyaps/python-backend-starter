@@ -30,6 +30,7 @@ jobs:
       SERVER_GEOLITE2_DATABASE_PATH: ""
       SERVER_GOOGLE_CLIENT_ID: "client-id"
       SERVER_GOOGLE_CLIENT_SECRET: "client-secret"
+      SERVER_SENTRY_DSN: ""
 
 
     services:

@@ -5,7 +5,7 @@
 groups = ["default", "dev", "test"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:1a7f84039736972234558d3ddd4a8cb59e6deb0827e6745e9ec59c2df7117358"
+content_hash = "sha256:6ee7a9ae96f14f612a55ba4d6940be003c8f3812abac7ed685a00b52a457b0f4"
 
 [[package]]
 name = "aiohttp"
@@ -1343,6 +1343,51 @@ dependencies = [
 files = [
     {file = "saq-0.12.2-py3-none-any.whl", hash = "sha256:2bbb4040fb1a1fb0b307aa317fbfa1d1bb74fa32807ab67e2b1e7b1787c110d7"},
     {file = "saq-0.12.2.tar.gz", hash = "sha256:8c20d605ca1b7f1aa9bb87f58097b74da9cdc39da6810e5ee738a4e04b64f7e0"},
+]
+
+[[package]]
+name = "sentry-sdk"
+version = "1.40.3"
+summary = "Python client for Sentry (https://sentry.io)"
+groups = ["default"]
+dependencies = [
+    "certifi",
+    "urllib3>=1.26.11; python_version >= \"3.6\"",
+]
+files = [
+    {file = "sentry-sdk-1.40.3.tar.gz", hash = "sha256:3c2b027979bb400cd65a47970e64f8cef8acda86b288a27f42a98692505086cd"},
+    {file = "sentry_sdk-1.40.3-py2.py3-none-any.whl", hash = "sha256:73383f28311ae55602bb6cc3b013830811135ba5521e41333a6e68f269413502"},
+]
+
+[[package]]
+name = "sentry-sdk"
+version = "1.40.3"
+extras = ["fastapi", "sqlalchemy"]
+summary = "Python client for Sentry (https://sentry.io)"
+groups = ["default"]
+dependencies = [
+    "fastapi>=0.79.0",
+    "sentry-sdk==1.40.3",
+    "sqlalchemy>=1.2",
+]
+files = [
+    {file = "sentry-sdk-1.40.3.tar.gz", hash = "sha256:3c2b027979bb400cd65a47970e64f8cef8acda86b288a27f42a98692505086cd"},
+    {file = "sentry_sdk-1.40.3-py2.py3-none-any.whl", hash = "sha256:73383f28311ae55602bb6cc3b013830811135ba5521e41333a6e68f269413502"},
+]
+
+[[package]]
+name = "sentry-sdk"
+version = "1.40.3"
+extras = ["fastapi"]
+summary = "Python client for Sentry (https://sentry.io)"
+groups = ["default"]
+dependencies = [
+    "fastapi>=0.79.0",
+    "sentry-sdk==1.40.3",
+]
+files = [
+    {file = "sentry-sdk-1.40.3.tar.gz", hash = "sha256:3c2b027979bb400cd65a47970e64f8cef8acda86b288a27f42a98692505086cd"},
+    {file = "sentry_sdk-1.40.3-py2.py3-none-any.whl", hash = "sha256:73383f28311ae55602bb6cc3b013830811135ba5521e41333a6e68f269413502"},
 ]
 
 [[package]]
