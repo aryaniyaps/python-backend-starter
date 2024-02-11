@@ -6,6 +6,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from app.core.constants import (
     APP_NAME,
     APP_URL,
+    EMAIL_VERIFICATION_TOKEN_EXPIRES_IN,
     PASSWORD_RESET_TOKEN_EXPIRES_IN,
     SUPPORT_EMAIL,
 )
@@ -31,6 +32,34 @@ def create_environment() -> Environment:
 
 
 environment = create_environment()
+
+# email verification request templates
+
+email_verification_request_subject = environment.get_template(
+    name="emails/email-verification-request/subject.txt",
+)
+
+email_verification_request_html = environment.get_template(
+    name="emails/email-verification-request/body.html",
+    globals={
+        "token_expires_in": naturaldelta(
+            timedelta(
+                seconds=EMAIL_VERIFICATION_TOKEN_EXPIRES_IN,
+            ),
+        ),
+    },
+)
+
+email_verification_request_text = environment.get_template(
+    name="emails/email-verification-request/body.txt",
+    globals={
+        "token_expires_in": naturaldelta(
+            timedelta(
+                seconds=EMAIL_VERIFICATION_TOKEN_EXPIRES_IN,
+            ),
+        ),
+    },
+)
 
 # password reset request templates
 

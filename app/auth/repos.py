@@ -9,7 +9,7 @@ from sqlalchemy import ScalarResult, delete, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from user_agents.parsers import UserAgent
 
-from app.auth.models import EmailVerificationRequest, PasswordResetToken, UserSession
+from app.auth.models import EmailVerificationToken, PasswordResetToken, UserSession
 from app.auth.types import UserInfo
 from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
 from app.core.geo_ip import get_ip_location
@@ -121,43 +121,43 @@ class AuthRepo:
             ),
         )
 
-    async def create_email_verification_request(self, email: str) -> str:
-        """Create a new email verification request."""
+    async def create_email_verification_token(self, email: str) -> str:
+        """Create a new email verification token."""
         verification_token = self.generate_email_verification_token()
-        email_verification_request = EmailVerificationRequest(
+        email_verification_token = EmailVerificationToken(
             email=email,
             verification_token_hash=self.hash_email_verification_token(
                 email_verification_token=verification_token,
             ),
         )
-        self._session.add(email_verification_request)
+        self._session.add(email_verification_token)
         await self._session.commit()
         return verification_token
 
-    async def get_email_verification_request_by_id(
+    async def get_email_verification_token_by_id(
         self,
-        email_verification_request_id: UUID,
-    ) -> EmailVerificationRequest | None:
-        """Get an email verification request by ID."""
+        email_verification_token_id: UUID,
+    ) -> EmailVerificationToken | None:
+        """Get an email verification token by ID."""
         return await self._session.scalar(
-            select(EmailVerificationRequest).where(
-                EmailVerificationRequest.id == email_verification_request_id,
+            select(EmailVerificationToken).where(
+                EmailVerificationToken.id == email_verification_token_id,
             ),
         )
 
-    async def update_email_verification_request(
+    async def update_email_verification_token(
         self,
-        email_verification_request: EmailVerificationRequest,
+        email_verification_token: EmailVerificationToken,
         *,
         is_verified: bool | None = None,
-    ) -> EmailVerificationRequest:
-        """Update the given email verification request."""
+    ) -> EmailVerificationToken:
+        """Update the given email verification token."""
         if is_verified is not None:
-            email_verification_request.is_verified = is_verified
+            email_verification_token.is_verified = is_verified
 
-        self._session.add(email_verification_request)
+        self._session.add(email_verification_token)
         await self._session.commit()
-        return email_verification_request
+        return email_verification_token
 
     async def create_authentication_token(
         self,

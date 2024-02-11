@@ -7,6 +7,7 @@ from saq.types import Context
 from saq.worker import Worker
 
 from app.auth.tasks import (
+    send_email_verification_request_email,
     send_new_login_location_detected_email,
     send_onboarding_email,
     send_password_reset_email,
@@ -73,6 +74,7 @@ if __name__ == "__main__":
             send_password_reset_request_email,
             send_new_login_location_detected_email,
             send_onboarding_email,
+            send_email_verification_request_email,
         ],
         concurrency=settings.saq_concurrency,
         before_process=before_process,

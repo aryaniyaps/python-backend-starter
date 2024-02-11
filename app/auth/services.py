@@ -8,7 +8,7 @@ from geoip2.database import Reader
 from sqlalchemy import ScalarResult
 from user_agents.parsers import UserAgent
 
-from app.auth.models import EmailVerificationRequest, UserSession
+from app.auth.models import EmailVerificationToken, UserSession
 from app.auth.repos import AuthRepo
 from app.auth.types import UserInfo
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
@@ -31,13 +31,34 @@ class AuthService:
         self._password_hasher = password_hasher
         self._geoip_reader = geoip_reader
 
-    async def request_email_verification(self, email: str) -> None:
+    async def request_email_verification(
+        self,
+        email: str,
+        user_agent: UserAgent,
+        request_ip: str,
+    ) -> None:
         """Send an email verification request to the given email."""
-        raise NotImplementedError
+        verification_token = await self._auth_repo.create_email_verification_token(
+            email=email,
+        )
+
+        # send verification request email
+        await task_queue.enqueue(
+            "send_email_verification_request_email",
+            receiver=email,
+            verification_token=verification_token,
+            device=user_agent.get_device(),
+            browser_name=user_agent.get_browser(),
+            location=get_ip_location(
+                ip_address=request_ip,
+                geoip_reader=self._geoip_reader,
+            ),
+            ip_address=request_ip,
+        )
 
     async def verify_email_verification_request(
         self, email: str, verification_token: str
-    ) -> EmailVerificationRequest:
+    ) -> EmailVerificationToken:
         """Verify the email verification request with the given email and verification token."""
         raise NotImplementedError
 

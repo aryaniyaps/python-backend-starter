@@ -6,6 +6,9 @@ from app.config import settings
 from app.core.constants import APP_URL
 from app.core.emails import email_sender
 from app.core.templates import (
+    email_verification_request_html,
+    email_verification_request_subject,
+    email_verification_request_text,
     new_login_location_html,
     new_login_location_subject,
     new_login_location_text,
@@ -39,6 +42,38 @@ def send_onboarding_email(
         ),
         html=onboarding_html.render(
             username=username,
+        ),
+    )
+
+
+def send_email_verification_request_email(
+    _ctx: Context,
+    *,
+    receiver: str,
+    verification_token: str,
+    device: str,
+    browser_name: str,
+    ip_address: str,
+    location: str,
+) -> None:
+    """Send an email verification request to the given email."""
+    email_sender.send(
+        sender=settings.email_from,
+        receivers=[receiver],
+        subject=email_verification_request_subject.render(),
+        text=email_verification_request_text.render(
+            verification_token=verification_token,
+            device=device,
+            browser_name=browser_name,
+            ip_address=ip_address,
+            location=location,
+        ),
+        html=email_verification_request_html.render(
+            verification_token=verification_token,
+            device=device,
+            browser_name=browser_name,
+            ip_address=ip_address,
+            location=location,
         ),
     )
 

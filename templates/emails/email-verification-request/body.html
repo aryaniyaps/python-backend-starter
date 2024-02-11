@@ -1,0 +1,59 @@
+{% extends "base/body.html" %}
+
+{% block title %}
+Verify your email
+{% endblock%}
+
+{% block content %}
+<table
+  class="email-body_inner"
+  align="center"
+  width="570"
+  cellpadding="0"
+  cellspacing="0"
+  role="presentation"
+>
+  <!-- Body content -->
+  <tr>
+    <td class="content-cell">
+      <div class="f-fallback">
+        <h1>Hey there,</h1>
+        <p>
+            We received a request to verify your email for your {{ app_name }} account.
+          <strong
+            >This email verification token is only valid for the next {{ token_expires_in }}.</strong
+          >
+        </p>
+        <!-- Sub copy -->
+        <table class="body-sub" role="presentation">
+            <tr>
+              <td>
+                <p class="f-fallback sub">
+                    Enter the following verification token to proceed:
+                </p>
+                <p class="f-fallback sub">{{ verification_token }}</p>
+              </td>
+            </tr>
+        </table>
+
+        <h3>Where this happened:</h3>
+          <p>
+          Device: {{ device }}<br/>
+
+          Browser: {{ browser_name }}<br/>
+
+          IP Address: {{ ip_address }}<br/>
+
+          Location: {{ location }}
+          </p>
+          <p>
+            If you did not request an email verification,, please ignore this email or
+          <a href="{{ support_email }}">contact support</a> if you have questions.
+          </p>
+        <p>Thanks, <br />The {{ app_name }} team</p>
+
+      </div>
+    </td>
+  </tr>
+</table>
+{% endblock %}

@@ -61,8 +61,8 @@ class UserSession(Base):
     )
 
 
-class EmailVerificationRequest(Base):
-    __tablename__ = "email_verification_requests"
+class EmailVerificationToken(Base):
+    __tablename__ = "email_verification_tokens"
 
     id: Mapped[UUID] = mapped_column(
         primary_key=True,

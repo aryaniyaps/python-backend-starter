@@ -1,0 +1,34 @@
+{% extends "base/body.txt" %}
+
+{% block title %}
+Use this token to verify your email. The token is only valid for {{ token_expires_in }}.
+{% endblock%}
+
+
+{% block content %}
+************
+Hey there,
+************
+
+We received a request to verify your email for your {{ app_name }} account. This email verification token is only valid for the next {{ token_expires_in }}.
+
+Enter the following verification token to proceed:
+
+{{ verification_token }}
+
+Where this happened:
+
+Device: {{ device }}
+
+Browser: {{ browser_name }}
+
+IP Address: {{ ip_address }}
+
+Location: {{ location }}
+
+If you did not request an email verification, please ignore this email or contact support ( {{ support_email }} ) if you have questions.
+
+Thanks,
+The {{ app_name }} team
+
+{% endblock%}
