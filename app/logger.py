@@ -8,22 +8,27 @@ from structlog.types import EventDict, Processor, WrappedLogger
 
 
 def add_correlation_id(
-    _logger: WrappedLogger, _method_name: str, event_dict: EventDict
+    _logger: WrappedLogger,
+    _method_name: str,
+    event_dict: EventDict,
 ) -> EventDict:
-    """Add request ID to log message."""
+    """Add the correlation ID to log message."""
     if request_id := correlation_id.get():
         event_dict["request_id"] = request_id
     return event_dict
 
 
 def remove_color_message(
-    _logger: WrappedLogger, _method_name: str, event_dict: EventDict
+    _logger: WrappedLogger,
+    _method_name: str,
+    event_dict: EventDict,
 ) -> EventDict:
     """
     Remove `color_message` from the event dict.
 
-    Uvicorn logs the message a second time in the extra `color_message`, but we don't
-    need it. This processor removes the key from the event dict if it exists.
+    Uvicorn logs the message a second time in the extra
+    `color_message`, but we don't need it. This processor
+    removes the key from the event dict if it exists.
     """
     event_dict.pop("color_message", None)
     return event_dict
@@ -100,16 +105,6 @@ def build_server_log_config(log_level: str, *, human_readable: bool) -> dict[str
     base_config["loggers"].update(
         {
             "uvicorn": {
-                "handlers": ["default"],
-                "level": log_level,
-                "propagate": False,
-            },
-            "uvicorn.error": {
-                "handlers": ["default"],
-                "level": log_level,
-                "propagate": False,
-            },
-            "uvicorn.access": {
                 "handlers": ["default"],
                 "level": log_level,
                 "propagate": False,

@@ -58,6 +58,7 @@ if __name__ == "__main__":
     setup_logging(
         human_readable=settings.debug,
     )
+
     dictConfig(
         build_worker_log_config(
             log_level=settings.log_level,
