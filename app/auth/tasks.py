@@ -130,7 +130,7 @@ def send_password_reset_request_email(
 
 
 def send_password_reset_email(
-    __ctx: Context,
+    _ctx: Context,
     *,
     receiver: str,
     username: str,

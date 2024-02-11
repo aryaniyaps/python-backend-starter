@@ -27,7 +27,7 @@ Make sure you have the following installed:
 
 To install dependencies, follow these steps:
 
-1. Ensure that pdm is installed. You can install it via pip:
+1. Ensure that [PDM](https://pdm-project.org/latest/) is installed. You can install it via pip:
 
     ```
     pip install -U pdm
