@@ -1,5 +1,4 @@
 from datetime import UTC, datetime
-from hashlib import sha256
 from uuid import UUID
 
 import humanize
@@ -9,7 +8,7 @@ from geoip2.database import Reader
 from sqlalchemy import ScalarResult
 from user_agents.parsers import UserAgent
 
-from app.auth.models import UserSession
+from app.auth.models import EmailVerificationRequest, UserSession
 from app.auth.repos import AuthRepo
 from app.auth.types import UserInfo
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
@@ -31,6 +30,16 @@ class AuthService:
         self._user_repo = user_repo
         self._password_hasher = password_hasher
         self._geoip_reader = geoip_reader
+
+    async def request_email_verification(self, email: str) -> None:
+        """Send an email verification request to the given email."""
+        raise NotImplementedError
+
+    async def verify_email_verification_request(
+        self, email: str, verification_token: str
+    ) -> EmailVerificationRequest:
+        """Verify the email verification request with the given email and verification token."""
+        raise NotImplementedError
 
     async def register_user(
         self,
@@ -258,11 +267,11 @@ class AuthService:
         user_agent: UserAgent,
     ) -> None:
         """Reset the relevant user's password with the given credentials."""
-        reset_token_hash = sha256(reset_token.encode()).hexdigest()
-
         existing_user = await self._user_repo.get_user_by_email(email=email)
-        password_reset_token = await self._auth_repo.get_password_reset_token(
-            reset_token_hash=reset_token_hash,
+        password_reset_token = (
+            await self._auth_repo.get_password_reset_token_by_reset_token(
+                reset_token=reset_token,
+            )
         )
 
         if not (

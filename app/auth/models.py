@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import Column, ForeignKey, String, text
+from sqlalchemy.dialects.postgresql import CITEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.schema import Index
 from sqlalchemy.sql.functions import now
@@ -57,6 +58,30 @@ class UserSession(Base):
     user: Mapped["User"] = relationship(
         "User",
         back_populates="user_sessions",
+    )
+
+
+class EmailVerificationRequest(Base):
+    __tablename__ = "email_verification_requests"
+
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True,
+        server_default=text(
+            "gen_random_uuid()",
+        ),
+    )
+
+    email: Mapped[str] = mapped_column(
+        CITEXT(250),
+        index=True,
+    )
+
+    verification_token_hash: Mapped[str] = mapped_column(
+        String(255),
+    )
+
+    is_verified: Mapped[bool] = mapped_column(
+        default=False,
     )
 
 

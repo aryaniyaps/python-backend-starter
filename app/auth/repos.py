@@ -9,7 +9,7 @@ from sqlalchemy import ScalarResult, delete, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from user_agents.parsers import UserAgent
 
-from app.auth.models import PasswordResetToken, UserSession
+from app.auth.models import EmailVerificationRequest, PasswordResetToken, UserSession
 from app.auth.types import UserInfo
 from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
 from app.core.geo_ip import get_ip_location
@@ -121,6 +121,44 @@ class AuthRepo:
             ),
         )
 
+    async def create_email_verification_request(self, email: str) -> str:
+        """Create a new email verification request."""
+        verification_token = self.generate_email_verification_token()
+        email_verification_request = EmailVerificationRequest(
+            email=email,
+            verification_token_hash=self.hash_email_verification_token(
+                email_verification_token=verification_token,
+            ),
+        )
+        self._session.add(email_verification_request)
+        await self._session.commit()
+        return verification_token
+
+    async def get_email_verification_request_by_id(
+        self,
+        email_verification_request_id: UUID,
+    ) -> EmailVerificationRequest | None:
+        """Get an email verification request by ID."""
+        return await self._session.scalar(
+            select(EmailVerificationRequest).where(
+                EmailVerificationRequest.id == email_verification_request_id,
+            ),
+        )
+
+    async def update_email_verification_request(
+        self,
+        email_verification_request: EmailVerificationRequest,
+        *,
+        is_verified: bool | None = None,
+    ) -> EmailVerificationRequest:
+        """Update the given email verification request."""
+        if is_verified is not None:
+            email_verification_request.is_verified = is_verified
+
+        self._session.add(email_verification_request)
+        await self._session.commit()
+        return email_verification_request
+
     async def create_authentication_token(
         self,
         user_id: UUID,
@@ -152,7 +190,11 @@ class AuthRepo:
     @staticmethod
     def generate_authentication_token() -> str:
         """Generate an authentication token."""
-        # Generate a random token
+        return token_hex(32)
+
+    @staticmethod
+    def generate_email_verification_token() -> str:
+        """Generate an email verification token."""
         return token_hex(32)
 
     @staticmethod
@@ -169,6 +211,11 @@ class AuthRepo:
     def hash_authentication_token(authentication_token: str) -> str:
         """Hash the given authentication token."""
         return sha256(authentication_token.encode()).hexdigest()
+
+    @staticmethod
+    def hash_email_verification_token(email_verification_token: str) -> str:
+        """Hash the given email verification token."""
+        return sha256(email_verification_token.encode()).hexdigest()
 
     async def get_user_info_for_authentication_token(
         self,
@@ -270,14 +317,15 @@ class AuthRepo:
         await self._session.commit()
         return reset_token
 
-    async def get_password_reset_token(
+    async def get_password_reset_token_by_reset_token(
         self,
-        reset_token_hash: str,
+        reset_token: str,
     ) -> PasswordResetToken | None:
-        """Get a password reset token."""
+        """Get a password reset token by reset token."""
         return await self._session.scalar(
             select(PasswordResetToken).where(
-                PasswordResetToken.token_hash == reset_token_hash,
+                PasswordResetToken.token_hash
+                == self.hash_password_reset_token(reset_token),
             ),
         )
 
