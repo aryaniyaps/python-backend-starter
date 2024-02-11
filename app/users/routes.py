@@ -56,6 +56,9 @@ async def get_current_user(
     )
 
 
+# TODO: include separate route to update password
+# TODO: include separate route to update email
+# TODO: include separate route to update other attributes such as username
 @users_router.patch(
     "/@me",
     response_model=UserSchema,
