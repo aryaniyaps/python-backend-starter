@@ -16,6 +16,7 @@
 - [ ] User session tracking
    - [x] IP address, User agent and geolocation data storage
    - [ ] Email notifications when new login location is detected
+- [x] IP address, device and geolocation data attached with every email notification for additional security
 - [ ] Sign in with Google
 - [x] Structured logging support
 - [x] Rate limiting (Moving window strategy)
