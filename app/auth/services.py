@@ -118,6 +118,8 @@ class AuthService:
                 # FIXME: do we need to check this here? assuming that verification tokens are only created for emails that are
                 # not already taken, and when the users are created those email verification tokens are deleted
                 # so when will we hit this condition??
+                # maybe we will just check if verification token doesnt exist and return an error saying
+                # email or email verification token is invalid
                 raise InvalidInputError(
                     message="User with that email already exists.",
                 )
