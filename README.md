@@ -1,5 +1,28 @@
 # Python Backend Starter
 
+## Features
+
+- [x] User registration
+   - [x] Secure authentication token storage
+   - [x] Email notifications for onboarding
+- [ ] User email verification
+- [x] User login
+   - [x] Passwords are securely hashed with Argon2
+   - [x] Passwords are rehashed upon login
+- [x] User account recovery
+   - [x] Secure account recovery token storage
+   - [x] Email notifications for recovery requests
+   - [x] Email notifications when password changes
+- [ ] User session tracking
+   - [x] IP address, User agent and geolocation data storage
+   - [ ] Email notifications when new login location is detected
+- [ ] Sign in with Google
+- [x] Structured logging support
+- [x] Rate limiting (Moving window strategy)
+   - [x] Primary rate limiting (API-wide)
+   - [x] Secondary rate limiting (operation-specific)
+- [ ] Error reporting with Sentry
+
 ## Tech Stack
 
 - [FastAPI](https://fastapi.tiangolo.com/)
