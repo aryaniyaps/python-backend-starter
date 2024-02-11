@@ -31,13 +31,23 @@ class AuthService:
         self._password_hasher = password_hasher
         self._geoip_reader = geoip_reader
 
-    async def request_email_verification(
+    async def send_email_verification_request(
         self,
         email: str,
         user_agent: UserAgent,
         request_ip: str,
     ) -> None:
         """Send an email verification request to the given email."""
+        if (
+            await self._user_repo.get_user_by_email(
+                email=email,
+            )
+            is not None
+        ):
+            raise InvalidInputError(
+                message="User with that email already exists.",
+            )
+
         verification_token = await self._auth_repo.create_email_verification_token(
             email=email,
         )
@@ -56,15 +66,33 @@ class AuthService:
             ip_address=request_ip,
         )
 
-    async def verify_email_verification_request(
-        self, email: str, verification_token: str
+    async def verify_email(
+        self,
+        email: str,
+        verification_token: str,
     ) -> EmailVerificationToken:
-        """Verify the email verification request with the given email and verification token."""
-        raise NotImplementedError
+        """Verify the email verification token with the given email."""
+        email_verification_token = (
+            await self._auth_repo.get_email_verification_token_by_token_email(
+                verification_token=verification_token, email=email
+            )
+        )
+
+        if email_verification_token is None:
+            raise InvalidInputError(
+                message="Invalid verification token or email.",
+            )
+
+        await self._auth_repo.update_email_verification_token(
+            email_verification_token=email_verification_token,
+            is_verified=True,
+        )
+        return email_verification_token
 
     async def register_user(
         self,
         email: str,
+        email_verification_token_id: UUID,
         username: str,
         password: str,
         request_ip: str,
@@ -72,15 +100,6 @@ class AuthService:
     ) -> tuple[str, User]:
         """Register a new user."""
         try:
-            if (
-                await self._user_repo.get_user_by_email(
-                    email=email,
-                )
-                is not None
-            ):
-                raise InvalidInputError(
-                    message="User with that email already exists.",
-                )
             if (
                 await self._user_repo.get_user_by_username(
                     username=username,
@@ -90,11 +109,39 @@ class AuthService:
                 raise InvalidInputError(
                     message="User with that username already exists.",
                 )
+            if (
+                await self._user_repo.get_user_by_email(
+                    email=email,
+                )
+                is not None
+            ):
+                raise InvalidInputError(
+                    message="User with that email already exists.",
+                )
+
+            verification_token = (
+                await self._auth_repo.get_email_verification_token_by_id(
+                    email_verification_token_id=email_verification_token_id,
+                )
+            )
+
+            if (
+                verification_token is None
+                or not verification_token.is_verified
+                or verification_token.email != email
+                or datetime.now(UTC) > verification_token.expires_at
+            ):
+                raise InvalidInputError(
+                    message="Invalid email verification token provided."
+                )
+
             user = await self._user_repo.create_user(
                 username=username,
                 email=email,
                 password=password,
             )
+
+            await self._auth_repo.delete_email_verification_tokens(email=email)
 
             user_session = await self._auth_repo.create_user_session(
                 user_id=user.id,

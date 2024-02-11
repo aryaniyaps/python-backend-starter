@@ -76,13 +76,16 @@ class EmailVerificationToken(Base):
         index=True,
     )
 
-    verification_token_hash: Mapped[str] = mapped_column(
+    token_hash: Mapped[str] = mapped_column(
         String(255),
+        index=True,
     )
 
     is_verified: Mapped[bool] = mapped_column(
         default=False,
     )
+
+    expires_at: Mapped[datetime]
 
 
 class PasswordResetToken(Base):

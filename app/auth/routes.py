@@ -12,6 +12,9 @@ from app.auth.dependencies import (
 )
 from app.auth.models import UserSession
 from app.auth.schemas import (
+    EmailVerificationInput,
+    EmailVerificationRequestInput,
+    EmailVerificationResult,
     LoginUserInput,
     LoginUserResult,
     LogoutInput,
@@ -31,6 +34,75 @@ auth_router = APIRouter(
     prefix="/auth",
     tags=[OpenAPITag.AUTHENTICATION],
 )
+
+
+@auth_router.post(
+    "/email-verification-request",
+    response_model=None,
+    status_code=HTTPStatus.NO_CONTENT,
+    summary="Send an email verification request.",
+    dependencies=[
+        Depends(
+            dependency=RateLimiter(
+                limit="15/hour",
+            ),
+        ),
+    ],
+)
+async def request_email_verification(
+    data: EmailVerificationRequestInput,
+    user_agent: Annotated[str, Header()],
+    request_ip: Annotated[
+        str,
+        Depends(
+            dependency=get_ip_address,
+        ),
+    ],
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=get_auth_service,
+        ),
+    ],
+) -> None:
+    """Send an email verification request."""
+    await auth_service.send_email_verification_request(
+        email=data.email,
+        user_agent=parse(user_agent),
+        request_ip=request_ip,
+    )
+
+
+@auth_router.post(
+    "/verify-email",
+    summary="Verify user email.",
+    response_model=EmailVerificationResult,
+    dependencies=[
+        Depends(
+            dependency=RateLimiter(
+                limit="20/hour",
+            ),
+        ),
+    ],
+)
+async def verify_email(
+    data: EmailVerificationInput,
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=get_auth_service,
+        ),
+    ],
+) -> EmailVerificationResult:
+    """Verify the user's email."""
+    verification_token = await auth_service.verify_email(
+        verification_token=data.verification_token,
+        email=data.email,
+    )
+
+    return EmailVerificationResult(
+        verification_token_id=verification_token.id,
+    )
 
 
 @auth_router.post(
