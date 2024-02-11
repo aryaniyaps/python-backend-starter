@@ -8,7 +8,7 @@ from app.auth.dependencies import get_viewer_info
 from app.auth.types import UserInfo
 from app.core.constants import OpenAPITag
 from app.core.rate_limiter import RateLimiter
-from app.core.schemas import ResourceNotFoundErrorResult
+from app.core.schemas import InvalidInputErrorResult, ResourceNotFoundErrorResult
 from app.users.dependencies import get_user_service
 from app.users.models import User
 from app.users.schemas import (
@@ -59,6 +59,12 @@ async def get_current_user(
 @users_router.patch(
     "/@me",
     response_model=UserSchema,
+    responses={
+        HTTPStatus.BAD_REQUEST: {
+            "model": InvalidInputErrorResult,
+            "description": "Invalid Input Error",
+        },
+    },
     summary="Update the current user.",
     dependencies=[
         Depends(

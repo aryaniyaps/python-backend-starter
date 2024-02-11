@@ -29,6 +29,7 @@ from app.auth.types import UserInfo
 from app.core.constants import OpenAPITag
 from app.core.dependencies import get_ip_address
 from app.core.rate_limiter import RateLimiter
+from app.core.schemas import InvalidInputErrorResult
 
 auth_router = APIRouter(
     prefix="/auth",
@@ -40,6 +41,12 @@ auth_router = APIRouter(
     "/email-verification-request",
     response_model=None,
     status_code=HTTPStatus.NO_CONTENT,
+    responses={
+        HTTPStatus.BAD_REQUEST: {
+            "model": InvalidInputErrorResult,
+            "description": "Invalid Input Error",
+        },
+    },
     summary="Send an email verification request.",
     dependencies=[
         Depends(
@@ -77,6 +84,12 @@ async def request_email_verification(
     "/verify-email",
     summary="Verify user email.",
     response_model=EmailVerificationResult,
+    responses={
+        HTTPStatus.BAD_REQUEST: {
+            "model": InvalidInputErrorResult,
+            "description": "Invalid Input Error",
+        },
+    },
     dependencies=[
         Depends(
             dependency=RateLimiter(
@@ -110,6 +123,12 @@ async def verify_email(
     response_model=RegisterUserResult,
     status_code=HTTPStatus.CREATED,
     summary="Register a new user.",
+    responses={
+        HTTPStatus.BAD_REQUEST: {
+            "model": InvalidInputErrorResult,
+            "description": "Invalid Input Error",
+        },
+    },
     dependencies=[
         Depends(
             dependency=RateLimiter(
@@ -137,6 +156,7 @@ async def register_user(
     """Register a new user."""
     authentication_token, user = await auth_service.register_user(
         email=data.email,
+        email_verification_token_id=data.email_verification_token_id,
         username=data.username,
         password=data.password,
         request_ip=request_ip,
@@ -153,6 +173,12 @@ async def register_user(
     "/login",
     response_model=LoginUserResult,
     summary="Login the current user.",
+    responses={
+        HTTPStatus.BAD_REQUEST: {
+            "model": InvalidInputErrorResult,
+            "description": "Invalid Input Error",
+        },
+    },
     dependencies=[
         Depends(
             dependency=RateLimiter(
@@ -321,6 +347,12 @@ async def request_password_reset(
     "/reset-password",
     status_code=HTTPStatus.NO_CONTENT,
     summary="Reset user password.",
+    responses={
+        HTTPStatus.BAD_REQUEST: {
+            "model": InvalidInputErrorResult,
+            "description": "Invalid Input Error",
+        },
+    },
     response_model=None,
     dependencies=[
         Depends(

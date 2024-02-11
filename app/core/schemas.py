@@ -121,18 +121,6 @@ class UnauthenticatedErrorResult(BaseSchema):
     ]
 
 
-class UnexpectedErrorResult(BaseSchema):
-    message: Annotated[
-        str,
-        Field(
-            examples=[
-                "An unexpected error occured.",
-            ],
-            description="A human readable message describing the error.",
-        ),
-    ]
-
-
 class RateLimitExceededErrorResult(BaseSchema):
     message: Annotated[
         str,
