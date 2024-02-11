@@ -115,6 +115,9 @@ class AuthService:
                 )
                 is not None
             ):
+                # FIXME: do we need to check this here? assuming that verification tokens are only created for emails that are
+                # not already taken, and when the users are created those email verification tokens are deleted
+                # so when will we hit this condition??
                 raise InvalidInputError(
                     message="User with that email already exists.",
                 )
