@@ -69,7 +69,7 @@ class Settings(BaseSettings):
         ),
     ]
 
-    rq_broker_url: Annotated[
+    saq_broker_url: Annotated[
         RedisDsn,
         Field(
             examples=[
@@ -77,6 +77,15 @@ class Settings(BaseSettings):
             ],
         ),
     ]
+
+    saq_concurrency: Annotated[
+        int,
+        Field(
+            examples=[
+                100,
+            ],
+        ),
+    ] = 100
 
     cors_allow_origins: Annotated[
         Sequence[str],

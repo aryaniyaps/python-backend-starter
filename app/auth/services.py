@@ -2,6 +2,7 @@ from datetime import UTC, datetime
 from hashlib import sha256
 from uuid import UUID
 
+import humanize
 from argon2 import PasswordHasher
 from argon2.exceptions import HashingError, VerifyMismatchError
 from geoip2.database import Reader
@@ -10,12 +11,6 @@ from user_agents.parsers import UserAgent
 
 from app.auth.models import UserSession
 from app.auth.repos import AuthRepo
-from app.auth.tasks import (
-    send_new_login_location_detected_email,
-    send_onboarding_email,
-    send_password_reset_email,
-    send_password_reset_request_email,
-)
 from app.auth.types import UserInfo
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
 from app.core.geo_ip import get_ip_location
@@ -85,9 +80,8 @@ class AuthService:
             user_id=user.id,
             user_session_id=user_session.id,
         )
-
-        task_queue.enqueue(
-            send_onboarding_email,
+        await task_queue.enqueue(
+            "send_onboarding_email",
             receiver=user.email,
             username=user.username,
         )
@@ -136,11 +130,11 @@ class AuthService:
             user_agent=str(user_agent),
             ip_address=request_ip,
         ):
-            task_queue.enqueue(
-                send_new_login_location_detected_email,
+            await task_queue.enqueue(
+                "send_new_login_location_detected_email",
                 receiver=user.email,
                 username=user.username,
-                login_timestamp=datetime.now(UTC),
+                login_timestamp=humanize.naturaldate(datetime.now(UTC)),
                 device=user_agent.get_device(),
                 browser_name=user_agent.get_browser(),
                 location=get_ip_location(
@@ -241,9 +235,8 @@ class AuthService:
             reset_token = await self._auth_repo.create_password_reset_token(
                 user_id=existing_user.id,
             )
-
-            task_queue.enqueue(
-                send_password_reset_request_email,
+            await task_queue.enqueue(
+                "send_password_reset_request_email",
                 receiver=existing_user.email,
                 username=existing_user.username,
                 password_reset_token=reset_token,
@@ -316,8 +309,8 @@ class AuthService:
         # or should we delete the sessions here?
 
         # send password reset mail
-        task_queue.enqueue(
-            send_password_reset_email,
+        await task_queue.enqueue(
+            "send_password_reset_email",
             receiver=existing_user.email,
             username=existing_user.username,
             device=user_agent.get_device(),

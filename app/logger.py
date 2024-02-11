@@ -1,9 +1,19 @@
 from typing import Any
 
 import structlog
+from asgi_correlation_id import correlation_id
 from structlog.dev import ConsoleRenderer
 from structlog.processors import JSONRenderer
 from structlog.types import EventDict, Processor, WrappedLogger
+
+
+def add_correlation_id(
+    _logger: WrappedLogger, _method_name: str, event_dict: EventDict
+) -> EventDict:
+    """Add request ID to log message."""
+    if request_id := correlation_id.get():
+        event_dict["request_id"] = request_id
+    return event_dict
 
 
 def remove_color_message(
@@ -30,7 +40,7 @@ def build_shared_processors(*, human_readable: bool) -> list[Processor]:
     """Build shared logging processors."""
     timestamper = structlog.processors.TimeStamper(fmt="iso", utc=True)
     shared_processors: list[Processor] = [
-        structlog.contextvars.merge_contextvars,  # Merge context variables
+        add_correlation_id,  # Add correlation ID
         structlog.stdlib.add_log_level,  # Add log level
         structlog.stdlib.add_logger_name,  # Add logger name
         structlog.stdlib.PositionalArgumentsFormatter(),  # Add positional arguments
@@ -109,8 +119,8 @@ def build_server_log_config(log_level: str, *, human_readable: bool) -> dict[str
                 "level": log_level,
                 "propagate": False,
             },
-            # RQ queue logs go in the server logs
-            "rq.queue": {
+            # SAQ queue logs go in the server logs
+            "saq": {
                 "handlers": ["default"],
                 "level": log_level,
                 "propagate": False,
@@ -126,7 +136,7 @@ def build_worker_log_config(log_level: str, *, human_readable: bool) -> dict[str
     # Extend base config with worker-specific loggers
     base_config["loggers"].update(
         {
-            "rq.worker": {
+            "saq": {
                 "handlers": ["default"],
                 "level": log_level,
                 "propagate": False,

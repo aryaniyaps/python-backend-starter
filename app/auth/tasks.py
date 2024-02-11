@@ -1,5 +1,7 @@
 from urllib.parse import urlencode, urljoin
 
+from saq.types import Context
+
 from app.config import settings
 from app.core.constants import APP_URL
 from app.core.emails import email_sender
@@ -20,6 +22,8 @@ from app.core.templates import (
 
 
 def send_onboarding_email(
+    _ctx: Context,
+    *,
     receiver: str,
     username: str,
 ) -> None:
@@ -40,6 +44,8 @@ def send_onboarding_email(
 
 
 def send_new_login_location_detected_email(
+    _ctx: Context,
+    *,
     receiver: str,
     username: str,
     login_timestamp: str,
@@ -75,6 +81,8 @@ def send_new_login_location_detected_email(
 
 
 def send_password_reset_request_email(
+    _ctx: Context,
+    *,
     receiver: str,
     username: str,
     password_reset_token: str,
@@ -122,6 +130,8 @@ def send_password_reset_request_email(
 
 
 def send_password_reset_email(
+    __ctx: Context,
+    *,
     receiver: str,
     username: str,
     device: str,

@@ -8,6 +8,7 @@
 - [Jinja2](https://jinja.palletsprojects.com/en/latest/)
 - [SQLAlchemy](https://www.sqlalchemy.org/)
 - [Alembic](https://alembic.sqlalchemy.org/en/latest/)
+- [SAQ](https://saq-py.readthedocs.io/en/latest/)
 - [Structlog](https://www.structlog.org/en/stable/)
 - [Pytest](https://docs.pytest.org/en/latest/)
 - [PostgreSQL](https://www.postgresql.org/)

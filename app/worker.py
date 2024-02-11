@@ -1,19 +1,57 @@
+import asyncio
 from logging.config import dictConfig
 
-from redis import Redis
-from rq import Queue, Worker
+from asgi_correlation_id import correlation_id
+from saq import Job, Queue
+from saq.types import Context
+from saq.worker import Worker
 
+from app.auth.tasks import (
+    send_new_login_location_detected_email,
+    send_onboarding_email,
+    send_password_reset_email,
+    send_password_reset_request_email,
+)
 from app.config import settings
 from app.logger import build_worker_log_config, setup_logging
 
-task_queue = Queue(
-    name="tasks",
-    connection=Redis.from_url(
-        url=str(
-            settings.rq_broker_url,
-        ),
-    ),
+
+async def before_enqueue(job: Job) -> None:
+    """
+    Before enqueue handler.
+
+    Sets the correlation ID for the job.
+    """
+    job.meta["request_id"] = correlation_id.get()
+
+
+task_queue = Queue.from_url(
+    url=str(settings.saq_broker_url),
 )
+
+task_queue.register_before_enqueue(
+    callback=before_enqueue,
+)
+
+
+async def before_process(ctx: Context) -> None:
+    """
+    Before process handler.
+
+    Loads the correlation ID from the enqueueing process.
+    """
+    request_id = ctx["job"].meta.get("request_id")
+    correlation_id.set(request_id)
+
+
+async def after_process(_ctx: Context) -> None:
+    """
+    After process handler.
+
+    Resets the correlation ID for the process.
+    """
+    correlation_id.set(None)
+
 
 if __name__ == "__main__":
     # set up logging
@@ -27,16 +65,18 @@ if __name__ == "__main__":
         ),
     )
 
-    # run worker
     worker = Worker(
-        queues=[
-            task_queue,
+        queue=task_queue,
+        functions=[
+            send_password_reset_email,
+            send_password_reset_request_email,
+            send_new_login_location_detected_email,
+            send_onboarding_email,
         ],
-        connection=Redis.from_url(
-            url=str(
-                settings.rq_broker_url,
-            ),
-        ),
+        concurrency=settings.saq_concurrency,
+        before_process=before_process,
+        after_process=after_process,
     )
 
-    worker.work()
+    # run worker
+    asyncio.run(worker.start())
