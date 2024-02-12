@@ -1,12 +1,21 @@
 from collections.abc import Sequence
+from enum import Enum
 from typing import Annotated
 
 from pydantic import Field, PostgresDsn, RedisDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+class Environment(str, Enum):
+    development = "development"
+    testing = "testing"
+    production = "production"
+
+
 class Settings(BaseSettings):
     debug: bool
+
+    environment: Environment = Environment.development
 
     host: Annotated[
         str,

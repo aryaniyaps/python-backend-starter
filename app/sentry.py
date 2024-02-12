@@ -8,18 +8,11 @@ from sentry_sdk.integrations.starlette import StarletteIntegration
 from app.config import settings
 
 
-def _get_sentry_environment() -> str:
-    """Get the Sentry environment."""
-    if settings.debug:
-        return "development"
-    return "production"
-
-
 def setup_sentry() -> None:
     """Set up Sentry error reporting and monitoring."""
     sentry_sdk.init(
         dsn=settings.sentry_dsn,
-        environment=_get_sentry_environment(),
+        environment=settings.environment,
         debug=settings.debug,
         traces_sample_rate=settings.sentry_sample_rate,
         integrations=[
