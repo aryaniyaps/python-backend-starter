@@ -48,13 +48,10 @@ def build_shared_processors(*, human_readable: bool) -> list[Processor]:
     timestamper = structlog.processors.TimeStamper(fmt="iso", utc=True)
     shared_processors: list[Processor] = [
         add_correlation_id,  # Add correlation ID
+        timestamper,  # Add timestamps
         structlog.stdlib.add_log_level,  # Add log level
         structlog.stdlib.add_logger_name,  # Add logger name
-        structlog.stdlib.PositionalArgumentsFormatter(),  # Add positional arguments
-        structlog.processors.StackInfoRenderer(),  # Add stack information
-        structlog.stdlib.ExtraAdder(),  # Add extra attributes
         remove_color_message,  # Drop color message
-        timestamper,  # Add timestamps
         SentryProcessor(
             event_level=logging.ERROR,
             tag_keys=[
@@ -62,6 +59,9 @@ def build_shared_processors(*, human_readable: bool) -> list[Processor]:
                 "request_id",
             ],
         ),  # Add sentry processor
+        structlog.stdlib.PositionalArgumentsFormatter(),  # Add positional arguments
+        structlog.processors.StackInfoRenderer(),  # Add stack information
+        structlog.stdlib.ExtraAdder(),  # Add extra attributes
     ]
 
     if not human_readable:
