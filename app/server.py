@@ -5,13 +5,13 @@ from app.logger import build_server_log_config, setup_logging
 from app.sentry import setup_sentry
 
 if __name__ == "__main__":
-    # set up sentry
-    setup_sentry()
-
     # set up logging
     setup_logging(
         human_readable=settings.debug,
     )
+
+    # set up sentry
+    setup_sentry()
 
     # run application
     uvicorn.run(

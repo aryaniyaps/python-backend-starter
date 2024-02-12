@@ -191,5 +191,21 @@ class Settings(BaseSettings):
         env_prefix="server_",
     )
 
+    def _is_environment(self, environment: Environment) -> bool:
+        """Check whether the current environment is the given environment."""
+        return self.environment == environment
+
+    def is_development(self) -> bool:
+        """Check whether the current environment is development."""
+        return self._is_environment(Environment.development)
+
+    def is_testing(self) -> bool:
+        """Check whether the current environment is testing."""
+        return self._is_environment(Environment.testing)
+
+    def is_production(self) -> bool:
+        """Check whether the current environment is production."""
+        return self._is_environment(Environment.production)
+
 
 settings = Settings()
