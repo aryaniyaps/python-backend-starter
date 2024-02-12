@@ -1,5 +1,3 @@
-import logging
-
 import sentry_sdk
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
@@ -16,17 +14,18 @@ def setup_sentry() -> None:
         debug=settings.debug,
         traces_sample_rate=settings.sentry_sample_rate,
         integrations=[
-            LoggingIntegration(
-                level=logging.getLevelName(
-                    settings.log_level,
-                ),
-                event_level=logging.ERROR,
-            ),
             StarletteIntegration(
                 transaction_style="url",
             ),
             FastApiIntegration(
                 transaction_style="url",
+            ),
+            # disable standard library logging
+            # FIXME: not sure if this is needed, we could keep this integration
+            # and remove the structlog-sentry processor instead
+            LoggingIntegration(
+                level=None,
+                event_level=None,
             ),
         ],
     )

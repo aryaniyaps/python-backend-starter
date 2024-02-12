@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 
 import structlog
@@ -5,6 +6,7 @@ from asgi_correlation_id import correlation_id
 from structlog.dev import ConsoleRenderer
 from structlog.processors import JSONRenderer
 from structlog.types import EventDict, Processor, WrappedLogger
+from structlog_sentry import SentryProcessor
 
 
 def add_correlation_id(
@@ -53,6 +55,13 @@ def build_shared_processors(*, human_readable: bool) -> list[Processor]:
         structlog.stdlib.ExtraAdder(),  # Add extra attributes
         remove_color_message,  # Drop color message
         timestamper,  # Add timestamps
+        SentryProcessor(
+            event_level=logging.ERROR,
+            tag_keys=[
+                "timestamp",
+                "request_id",
+            ],
+        ),  # Add sentry processor
     ]
 
     if not human_readable:
