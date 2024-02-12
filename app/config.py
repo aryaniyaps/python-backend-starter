@@ -151,6 +151,18 @@ class Settings(BaseSettings):
         ),
     ]
 
+    sentry_sample_rate: Annotated[
+        float,
+        Field(
+            gt=0.0,
+            le=1.0,
+            examples=[
+                0.1,
+                1.0,
+            ],
+        ),
+    ] = 1.0
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_prefix="server_",

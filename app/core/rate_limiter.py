@@ -1,5 +1,5 @@
 from fastapi import Request
-from limits import parse
+from limits import RateLimitItem, parse
 from limits.storage import RedisStorage
 from limits.strategies import MovingWindowRateLimiter
 
@@ -28,8 +28,10 @@ class RateLimiter:
     Performs secondary (route-specific) rate limiting.
     """
 
+    rate_limit: RateLimitItem
+
     def __init__(self, limit: str) -> None:
-        self._rate_limit = parse(limit)
+        self.rate_limit = parse(limit)
 
     def __call__(self, request: Request) -> None:
         request_identifier = get_request_identifier(request)
@@ -39,14 +41,14 @@ class RateLimiter:
         # this is used by the rate limiter middleware to
         # set metadata on the response headers.
         request.state.secondary_rate_limit_window_stats = rate_limiter.get_window_stats(
-            self._rate_limit,
+            self.rate_limit,
             request_identifier,
             path_identifier,
         )
 
         # perform secondary rate limiting
         if not rate_limiter.hit(
-            self._rate_limit,
+            self.rate_limit,
             request_identifier,
             path_identifier,
         ):

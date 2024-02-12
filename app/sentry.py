@@ -21,13 +21,13 @@ def setup_sentry() -> None:
         dsn=settings.sentry_dsn,
         environment=_get_sentry_environment(),
         debug=settings.debug,
-        enable_tracing=True,
-        traces_sample_rate=1.0,
-        profiles_sample_rate=1.0,
+        traces_sample_rate=settings.sentry_sample_rate,
         integrations=[
             LoggingIntegration(
-                level=logging.INFO,
-                event_level=logging.INFO,
+                level=logging.getLevelName(
+                    settings.log_level,
+                ),
+                event_level=logging.ERROR,
             ),
             StarletteIntegration(
                 transaction_style="url",
