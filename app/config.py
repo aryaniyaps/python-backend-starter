@@ -46,9 +46,22 @@ class Settings(BaseSettings):
         ),
     ] = "DEBUG"
 
+    cors_allow_origins: Annotated[
+        Sequence[str],
+        Field(
+            examples=[
+                {
+                    "example.com",
+                },
+            ],
+        ),
+    ] = ("*",)
+
     openapi_url: str | None = "/openapi.json"
 
     server_url: str = "http://localhost:8000"
+
+    # database config
 
     database_url: Annotated[
         PostgresDsn,
@@ -69,6 +82,8 @@ class Settings(BaseSettings):
         ),
     ] = 20
 
+    # redis config
+
     redis_url: Annotated[
         RedisDsn,
         Field(
@@ -77,6 +92,8 @@ class Settings(BaseSettings):
             ],
         ),
     ]
+
+    # SAQ config
 
     saq_broker_url: Annotated[
         RedisDsn,
@@ -96,16 +113,7 @@ class Settings(BaseSettings):
         ),
     ] = 100
 
-    cors_allow_origins: Annotated[
-        Sequence[str],
-        Field(
-            examples=[
-                {
-                    "example.com",
-                },
-            ],
-        ),
-    ] = ("*",)
+    # email config
 
     email_port: Annotated[
         int,
@@ -138,6 +146,8 @@ class Settings(BaseSettings):
         ),
     ]
 
+    # GeoIP config
+
     geolite2_database_path: Annotated[
         str,
         Field(
@@ -147,9 +157,13 @@ class Settings(BaseSettings):
         ),
     ]
 
+    # oauth2 config
+
     google_client_id: str
 
     google_client_secret: str
+
+    # sentry config
 
     sentry_dsn: Annotated[
         str,
