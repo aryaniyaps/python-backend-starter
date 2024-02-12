@@ -2,7 +2,6 @@ from collections.abc import Awaitable, Callable
 
 from fastapi import Request, Response
 from limits import WindowStats, parse
-from structlog import get_logger
 
 from app.core.constants import PRIMARY_RATE_LIMIT
 from app.core.errors import RateLimitExceededError
@@ -11,8 +10,6 @@ from app.core.rate_limiter import (
     get_request_identifier,
     rate_limiter,
 )
-
-logger = get_logger()
 
 primary_rate_limit = parse(PRIMARY_RATE_LIMIT)
 
@@ -37,7 +34,6 @@ async def rate_limiter_middleware(
     Performs primary (API-wide) rate limiting and sets rate
     limiting metadata on the response headers.
     """
-    logger.info(get_path_identifier(request=request))
     if get_path_identifier(request) in primary_route_exemptions:
         # exempt from rate limiting
         return await call_next(request)
