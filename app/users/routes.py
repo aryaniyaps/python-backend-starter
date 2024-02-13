@@ -2,20 +2,22 @@ from http import HTTPStatus
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Path
+from fastapi import APIRouter, Depends, Header, Path
+from user_agents import parse
 
 from app.auth.dependencies import get_viewer_info
 from app.auth.types import UserInfo
 from app.core.constants import OpenAPITag
+from app.core.dependencies import get_ip_address
 from app.core.rate_limiter import RateLimiter
 from app.core.schemas import InvalidInputErrorResult, ResourceNotFoundErrorResult
 from app.users.dependencies import get_user_service
 from app.users.models import User
 from app.users.schemas import (
     ChangeUserEmailRequestInput,
+    ChangeUserPasswordInput,
     PartialUserSchema,
     UpdateUserInput,
-    UpdateUserPasswordInput,
     UserSchema,
 )
 from app.users.services import UserService
@@ -107,7 +109,7 @@ async def update_current_user(
             "description": "Invalid Input Error",
         },
     },
-    summary="Update the current user's password.",
+    summary="Change the current user's password.",
     dependencies=[
         Depends(
             dependency=RateLimiter(
@@ -116,8 +118,8 @@ async def update_current_user(
         ),
     ],
 )
-async def update_current_user_password(
-    data: UpdateUserPasswordInput,
+async def change_current_user_password(
+    data: ChangeUserPasswordInput,
     viewer_info: Annotated[
         UserInfo,
         Depends(
@@ -131,7 +133,7 @@ async def update_current_user_password(
         ),
     ],
 ) -> User:
-    """Update the current user's password."""
+    """Change the current user's password."""
     return await user_service.update_user_password(
         user_id=viewer_info.user_id,
         current_password=data.current_password.get_secret_value(),
@@ -139,7 +141,6 @@ async def update_current_user_password(
     )
 
 
-# TODO: maybe rename this route to request email change
 @users_router.patch(
     "/@me/email/change",
     response_model=None,
@@ -150,7 +151,7 @@ async def update_current_user_password(
             "description": "Invalid Input Error",
         },
     },
-    summary="Update the current user's email.",
+    summary="Send an email change request.",
     dependencies=[
         Depends(
             dependency=RateLimiter(
@@ -161,6 +162,13 @@ async def update_current_user_password(
 )
 async def request_current_user_email_change(
     data: ChangeUserEmailRequestInput,
+    user_agent: Annotated[str, Header()],
+    request_ip: Annotated[
+        str,
+        Depends(
+            dependency=get_ip_address,
+        ),
+    ],
     viewer_info: Annotated[
         UserInfo,
         Depends(
@@ -174,10 +182,13 @@ async def request_current_user_email_change(
         ),
     ],
 ) -> None:
-    """Update the current user's email."""
-    await user_service.update_user_email(
+    """Send an email change request."""
+    await user_service.send_change_email_request(
         user_id=viewer_info.user_id,
         email=data.email,
+        current_password=data.current_password.get_secret_value(),
+        user_agent=parse(user_agent),
+        request_ip=request_ip,
     )
 
 

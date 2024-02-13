@@ -2,8 +2,13 @@ from uuid import UUID
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
+from geoip2.database import Reader
+from user_agents.parsers import UserAgent
 
+from app.auth.repos import AuthRepo
 from app.core.errors import InvalidInputError, ResourceNotFoundError
+from app.core.geo_ip import get_ip_location
+from app.worker import task_queue
 
 from .models import User
 from .repos import UserRepo
@@ -13,10 +18,14 @@ class UserService:
     def __init__(
         self,
         user_repo: UserRepo,
+        auth_repo: AuthRepo,
         password_hasher: PasswordHasher,
+        geoip_reader: Reader,
     ) -> None:
         self._user_repo = user_repo
+        self._auth_repo = auth_repo
         self._password_hasher = password_hasher
+        self._geoip_reader = geoip_reader
 
     async def get_user_by_id(self, user_id: UUID) -> User:
         """Get a user by ID."""
@@ -73,13 +82,27 @@ class UserService:
             password=new_password,
         )
 
-    async def update_user_email(
+    async def send_change_email_request(
         self,
         user_id: UUID,
         email: str,
+        current_password: str,
+        user_agent: UserAgent,
+        request_ip: str,
     ) -> None:
         """Update the user with the given ID."""
         user = await self.get_user_by_id(user_id=user_id)
+
+        try:
+            self._password_hasher.verify(
+                hash=user.password_hash,
+                password=current_password,
+            )
+        except VerifyMismatchError as exception:
+            raise InvalidInputError(
+                message="Invalid current password provided.",
+            ) from exception
+
         if (
             email
             and await self._user_repo.get_user_by_email(
@@ -91,8 +114,20 @@ class UserService:
                 message="User with that email already exists.",
             )
 
-        # TODO: send email change verification code
-        # return await self._user_repo.update_user(
-        #     user=user,
-        #     email=email,
-        # )
+        verification_token = await self._auth_repo.create_email_verification_token(
+            email=email
+        )
+
+        # send verification request email
+        await task_queue.enqueue(
+            "send_email_verification_request_email",
+            receiver=email,
+            verification_token=verification_token,
+            device=user_agent.get_device(),
+            browser_name=user_agent.get_browser(),
+            location=get_ip_location(
+                ip_address=request_ip,
+                geoip_reader=self._geoip_reader,
+            ),
+            ip_address=request_ip,
+        )

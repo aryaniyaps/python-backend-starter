@@ -54,7 +54,7 @@ class UserSchema(PartialUserSchema):
     ]
 
 
-class UpdateUserPasswordInput(BaseSchema):
+class ChangeUserPasswordInput(BaseSchema):
     new_password: Annotated[
         SecretStr,
         Field(
@@ -75,7 +75,7 @@ class UpdateUserPasswordInput(BaseSchema):
                 "super-Secret12!",
             ],
             title="Current Password",
-            description="The password associated with the user account.",
+            description="The password associated with the user.",
         ),
     ]
 
@@ -89,6 +89,16 @@ class ChangeUserEmailRequestInput(BaseSchema):
                 "aryan_new@example.com",
             ],
             description="The new email address for the user.",
+        ),
+    ]
+
+    current_password: Annotated[
+        SecretStr,
+        Field(
+            examples=[
+                "super-Secret12!",
+            ],
+            description="The password associated with the user.",
         ),
     ]
 
