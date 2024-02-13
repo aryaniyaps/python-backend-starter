@@ -111,16 +111,16 @@ class AuthRepo:
             )
         )
 
-    async def delete_user_sessions(
+    async def logout_user_sessions(
         self,
         user_id: UUID,
-        except_user_session_id: UUID,
     ) -> None:
-        """Delete all user sessions for the user except for the given user session ID."""
+        """Mark all user sessions with the given user ID as logged out."""
         await self._session.execute(
-            delete(UserSession).where(
-                UserSession.user_id == user_id
-                and UserSession.id != except_user_session_id
+            update(UserSession)
+            .where(UserSession.user_id == user_id)
+            .values(
+                logged_out_at=text("NOW()"),
             ),
         )
 

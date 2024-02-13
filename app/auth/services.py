@@ -241,18 +241,6 @@ class AuthService:
             logged_out_at=datetime.now(UTC),
         )
 
-    async def delete_user_sessions(
-        self,
-        user_id: UUID,
-        except_user_session_id: UUID,
-    ) -> None:
-        """Delete all user sessions for the user except for the given user session ID."""
-        await self._auth_repo.delete_user_sessions(
-            except_user_session_id=except_user_session_id,
-            user_id=user_id,
-        )
-        # TODO: delete relevant auth tokens here
-
     async def get_user_info_for_authentication_token(
         self, authentication_token: str
     ) -> UserInfo:
@@ -345,8 +333,9 @@ class AuthService:
             user_id=existing_user.id,
         )
 
-        # TODO: invalidate all user sessions here
-        # or should we delete the sessions here?
+        await self._auth_repo.logout_user_sessions(
+            user_id=existing_user.id,
+        )
 
         # send password reset mail
         await task_queue.enqueue(

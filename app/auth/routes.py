@@ -241,31 +241,6 @@ async def get_user_sessions(
     return await auth_service.get_user_sessions(user_id=viewer_info.user_id)
 
 
-@auth_router.delete(
-    "/sessions/",
-    summary="Logout every other session for the user except for the current session.",
-)
-async def delete_user_sessions(
-    auth_service: Annotated[
-        AuthService,
-        Depends(
-            dependency=get_auth_service,
-        ),
-    ],
-    viewer_info: Annotated[
-        UserInfo,
-        Depends(
-            dependency=get_viewer_info,
-        ),
-    ],
-) -> None:
-    """Logout every other session except for the current session."""
-    await auth_service.delete_user_sessions(
-        user_id=viewer_info.user_id,
-        except_user_session_id=viewer_info.user_session_id,
-    )
-
-
 @auth_router.post(
     "/reset-password-request",
     status_code=HTTPStatus.NO_CONTENT,
