@@ -12,9 +12,7 @@ from app.auth.dependencies import (
 )
 from app.auth.models import UserSession
 from app.auth.schemas import (
-    EmailVerificationInput,
     EmailVerificationRequestInput,
-    EmailVerificationResult,
     LoginUserInput,
     LoginUserResult,
     LogoutInput,
@@ -81,44 +79,6 @@ async def request_email_verification(
 
 
 @auth_router.post(
-    "/verify-email",
-    summary="Verify user email.",
-    response_model=EmailVerificationResult,
-    responses={
-        HTTPStatus.BAD_REQUEST: {
-            "model": InvalidInputErrorResult,
-            "description": "Invalid Input Error",
-        },
-    },
-    dependencies=[
-        Depends(
-            dependency=RateLimiter(
-                limit="20/hour",
-            ),
-        ),
-    ],
-)
-async def verify_email(
-    data: EmailVerificationInput,
-    auth_service: Annotated[
-        AuthService,
-        Depends(
-            dependency=get_auth_service,
-        ),
-    ],
-) -> EmailVerificationResult:
-    """Verify the user's email."""
-    verification_token = await auth_service.verify_email(
-        verification_token=data.verification_token,
-        email=data.email,
-    )
-
-    return EmailVerificationResult(
-        verification_token_id=verification_token.id,
-    )
-
-
-@auth_router.post(
     "/register",
     response_model=RegisterUserResult,
     status_code=HTTPStatus.CREATED,
@@ -156,7 +116,7 @@ async def register_user(
     """Register a new user."""
     authentication_token, user = await auth_service.register_user(
         email=data.email,
-        email_verification_token_id=data.email_verification_token_id,
+        email_verification_token=data.email_verification_token,
         username=data.username,
         password=data.password,
         request_ip=request_ip,

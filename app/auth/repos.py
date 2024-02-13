@@ -157,30 +157,6 @@ class AuthRepo:
             ),
         )
 
-    async def get_email_verification_token_by_id(
-        self, email_verification_token_id: UUID
-    ) -> EmailVerificationToken | None:
-        """Get an email verification token by ID."""
-        return await self._session.scalar(
-            select(EmailVerificationToken).where(
-                EmailVerificationToken.id == email_verification_token_id
-            ),
-        )
-
-    async def update_email_verification_token(
-        self,
-        email_verification_token: EmailVerificationToken,
-        *,
-        is_verified: bool | None = None,
-    ) -> EmailVerificationToken:
-        """Update the given email verification token."""
-        if is_verified is not None:
-            email_verification_token.is_verified = is_verified
-
-        self._session.add(email_verification_token)
-        await self._session.commit()
-        return email_verification_token
-
     async def delete_email_verification_tokens(self, email: str) -> None:
         """Delete email verification tokens for the given email."""
         await self._session.execute(

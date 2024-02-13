@@ -64,6 +64,14 @@ class UserSession(Base):
 class EmailVerificationToken(Base):
     __tablename__ = "email_verification_tokens"
 
+    __table_args__ = (
+        Index(
+            "email_verification_tokens_email_token_hash_idx",
+            Column("email"),
+            Column("token_hash"),
+        ),
+    )
+
     id: Mapped[UUID] = mapped_column(
         primary_key=True,
         server_default=text(
@@ -79,10 +87,6 @@ class EmailVerificationToken(Base):
     token_hash: Mapped[str] = mapped_column(
         String(255),
         index=True,
-    )
-
-    is_verified: Mapped[bool] = mapped_column(
-        default=False,
     )
 
     expires_at: Mapped[datetime]

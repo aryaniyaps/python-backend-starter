@@ -114,40 +114,6 @@ class EmailVerificationRequestInput(BaseSchema):
     ]
 
 
-class EmailVerificationInput(BaseSchema):
-    email: Annotated[
-        EmailStr,
-        Field(
-            max_length=250,
-            examples=[
-                "aryan@example.com",
-            ],
-            description="The email address to verify.",
-        ),
-    ]
-
-    verification_token: Annotated[
-        str,
-        Field(
-            examples=[
-                "my_verification_token",
-            ],
-            title="Verification Token",
-            description="The token used to verify the user's email.",
-        ),
-    ]
-
-
-class EmailVerificationResult(BaseSchema):
-    verification_token_id: Annotated[
-        UUID,
-        Field(
-            title="Verification Token ID",
-            description="The email verification token ID used while creating an user.",
-        ),
-    ]
-
-
 class RegisterUserInput(BaseSchema):
     username: Annotated[
         str,
@@ -172,11 +138,11 @@ class RegisterUserInput(BaseSchema):
         ),
     ]
 
-    email_verification_token_id: Annotated[
-        UUID,
+    email_verification_token: Annotated[
+        str,
         Field(
-            title="Email Verification Token ID",
-            description="The verification token ID obtained after verifying the email address.",
+            title="Email Verification Token",
+            description="The verification token for the email address.",
         ),
     ]
 

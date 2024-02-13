@@ -8,7 +8,7 @@ from geoip2.database import Reader
 from sqlalchemy import ScalarResult
 from user_agents.parsers import UserAgent
 
-from app.auth.models import EmailVerificationToken, UserSession
+from app.auth.models import UserSession
 from app.auth.repos import AuthRepo
 from app.auth.types import UserInfo
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
@@ -66,33 +66,10 @@ class AuthService:
             ip_address=request_ip,
         )
 
-    async def verify_email(
-        self,
-        email: str,
-        verification_token: str,
-    ) -> EmailVerificationToken:
-        """Verify the email verification token with the given email."""
-        email_verification_token = (
-            await self._auth_repo.get_email_verification_token_by_token_email(
-                verification_token=verification_token, email=email
-            )
-        )
-
-        if email_verification_token is None:
-            raise InvalidInputError(
-                message="Invalid verification token or email.",
-            )
-
-        await self._auth_repo.update_email_verification_token(
-            email_verification_token=email_verification_token,
-            is_verified=True,
-        )
-        return email_verification_token
-
     async def register_user(
         self,
         email: str,
-        email_verification_token_id: UUID,
+        email_verification_token: str,
         username: str,
         password: str,
         request_ip: str,
@@ -109,35 +86,20 @@ class AuthService:
                 raise InvalidInputError(
                     message="User with that username already exists.",
                 )
-            if (
-                await self._user_repo.get_user_by_email(
-                    email=email,
-                )
-                is not None
-            ):
-                # FIXME: do we need to check this here? assuming that verification tokens are only created for emails that are
-                # not already taken, and when the users are created those email verification tokens are deleted
-                # so when will we hit this condition??
-                # maybe we will just check if verification token doesnt exist and return an error saying
-                # email or email verification token is invalid
-                raise InvalidInputError(
-                    message="User with that email already exists.",
-                )
 
             verification_token = (
-                await self._auth_repo.get_email_verification_token_by_id(
-                    email_verification_token_id=email_verification_token_id,
+                await self._auth_repo.get_email_verification_token_by_token_email(
+                    verification_token=email_verification_token,
+                    email=email,
                 )
             )
 
             if (
                 verification_token is None
-                or not verification_token.is_verified
-                or verification_token.email != email
                 or datetime.now(UTC) > verification_token.expires_at
             ):
                 raise InvalidInputError(
-                    message="Invalid email verification token provided."
+                    message="Invalid email or email verification token provided."
                 )
 
             user = await self._user_repo.create_user(
