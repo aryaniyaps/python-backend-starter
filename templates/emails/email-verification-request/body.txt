@@ -1,4 +1,4 @@
-{% extends "base/body.txt" %}
+{% extends "emails/base/body.txt" %}
 
 {% block title %}
 Use this token to verify your email. The token is only valid for {{ token_expires_in }}.

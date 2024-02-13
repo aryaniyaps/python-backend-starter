@@ -1,4 +1,4 @@
-{% extends "base/body.txt" %}
+{% extends "emails/base/body.txt" %}
 
 {% block title %}
 Use this link to reset your password. The link is only valid for {{ token_expires_in }}.

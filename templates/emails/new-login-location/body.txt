@@ -1,4 +1,4 @@
-{% extends "base/body.txt" %}
+{% extends "emails/base/body.txt" %}
 
 {% block title %}
 New login to your {{ app_name }} account from {{ device }}

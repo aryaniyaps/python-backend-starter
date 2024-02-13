@@ -1,4 +1,4 @@
-{% extends "base/body.txt" %}
+{% extends "emails/base/body.txt" %}
 
 {% block title %}
 Your {{ app_name }} password has been reset.

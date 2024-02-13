@@ -1,4 +1,4 @@
-{% extends "base/body.txt" %}
+{% extends "emails/base/body.txt" %}
 
 {% block title %}
 Welcome to {{ app_name }}!
