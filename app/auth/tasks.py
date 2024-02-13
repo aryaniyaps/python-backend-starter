@@ -160,8 +160,6 @@ def send_password_reset_email(
     location: str,
 ) -> None:
     """Send a password reset email to the given user."""
-    # point action URL to a frontend page
-
     email_sender.send(
         sender=settings.email_from,
         receivers=[receiver],
