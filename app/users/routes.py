@@ -12,8 +12,8 @@ from app.core.schemas import InvalidInputErrorResult, ResourceNotFoundErrorResul
 from app.users.dependencies import get_user_service
 from app.users.models import User
 from app.users.schemas import (
+    ChangeUserEmailRequestInput,
     PartialUserSchema,
-    UpdateUserEmailInput,
     UpdateUserInput,
     UpdateUserPasswordInput,
     UserSchema,
@@ -134,16 +134,16 @@ async def update_current_user_password(
     """Update the current user's password."""
     return await user_service.update_user_password(
         user_id=viewer_info.user_id,
-        current_password=data.current_password,
-        new_password=data.new_password,
+        current_password=data.current_password.get_secret_value(),
+        new_password=data.new_password.get_secret_value(),
     )
 
 
 # TODO: maybe rename this route to request email change
 @users_router.patch(
-    "/@me/email",
+    "/@me/email/change",
     response_model=None,
-    status_code=HTTPStatus.NO_CONTENT,
+    status_code=HTTPStatus.ACCEPTED,
     responses={
         HTTPStatus.BAD_REQUEST: {
             "model": InvalidInputErrorResult,
@@ -159,8 +159,8 @@ async def update_current_user_password(
         ),
     ],
 )
-async def update_current_user_email(
-    data: UpdateUserEmailInput,
+async def request_current_user_email_change(
+    data: ChangeUserEmailRequestInput,
     viewer_info: Annotated[
         UserInfo,
         Depends(

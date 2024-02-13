@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from pydantic import EmailStr, Field, ValidationInfo, field_validator
+from pydantic import EmailStr, Field, SecretStr
 
 from app.core.schemas import BaseSchema
 
@@ -56,7 +56,7 @@ class UserSchema(PartialUserSchema):
 
 class UpdateUserPasswordInput(BaseSchema):
     new_password: Annotated[
-        str,
+        SecretStr,
         Field(
             min_length=8,
             max_length=64,
@@ -69,7 +69,7 @@ class UpdateUserPasswordInput(BaseSchema):
     ]
 
     current_password: Annotated[
-        str,
+        SecretStr,
         Field(
             examples=[
                 "super-Secret12!",
@@ -80,7 +80,7 @@ class UpdateUserPasswordInput(BaseSchema):
     ]
 
 
-class UpdateUserEmailInput(BaseSchema):
+class ChangeUserEmailRequestInput(BaseSchema):
     email: Annotated[
         EmailStr,
         Field(

@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from pydantic import EmailStr, Field
+from pydantic import EmailStr, Field, SecretStr
 from pydantic.networks import IPvAnyAddress
 
 from app.core.schemas import BaseSchema
@@ -71,7 +71,7 @@ class LoginUserInput(BaseSchema):
     ]
 
     password: Annotated[
-        str,
+        SecretStr,
         Field(
             examples=[
                 "super-Secret12!",
@@ -139,7 +139,7 @@ class RegisterUserInput(BaseSchema):
     ]
 
     email_verification_token: Annotated[
-        str,
+        SecretStr,
         Field(
             title="Email Verification Token",
             description="The verification token for the email address.",
@@ -147,7 +147,7 @@ class RegisterUserInput(BaseSchema):
     ]
 
     password: Annotated[
-        str,
+        SecretStr,
         Field(
             min_length=8,
             max_length=64,
@@ -218,7 +218,7 @@ class PasswordResetInput(BaseSchema):
     ]
 
     new_password: Annotated[
-        str,
+        SecretStr,
         Field(
             min_length=8,
             max_length=64,
@@ -232,7 +232,7 @@ class PasswordResetInput(BaseSchema):
     ]
 
     reset_token: Annotated[
-        str,
+        SecretStr,
         Field(
             examples=[
                 "my_reset_token",

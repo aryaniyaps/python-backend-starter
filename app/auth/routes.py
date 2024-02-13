@@ -38,7 +38,7 @@ auth_router = APIRouter(
 @auth_router.post(
     "/email-verification-request",
     response_model=None,
-    status_code=HTTPStatus.NO_CONTENT,
+    status_code=HTTPStatus.ACCEPTED,
     responses={
         HTTPStatus.BAD_REQUEST: {
             "model": InvalidInputErrorResult,
@@ -116,9 +116,9 @@ async def register_user(
     """Register a new user."""
     authentication_token, user = await auth_service.register_user(
         email=data.email,
-        email_verification_token=data.email_verification_token,
+        email_verification_token=data.email_verification_token.get_secret_value(),
         username=data.username,
-        password=data.password,
+        password=data.password.get_secret_value(),
         request_ip=request_ip,
         user_agent=parse(user_agent),
     )
@@ -166,7 +166,7 @@ async def login_user(
     """Login the current user."""
     authentication_token, user = await auth_service.login_user(
         login=data.login,
-        password=data.password,
+        password=data.password.get_secret_value(),
         user_agent=parse(user_agent),
         request_ip=request_ip,
     )
@@ -243,7 +243,7 @@ async def get_user_sessions(
 
 @auth_router.post(
     "/reset-password-request",
-    status_code=HTTPStatus.NO_CONTENT,
+    status_code=HTTPStatus.ACCEPTED,
     summary="Send a password reset request.",
     response_model=None,
     dependencies=[
@@ -315,9 +315,9 @@ async def reset_password(
 ) -> None:
     """Reset the user's password."""
     await auth_service.reset_password(
-        reset_token=data.reset_token,
+        reset_token=data.reset_token.get_secret_value(),
         email=data.email,
-        new_password=data.new_password,
+        new_password=data.new_password.get_secret_value(),
         request_ip=request_ip,
         user_agent=parse(user_agent),
     )
