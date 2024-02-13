@@ -12,7 +12,7 @@ Hi {{ username }},
 
 You recently requested to reset your password for your {{ app_name }} account. Use the button below to reset it. This password reset is only valid for the next {{ token_expires_in }}.
 
-Enter the following verification token to proceed:
+Enter the following password reset token to proceed:
 
 {{ password_reset_token }}
 
