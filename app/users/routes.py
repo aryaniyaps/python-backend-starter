@@ -111,7 +111,7 @@ async def update_current_user(
     dependencies=[
         Depends(
             dependency=RateLimiter(
-                limit="100/hour",
+                limit="15/hour",
             ),
         ),
     ],
@@ -154,7 +154,7 @@ async def update_current_user_password(
     dependencies=[
         Depends(
             dependency=RateLimiter(
-                limit="100/hour",
+                limit="15/hour",
             ),
         ),
     ],
