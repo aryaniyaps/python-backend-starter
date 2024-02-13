@@ -1,9 +1,6 @@
-from urllib.parse import urlencode, urljoin
-
 from saq.types import Context
 
 from app.config import settings
-from app.core.constants import APP_URL
 from app.core.emails import email_sender
 from app.core.templates import (
     email_verification_request_html,
@@ -127,18 +124,6 @@ def send_password_reset_request_email(
     location: str,
 ) -> None:
     """Send a password reset request email to the given user."""
-    # point action URL to a frontend page
-    action_url = (
-        urljoin(APP_URL, "/auth/reset-password")
-        + "?"
-        + urlencode(
-            {
-                "email": receiver,
-                "reset_token": password_reset_token,
-            },
-        )
-    )
-
     email_sender.send(
         sender=settings.email_from,
         receivers=[receiver],
@@ -146,7 +131,7 @@ def send_password_reset_request_email(
             username=username,
         ),
         text=reset_password_request_text.render(
-            action_url=action_url,
+            password_reset_token=password_reset_token,
             device=device,
             browser_name=browser_name,
             username=username,
@@ -154,7 +139,7 @@ def send_password_reset_request_email(
             location=location,
         ),
         html=reset_password_request_html.render(
-            action_url=action_url,
+            password_reset_token=password_reset_token,
             device=device,
             browser_name=browser_name,
             username=username,

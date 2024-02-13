@@ -26,40 +26,19 @@ Reset Your Password
             }}.</strong
           >
         </p>
-        <!-- Action -->
-        <table
-          class="body-action"
-          align="center"
-          width="100%"
-          cellpadding="0"
-          cellspacing="0"
-          role="presentation"
-        >
+        <!-- discount body -->
+        <table class="discount_body" width="100%" role="presentation">
           <tr>
-            <td align="center">
-              <!-- Border based button
-https://litmus.com/blog/a-guide-to-bulletproof-buttons-in-email-design -->
-              <table
-                width="100%"
-                border="0"
-                cellspacing="0"
-                cellpadding="0"
-                role="presentation"
-              >
-                <tr>
-                  <td align="center">
-                    <a
-                      href="{{action_url}}"
-                      class="f-fallback button button--green"
-                      target="_blank"
-                      >Reset your password</a
-                    >
-                  </td>
-                </tr>
-              </table>
+            <td>
+              <p class="discount_header">
+                  Enter the following reset token to proceed:
+              </p>
+              <p class="discount">{{ password_reset_token }}</p>
             </td>
           </tr>
-        </table>
+      </table>
+
+      <br/><br/>
         <h3>Where this happened:</h3>
           <p>
             <b>Device:</b> {{ device }}<br/>
@@ -75,18 +54,7 @@ https://litmus.com/blog/a-guide-to-bulletproof-buttons-in-email-design -->
           <a href="{{ support_email }}">contact support</a> if you have questions.
           </p>
         <p>Thanks, <br />The {{ app_name }} team</p>
-        <!-- Sub copy -->
-        <table class="body-sub" role="presentation">
-          <tr>
-            <td>
-              <p class="f-fallback sub">
-                If you’re having trouble with the button above, copy and paste
-                the URL below into your web browser.
-              </p>
-              <p class="f-fallback sub">{{action_url}}</p>
-            </td>
-          </tr>
-        </table>
+
       </div>
     </td>
   </tr>
