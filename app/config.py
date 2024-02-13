@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from enum import Enum
 from typing import Annotated
 
-from pydantic import Field, PostgresDsn, RedisDsn
+from pydantic import Field, PostgresDsn, RedisDsn, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -135,7 +135,7 @@ class Settings(BaseSettings):
 
     email_username: str | None = None
 
-    email_password: str | None = None
+    email_password: SecretStr | None = None
 
     email_from: Annotated[
         str,
@@ -159,9 +159,9 @@ class Settings(BaseSettings):
 
     # oauth2 config
 
-    google_client_id: str
+    google_client_id: SecretStr
 
-    google_client_secret: str
+    google_client_secret: SecretStr
 
     # sentry config
 

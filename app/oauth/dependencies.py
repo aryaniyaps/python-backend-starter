@@ -35,6 +35,6 @@ def get_oauth_service(
 def get_google_sso() -> GoogleSSO:
     """Get the Google SSO instance."""
     return GoogleSSO(
-        client_id=settings.google_client_id,
-        client_secret=settings.google_client_secret,
+        client_id=settings.google_client_id.get_secret_value(),
+        client_secret=settings.google_client_secret.get_secret_value(),
     )
