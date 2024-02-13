@@ -97,24 +97,10 @@ reset_password_subject = environment.get_template(
 
 reset_password_html = environment.get_template(
     name="emails/reset-password/body.html",
-    globals={
-        "token_expires_in": naturaldelta(
-            timedelta(
-                seconds=PASSWORD_RESET_TOKEN_EXPIRES_IN,
-            ),
-        ),
-    },
 )
 
 reset_password_text = environment.get_template(
     name="emails/reset-password/body.txt",
-    globals={
-        "token_expires_in": naturaldelta(
-            timedelta(
-                seconds=PASSWORD_RESET_TOKEN_EXPIRES_IN,
-            ),
-        ),
-    },
 )
 
 # onboarding templates
