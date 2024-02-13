@@ -309,9 +309,7 @@ class AuthService:
             )
         )
 
-        if not (
-            existing_user and password_reset_token and existing_user.email == email
-        ):
+        if not (existing_user and password_reset_token):
             raise InvalidInputError(
                 message="Invalid password reset token or email provided.",
             )
@@ -322,14 +320,17 @@ class AuthService:
                 message="Invalid password reset token or email provided.",
             )
 
+        # delete all password reset tokens to prevent duplicate use
+        await self._auth_repo.delete_password_reset_tokens(
+            user_id=existing_user.id,
+        )
+
         if await self._auth_repo.check_user_session_exists_after(
             user_id=existing_user.id,
             timestamp=password_reset_token.created_at,
         ):
             # If the user has logged in again after generating the password
             # reset token, the generated token becomes invalid.
-
-            # TODO: delete the password reset token here
             raise InvalidInputError(
                 message="Invalid password reset token or email provided.",
             )
@@ -337,11 +338,6 @@ class AuthService:
         await self._user_repo.update_user(
             user=existing_user,
             password=new_password,
-        )
-
-        # delete all other password reset tokens for user
-        await self._auth_repo.delete_password_reset_tokens(
-            user_id=existing_user.id,
         )
 
         # logout user everywhere
