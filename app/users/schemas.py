@@ -54,6 +54,45 @@ class UserSchema(PartialUserSchema):
     ]
 
 
+class UpdateUserPasswordInput(BaseSchema):
+    new_password: Annotated[
+        str,
+        Field(
+            min_length=8,
+            max_length=64,
+            pattern=r"(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W])",
+            examples=[
+                "new-super-Secret12!",
+            ],
+            description="The new password for the user.",
+        ),
+    ]
+
+    current_password: Annotated[
+        str,
+        Field(
+            examples=[
+                "super-Secret12!",
+            ],
+            title="Current Password",
+            description="The password associated with the user account.",
+        ),
+    ]
+
+
+class UpdateUserEmailInput(BaseSchema):
+    email: Annotated[
+        EmailStr,
+        Field(
+            max_length=250,
+            examples=[
+                "aryan_new@example.com",
+            ],
+            description="The new email address for the user.",
+        ),
+    ]
+
+
 class UpdateUserInput(BaseSchema):
     username: Annotated[
         str | None,
@@ -66,56 +105,3 @@ class UpdateUserInput(BaseSchema):
             description="The new username for the user.",
         ),
     ] = None
-
-    email: Annotated[
-        EmailStr | None,
-        Field(
-            max_length=250,
-            examples=[
-                "aryan_new@example.com",
-            ],
-            description="The new email address for the user.",
-        ),
-    ] = None
-
-    password: Annotated[
-        str | None,
-        Field(
-            min_length=8,
-            max_length=64,
-            pattern=r"(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W])",
-            examples=[
-                "new-super-Secret12!",
-            ],
-            description="The new password for the user.",
-        ),
-    ] = None
-
-    current_password: Annotated[
-        str | None,
-        Field(
-            examples=[
-                "super-Secret12!",
-            ],
-            title="Current Password",
-            description="The password associated with the user account.",
-        ),
-    ] = None
-
-    @field_validator("current_password")
-    @classmethod
-    def check_current_password(cls, current_password: str, info: ValidationInfo) -> str:
-        """Ensure that the password exists when the current password is provided."""
-        if info.data.get("password") and not current_password:
-            message = "Current password is required when password is provided."
-            raise ValueError(message)
-        return current_password
-
-    @field_validator("password")
-    @classmethod
-    def check_password(cls, password: str, info: ValidationInfo) -> str:
-        """Ensure that the current password exists when the password is provided."""
-        if info.data.get("current_password") and not password:
-            message = "Password is required when current password is provided."
-            raise ValueError(message)
-        return password

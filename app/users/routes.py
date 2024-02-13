@@ -13,7 +13,9 @@ from app.users.dependencies import get_user_service
 from app.users.models import User
 from app.users.schemas import (
     PartialUserSchema,
+    UpdateUserEmailInput,
     UpdateUserInput,
+    UpdateUserPasswordInput,
     UserSchema,
 )
 from app.users.services import UserService
@@ -56,9 +58,6 @@ async def get_current_user(
     )
 
 
-# TODO: include separate route to update password
-# TODO: include separate route to update email
-# TODO: include separate route to update other attributes such as username
 @users_router.patch(
     "/@me",
     response_model=UserSchema,
@@ -92,13 +91,93 @@ async def update_current_user(
         ),
     ],
 ) -> User:
-    """Get the current user."""
+    """Update the current user."""
     return await user_service.update_user(
         user_id=viewer_info.user_id,
         username=data.username,
-        email=data.email,
-        new_password=data.password,
+    )
+
+
+@users_router.patch(
+    "/@me/password",
+    response_model=UserSchema,
+    responses={
+        HTTPStatus.BAD_REQUEST: {
+            "model": InvalidInputErrorResult,
+            "description": "Invalid Input Error",
+        },
+    },
+    summary="Update the current user's password.",
+    dependencies=[
+        Depends(
+            dependency=RateLimiter(
+                limit="100/hour",
+            ),
+        ),
+    ],
+)
+async def update_current_user_password(
+    data: UpdateUserPasswordInput,
+    viewer_info: Annotated[
+        UserInfo,
+        Depends(
+            dependency=get_viewer_info,
+        ),
+    ],
+    user_service: Annotated[
+        UserService,
+        Depends(
+            dependency=get_user_service,
+        ),
+    ],
+) -> User:
+    """Update the current user's password."""
+    return await user_service.update_user_password(
+        user_id=viewer_info.user_id,
         current_password=data.current_password,
+        new_password=data.new_password,
+    )
+
+
+# TODO: maybe rename this route to request email change
+@users_router.patch(
+    "/@me/email",
+    response_model=None,
+    status_code=HTTPStatus.NO_CONTENT,
+    responses={
+        HTTPStatus.BAD_REQUEST: {
+            "model": InvalidInputErrorResult,
+            "description": "Invalid Input Error",
+        },
+    },
+    summary="Update the current user's email.",
+    dependencies=[
+        Depends(
+            dependency=RateLimiter(
+                limit="100/hour",
+            ),
+        ),
+    ],
+)
+async def update_current_user_email(
+    data: UpdateUserEmailInput,
+    viewer_info: Annotated[
+        UserInfo,
+        Depends(
+            dependency=get_viewer_info,
+        ),
+    ],
+    user_service: Annotated[
+        UserService,
+        Depends(
+            dependency=get_user_service,
+        ),
+    ],
+) -> None:
+    """Update the current user's email."""
+    await user_service.update_user_email(
+        user_id=viewer_info.user_id,
+        email=data.email,
     )
 
 

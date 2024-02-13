@@ -31,10 +31,53 @@ class UserService:
         self,
         user_id: UUID,
         username: str | None = None,
-        email: str | None = None,
-        current_password: str | None = None,
-        new_password: str | None = None,
     ) -> User:
+        """Update the user with the given ID."""
+        user = await self.get_user_by_id(user_id=user_id)
+        if (
+            username
+            and await self._user_repo.get_user_by_username(
+                username=username,
+            )
+            is not None
+        ):
+            raise InvalidInputError(
+                message="User with that username already exists.",
+            )
+        return await self._user_repo.update_user(
+            user=user,
+            username=username,
+        )
+
+    async def update_user_password(
+        self,
+        user_id: UUID,
+        new_password: str,
+        current_password: str,
+    ) -> User:
+        """Update the user with the given ID."""
+        user = await self.get_user_by_id(user_id=user_id)
+
+        try:
+            self._password_hasher.verify(
+                hash=user.password_hash,
+                password=current_password,
+            )
+        except VerifyMismatchError as exception:
+            raise InvalidInputError(
+                message="Invalid current password provided.",
+            ) from exception
+
+        return await self._user_repo.update_user(
+            user=user,
+            password=new_password,
+        )
+
+    async def update_user_email(
+        self,
+        user_id: UUID,
+        email: str,
+    ) -> None:
         """Update the user with the given ID."""
         user = await self.get_user_by_id(user_id=user_id)
         if (
@@ -47,30 +90,9 @@ class UserService:
             raise InvalidInputError(
                 message="User with that email already exists.",
             )
-        if (
-            username
-            and await self._user_repo.get_user_by_username(
-                username=username,
-            )
-            is not None
-        ):
-            raise InvalidInputError(
-                message="User with that username already exists.",
-            )
 
-        if new_password and current_password:
-            try:
-                self._password_hasher.verify(
-                    hash=user.password_hash,
-                    password=current_password,
-                )
-            except VerifyMismatchError as exception:
-                raise InvalidInputError(
-                    message="Invalid current password passed.",
-                ) from exception
-        return await self._user_repo.update_user(
-            user=user,
-            username=username,
-            email=email,
-            password=new_password,
-        )
+        # TODO: send email change verification code
+        # return await self._user_repo.update_user(
+        #     user=user,
+        #     email=email,
+        # )

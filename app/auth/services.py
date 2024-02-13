@@ -188,7 +188,6 @@ class AuthService:
                 ip_address=request_ip,
             )
 
-        # TODO: check if max number of user sessions is exceeded
         user_session = await self._auth_repo.create_user_session(
             user_id=user.id,
             ip_address=request_ip,
@@ -319,6 +318,7 @@ class AuthService:
         ):
             # If the user has logged in again after generating the password
             # reset token, the generated token becomes invalid.
+            # TODO: review logic here
             raise InvalidInputError(
                 message="Invalid password reset token or email provided.",
             )
