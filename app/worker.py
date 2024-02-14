@@ -15,6 +15,7 @@ from app.auth.tasks import (
 )
 from app.config import settings
 from app.logger import build_worker_log_config, setup_logging
+from app.sentry import setup_sentry
 
 
 async def before_enqueue(job: Job) -> None:
@@ -66,6 +67,9 @@ if __name__ == "__main__":
             human_readable=settings.debug,
         ),
     )
+
+    # set up sentry
+    setup_sentry()
 
     worker = Worker(
         queue=task_queue,
