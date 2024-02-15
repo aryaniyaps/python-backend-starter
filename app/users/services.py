@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from uuid import UUID
 
 from argon2 import PasswordHasher
@@ -64,7 +65,7 @@ class UserService:
         new_password: str,
         current_password: str,
     ) -> User:
-        """Update the user with the given ID."""
+        """Update the password for the given user."""
         user = await self.get_user_by_id(user_id=user_id)
 
         try:
@@ -130,4 +131,35 @@ class UserService:
                 geoip_reader=self._geoip_reader,
             ),
             ip_address=request_ip,
+        )
+
+    async def update_user_email(
+        self,
+        user_id: UUID,
+        email: str,
+        email_verification_token: str,
+    ) -> User:
+        """Update the email for the given user."""
+        user = await self.get_user_by_id(user_id=user_id)
+
+        verification_token = (
+            await self._auth_repo.get_email_verification_token_by_token_email(
+                verification_token=email_verification_token,
+                email=email,
+            )
+        )
+
+        if (
+            verification_token is None
+            or datetime.now(UTC) > verification_token.expires_at
+        ):
+            raise InvalidInputError(
+                message="Invalid email or email verification token provided."
+            )
+
+        await self._auth_repo.delete_email_verification_tokens(email=email)
+
+        return await self._user_repo.update_user(
+            user=user,
+            email=email,
         )

@@ -102,13 +102,13 @@ class AuthService:
                     message="Invalid email or email verification token provided."
                 )
 
+            await self._auth_repo.delete_email_verification_tokens(email=email)
+
             user = await self._user_repo.create_user(
                 username=username,
                 email=email,
                 password=password,
             )
-
-            await self._auth_repo.delete_email_verification_tokens(email=email)
 
             user_session = await self._auth_repo.create_user_session(
                 user_id=user.id,

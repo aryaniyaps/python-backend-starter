@@ -103,6 +103,27 @@ class ChangeUserEmailRequestInput(BaseSchema):
     ]
 
 
+class ChangeUserEmailInput(BaseSchema):
+    email: Annotated[
+        EmailStr,
+        Field(
+            max_length=250,
+            examples=[
+                "aryan_new@example.com",
+            ],
+            description="The new email address for the user.",
+        ),
+    ]
+
+    email_verification_token: Annotated[
+        SecretStr,
+        Field(
+            title="Email Verification Token",
+            description="The verification token for the email.",
+        ),
+    ]
+
+
 class UpdateUserInput(BaseSchema):
     username: Annotated[
         str | None,

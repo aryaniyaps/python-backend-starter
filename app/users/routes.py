@@ -14,6 +14,7 @@ from app.core.schemas import InvalidInputErrorResult, ResourceNotFoundErrorResul
 from app.users.dependencies import get_user_service
 from app.users.models import User
 from app.users.schemas import (
+    ChangeUserEmailInput,
     ChangeUserEmailRequestInput,
     ChangeUserPasswordInput,
     PartialUserSchema,
@@ -142,7 +143,7 @@ async def change_current_user_password(
 
 
 @users_router.patch(
-    "/@me/email/change",
+    "/@me/email-change-request",
     response_model=None,
     status_code=HTTPStatus.ACCEPTED,
     responses={
@@ -189,6 +190,48 @@ async def request_current_user_email_change(
         current_password=data.current_password.get_secret_value(),
         user_agent=parse(user_agent),
         request_ip=request_ip,
+    )
+
+
+@users_router.patch(
+    "/@me/email/change",
+    response_model=None,
+    status_code=HTTPStatus.ACCEPTED,
+    responses={
+        HTTPStatus.BAD_REQUEST: {
+            "model": InvalidInputErrorResult,
+            "description": "Invalid Input Error",
+        },
+    },
+    summary="Change the current user's email.",
+    dependencies=[
+        Depends(
+            dependency=RateLimiter(
+                limit="15/hour",
+            ),
+        ),
+    ],
+)
+async def change_current_user_email(
+    data: ChangeUserEmailInput,
+    viewer_info: Annotated[
+        UserInfo,
+        Depends(
+            dependency=get_viewer_info,
+        ),
+    ],
+    user_service: Annotated[
+        UserService,
+        Depends(
+            dependency=get_user_service,
+        ),
+    ],
+) -> None:
+    """Change the current user's email."""
+    await user_service.update_user_email(
+        user_id=viewer_info.user_id,
+        email_verification_token=data.email_verification_token.get_secret_value(),
+        email=data.email,
     )
 
 

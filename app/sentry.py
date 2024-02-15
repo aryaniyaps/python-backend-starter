@@ -11,7 +11,6 @@ def setup_sentry() -> None:
     sentry_sdk.init(
         dsn=settings.sentry_dsn,
         environment=settings.environment,
-        debug=settings.debug,
         traces_sample_rate=settings.sentry_sample_rate,
         integrations=[
             LoggingIntegration(
