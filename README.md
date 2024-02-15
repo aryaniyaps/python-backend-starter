@@ -5,6 +5,7 @@
 - [x] User registration
    - [x] Secure authentication token storage
    - [x] Email notifications for onboarding
+- [x] Password strength validation using the [ZXCVBN](https://github.com/dropbox/zxcvbn) algorithm
 - [x] Email verification on user registration
 - [x] Verified email change requests
 - [x] User login

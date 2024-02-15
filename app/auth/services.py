@@ -13,6 +13,7 @@ from app.auth.repos import AuthRepo
 from app.auth.types import UserInfo
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
 from app.core.geo_ip import get_ip_location
+from app.core.security import check_password_strength
 from app.users.models import User
 from app.users.repos import UserRepo
 from app.worker import task_queue
@@ -76,6 +77,14 @@ class AuthService:
         user_agent: UserAgent,
     ) -> tuple[str, User]:
         """Register a new user."""
+        if not check_password_strength(
+            password=password,
+            username=username,
+            email=email,
+        ):
+            raise InvalidInputError(
+                message="Enter a stronger password.",
+            )
         try:
             if (
                 await self._user_repo.get_user_by_username(
@@ -305,6 +314,15 @@ class AuthService:
             # password reset token has expired.
             raise InvalidInputError(
                 message="Invalid password reset token or email provided.",
+            )
+
+        if not check_password_strength(
+            password=new_password,
+            username=existing_user.username,
+            email=existing_user.email,
+        ):
+            raise InvalidInputError(
+                message="Enter a stronger password.",
             )
 
         # delete all password reset tokens to prevent duplicate use

@@ -142,7 +142,7 @@ async def change_current_user_password(
     )
 
 
-@users_router.patch(
+@users_router.post(
     "/@me/email-change-request",
     response_model=None,
     status_code=HTTPStatus.ACCEPTED,
@@ -194,9 +194,8 @@ async def request_current_user_email_change(
 
 
 @users_router.patch(
-    "/@me/email/change",
-    response_model=None,
-    status_code=HTTPStatus.ACCEPTED,
+    "/@me/email",
+    response_model=UserSchema,
     responses={
         HTTPStatus.BAD_REQUEST: {
             "model": InvalidInputErrorResult,
@@ -226,9 +225,9 @@ async def change_current_user_email(
             dependency=get_user_service,
         ),
     ],
-) -> None:
+) -> User:
     """Change the current user's email."""
-    await user_service.update_user_email(
+    return await user_service.update_user_email(
         user_id=viewer_info.user_id,
         email_verification_token=data.email_verification_token.get_secret_value(),
         email=data.email,

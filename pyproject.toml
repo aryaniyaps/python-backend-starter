@@ -26,6 +26,7 @@ dependencies = [
     "structlog>=24.1.0",
     "saq>=0.12.2",
     "sentry-sdk[fastapi,sqlalchemy]>=1.40.3",
+    "zxcvbn-rs-py>=0.1.0",
 ]
 requires-python = ">=3.11"
 readme = "README.md"

@@ -8,6 +8,7 @@ from user_agents.parsers import UserAgent
 
 from app.core.errors import InvalidInputError, ResourceNotFoundError
 from app.core.geo_ip import get_ip_location
+from app.core.security import check_password_strength
 from app.worker import task_queue
 
 from .models import User
@@ -74,6 +75,15 @@ class UserService:
             raise InvalidInputError(
                 message="Invalid current password provided.",
             ) from exception
+
+        if not check_password_strength(
+            password=new_password,
+            username=user.username,
+            email=user.email,
+        ):
+            raise InvalidInputError(
+                message="Enter a stronger password.",
+            )
 
         return await self._user_repo.update_user(
             user=user,
