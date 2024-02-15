@@ -18,7 +18,7 @@
 - [ ] User session tracking
    - [x] IP address, User agent and geolocation data storage
    - [ ] Email notifications when new login location is detected
-- [x] The following metadata are always attached with security notifications for enhanced user security:
+- [x] The following metadata are attached with security notifications for enhanced user security:
    - Requester IP address
    - Requester device (based on the user agent)
    - Geolocation data (based on IP)

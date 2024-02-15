@@ -2,10 +2,11 @@ from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from pydantic import EmailStr, Field, SecretStr
+from pydantic import EmailStr, Field, SecretStr, ValidationInfo, field_validator
 from pydantic.networks import IPvAnyAddress
 
 from app.core.schemas import BaseSchema
+from app.core.security import check_password_strength
 from app.users.schemas import UserSchema
 
 

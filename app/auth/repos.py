@@ -33,6 +33,9 @@ class AuthRepo:
         user_agent: UserAgent,
     ) -> UserSession:
         """Create a new user session."""
+        # TODO: pass device ID here, like instagram does on register/ login
+        # TODO: store the GeoID of the region (of a bigger area like a country) along with the location string
+        # this can help us detect new logins in a better way
         user_session = UserSession(
             user_id=user_id,
             ip_address=ip_address,
@@ -54,6 +57,9 @@ class AuthRepo:
     ) -> bool:
         """Check whether user sessions for the user exist with the given user agent and IP address."""
         # FIXME: dont check IP addresses too strictly, they can be dynamic in some environments
+        # TODO: pass device ID here, like instagram does on register/ login
+        # TODO: store the GeoID of the region (of a bigger area like a country) along with the location string
+        # this can help us detect new logins in a better way
         results = await self._session.scalars(
             select(UserSession).where(
                 UserSession.user_id == user_id
