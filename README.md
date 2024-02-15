@@ -6,7 +6,7 @@
    - [x] Secure authentication token storage
    - [x] Email notifications for onboarding
 - [x] Email verification on user registration
-- [ ] Verified email change requests
+- [x] Verified email change requests
 - [x] User login
    - [x] Passwords are securely hashed with Argon2
    - [x] Passwords are rehashed upon login
