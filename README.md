@@ -3,22 +3,25 @@
 ## Features
 
 - [x] User registration
-   - [x] Secure authentication token storage
+   - [x] Authentication tokens are sha256 hashed
+   - [x] Passwords are securely hashed with Argon2
    - [x] Email notifications for onboarding
 - [x] Password strength validation using the [ZXCVBN](https://github.com/dropbox/zxcvbn) algorithm
 - [x] Email verification on user registration
 - [x] Verified email change requests
 - [x] User login
-   - [x] Passwords are securely hashed with Argon2
    - [x] Passwords are rehashed upon login
-- [x] User account recovery
-   - [x] Secure account recovery token storage
-   - [x] Email notifications for recovery requests
+- [x] Password resets
+   - [x] Password reset tokens are sha256 hashed
+   - [x] Email notifications for password reset requests
    - [x] Email notifications when password changes
 - [ ] User session tracking
    - [x] IP address, User agent and geolocation data storage
    - [ ] Email notifications when new login location is detected
-- [x] IP address, device and geolocation data attached with every email notification for additional security
+- [x] The following metadata are always attached with security notifications for enhanced user security:
+   - Requester IP address
+   - Requester device (based on the user agent)
+   - Geolocation data (based on IP)
 - [ ] Sign in with Google
 - [x] Structured logging support
 - [x] Rate limiting (Moving window strategy)

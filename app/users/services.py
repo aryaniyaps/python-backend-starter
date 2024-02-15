@@ -90,6 +90,8 @@ class UserService:
             password=new_password,
         )
 
+    # TODO: send password changed email here
+
     async def send_change_email_request(
         self,
         user_id: UUID,
