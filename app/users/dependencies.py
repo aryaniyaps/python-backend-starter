@@ -5,8 +5,6 @@ from fastapi import Depends
 from geoip2.database import Reader
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.dependencies import get_auth_repo
-from app.auth.repos import AuthRepo
 from app.core.database import get_database_session
 from app.core.geo_ip import get_geoip_reader
 from app.core.security import get_password_hasher
@@ -42,12 +40,6 @@ def get_user_service(
             dependency=get_user_repo,
         ),
     ],
-    auth_repo: Annotated[
-        AuthRepo,
-        Depends(
-            dependency=get_auth_repo,
-        ),
-    ],
     password_hasher: Annotated[
         PasswordHasher,
         Depends(
@@ -64,7 +56,6 @@ def get_user_service(
     """Get the user service."""
     return UserService(
         user_repo=user_repo,
-        auth_repo=auth_repo,
         password_hasher=password_hasher,
         geoip_reader=geoip_reader,
     )

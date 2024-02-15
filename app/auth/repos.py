@@ -9,12 +9,9 @@ from sqlalchemy import ScalarResult, delete, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from user_agents.parsers import UserAgent
 
-from app.auth.models import EmailVerificationToken, PasswordResetToken, UserSession
+from app.auth.models import PasswordResetToken, UserSession
 from app.auth.types import UserInfo
-from app.core.constants import (
-    EMAIL_VERIFICATION_TOKEN_EXPIRES_IN,
-    PASSWORD_RESET_TOKEN_EXPIRES_IN,
-)
+from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
 from app.core.geo_ip import get_ip_location
 
 
@@ -124,47 +121,6 @@ class AuthRepo:
             ),
         )
 
-    async def create_email_verification_token(self, email: str) -> str:
-        """Create a new email verification token."""
-        expires_at = text(
-            f"NOW() + INTERVAL '{EMAIL_VERIFICATION_TOKEN_EXPIRES_IN} SECOND'",
-        )
-
-        verification_token = self.generate_email_verification_token()
-
-        email_verification_token = EmailVerificationToken(
-            email=email,
-            expires_at=expires_at,
-            token_hash=self.hash_email_verification_token(
-                email_verification_token=verification_token,
-            ),
-        )
-        self._session.add(email_verification_token)
-        await self._session.commit()
-        return verification_token
-
-    async def get_email_verification_token_by_token_email(
-        self, verification_token: str, email: str
-    ) -> EmailVerificationToken | None:
-        """Get an email verification token by token and email."""
-        return await self._session.scalar(
-            select(EmailVerificationToken).where(
-                EmailVerificationToken.token_hash
-                == self.hash_email_verification_token(
-                    email_verification_token=verification_token,
-                )
-                and EmailVerificationToken.email == email,
-            ),
-        )
-
-    async def delete_email_verification_tokens(self, email: str) -> None:
-        """Delete email verification tokens for the given email."""
-        await self._session.execute(
-            delete(EmailVerificationToken).where(
-                EmailVerificationToken.email == email,
-            ),
-        )
-
     async def create_authentication_token(
         self,
         user_id: UUID,
@@ -199,11 +155,6 @@ class AuthRepo:
         return token_hex(32)
 
     @staticmethod
-    def generate_email_verification_token() -> str:
-        """Generate an email verification token."""
-        return token_hex(32)
-
-    @staticmethod
     def generate_authentication_token_key(authentication_token_hash: str) -> str:
         """Generate a token key for the authentication token hash."""
         return f"auth-tokens:${authentication_token_hash}"
@@ -217,11 +168,6 @@ class AuthRepo:
     def hash_authentication_token(authentication_token: str) -> str:
         """Hash the given authentication token."""
         return sha256(authentication_token.encode()).hexdigest()
-
-    @staticmethod
-    def hash_email_verification_token(email_verification_token: str) -> str:
-        """Hash the given email verification token."""
-        return sha256(email_verification_token.encode()).hexdigest()
 
     async def get_user_info_for_authentication_token(
         self,

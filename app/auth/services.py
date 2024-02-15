@@ -48,7 +48,7 @@ class AuthService:
                 message="User with that email already exists.",
             )
 
-        verification_token = await self._auth_repo.create_email_verification_token(
+        verification_token = await self._user_repo.create_email_verification_token(
             email=email,
         )
 
@@ -88,7 +88,7 @@ class AuthService:
                 )
 
             verification_token = (
-                await self._auth_repo.get_email_verification_token_by_token_email(
+                await self._user_repo.get_email_verification_token_by_token_email(
                     verification_token=email_verification_token,
                     email=email,
                 )
@@ -102,7 +102,7 @@ class AuthService:
                     message="Invalid email or email verification token provided."
                 )
 
-            await self._auth_repo.delete_email_verification_tokens(email=email)
+            await self._user_repo.delete_email_verification_tokens(email=email)
 
             user = await self._user_repo.create_user(
                 username=username,
