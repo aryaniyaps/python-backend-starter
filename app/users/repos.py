@@ -102,7 +102,7 @@ class UserRepo:
         email: str | None = None,
         password: str | None = None,
     ) -> User:
-        """Update the user with the given ID."""
+        """Update the given user."""
         if username is not None:
             user.username = username
         if email is not None:
@@ -126,7 +126,7 @@ class UserRepo:
         self,
         user_id: UUID,
     ) -> User | None:
-        """Get a user by ID."""
+        """Get an user by ID."""
         return await self._session.scalar(
             select(User).where(
                 User.id == user_id,
@@ -137,7 +137,7 @@ class UserRepo:
         self,
         username: str,
     ) -> User | None:
-        """Get a user by username."""
+        """Get an user by username."""
         return await self._session.scalar(
             select(User).where(
                 User.username == username,
@@ -148,7 +148,7 @@ class UserRepo:
         self,
         email: str,
     ) -> User | None:
-        """Get a user by email."""
+        """Get an user by email."""
         return await self._session.scalar(
             select(User).where(
                 User.email == email,
