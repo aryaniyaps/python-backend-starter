@@ -10,14 +10,16 @@
 - [x] Email verification on user registration
 - [x] Verified email change requests
 - [x] Email verification tokens are sha256 hashed
-- [ ] Secure password changes
 - [x] User login
    - [x] Login based on either email or username
    - [x] Passwords are rehashed upon login
 - [x] Password resets
    - [x] Password reset tokens are sha256 hashed
    - [x] Email notifications for password reset requests
-   - [x] Email notifications when password changes
+   - [x] Email notifications when password resets
+- [x] Secure password changes
+- [x] Email notifications when password changes
+- [x] Changing or resetting password logs out the user from all sessions and deletes all of their authentication tokens.
 - [ ] User session tracking
    - [x] IP address, User agent and geolocation data storage
    - [ ] Email notifications when new login location is detected
