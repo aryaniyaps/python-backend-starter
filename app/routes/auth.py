@@ -6,13 +6,13 @@ from sqlalchemy import ScalarResult
 from user_agents import parse
 
 from app.core.constants import OpenAPITag
-from app.core.rate_limiter import RateLimiter
 from app.dependencies.auth import (
     authentication_token_header,
     get_auth_service,
     get_viewer_info,
 )
 from app.dependencies.ip_address import get_ip_address
+from app.dependencies.rate_limiter import RateLimiter
 from app.models.user_session import UserSession
 from app.schemas.auth import (
     EmailVerificationRequestInput,

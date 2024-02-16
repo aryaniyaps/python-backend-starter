@@ -6,9 +6,9 @@ from fastapi import APIRouter, Depends, Header, Path
 from user_agents import parse
 
 from app.core.constants import OpenAPITag
-from app.core.rate_limiter import RateLimiter
 from app.dependencies.auth import get_viewer_info
 from app.dependencies.ip_address import get_ip_address
+from app.dependencies.rate_limiter import RateLimiter
 from app.dependencies.user import get_user_service
 from app.models.user import User
 from app.schemas.errors import InvalidInputErrorResult, ResourceNotFoundErrorResult
