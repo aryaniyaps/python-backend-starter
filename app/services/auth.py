@@ -195,7 +195,7 @@ class AuthService:
         # new device is detected? What if both login location and device are different?
         if not await self._user_session_repo.check_if_exists(
             user_id=user.id,
-            user_agent=str(user_agent),
+            user_agent=user_agent,
             ip_address=request_ip,
         ):
             await task_queue.enqueue(
