@@ -11,6 +11,7 @@
 - [x] Verified email change requests
 - [ ] Secure password changes
 - [x] User login
+   - [x] Login based on either email or username
    - [x] Passwords are rehashed upon login
 - [x] Password resets
    - [x] Password reset tokens are sha256 hashed
