@@ -5,13 +5,17 @@ from fastapi import Depends
 from geoip2.database import Reader
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.dependencies import get_authentication_token_repo, get_user_session_repo
-from app.auth.repos import AuthenticationTokenRepo, UserSessionRepo
 from app.core.database import get_database_session
 from app.core.geo_ip import get_geoip_reader
 from app.core.security import get_password_hasher
-from app.users.repos import EmailVerificationTokenRepo, UserRepo
-from app.users.services import UserService
+from app.dependencies.authentication_token import get_authentication_token_repo
+from app.dependencies.email_verification_token import get_email_verification_token_repo
+from app.dependencies.user_session import get_user_session_repo
+from app.repositories.authentication_token import AuthenticationTokenRepo
+from app.repositories.email_verification_token import EmailVerificationTokenRepo
+from app.repositories.user import UserRepo
+from app.repositories.user_session import UserSessionRepo
+from app.services.user import UserService
 
 
 def get_user_repo(
@@ -32,20 +36,6 @@ def get_user_repo(
     return UserRepo(
         session=session,
         password_hasher=password_hasher,
-    )
-
-
-def get_email_verification_token_repo(
-    session: Annotated[
-        AsyncSession,
-        Depends(
-            dependency=get_database_session,
-        ),
-    ],
-) -> EmailVerificationTokenRepo:
-    """Get the email verification token repo."""
-    return EmailVerificationTokenRepo(
-        session=session,
     )
 
 

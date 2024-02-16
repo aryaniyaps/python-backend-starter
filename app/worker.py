@@ -6,16 +6,16 @@ from saq import Job, Queue
 from saq.types import Context
 from saq.worker import Worker
 
-from app.auth.tasks import (
+from app.config import settings
+from app.logger import build_worker_log_config, setup_logging
+from app.sentry import setup_sentry
+from app.tasks import (
     send_email_verification_request_email,
     send_new_login_location_detected_email,
     send_onboarding_email,
     send_password_reset_email,
     send_password_reset_request_email,
 )
-from app.config import settings
-from app.logger import build_worker_log_config, setup_logging
-from app.sentry import setup_sentry
 
 
 async def before_enqueue(job: Job) -> None:

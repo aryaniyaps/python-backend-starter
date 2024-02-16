@@ -7,9 +7,9 @@ from fastapi_sso.sso.google import GoogleSSO
 from user_agents import parse
 
 from app.core.constants import OpenAPITag
-from app.core.dependencies import get_ip_address
-from app.oauth.dependencies import get_google_sso, get_oauth_service
-from app.oauth.services import OAuthService
+from app.dependencies.ip_address import get_ip_address
+from app.dependencies.oauth import get_google_sso, get_oauth_service
+from app.services.oauth import OAuthService
 
 oauth_router = APIRouter(
     prefix="/oauth",

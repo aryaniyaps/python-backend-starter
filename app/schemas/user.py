@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import EmailStr, Field, SecretStr
 
-from app.core.schemas import BaseSchema
+from app.schemas.base import BaseSchema
 
 
 class PartialUserSchema(BaseSchema):

@@ -4,73 +4,23 @@ from argon2 import PasswordHasher
 from fastapi import Depends, Security
 from fastapi.security import APIKeyHeader
 from geoip2.database import Reader
-from redis.asyncio import Redis
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.repos import (
-    AuthenticationTokenRepo,
-    PasswordResetTokenRepo,
-    UserSessionRepo,
-)
-from app.auth.services import AuthService
 from app.auth.types import UserInfo
-from app.core.database import get_database_session
 from app.core.geo_ip import get_geoip_reader
-from app.core.redis_client import get_redis_client
 from app.core.security import get_password_hasher
-from app.users.dependencies import get_email_verification_token_repo, get_user_repo
-from app.users.repos import EmailVerificationTokenRepo, UserRepo
+from app.dependencies.authentication_token import get_authentication_token_repo
+from app.dependencies.email_verification_token import get_email_verification_token_repo
+from app.dependencies.password_reset_token import get_password_reset_token_repo
+from app.dependencies.user import get_user_repo
+from app.dependencies.user_session import get_user_session_repo
+from app.repositories.authentication_token import AuthenticationTokenRepo
+from app.repositories.email_verification_token import EmailVerificationTokenRepo
+from app.repositories.password_reset_token import PasswordResetTokenRepo
+from app.repositories.user import UserRepo
+from app.repositories.user_session import UserSessionRepo
+from app.services.auth import AuthService
 
 authentication_token_header = APIKeyHeader(name="X-Authentication-Token")
-
-
-def get_authentication_token_repo(
-    redis_client: Annotated[
-        Redis,
-        Depends(
-            dependency=get_redis_client,
-        ),
-    ],
-) -> AuthenticationTokenRepo:
-    """Get the authentication token repo."""
-    return AuthenticationTokenRepo(
-        redis_client=redis_client,
-    )
-
-
-def get_password_reset_token_repo(
-    session: Annotated[
-        AsyncSession,
-        Depends(
-            dependency=get_database_session,
-        ),
-    ],
-) -> PasswordResetTokenRepo:
-    """Get the password reset token repo."""
-    return PasswordResetTokenRepo(
-        session=session,
-    )
-
-
-def get_user_session_repo(
-    session: Annotated[
-        AsyncSession,
-        Depends(
-            dependency=get_database_session,
-        ),
-    ],
-    geoip_reader: Annotated[
-        Reader,
-        Depends(
-            dependency=get_geoip_reader,
-        ),
-    ],
-) -> UserSessionRepo:
-    """Get the user session repo."""
-    return UserSessionRepo(
-        session=session,
-        geoip_reader=geoip_reader,
-    )
 
 
 def get_auth_service(

@@ -10,7 +10,7 @@ from sqlalchemy.sql.functions import now
 from app.core.database import Base
 
 if TYPE_CHECKING:
-    from app.users.models import User
+    from app.models.user import User
 
 
 class UserSession(Base):
@@ -57,35 +57,4 @@ class UserSession(Base):
     user: Mapped["User"] = relationship(
         "User",
         back_populates="user_sessions",
-    )
-
-
-class PasswordResetToken(Base):
-    __tablename__ = "password_reset_tokens"
-
-    id: Mapped[UUID] = mapped_column(
-        primary_key=True,
-        server_default=text(
-            "gen_random_uuid()",
-        ),
-    )
-
-    token_hash: Mapped[str] = mapped_column(
-        String(128),
-        unique=True,
-        index=True,
-    )
-
-    user_id: Mapped[UUID] = mapped_column(
-        ForeignKey("users.id"),
-    )
-
-    expires_at: Mapped[datetime]
-
-    created_at: Mapped[datetime] = mapped_column(
-        server_default=now(),
-    )
-
-    user: Mapped["User"] = relationship(
-        back_populates="password_reset_tokens",
     )

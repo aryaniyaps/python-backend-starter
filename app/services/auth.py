@@ -8,18 +8,17 @@ from geoip2.database import Reader
 from sqlalchemy import ScalarResult
 from user_agents.parsers import UserAgent
 
-from app.auth.models import UserSession
-from app.auth.repos import (
-    AuthenticationTokenRepo,
-    PasswordResetTokenRepo,
-    UserSessionRepo,
-)
 from app.auth.types import UserInfo
 from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
 from app.core.geo_ip import get_ip_location
 from app.core.security import check_password_strength
-from app.users.models import User
-from app.users.repos import EmailVerificationTokenRepo, UserRepo
+from app.models.user import User
+from app.models.user_session import UserSession
+from app.repositories.authentication_token import AuthenticationTokenRepo
+from app.repositories.email_verification_token import EmailVerificationTokenRepo
+from app.repositories.password_reset_token import PasswordResetTokenRepo
+from app.repositories.user import UserRepo
+from app.repositories.user_session import UserSessionRepo
 from app.worker import task_queue
 
 

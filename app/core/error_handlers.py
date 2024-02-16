@@ -12,8 +12,8 @@ from app.core.errors import (
     UnauthenticatedError,
     UnexpectedError,
 )
-from app.core.schemas import (
-    BaseSchema,
+from app.schemas.base import BaseSchema
+from app.schemas.errors import (
     HTTPExceptionResult,
     InvalidInputErrorResult,
     RateLimitExceededErrorResult,

@@ -5,13 +5,17 @@ from fastapi import APIRouter, Depends, Header
 from sqlalchemy import ScalarResult
 from user_agents import parse
 
-from app.auth.dependencies import (
+from app.auth.types import UserInfo
+from app.core.constants import OpenAPITag
+from app.core.rate_limiter import RateLimiter
+from app.dependencies.auth import (
     authentication_token_header,
     get_auth_service,
     get_viewer_info,
 )
-from app.auth.models import UserSession
-from app.auth.schemas import (
+from app.dependencies.ip_address import get_ip_address
+from app.models.user_session import UserSession
+from app.schemas.auth import (
     EmailVerificationRequestInput,
     LoginUserInput,
     LoginUserResult,
@@ -20,14 +24,10 @@ from app.auth.schemas import (
     PasswordResetRequestInput,
     RegisterUserInput,
     RegisterUserResult,
-    UserSessionSchema,
 )
-from app.auth.services import AuthService
-from app.auth.types import UserInfo
-from app.core.constants import OpenAPITag
-from app.core.dependencies import get_ip_address
-from app.core.rate_limiter import RateLimiter
-from app.core.schemas import InvalidInputErrorResult
+from app.schemas.errors import InvalidInputErrorResult
+from app.schemas.user_session import UserSessionSchema
+from app.services.auth import AuthService
 
 auth_router = APIRouter(
     prefix="/auth",

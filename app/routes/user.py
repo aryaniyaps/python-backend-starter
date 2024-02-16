@@ -5,15 +5,15 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Header, Path
 from user_agents import parse
 
-from app.auth.dependencies import get_viewer_info
 from app.auth.types import UserInfo
 from app.core.constants import OpenAPITag
-from app.core.dependencies import get_ip_address
 from app.core.rate_limiter import RateLimiter
-from app.core.schemas import InvalidInputErrorResult, ResourceNotFoundErrorResult
-from app.users.dependencies import get_user_service
-from app.users.models import User
-from app.users.schemas import (
+from app.dependencies.auth import get_viewer_info
+from app.dependencies.ip_address import get_ip_address
+from app.dependencies.user import get_user_service
+from app.models.user import User
+from app.schemas.errors import InvalidInputErrorResult, ResourceNotFoundErrorResult
+from app.schemas.user import (
     ChangeUserEmailInput,
     ChangeUserEmailRequestInput,
     ChangeUserPasswordInput,
@@ -21,7 +21,7 @@ from app.users.schemas import (
     UpdateUserInput,
     UserSchema,
 )
-from app.users.services import UserService
+from app.services.user import UserService
 
 users_router = APIRouter(
     prefix="/users",

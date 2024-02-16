@@ -2,7 +2,7 @@ from typing import Annotated, Literal
 
 from pydantic import Field
 
-from app.core.schemas import BaseSchema
+from app.schemas.base import BaseSchema
 
 
 class HealthCheckResult(BaseSchema):

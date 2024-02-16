@@ -6,14 +6,15 @@ from argon2.exceptions import VerifyMismatchError
 from geoip2.database import Reader
 from user_agents.parsers import UserAgent
 
-from app.auth.repos import AuthenticationTokenRepo, UserSessionRepo
 from app.core.errors import InvalidInputError, ResourceNotFoundError
 from app.core.geo_ip import get_ip_location
 from app.core.security import check_password_strength
+from app.models.user import User
+from app.repositories.authentication_token import AuthenticationTokenRepo
+from app.repositories.email_verification_token import EmailVerificationTokenRepo
+from app.repositories.user import UserRepo
+from app.repositories.user_session import UserSessionRepo
 from app.worker import task_queue
-
-from .models import User
-from .repos import EmailVerificationTokenRepo, UserRepo
 
 
 class UserService:

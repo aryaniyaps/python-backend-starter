@@ -9,7 +9,6 @@ from fastapi.responses import ORJSONResponse
 from starlette.exceptions import HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from app.auth.routes import auth_router
 from app.config import settings
 from app.core.constants import APP_NAME, SUPPORT_EMAIL
 from app.core.error_handlers import (
@@ -28,15 +27,16 @@ from app.core.errors import (
     UnauthenticatedError,
     UnexpectedError,
 )
-from app.core.middleware.rate_limiter import rate_limiter_middleware
-from app.core.schemas import (
+from app.middleware.rate_limiter import rate_limiter_middleware
+from app.routes.auth import auth_router
+from app.routes.health import health_router
+from app.routes.oauth import oauth_router
+from app.routes.user import users_router
+from app.schemas.errors import (
     RateLimitExceededErrorResult,
     UnexpectedErrorResult,
     ValidationErrorResult,
 )
-from app.health.routes import health_router
-from app.oauth.routes import oauth_router
-from app.users.routes import users_router
 
 
 def add_routes(app: FastAPI) -> None:
