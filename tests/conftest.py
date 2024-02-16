@@ -74,7 +74,7 @@ def test_worker() -> Iterator[SimpleWorker]:
 @pytest.fixture
 async def user(user_repo: UserRepo) -> User:
     """Create an user for testing."""
-    return await user_repo.create_user(
+    return await user_repo.create(
         username="tester",
         email="tester@example.org",
         password="password",

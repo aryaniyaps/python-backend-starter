@@ -14,18 +14,18 @@ class EmailVerificationTokenRepo:
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
-    async def create_email_verification_token(self, email: str) -> str:
+    async def create(self, email: str) -> str:
         """Create a new email verification token."""
         expires_at = text(
             f"NOW() + INTERVAL '{EMAIL_VERIFICATION_TOKEN_EXPIRES_IN} SECOND'",
         )
 
-        verification_token = self.generate_email_verification_token()
+        verification_token = self.generate_token()
 
         email_verification_token = EmailVerificationToken(
             email=email,
             expires_at=expires_at,
-            token_hash=self.hash_email_verification_token(
+            token_hash=self.hash_token(
                 email_verification_token=verification_token,
             ),
         )
@@ -33,22 +33,22 @@ class EmailVerificationTokenRepo:
         await self._session.commit()
         return verification_token
 
-    async def get_email_verification_token_by_token_email(
+    async def get_by_token_email(
         self, verification_token: str, email: str
     ) -> EmailVerificationToken | None:
         """Get an email verification token by token and email."""
         return await self._session.scalar(
             select(EmailVerificationToken).where(
                 EmailVerificationToken.token_hash
-                == self.hash_email_verification_token(
+                == self.hash_token(
                     email_verification_token=verification_token,
                 )
                 and EmailVerificationToken.email == email,
             ),
         )
 
-    async def delete_email_verification_tokens(self, email: str) -> None:
-        """Delete email verification tokens for the given email."""
+    async def delete_all(self, email: str) -> None:
+        """Delete all email verification tokens for the given email."""
         await self._session.execute(
             delete(EmailVerificationToken).where(
                 EmailVerificationToken.email == email,
@@ -56,12 +56,12 @@ class EmailVerificationTokenRepo:
         )
 
     @staticmethod
-    def generate_email_verification_token() -> str:
+    def generate_token() -> str:
         """Generate an email verification token."""
         return token_hex(32)
 
     @staticmethod
-    def hash_email_verification_token(email_verification_token: str) -> str:
+    def hash_token(email_verification_token: str) -> str:
         """Hash the given email verification token."""
         return sha256(email_verification_token.encode()).hexdigest()
 
@@ -75,7 +75,7 @@ class UserRepo:
         self._session = session
         self._password_hasher = password_hasher
 
-    async def create_user(
+    async def create(
         self,
         username: str,
         email: str,
@@ -94,7 +94,7 @@ class UserRepo:
         await self._session.commit()
         return user
 
-    async def update_user(
+    async def update(
         self,
         user: User,
         *,
@@ -122,18 +122,7 @@ class UserRepo:
             password=password,
         )
 
-    async def get_user_by_username(
-        self,
-        username: str,
-    ) -> User | None:
-        """Get a user by username."""
-        return await self._session.scalar(
-            select(User).where(
-                User.username == username,
-            ),
-        )
-
-    async def get_user_by_id(
+    async def get(
         self,
         user_id: UUID,
     ) -> User | None:
@@ -144,7 +133,18 @@ class UserRepo:
             ),
         )
 
-    async def get_user_by_email(
+    async def get_by_username(
+        self,
+        username: str,
+    ) -> User | None:
+        """Get a user by username."""
+        return await self._session.scalar(
+            select(User).where(
+                User.username == username,
+            ),
+        )
+
+    async def get_by_email(
         self,
         email: str,
     ) -> User | None:

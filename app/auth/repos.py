@@ -24,7 +24,7 @@ class UserSessionRepo:
         self._session = session
         self._geoip_reader = geoip_reader
 
-    async def create_user_session(
+    async def create(
         self,
         user_id: UUID,
         ip_address: str,
@@ -47,7 +47,7 @@ class UserSessionRepo:
         await self._session.commit()
         return user_session
 
-    async def check_user_session_exists(
+    async def check_if_exists(
         self,
         user_id: UUID,
         user_agent: str,
@@ -67,9 +67,7 @@ class UserSessionRepo:
         )
         return results.first() is not None
 
-    async def check_user_session_exists_after(
-        self, user_id: UUID, timestamp: datetime
-    ) -> bool:
+    async def check_if_exists_after(self, user_id: UUID, timestamp: datetime) -> bool:
         """Check whether user sessions for the user which are created after the given timestamp exist."""
         results = await self._session.scalars(
             select(UserSession).where(
@@ -78,7 +76,7 @@ class UserSessionRepo:
         )
         return results.first() is not None
 
-    async def get_user_sessions(self, user_id: UUID) -> ScalarResult[UserSession]:
+    async def get_all(self, user_id: UUID) -> ScalarResult[UserSession]:
         """Get user sessions for the given user ID."""
         return await self._session.scalars(
             select(UserSession).where(
@@ -86,7 +84,7 @@ class UserSessionRepo:
             ),
         )
 
-    async def delete_user_session(
+    async def delete(
         self,
         user_session_id: UUID,
         user_id: UUID,
@@ -98,7 +96,7 @@ class UserSessionRepo:
             ),
         )
 
-    async def update_user_session(
+    async def update(
         self,
         user_session_id: UUID,
         logged_out_at: datetime | None,
@@ -112,7 +110,7 @@ class UserSessionRepo:
             )
         )
 
-    async def logout_user_sessions(
+    async def logout_all(
         self,
         user_id: UUID,
     ) -> None:
@@ -133,19 +131,19 @@ class AuthenticationTokenRepo:
     ) -> None:
         self._redis_client = redis_client
 
-    async def create_authentication_token(
+    async def create(
         self,
         user_id: UUID,
         user_session_id: UUID,
     ) -> str:
         """Create a new authentication token."""
-        authentication_token = self.generate_authentication_token()
+        authentication_token = self.generate_token()
         # hash authentication token before storing
-        authentication_token_hash = self.hash_authentication_token(
+        authentication_token_hash = self.hash_token(
             authentication_token=authentication_token,
         )
         await self._redis_client.hset(
-            name=self.generate_authentication_token_key(
+            name=self.generate_token_key(
                 authentication_token_hash=authentication_token_hash,
             ),
             mapping={
@@ -162,12 +160,12 @@ class AuthenticationTokenRepo:
         return authentication_token
 
     @staticmethod
-    def generate_authentication_token() -> str:
+    def generate_token() -> str:
         """Generate an authentication token."""
         return token_hex(32)
 
     @staticmethod
-    def generate_authentication_token_key(authentication_token_hash: str) -> str:
+    def generate_token_key(authentication_token_hash: str) -> str:
         """Generate a token key for the authentication token hash."""
         return f"auth-tokens:${authentication_token_hash}"
 
@@ -177,18 +175,18 @@ class AuthenticationTokenRepo:
         return f"auth-token-owners:${user_id}"
 
     @staticmethod
-    def hash_authentication_token(authentication_token: str) -> str:
+    def hash_token(authentication_token: str) -> str:
         """Hash the given authentication token."""
         return sha256(authentication_token.encode()).hexdigest()
 
-    async def get_user_info_for_authentication_token(
+    async def get_user_info(
         self,
         authentication_token: str,
     ) -> UserInfo | None:
         """Get the user ID and user session ID for the authentication token."""
         user_info = await self._redis_client.hgetall(
-            name=self.generate_authentication_token_key(
-                authentication_token_hash=self.hash_authentication_token(
+            name=self.generate_token_key(
+                authentication_token_hash=self.hash_token(
                     authentication_token=authentication_token,
                 ),
             ),
@@ -204,13 +202,13 @@ class AuthenticationTokenRepo:
             )
         return None
 
-    async def remove_authentication_token(
+    async def delete(
         self,
         authentication_token: str,
         user_id: UUID,
     ) -> None:
-        """Remove the given authentication token."""
-        authentication_token_hash = self.hash_authentication_token(
+        """Delete the given authentication token."""
+        authentication_token_hash = self.hash_token(
             authentication_token=authentication_token,
         )
         await self._redis_client.delete(authentication_token_hash)
@@ -221,11 +219,11 @@ class AuthenticationTokenRepo:
             authentication_token_hash,
         )  # type: ignore[misc]
 
-    async def remove_all_authentication_tokens(
+    async def delete_all(
         self,
         user_id: UUID,
     ) -> None:
-        """Remove all authentication tokens for the given user ID."""
+        """Delete all authentication tokens for the given user ID."""
         authentication_token_hashes = await self._redis_client.smembers(
             name=self.generate_token_owner_key(
                 user_id=user_id,
@@ -234,7 +232,7 @@ class AuthenticationTokenRepo:
         if authentication_token_hashes:
             await self._redis_client.delete(
                 *[
-                    self.generate_authentication_token_key(
+                    self.generate_token_key(
                         authentication_token_hash=authentication_token_hash,
                     )
                     for authentication_token_hash in authentication_token_hashes
@@ -252,17 +250,17 @@ class PasswordResetTokenRepo:
         self._session = session
 
     @staticmethod
-    def generate_password_reset_token() -> str:
+    def generate_token() -> str:
         """Generate a password reset token."""
         # Generate a random token
         return token_hex(32)
 
     @staticmethod
-    def hash_password_reset_token(password_reset_token: str) -> str:
+    def hash_token(password_reset_token: str) -> str:
         """Hash the given password reset token."""
         return sha256(password_reset_token.encode()).hexdigest()
 
-    async def create_password_reset_token(
+    async def create(
         self,
         user_id: UUID,
     ) -> str:
@@ -271,13 +269,13 @@ class PasswordResetTokenRepo:
             f"NOW() + INTERVAL '{PASSWORD_RESET_TOKEN_EXPIRES_IN} SECOND'",
         )
 
-        reset_token = self.generate_password_reset_token()
+        reset_token = self.generate_token()
 
         self._session.add(
             PasswordResetToken(
                 user_id=user_id,
                 # hash password reset token before storing
-                token_hash=self.hash_password_reset_token(
+                token_hash=self.hash_token(
                     password_reset_token=reset_token,
                 ),
                 expires_at=expires_at,
@@ -286,19 +284,18 @@ class PasswordResetTokenRepo:
         await self._session.commit()
         return reset_token
 
-    async def get_password_reset_token_by_reset_token(
+    async def get_by_reset_token(
         self,
         reset_token: str,
     ) -> PasswordResetToken | None:
         """Get a password reset token by reset token."""
         return await self._session.scalar(
             select(PasswordResetToken).where(
-                PasswordResetToken.token_hash
-                == self.hash_password_reset_token(reset_token),
+                PasswordResetToken.token_hash == self.hash_token(reset_token),
             ),
         )
 
-    async def delete_password_reset_tokens(
+    async def delete_all(
         self,
         user_id: UUID,
     ) -> None:

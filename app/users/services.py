@@ -35,7 +35,7 @@ class UserService:
 
     async def get_user_by_id(self, user_id: UUID) -> User:
         """Get a user by ID."""
-        user = await self._user_repo.get_user_by_id(user_id=user_id)
+        user = await self._user_repo.get(user_id=user_id)
         if user is None:
             raise ResourceNotFoundError(
                 message="Couldn't find user with the given ID.",
@@ -51,7 +51,7 @@ class UserService:
         user = await self.get_user_by_id(user_id=user_id)
         if (
             username
-            and await self._user_repo.get_user_by_username(
+            and await self._user_repo.get_by_username(
                 username=username,
             )
             is not None
@@ -59,7 +59,7 @@ class UserService:
             raise InvalidInputError(
                 message="User with that username already exists.",
             )
-        return await self._user_repo.update_user(
+        return await self._user_repo.update(
             user=user,
             username=username,
         )
@@ -96,17 +96,17 @@ class UserService:
                 message="Enter a stronger password.",
             )
 
-        await self._user_repo.update_user(
+        await self._user_repo.update(
             user=user,
             password=new_password,
         )
 
         # logout user everywhere
-        await self._authentication_token_repo.remove_all_authentication_tokens(
+        await self._authentication_token_repo.delete_all(
             user_id=user.id,
         )
 
-        await self._user_session_repo.logout_user_sessions(
+        await self._user_session_repo.logout_all(
             user_id=user.id,
         )
 
@@ -150,7 +150,7 @@ class UserService:
 
         if (
             email
-            and await self._user_repo.get_user_by_email(
+            and await self._user_repo.get_by_email(
                 email=email,
             )
             is not None
@@ -160,7 +160,7 @@ class UserService:
             )
 
         verification_token = (
-            await self._email_verification_token_repo.create_email_verification_token(
+            await self._email_verification_token_repo.create(
                 email=email
             )
         )
@@ -188,7 +188,7 @@ class UserService:
         """Update the email for the given user."""
         user = await self.get_user_by_id(user_id=user_id)
 
-        verification_token = await self._email_verification_token_repo.get_email_verification_token_by_token_email(
+        verification_token = await self._email_verification_token_repo.get_by_token_email(
             verification_token=email_verification_token,
             email=email,
         )
@@ -201,11 +201,11 @@ class UserService:
                 message="Invalid email or email verification token provided."
             )
 
-        await self._email_verification_token_repo.delete_email_verification_tokens(
+        await self._email_verification_token_repo.delete_all(
             email=email
         )
 
-        return await self._user_repo.update_user(
+        return await self._user_repo.update(
             user=user,
             email=email,
         )

@@ -50,7 +50,7 @@ class AuthService:
     ) -> None:
         """Send an email verification request to the given email."""
         if (
-            await self._user_repo.get_user_by_email(
+            await self._user_repo.get_by_email(
                 email=email,
             )
             is not None
@@ -60,7 +60,7 @@ class AuthService:
             )
 
         verification_token = (
-            await self._email_verification_token_repo.create_email_verification_token(
+            await self._email_verification_token_repo.create(
                 email=email,
             )
         )
@@ -101,7 +101,7 @@ class AuthService:
             )
         try:
             if (
-                await self._user_repo.get_user_by_username(
+                await self._user_repo.get_by_username(
                     username=username,
                 )
                 is not None
@@ -110,7 +110,7 @@ class AuthService:
                     message="User with that username already exists.",
                 )
 
-            verification_token = await self._email_verification_token_repo.get_email_verification_token_by_token_email(
+            verification_token = await self._email_verification_token_repo.get_by_token_email(
                 verification_token=email_verification_token,
                 email=email,
             )
@@ -123,17 +123,17 @@ class AuthService:
                     message="Invalid email or email verification token provided."
                 )
 
-            await self._email_verification_token_repo.delete_email_verification_tokens(
+            await self._email_verification_token_repo.delete_all(
                 email=email
             )
 
-            user = await self._user_repo.create_user(
+            user = await self._user_repo.create(
                 username=username,
                 email=email,
                 password=password,
             )
 
-            user_session = await self._user_session_repo.create_user_session(
+            user_session = await self._user_session_repo.create(
                 user_id=user.id,
                 ip_address=request_ip,
                 user_agent=user_agent,
@@ -143,11 +143,9 @@ class AuthService:
                 message="Could not create user. Please try again.",
             ) from exception
 
-        authentication_token = (
-            await self._authentication_token_repo.create_authentication_token(
-                user_id=user.id,
-                user_session_id=user_session.id,
-            )
+        authentication_token = await self._authentication_token_repo.create(
+            user_id=user.id,
+            user_session_id=user_session.id,
         )
         await task_queue.enqueue(
             "send_onboarding_email",
@@ -172,12 +170,12 @@ class AuthService:
         """
         if "@" in login:
             # if "@" is present, assume it's an email
-            user = await self._user_repo.get_user_by_email(
+            user = await self._user_repo.get_by_email(
                 email=login,
             )
         else:
             # assume it's an username
-            user = await self._user_repo.get_user_by_username(
+            user = await self._user_repo.get_by_username(
                 username=login,
             )
         if not user:
@@ -194,7 +192,7 @@ class AuthService:
                 message="Invalid credentials provided.",
             ) from exception
 
-        if not await self._user_session_repo.check_user_session_exists(
+        if not await self._user_session_repo.check_if_exists(
             user_id=user.id,
             user_agent=str(user_agent),
             ip_address=request_ip,
@@ -215,25 +213,23 @@ class AuthService:
                 ip_address=request_ip,
             )
 
-        user_session = await self._user_session_repo.create_user_session(
+        user_session = await self._user_session_repo.create(
             user_id=user.id,
             ip_address=request_ip,
             user_agent=user_agent,
         )
 
         # create authentication token
-        authentication_token = (
-            await self._authentication_token_repo.create_authentication_token(
-                user_id=user.id,
-                user_session_id=user_session.id,
-            )
+        authentication_token = await self._authentication_token_repo.create(
+            user_id=user.id,
+            user_session_id=user_session.id,
         )
 
         if self._password_hasher.check_needs_rehash(
             hash=user.password_hash,
         ):
             # update user's password hash
-            user = await self._user_repo.update_user(
+            user = await self._user_repo.update(
                 user=user,
                 password=password,
             )
@@ -242,7 +238,7 @@ class AuthService:
 
     async def get_user_sessions(self, user_id: UUID) -> ScalarResult[UserSession]:
         """Get user sessions for the given user ID."""
-        return await self._user_session_repo.get_user_sessions(
+        return await self._user_session_repo.get_all(
             user_id=user_id,
         )
 
@@ -255,16 +251,16 @@ class AuthService:
         remember_session: bool,
     ) -> None:
         """Logout the user."""
-        await self._authentication_token_repo.remove_authentication_token(
+        await self._authentication_token_repo.delete(
             authentication_token=authentication_token,
             user_id=user_id,
         )
         if not remember_session:
-            return await self._user_session_repo.delete_user_session(
+            return await self._user_session_repo.delete(
                 user_session_id=user_session_id,
                 user_id=user_id,
             )
-        return await self._user_session_repo.update_user_session(
+        return await self._user_session_repo.update(
             user_session_id=user_session_id,
             logged_out_at=datetime.now(UTC),
         )
@@ -273,7 +269,7 @@ class AuthService:
         self, authentication_token: str
     ) -> UserInfo:
         """Verify the given authentication token and return the corresponding user info."""
-        user_info = await self._authentication_token_repo.get_user_info_for_authentication_token(
+        user_info = await self._authentication_token_repo.get_user_info(
             authentication_token=authentication_token,
         )
 
@@ -290,12 +286,10 @@ class AuthService:
         request_ip: str,
     ) -> None:
         """Send a password reset request to the given user if they exist."""
-        existing_user = await self._user_repo.get_user_by_email(email=email)
+        existing_user = await self._user_repo.get_by_email(email=email)
         if existing_user is not None:
-            reset_token = (
-                await self._password_reset_token_repo.create_password_reset_token(
-                    user_id=existing_user.id,
-                )
+            reset_token = await self._password_reset_token_repo.create(
+                user_id=existing_user.id,
             )
             await task_queue.enqueue(
                 "send_password_reset_request_email",
@@ -320,8 +314,8 @@ class AuthService:
         user_agent: UserAgent,
     ) -> None:
         """Reset the relevant user's password with the given credentials."""
-        existing_user = await self._user_repo.get_user_by_email(email=email)
-        password_reset_token = await self._password_reset_token_repo.get_password_reset_token_by_reset_token(
+        existing_user = await self._user_repo.get_by_email(email=email)
+        password_reset_token = await self._password_reset_token_repo.get_by_reset_token(
             reset_token=reset_token,
         )
 
@@ -348,11 +342,11 @@ class AuthService:
             )
 
         # delete all password reset tokens to prevent duplicate use
-        await self._password_reset_token_repo.delete_password_reset_tokens(
+        await self._password_reset_token_repo.delete_all(
             user_id=existing_user.id,
         )
 
-        if await self._user_session_repo.check_user_session_exists_after(
+        if await self._user_session_repo.check_if_exists_after(
             user_id=existing_user.id,
             timestamp=password_reset_token.created_at,
         ):
@@ -363,17 +357,17 @@ class AuthService:
                 message="Invalid password reset token or email provided.",
             )
 
-        await self._user_repo.update_user(
+        await self._user_repo.update(
             user=existing_user,
             password=new_password,
         )
 
         # logout user everywhere
-        await self._authentication_token_repo.remove_all_authentication_tokens(
+        await self._authentication_token_repo.delete_all(
             user_id=existing_user.id,
         )
 
-        await self._user_session_repo.logout_user_sessions(
+        await self._user_session_repo.logout_all(
             user_id=existing_user.id,
         )
 
