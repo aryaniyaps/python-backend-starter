@@ -62,6 +62,8 @@ class UserService:
         user_id: UUID,
         new_password: str,
         current_password: str,
+        user_agent: UserAgent,
+        request_ip: str,
     ) -> User:
         """Update the password for the given user."""
         user = await self.get_user_by_id(user_id=user_id)
@@ -87,12 +89,35 @@ class UserService:
                 message="Enter a stronger password.",
             )
 
-        return await self._user_repo.update_user(
+        await self._user_repo.update_user(
             user=user,
             password=new_password,
         )
 
-    # TODO: send password changed email here
+        # logout user everywhere
+        await self._auth_repo.remove_all_authentication_tokens(
+            user_id=user.id,
+        )
+
+        await self._auth_repo.logout_user_sessions(
+            user_id=user.id,
+        )
+
+        # send password changed mail
+        await task_queue.enqueue(
+            "send_password_reset_email",
+            receiver=user.email,
+            username=user.username,
+            device=user_agent.get_device(),
+            browser_name=user_agent.get_browser(),
+            location=get_ip_location(
+                ip_address=request_ip,
+                geoip_reader=self._geoip_reader,
+            ),
+            ip_address=request_ip,
+        )
+
+        return user
 
     async def send_change_email_request(
         self,

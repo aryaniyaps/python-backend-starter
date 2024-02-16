@@ -185,6 +185,8 @@ class AuthService:
             user_agent=str(user_agent),
             ip_address=request_ip,
         ):
+            # FIXME: maybe send emails only when new device is detected, and not login location.
+            # send the IP address as metadata alone.
             await task_queue.enqueue(
                 "send_new_login_location_detected_email",
                 receiver=user.email,

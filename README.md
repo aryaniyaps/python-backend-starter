@@ -9,6 +9,7 @@
 - [x] Password strength validation using the [ZXCVBN](https://github.com/dropbox/zxcvbn) algorithm
 - [x] Email verification on user registration
 - [x] Verified email change requests
+- [ ] Secure password changes
 - [x] User login
    - [x] Passwords are rehashed upon login
 - [x] Password resets

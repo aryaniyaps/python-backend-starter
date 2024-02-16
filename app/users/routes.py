@@ -121,6 +121,13 @@ async def update_current_user(
 )
 async def change_current_user_password(
     data: ChangeUserPasswordInput,
+    request_ip: Annotated[
+        str,
+        Depends(
+            dependency=get_ip_address,
+        ),
+    ],
+    user_agent: Annotated[str, Header()],
     viewer_info: Annotated[
         UserInfo,
         Depends(
@@ -139,6 +146,8 @@ async def change_current_user_password(
         user_id=viewer_info.user_id,
         current_password=data.current_password.get_secret_value(),
         new_password=data.new_password.get_secret_value(),
+        request_ip=request_ip,
+        user_agent=parse(user_agent),
     )
 
 
