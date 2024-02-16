@@ -19,4 +19,9 @@ class OAuthService:
         user_agent: UserAgent,
     ) -> tuple[str, User]:
         """Login or register the user associated with the given OpenID credentials."""
-        raise NotImplementedError
+        if openid_user.email is None:
+            # raise error
+            pass
+        if openid_user.display_name is None:
+            # raise error
+            pass

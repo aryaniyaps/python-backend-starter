@@ -6,7 +6,11 @@ from sqlalchemy import ScalarResult, delete, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from user_agents.parsers import UserAgent
 
-from app.lib.geo_ip import get_ip_location
+from app.lib.geo_ip import (
+    get_city_location,
+    get_city_subdivision_geoname_id,
+    get_geoip_city,
+)
 from app.models.user_session import UserSession
 
 
@@ -27,16 +31,18 @@ class UserSessionRepo:
     ) -> UserSession:
         """Create a new user session."""
         # TODO: pass device ID here, like instagram does on register/ login
-        # TODO: store the GeoID of the region (of a bigger area like a country) along with the location string
-        # this can help us detect new logins in a better way
+        # TODO: check if we need to store user_agent, we seem to only need device here
+        city = get_geoip_city(
+            ip_address=ip_address,
+            geoip_reader=self._geoip_reader,
+        )
         user_session = UserSession(
             user_id=user_id,
             ip_address=ip_address,
-            location=get_ip_location(
-                ip_address=ip_address,
-                geoip_reader=self._geoip_reader,
-            ),
+            subdivision_geoname_id=get_city_subdivision_geoname_id(city),
+            location=get_city_location(city),
             user_agent=str(user_agent),
+            device=user_agent.device,
         )
         self._session.add(user_session)
         await self._session.commit()
@@ -45,19 +51,23 @@ class UserSessionRepo:
     async def check_if_exists(
         self,
         user_id: UUID,
-        user_agent: str,
+        user_agent: UserAgent,
         ip_address: str,
     ) -> bool:
         """Check whether user sessions for the user exist with the given user agent and IP address."""
-        # FIXME: dont check IP addresses too strictly, they can be dynamic in some environments
         # TODO: pass device ID here, like instagram does on register/ login
-        # TODO: store the GeoID of the region (of a bigger area like a country) along with the location string
-        # this can help us detect new logins in a better way
+        # TODO: handle case where subdivision_geoname_id is None
+        subdivision_geoname_id = get_city_subdivision_geoname_id(
+            city=get_geoip_city(
+                ip_address=ip_address,
+                geoip_reader=self._geoip_reader,
+            ),
+        )
         results = await self._session.scalars(
             select(UserSession).where(
                 UserSession.user_id == user_id
-                and UserSession.user_agent == user_agent
-                and UserSession.ip_address == ip_address
+                and UserSession.device == user_agent.device
+                and UserSession.subdivision_geoname_id == subdivision_geoname_id
             ),
         )
         return results.first() is not None

@@ -10,7 +10,7 @@ from user_agents.parsers import UserAgent
 
 from app.auth.types import UserInfo
 from app.lib.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
-from app.lib.geo_ip import get_ip_location
+from app.lib.geo_ip import get_city_location
 from app.lib.security import check_password_strength
 from app.models.user import User
 from app.models.user_session import UserSession
@@ -69,7 +69,7 @@ class AuthService:
             verification_token=verification_token,
             device=user_agent.get_device(),
             browser_name=user_agent.get_browser(),
-            location=get_ip_location(
+            location=get_city_location(
                 ip_address=request_ip,
                 geoip_reader=self._geoip_reader,
             ),
@@ -203,7 +203,7 @@ class AuthService:
                 login_timestamp=humanize.naturaldate(datetime.now(UTC)),
                 device=user_agent.get_device(),
                 browser_name=user_agent.get_browser(),
-                location=get_ip_location(
+                location=get_city_location(
                     ip_address=request_ip,
                     geoip_reader=self._geoip_reader,
                 ),
@@ -295,7 +295,7 @@ class AuthService:
                 password_reset_token=reset_token,
                 device=user_agent.get_device(),
                 browser_name=user_agent.get_browser(),
-                location=get_ip_location(
+                location=get_city_location(
                     ip_address=request_ip,
                     geoip_reader=self._geoip_reader,
                 ),
@@ -375,7 +375,7 @@ class AuthService:
             username=existing_user.username,
             device=user_agent.get_device(),
             browser_name=user_agent.get_browser(),
-            location=get_ip_location(
+            location=get_city_location(
                 ip_address=request_ip,
                 geoip_reader=self._geoip_reader,
             ),

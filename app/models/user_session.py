@@ -40,11 +40,17 @@ class UserSession(Base):
         String(40),
     )
 
+    subdivision_geoname_id: Mapped[int]
+
     location: Mapped[str] = mapped_column(
         String(256),
     )
 
     user_agent: Mapped[str] = mapped_column(
+        String(256),
+    )
+
+    device: Mapped[str] = mapped_column(
         String(256),
     )
 

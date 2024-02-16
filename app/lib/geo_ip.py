@@ -12,13 +12,26 @@ def format_geoip_city(city: City) -> str:
     return f"{city.city.name}, {city.subdivisions.most_specific.name} ({city.country.iso_code})"
 
 
-def get_ip_location(ip_address: str, geoip_reader: Reader) -> str:
-    """Get the location string from the given IP address."""
+def get_geoip_city(ip_address: str, geoip_reader: Reader) -> City | None:
+    """Get the GeoIP city from the given IP address."""
     try:
-        city = geoip_reader.city(ip_address)
-        return format_geoip_city(city)
+        return geoip_reader.city(ip_address)
     except AddressNotFoundError:
+        return None
+
+
+def get_city_location(city: City | None) -> str:
+    """Get the location string from the given city."""
+    if city is None:
         return "Unknown"
+    return format_geoip_city(city)
+
+
+def get_city_subdivision_geoname_id(city: City | None) -> int | None:
+    """Get the most specific subdivision's geoname ID from the given city."""
+    if city is not None:
+        return city.subdivisions.most_specific.geoname_id
+    return None
 
 
 @lru_cache

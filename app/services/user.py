@@ -7,7 +7,7 @@ from geoip2.database import Reader
 from user_agents.parsers import UserAgent
 
 from app.lib.errors import InvalidInputError, ResourceNotFoundError
-from app.lib.geo_ip import get_ip_location
+from app.lib.geo_ip import get_city_location
 from app.lib.security import check_password_strength
 from app.models.user import User
 from app.repositories.authentication_token import AuthenticationTokenRepo
@@ -118,7 +118,7 @@ class UserService:
             username=user.username,
             device=user_agent.get_device(),
             browser_name=user_agent.get_browser(),
-            location=get_ip_location(
+            location=get_city_location(
                 ip_address=request_ip,
                 geoip_reader=self._geoip_reader,
             ),
@@ -170,7 +170,7 @@ class UserService:
             verification_token=verification_token,
             device=user_agent.get_device(),
             browser_name=user_agent.get_browser(),
-            location=get_ip_location(
+            location=get_city_location(
                 ip_address=request_ip,
                 geoip_reader=self._geoip_reader,
             ),
