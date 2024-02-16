@@ -91,18 +91,31 @@ reset_password_request_text = environment.get_template(
 
 # password reset templates
 
-reset_password_subject = environment.get_template(
-    name="emails/reset-password/subject.txt",
+password_reset_subject = environment.get_template(
+    name="emails/password-reset/subject.txt",
 )
 
-reset_password_html = environment.get_template(
-    name="emails/reset-password/body.html",
+password_reset_html = environment.get_template(
+    name="emails/password-reset/body.html",
 )
 
-reset_password_text = environment.get_template(
-    name="emails/reset-password/body.txt",
+password_reset_text = environment.get_template(
+    name="emails/password-reset/body.txt",
 )
 
+# password changed templates
+
+password_changed_subject = environment.get_template(
+    name="emails/password-changed/subject.txt",
+)
+
+password_changed_html = environment.get_template(
+    name="emails/password-changed/body.html",
+)
+
+password_changed_text = environment.get_template(
+    name="emails/password-changed/body.txt",
+)
 # onboarding templates
 
 onboarding_subject = environment.get_template(

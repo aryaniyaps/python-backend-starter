@@ -12,12 +12,15 @@ from app.lib.templates import (
     onboarding_html,
     onboarding_subject,
     onboarding_text,
-    reset_password_html,
+    password_changed_html,
+    password_changed_subject,
+    password_changed_text,
+    password_reset_html,
+    password_reset_subject,
+    password_reset_text,
     reset_password_request_html,
     reset_password_request_subject,
     reset_password_request_text,
-    reset_password_subject,
-    reset_password_text,
 )
 
 
@@ -163,15 +166,47 @@ def send_password_reset_email(
     email_sender.send(
         sender=settings.email_from,
         receivers=[receiver],
-        subject=reset_password_subject.render(),
-        text=reset_password_text.render(
+        subject=password_reset_subject.render(),
+        text=password_reset_text.render(
             device=device,
             browser_name=browser_name,
             username=username,
             ip_address=ip_address,
             location=location,
         ),
-        html=reset_password_html.render(
+        html=password_reset_html.render(
+            device=device,
+            browser_name=browser_name,
+            username=username,
+            ip_address=ip_address,
+            location=location,
+        ),
+    )
+
+
+def send_password_changed_email(
+    _ctx: Context,
+    *,
+    receiver: str,
+    username: str,
+    device: str,
+    browser_name: str,
+    ip_address: str,
+    location: str,
+) -> None:
+    """Send a password changed email to the given user."""
+    email_sender.send(
+        sender=settings.email_from,
+        receivers=[receiver],
+        subject=password_changed_subject.render(),
+        text=password_changed_text.render(
+            device=device,
+            browser_name=browser_name,
+            username=username,
+            ip_address=ip_address,
+            location=location,
+        ),
+        html=password_changed_html.render(
             device=device,
             browser_name=browser_name,
             username=username,

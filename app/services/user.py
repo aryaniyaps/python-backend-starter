@@ -112,9 +112,8 @@ class UserService:
         )
 
         # send password changed mail
-        # TODO: maybe rename `reset` to `changed` here
         await task_queue.enqueue(
-            "send_password_reset_email",
+            "send_password_changed_email",
             receiver=user.email,
             username=user.username,
             device=user_agent.get_device(),

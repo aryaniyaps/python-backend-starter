@@ -1,0 +1,32 @@
+{% extends "emails/base/body.txt" %}
+
+{% block title %}
+Your {{ app_name }} password has been reset.
+{% endblock%}
+
+
+{% block content %}
+************
+Hi {{ username }},
+************
+
+This is to let you know that your {{ app_name }} password has been changed.
+
+Where this happened:
+
+Device: {{ device }}
+
+Browser: {{ browser_name }}
+
+IP Address: {{ ip_address }}
+
+Location: {{ location }}
+
+If this was you, you don't need to do anything.
+
+Please contact support ( {{ support_email }} ) if you have questions.
+
+Thanks,
+The {{ app_name }} team
+
+{% endblock%}

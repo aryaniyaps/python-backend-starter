@@ -15,9 +15,9 @@ from app.lib.templates import (
     onboarding_html,
     onboarding_subject,
     onboarding_text,
-    reset_password_html,
+    password_reset_html,
+    password_reset_text,
     reset_password_request_subject,
-    reset_password_text,
 )
 from app.users.schemas import UserSchema
 from redmail.email.sender import EmailSender
@@ -186,7 +186,7 @@ def test_send_password_reset_request_email() -> None:
         subject=reset_password_request_subject.render(
             username=mock_user.username,
         ),
-        text=reset_password_text.render(
+        text=password_reset_text.render(
             action_url=action_url,
             device=device,
             browser_name=browser_name,
@@ -194,7 +194,7 @@ def test_send_password_reset_request_email() -> None:
             ip_address=ip_address,
             location=location,
         ),
-        html=reset_password_html.render(
+        html=password_reset_html.render(
             action_url=action_url,
             device=device,
             browser_name=browser_name,
