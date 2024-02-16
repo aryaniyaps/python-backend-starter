@@ -32,6 +32,7 @@ class UserSessionRepo:
         """Create a new user session."""
         # TODO: pass device ID here, like instagram does on register/ login
         # TODO: check if we need to store user_agent, we seem to only need device here
+        # TODO: can we rename subdivision_geoname_id to subdivision_id or location_subdivision_id?
         city = get_geoip_city(
             ip_address=ip_address,
             geoip_reader=self._geoip_reader,
