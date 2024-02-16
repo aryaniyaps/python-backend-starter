@@ -4,7 +4,7 @@ from secrets import token_hex
 from sqlalchemy import delete, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.constants import EMAIL_VERIFICATION_TOKEN_EXPIRES_IN
+from app.lib.constants import EMAIL_VERIFICATION_TOKEN_EXPIRES_IN
 from app.models.email_verification_token import EmailVerificationToken
 
 

@@ -5,7 +5,6 @@ from fastapi import APIRouter, Depends, Header
 from sqlalchemy import ScalarResult
 from user_agents import parse
 
-from app.core.constants import OpenAPITag
 from app.dependencies.auth import (
     authentication_token_header,
     get_auth_service,
@@ -13,6 +12,7 @@ from app.dependencies.auth import (
 )
 from app.dependencies.ip_address import get_ip_address
 from app.dependencies.rate_limiter import RateLimiter
+from app.lib.constants import OpenAPITag
 from app.models.user_session import UserSession
 from app.schemas.auth import (
     EmailVerificationRequestInput,

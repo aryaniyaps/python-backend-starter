@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.core.constants import OpenAPITag
+from app.lib.constants import OpenAPITag
 from app.schemas.health import HealthCheckResult
 
 health_router = APIRouter(

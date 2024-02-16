@@ -6,9 +6,9 @@ from fastapi.responses import RedirectResponse
 from fastapi_sso.sso.google import GoogleSSO
 from user_agents import parse
 
-from app.core.constants import OpenAPITag
 from app.dependencies.ip_address import get_ip_address
 from app.dependencies.oauth import get_google_sso, get_oauth_service
+from app.lib.constants import OpenAPITag
 from app.services.oauth import OAuthService
 
 oauth_router = APIRouter(

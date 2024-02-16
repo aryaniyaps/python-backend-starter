@@ -6,9 +6,9 @@ from argon2.exceptions import VerifyMismatchError
 from geoip2.database import Reader
 from user_agents.parsers import UserAgent
 
-from app.core.errors import InvalidInputError, ResourceNotFoundError
-from app.core.geo_ip import get_ip_location
-from app.core.security import check_password_strength
+from app.lib.errors import InvalidInputError, ResourceNotFoundError
+from app.lib.geo_ip import get_ip_location
+from app.lib.security import check_password_strength
 from app.models.user import User
 from app.repositories.authentication_token import AuthenticationTokenRepo
 from app.repositories.email_verification_token import EmailVerificationTokenRepo
@@ -160,10 +160,8 @@ class UserService:
                 message="User with that email already exists.",
             )
 
-        verification_token = (
-            await self._email_verification_token_repo.create(
-                email=email
-            )
+        verification_token = await self._email_verification_token_repo.create(
+            email=email
         )
 
         # send verification request email
@@ -189,9 +187,11 @@ class UserService:
         """Update the email for the given user."""
         user = await self.get_user_by_id(user_id=user_id)
 
-        verification_token = await self._email_verification_token_repo.get_by_token_email(
-            verification_token=email_verification_token,
-            email=email,
+        verification_token = (
+            await self._email_verification_token_repo.get_by_token_email(
+                verification_token=email_verification_token,
+                email=email,
+            )
         )
 
         if (
@@ -202,9 +202,7 @@ class UserService:
                 message="Invalid email or email verification token provided."
             )
 
-        await self._email_verification_token_repo.delete_all(
-            email=email
-        )
+        await self._email_verification_token_repo.delete_all(email=email)
 
         return await self._user_repo.update(
             user=user,

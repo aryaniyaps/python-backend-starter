@@ -7,8 +7,8 @@ from app.auth.tasks import (
     send_password_reset_request_email,
 )
 from app.config import settings
-from app.core.constants import APP_URL
-from app.core.templates import (
+from app.lib.constants import APP_URL
+from app.lib.templates import (
     new_login_location_html,
     new_login_location_subject,
     new_login_location_text,

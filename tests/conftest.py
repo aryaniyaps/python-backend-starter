@@ -6,9 +6,9 @@ from alembic.config import Config
 from app.auth.models import UserSession
 from app.auth.repos import AuthRepo
 from app.config import settings
-from app.core.geo_ip import get_geoip_reader
-from app.core.redis_client import get_redis_client
-from app.core.security import get_password_hasher
+from app.lib.geo_ip import get_geoip_reader
+from app.lib.redis_client import get_redis_client
+from app.lib.security import get_password_hasher
 from app.users.models import User
 from app.users.repos import UserRepo
 from app.worker import task_queue

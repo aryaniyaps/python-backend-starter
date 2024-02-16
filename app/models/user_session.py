@@ -7,7 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.schema import Index
 from sqlalchemy.sql.functions import now
 
-from app.core.database import Base
+from app.lib.database import Base
 
 if TYPE_CHECKING:
     from app.models.user import User

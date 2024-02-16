@@ -3,9 +3,9 @@ from collections.abc import Awaitable, Callable
 from fastapi import Request, Response
 from limits import WindowStats, parse
 
-from app.core.constants import PRIMARY_RATE_LIMIT
-from app.core.errors import RateLimitExceededError
-from app.core.rate_limiter import (
+from app.lib.constants import PRIMARY_RATE_LIMIT
+from app.lib.errors import RateLimitExceededError
+from app.lib.rate_limiter import (
     get_path_identifier,
     get_request_identifier,
     rate_limiter,

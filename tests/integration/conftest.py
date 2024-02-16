@@ -3,7 +3,7 @@ from typing import Any
 
 import pytest
 from app import create_app
-from app.core.database import get_database_session
+from app.lib.database import get_database_session
 from fastapi import FastAPI
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession

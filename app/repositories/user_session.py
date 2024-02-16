@@ -6,7 +6,7 @@ from sqlalchemy import ScalarResult, delete, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from user_agents.parsers import UserAgent
 
-from app.core.geo_ip import get_ip_location
+from app.lib.geo_ip import get_ip_location
 from app.models.user_session import UserSession
 
 

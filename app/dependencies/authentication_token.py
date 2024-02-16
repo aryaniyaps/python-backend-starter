@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends
 from redis.asyncio import Redis
 
-from app.core.redis_client import get_redis_client
+from app.lib.redis_client import get_redis_client
 from app.repositories.authentication_token import AuthenticationTokenRepo
 
 

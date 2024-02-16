@@ -5,7 +5,7 @@ from sqlalchemy import Column, Index, String, text
 from sqlalchemy.dialects.postgresql import CITEXT
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.core.database import Base
+from app.lib.database import Base
 
 
 class EmailVerificationToken(Base):
@@ -37,5 +37,3 @@ class EmailVerificationToken(Base):
     )
 
     expires_at: Mapped[datetime]
-
-

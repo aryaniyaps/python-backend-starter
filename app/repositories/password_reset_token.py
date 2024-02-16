@@ -5,7 +5,7 @@ from uuid import UUID
 from sqlalchemy import delete, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
+from app.lib.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
 from app.models.password_reset_token import PasswordResetToken
 
 

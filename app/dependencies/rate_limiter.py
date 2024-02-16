@@ -1,8 +1,8 @@
 from fastapi import Request
 from limits import RateLimitItem, parse
 
-from app.core.errors import RateLimitExceededError
-from app.core.rate_limiter import (
+from app.lib.errors import RateLimitExceededError
+from app.lib.rate_limiter import (
     get_path_identifier,
     get_request_identifier,
     rate_limiter,

@@ -9,9 +9,9 @@ from sqlalchemy import ScalarResult
 from user_agents.parsers import UserAgent
 
 from app.auth.types import UserInfo
-from app.core.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
-from app.core.geo_ip import get_ip_location
-from app.core.security import check_password_strength
+from app.lib.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
+from app.lib.geo_ip import get_ip_location
+from app.lib.security import check_password_strength
 from app.models.user import User
 from app.models.user_session import UserSession
 from app.repositories.authentication_token import AuthenticationTokenRepo
@@ -58,10 +58,8 @@ class AuthService:
                 message="User with that email already exists.",
             )
 
-        verification_token = (
-            await self._email_verification_token_repo.create(
-                email=email,
-            )
+        verification_token = await self._email_verification_token_repo.create(
+            email=email,
         )
 
         # send verification request email
@@ -109,9 +107,11 @@ class AuthService:
                     message="User with that username already exists.",
                 )
 
-            verification_token = await self._email_verification_token_repo.get_by_token_email(
-                verification_token=email_verification_token,
-                email=email,
+            verification_token = (
+                await self._email_verification_token_repo.get_by_token_email(
+                    verification_token=email_verification_token,
+                    email=email,
+                )
             )
 
             if (
@@ -122,9 +122,7 @@ class AuthService:
                     message="Invalid email or email verification token provided."
                 )
 
-            await self._email_verification_token_repo.delete_all(
-                email=email
-            )
+            await self._email_verification_token_repo.delete_all(email=email)
 
             user = await self._user_repo.create(
                 username=username,

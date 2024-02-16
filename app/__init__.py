@@ -10,8 +10,8 @@ from starlette.exceptions import HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.config import settings
-from app.core.constants import APP_NAME, SUPPORT_EMAIL
-from app.core.error_handlers import (
+from app.lib.constants import APP_NAME, SUPPORT_EMAIL
+from app.lib.error_handlers import (
     handle_http_exception,
     handle_invalid_input_error,
     handle_ratelimit_exceeded_error,
@@ -20,7 +20,7 @@ from app.core.error_handlers import (
     handle_unexpected_error,
     handle_validation_error,
 )
-from app.core.errors import (
+from app.lib.errors import (
     InvalidInputError,
     RateLimitExceededError,
     ResourceNotFoundError,

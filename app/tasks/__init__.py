@@ -1,8 +1,8 @@
 from saq.types import Context
 
 from app.config import settings
-from app.core.emails import email_sender
-from app.core.templates import (
+from app.lib.emails import email_sender
+from app.lib.templates import (
     email_verification_request_html,
     email_verification_request_subject,
     email_verification_request_text,

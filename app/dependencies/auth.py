@@ -5,13 +5,13 @@ from fastapi import Depends, Security
 from fastapi.security import APIKeyHeader
 from geoip2.database import Reader
 
-from app.core.geo_ip import get_geoip_reader
-from app.core.security import get_password_hasher
 from app.dependencies.authentication_token import get_authentication_token_repo
 from app.dependencies.email_verification_token import get_email_verification_token_repo
 from app.dependencies.password_reset_token import get_password_reset_token_repo
 from app.dependencies.user import get_user_repo
 from app.dependencies.user_session import get_user_session_repo
+from app.lib.geo_ip import get_geoip_reader
+from app.lib.security import get_password_hasher
 from app.repositories.authentication_token import AuthenticationTokenRepo
 from app.repositories.email_verification_token import EmailVerificationTokenRepo
 from app.repositories.password_reset_token import PasswordResetTokenRepo
