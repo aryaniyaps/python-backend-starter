@@ -6,23 +6,30 @@ from argon2.exceptions import VerifyMismatchError
 from geoip2.database import Reader
 from user_agents.parsers import UserAgent
 
+from app.auth.repos import AuthenticationTokenRepo, UserSessionRepo
 from app.core.errors import InvalidInputError, ResourceNotFoundError
 from app.core.geo_ip import get_ip_location
 from app.core.security import check_password_strength
 from app.worker import task_queue
 
 from .models import User
-from .repos import UserRepo
+from .repos import EmailVerificationTokenRepo, UserRepo
 
 
 class UserService:
     def __init__(
         self,
         user_repo: UserRepo,
+        email_verification_token_repo: EmailVerificationTokenRepo,
+        authentication_token_repo: AuthenticationTokenRepo,
+        user_session_repo: UserSessionRepo,
         password_hasher: PasswordHasher,
         geoip_reader: Reader,
     ) -> None:
         self._user_repo = user_repo
+        self._email_verification_token_repo = email_verification_token_repo
+        self._authentication_token_repo = authentication_token_repo
+        self._user_session_repo = user_session_repo
         self._password_hasher = password_hasher
         self._geoip_reader = geoip_reader
 
@@ -95,15 +102,16 @@ class UserService:
         )
 
         # logout user everywhere
-        await self._auth_repo.remove_all_authentication_tokens(
+        await self._authentication_token_repo.remove_all_authentication_tokens(
             user_id=user.id,
         )
 
-        await self._auth_repo.logout_user_sessions(
+        await self._user_session_repo.logout_user_sessions(
             user_id=user.id,
         )
 
         # send password changed mail
+        # TODO: maybe rename `reset` to `changed` here
         await task_queue.enqueue(
             "send_password_reset_email",
             receiver=user.email,
@@ -151,8 +159,10 @@ class UserService:
                 message="User with that email already exists.",
             )
 
-        verification_token = await self._user_repo.create_email_verification_token(
-            email=email
+        verification_token = (
+            await self._email_verification_token_repo.create_email_verification_token(
+                email=email
+            )
         )
 
         # send verification request email
@@ -178,11 +188,9 @@ class UserService:
         """Update the email for the given user."""
         user = await self.get_user_by_id(user_id=user_id)
 
-        verification_token = (
-            await self._user_repo.get_email_verification_token_by_token_email(
-                verification_token=email_verification_token,
-                email=email,
-            )
+        verification_token = await self._email_verification_token_repo.get_email_verification_token_by_token_email(
+            verification_token=email_verification_token,
+            email=email,
         )
 
         if (
@@ -193,7 +201,9 @@ class UserService:
                 message="Invalid email or email verification token provided."
             )
 
-        await self._user_repo.delete_email_verification_tokens(email=email)
+        await self._email_verification_token_repo.delete_email_verification_tokens(
+            email=email
+        )
 
         return await self._user_repo.update_user(
             user=user,

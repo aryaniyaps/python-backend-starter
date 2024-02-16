@@ -7,30 +7,56 @@ from geoip2.database import Reader
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.repos import AuthRepo
+from app.auth.repos import (
+    AuthenticationTokenRepo,
+    PasswordResetTokenRepo,
+    UserSessionRepo,
+)
 from app.auth.services import AuthService
 from app.auth.types import UserInfo
 from app.core.database import get_database_session
 from app.core.geo_ip import get_geoip_reader
 from app.core.redis_client import get_redis_client
 from app.core.security import get_password_hasher
-from app.users.dependencies import get_user_repo
-from app.users.repos import UserRepo
+from app.users.dependencies import get_email_verification_token_repo, get_user_repo
+from app.users.repos import EmailVerificationTokenRepo, UserRepo
 
 authentication_token_header = APIKeyHeader(name="X-Authentication-Token")
 
 
-def get_auth_repo(
+def get_authentication_token_repo(
+    redis_client: Annotated[
+        Redis,
+        Depends(
+            dependency=get_redis_client,
+        ),
+    ],
+) -> AuthenticationTokenRepo:
+    """Get the authentication token repo."""
+    return AuthenticationTokenRepo(
+        redis_client=redis_client,
+    )
+
+
+def get_password_reset_token_repo(
     session: Annotated[
         AsyncSession,
         Depends(
             dependency=get_database_session,
         ),
     ],
-    redis_client: Annotated[
-        Redis,
+) -> PasswordResetTokenRepo:
+    """Get the password reset token repo."""
+    return PasswordResetTokenRepo(
+        session=session,
+    )
+
+
+def get_user_session_repo(
+    session: Annotated[
+        AsyncSession,
         Depends(
-            dependency=get_redis_client,
+            dependency=get_database_session,
         ),
     ],
     geoip_reader: Annotated[
@@ -39,26 +65,43 @@ def get_auth_repo(
             dependency=get_geoip_reader,
         ),
     ],
-) -> AuthRepo:
-    """Get the auth repo."""
-    return AuthRepo(
+) -> UserSessionRepo:
+    """Get the user session repo."""
+    return UserSessionRepo(
         session=session,
-        redis_client=redis_client,
         geoip_reader=geoip_reader,
     )
 
 
 def get_auth_service(
-    auth_repo: Annotated[
-        AuthRepo,
+    user_session_repo: Annotated[
+        UserSessionRepo,
         Depends(
-            dependency=get_auth_repo,
+            dependency=get_user_session_repo,
+        ),
+    ],
+    password_reset_token_repo: Annotated[
+        PasswordResetTokenRepo,
+        Depends(
+            dependency=get_password_reset_token_repo,
+        ),
+    ],
+    authentication_token_repo: Annotated[
+        AuthenticationTokenRepo,
+        Depends(
+            dependency=get_authentication_token_repo,
         ),
     ],
     user_repo: Annotated[
         UserRepo,
         Depends(
             dependency=get_user_repo,
+        ),
+    ],
+    email_verification_token_repo: Annotated[
+        EmailVerificationTokenRepo,
+        Depends(
+            dependency=get_email_verification_token_repo,
         ),
     ],
     password_hasher: Annotated[
@@ -76,8 +119,11 @@ def get_auth_service(
 ) -> AuthService:
     """Get the auth service."""
     return AuthService(
-        auth_repo=auth_repo,
+        user_session_repo=user_session_repo,
+        password_reset_token_repo=password_reset_token_repo,
+        authentication_token_repo=authentication_token_repo,
         user_repo=user_repo,
+        email_verification_token_repo=email_verification_token_repo,
         password_hasher=password_hasher,
         geoip_reader=geoip_reader,
     )

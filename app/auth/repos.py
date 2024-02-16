@@ -15,15 +15,13 @@ from app.core.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
 from app.core.geo_ip import get_ip_location
 
 
-class AuthRepo:
+class UserSessionRepo:
     def __init__(
         self,
         session: AsyncSession,
-        redis_client: Redis,
         geoip_reader: Reader,
     ) -> None:
         self._session = session
-        self._redis_client = redis_client
         self._geoip_reader = geoip_reader
 
     async def create_user_session(
@@ -126,6 +124,14 @@ class AuthRepo:
                 logged_out_at=text("NOW()"),
             ),
         )
+
+
+class AuthenticationTokenRepo:
+    def __init__(
+        self,
+        redis_client: Redis,
+    ) -> None:
+        self._redis_client = redis_client
 
     async def create_authentication_token(
         self,
@@ -239,6 +245,11 @@ class AuthRepo:
                 user_id=user_id,
             ),
         )
+
+
+class PasswordResetTokenRepo:
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
 
     @staticmethod
     def generate_password_reset_token() -> str:
