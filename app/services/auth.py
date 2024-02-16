@@ -8,9 +8,8 @@ from geoip2.database import Reader
 from sqlalchemy import ScalarResult
 from user_agents.parsers import UserAgent
 
-from app.auth.types import UserInfo
 from app.lib.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
-from app.lib.geo_ip import get_city_location
+from app.lib.geo_ip import get_city_location, get_geoip_city
 from app.lib.security import check_password_strength
 from app.models.user import User
 from app.models.user_session import UserSession
@@ -19,6 +18,7 @@ from app.repositories.email_verification_token import EmailVerificationTokenRepo
 from app.repositories.password_reset_token import PasswordResetTokenRepo
 from app.repositories.user import UserRepo
 from app.repositories.user_session import UserSessionRepo
+from app.types.auth import UserInfo
 from app.worker import task_queue
 
 
@@ -70,8 +70,10 @@ class AuthService:
             device=user_agent.get_device(),
             browser_name=user_agent.get_browser(),
             location=get_city_location(
-                ip_address=request_ip,
-                geoip_reader=self._geoip_reader,
+                city=get_geoip_city(
+                    ip_address=request_ip,
+                    geoip_reader=self._geoip_reader,
+                ),
             ),
             ip_address=request_ip,
         )
@@ -189,13 +191,13 @@ class AuthService:
                 message="Invalid credentials provided.",
             ) from exception
 
+        # FIXME: send separate emails when new login location is detected and when
+        # new device is detected? What if both login location and device are different?
         if not await self._user_session_repo.check_if_exists(
             user_id=user.id,
             user_agent=str(user_agent),
             ip_address=request_ip,
         ):
-            # FIXME: maybe send emails only when new device is detected, and not login location.
-            # send the IP address as metadata alone.
             await task_queue.enqueue(
                 "send_new_login_location_detected_email",
                 receiver=user.email,
@@ -204,8 +206,10 @@ class AuthService:
                 device=user_agent.get_device(),
                 browser_name=user_agent.get_browser(),
                 location=get_city_location(
-                    ip_address=request_ip,
-                    geoip_reader=self._geoip_reader,
+                    city=get_geoip_city(
+                        ip_address=request_ip,
+                        geoip_reader=self._geoip_reader,
+                    ),
                 ),
                 ip_address=request_ip,
             )
@@ -296,8 +300,10 @@ class AuthService:
                 device=user_agent.get_device(),
                 browser_name=user_agent.get_browser(),
                 location=get_city_location(
-                    ip_address=request_ip,
-                    geoip_reader=self._geoip_reader,
+                    city=get_geoip_city(
+                        ip_address=request_ip,
+                        geoip_reader=self._geoip_reader,
+                    ),
                 ),
                 ip_address=request_ip,
             )
@@ -376,8 +382,10 @@ class AuthService:
             device=user_agent.get_device(),
             browser_name=user_agent.get_browser(),
             location=get_city_location(
-                ip_address=request_ip,
-                geoip_reader=self._geoip_reader,
+                city=get_geoip_city(
+                    ip_address=request_ip,
+                    geoip_reader=self._geoip_reader,
+                ),
             ),
             ip_address=request_ip,
         )

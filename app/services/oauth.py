@@ -1,7 +1,6 @@
 from fastapi_sso import OpenID
 from user_agents.parsers import UserAgent
 
-from app.models.user import User
 from app.repositories.user import UserRepo
 
 
@@ -17,7 +16,7 @@ class OAuthService:
         openid_user: OpenID,
         request_ip: str,
         user_agent: UserAgent,
-    ) -> tuple[str, User]:
+    ) -> None:
         """Login or register the user associated with the given OpenID credentials."""
         if openid_user.email is None:
             # raise error
