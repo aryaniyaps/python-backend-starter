@@ -79,8 +79,10 @@ class AuthService:
         """Register a new user."""
         if not check_password_strength(
             password=password,
-            username=username,
-            email=email,
+            context={
+                "username": username,
+                "email": email,
+            },
         ):
             raise InvalidInputError(
                 message="Enter a stronger password.",
@@ -318,8 +320,10 @@ class AuthService:
 
         if not check_password_strength(
             password=new_password,
-            username=existing_user.username,
-            email=existing_user.email,
+            context={
+                "username": existing_user.username,
+                "email": existing_user.email,
+            },
         ):
             raise InvalidInputError(
                 message="Enter a stronger password.",

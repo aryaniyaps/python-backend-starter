@@ -22,7 +22,7 @@ PRIMARY_RATE_LIMIT = "5000/hour"
 
 # password strength
 
-# score ranges from 0 - 4 as follows:
+# ZXCVBN algorithm score ranges from 0 - 4 as follows:
 
 # 0 too guessable: risky password. (guesses < 10^3)
 # 1 very guessable: protection from throttled online attacks. (guesses < 10^6)

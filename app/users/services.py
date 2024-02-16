@@ -78,8 +78,10 @@ class UserService:
 
         if not check_password_strength(
             password=new_password,
-            username=user.username,
-            email=user.email,
+            context={
+                "username": user.username,
+                "email": user.email,
+            },
         ):
             raise InvalidInputError(
                 message="Enter a stronger password.",

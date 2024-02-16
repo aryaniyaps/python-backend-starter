@@ -1,3 +1,5 @@
+from typing import TypedDict
+
 from argon2 import PasswordHasher
 from zxcvbn_rs_py import zxcvbn
 
@@ -9,16 +11,31 @@ def get_password_hasher() -> PasswordHasher:
     return PasswordHasher()
 
 
-def check_password_strength(password: str, username: str, email: str) -> bool:
+class PasswordStrengthContext(TypedDict):
+    """
+    Password strength context.
+
+    Context to consider while checking password strength.
+    """
+
+    email: str
+    username: str
+
+
+def check_password_strength(password: str, context: PasswordStrengthContext) -> bool:
     """
     Check the strength of the given password.
 
     Checks the strength of the given password with the other fields
     entered by the user in context (using the zxcvbn algorithm).
     """
-    password_strength = zxcvbn(
-        password=password,
-        user_inputs=[username, email],
+    return (
+        zxcvbn(
+            password=password,
+            user_inputs=[
+                context["username"],
+                context["email"],
+            ],
+        ).score
+        >= MIN_PASSWORD_ZXCVBN_SCORE
     )
-
-    return password_strength.score >= MIN_PASSWORD_ZXCVBN_SCORE
