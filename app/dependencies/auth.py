@@ -5,7 +5,6 @@ from fastapi import Depends, Security
 from fastapi.security import APIKeyHeader
 from geoip2.database import Reader
 
-from app.auth.types import UserInfo
 from app.core.geo_ip import get_geoip_reader
 from app.core.security import get_password_hasher
 from app.dependencies.authentication_token import get_authentication_token_repo
@@ -19,6 +18,7 @@ from app.repositories.password_reset_token import PasswordResetTokenRepo
 from app.repositories.user import UserRepo
 from app.repositories.user_session import UserSessionRepo
 from app.services.auth import AuthService
+from app.types.auth import UserInfo
 
 authentication_token_header = APIKeyHeader(name="X-Authentication-Token")
 

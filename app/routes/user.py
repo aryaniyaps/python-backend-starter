@@ -5,7 +5,6 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Header, Path
 from user_agents import parse
 
-from app.auth.types import UserInfo
 from app.core.constants import OpenAPITag
 from app.core.rate_limiter import RateLimiter
 from app.dependencies.auth import get_viewer_info
@@ -22,6 +21,7 @@ from app.schemas.user import (
     UserSchema,
 )
 from app.services.user import UserService
+from app.types.auth import UserInfo
 
 users_router = APIRouter(
     prefix="/users",
