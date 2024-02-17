@@ -15,6 +15,6 @@ health_router = APIRouter(
     summary="Check the health status of the application.",
     description="Provides information about the health status of the application.",
 )
-async def healthcheck() -> HealthCheckResult:
+async def check_health() -> HealthCheckResult:
     """Get the health status of the application."""
     return HealthCheckResult(status="OK")

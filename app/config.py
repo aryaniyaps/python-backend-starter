@@ -1,12 +1,12 @@
 from collections.abc import Sequence
-from enum import Enum
+from enum import StrEnum
 from typing import Annotated
 
 from pydantic import Field, PostgresDsn, RedisDsn, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Environment(str, Enum):
+class Environment(StrEnum):
     development = "development"
     testing = "testing"
     production = "production"

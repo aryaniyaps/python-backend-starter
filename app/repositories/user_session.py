@@ -29,6 +29,9 @@ class UserSessionRepo:
         user_agent: UserAgent,
     ) -> UserSession:
         """Create a new user session."""
+        # FIXME: review device strings, we get pretty much common strings
+        # like iPhone, so we can't possibly differentitate between device versions
+        # maybe pass device IDs instead?
         user_session = UserSession(
             user_id=user_id,
             ip_address=ip_address,

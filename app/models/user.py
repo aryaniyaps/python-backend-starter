@@ -11,6 +11,7 @@ from app.lib.constants import MAX_USERNAME_LENGTH
 from app.lib.database import Base
 
 if TYPE_CHECKING:
+    from app.models.oauth_account import OauthAccount
     from app.models.password_reset_token import PasswordResetToken
     from app.models.user_session import UserSession
 
@@ -50,6 +51,11 @@ class User(Base):
     )
 
     password_reset_tokens: Mapped[list["PasswordResetToken"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
+    oauth_accounts: Mapped[list["OauthAccount"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
     )
