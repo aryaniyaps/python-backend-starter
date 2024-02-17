@@ -9,6 +9,7 @@ from user_agents import parse
 from app.dependencies.ip_address import get_ip_address
 from app.dependencies.oauth import get_google_sso, get_oauth_service
 from app.lib.constants import OpenAPITag
+from app.lib.errors import InvalidInputError
 from app.services.oauth import OAuthService
 
 oauth_router = APIRouter(
@@ -34,8 +35,6 @@ async def google_login(
     ],
 ) -> RedirectResponse:
     """Redirect the user to the Google sign in URL."""
-    # TODO: pass the request ip_address and useragent also in the state
-    # after signing it with itsdangerous. This will be needed for user creation/ login
     return await google_sso.get_login_redirect(
         state=dumps({"redirect_to": redirect_to}),
         redirect_uri=str(
@@ -71,13 +70,12 @@ async def google_callback(
     openid_user = await google_sso.verify_and_process(request)
 
     if openid_user is None:
-        # TODO: raise error here
-        raise Exception
+        raise InvalidInputError(
+            message="Couldn't sign in user.",
+        )
 
     # TODO: We should probably have a SocialConnection/ Identity model that allows
     # users to connect to multiple social accounts
-    # TODO: check if the ip address and user agent are that of google's servers or
-    # of the client that initiated the oauth workflow
     authentication_token, user = await oauth_service.login_or_register_user(
         openid_user=openid_user,
         request_ip=request_ip,
