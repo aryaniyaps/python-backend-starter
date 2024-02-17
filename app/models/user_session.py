@@ -2,9 +2,8 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import Column, ForeignKey, String, text
+from sqlalchemy import ForeignKey, String, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.schema import Index
 from sqlalchemy.sql.functions import now
 
 from app.lib.database import Base
@@ -15,14 +14,6 @@ if TYPE_CHECKING:
 
 class UserSession(Base):
     __tablename__ = "user_sessions"
-
-    __table_args__ = (
-        Index(
-            "user_sessions_user_id_ip_address_idx",
-            Column("user_id"),
-            Column("ip_address"),
-        ),
-    )
 
     id: Mapped[UUID] = mapped_column(
         primary_key=True,

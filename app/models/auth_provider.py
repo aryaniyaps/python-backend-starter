@@ -15,10 +15,11 @@ if TYPE_CHECKING:
 
 class ProviderType(StrEnum):
     google = "google"
+    email = "email"
 
 
-class OauthAccount(Base):
-    __tablename__ = "oauth_accounts"
+class AuthProvider(Base):
+    __tablename__ = "auth_providers"
 
     provider: Mapped[ProviderType] = mapped_column(
         primary_key=True,
@@ -28,6 +29,11 @@ class OauthAccount(Base):
         ForeignKey("users.id"),
         primary_key=True,
     )
+
+    provider_user_id: Mapped[str]
+
+    # password hash is only set when te provider is `email`
+    password_hash: Mapped[str | None]
 
     created_at: Mapped[datetime] = mapped_column(
         server_default=now(),
