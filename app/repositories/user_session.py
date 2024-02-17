@@ -29,14 +29,15 @@ class UserSessionRepo:
         user_agent: UserAgent,
     ) -> UserSession:
         """Create a new user session."""
-        city = get_geoip_city(
-            ip_address=ip_address,
-            geoip_reader=self._geoip_reader,
-        )
         user_session = UserSession(
             user_id=user_id,
             ip_address=ip_address,
-            location=get_city_location(city),
+            location=get_city_location(
+                city=get_geoip_city(
+                    ip_address=ip_address,
+                    geoip_reader=self._geoip_reader,
+                ),
+            ),
             device=user_agent.device,
         )
         self._session.add(user_session)

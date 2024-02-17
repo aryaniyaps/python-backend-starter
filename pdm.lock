@@ -5,7 +5,7 @@
 groups = ["default", "dev", "test"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:8093af7763eca4e0e04dfa4f3c138af2330c8345d72cc38bee9d49fb4032feb5"
+content_hash = "sha256:da0449dd62f3c080ada65c98b412df669db49604a51f84aeee0b0ad297806f12"
 
 [[package]]
 name = "aiohttp"
@@ -908,6 +908,16 @@ groups = ["dev"]
 files = [
     {file = "mypy_extensions-1.0.0-py3-none-any.whl", hash = "sha256:4392f6c0eb8a5668a69e23d168ffa70f0be9ccfd32b5cc2d26a34ae5b844552d"},
     {file = "mypy_extensions-1.0.0.tar.gz", hash = "sha256:75dbf8955dc00442a438fc4d0666508a9a97b6bd41aa2f0ffe9d2f2725af0782"},
+]
+
+[[package]]
+name = "nanoid"
+version = "2.0.0"
+summary = "A tiny, secure, URL-friendly, unique string ID generator for Python"
+groups = ["default"]
+files = [
+    {file = "nanoid-2.0.0-py3-none-any.whl", hash = "sha256:90aefa650e328cffb0893bbd4c236cfd44c48bc1f2d0b525ecc53c3187b653bb"},
+    {file = "nanoid-2.0.0.tar.gz", hash = "sha256:5a80cad5e9c6e9ae3a41fa2fb34ae189f7cb420b2a5d8f82bd9d23466e4efa68"},
 ]
 
 [[package]]
