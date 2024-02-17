@@ -8,7 +8,6 @@ from user_agents.parsers import UserAgent
 
 from app.lib.geo_ip import (
     get_city_location,
-    get_city_subdivision_geoname_id,
     get_geoip_city,
 )
 from app.models.user_session import UserSession
@@ -30,9 +29,6 @@ class UserSessionRepo:
         user_agent: UserAgent,
     ) -> UserSession:
         """Create a new user session."""
-        # TODO: pass device ID here, like instagram does on register/ login
-        # TODO: check if we need to store user_agent, we seem to only need device here
-        # TODO: can we rename subdivision_geoname_id to subdivision_id or location_subdivision_id?
         city = get_geoip_city(
             ip_address=ip_address,
             geoip_reader=self._geoip_reader,
@@ -40,35 +36,22 @@ class UserSessionRepo:
         user_session = UserSession(
             user_id=user_id,
             ip_address=ip_address,
-            subdivision_geoname_id=get_city_subdivision_geoname_id(city),
             location=get_city_location(city),
-            user_agent=str(user_agent),
             device=user_agent.device,
         )
         self._session.add(user_session)
         await self._session.commit()
         return user_session
 
-    async def check_if_exists(
+    async def check_if_device_exists(
         self,
         user_id: UUID,
-        user_agent: UserAgent,
-        ip_address: str,
+        device: str,
     ) -> bool:
-        """Check whether user sessions for the user exist with the given user agent and IP address."""
-        # TODO: pass device ID here, like instagram does on register/ login
-        # TODO: handle case where subdivision_geoname_id is None
-        subdivision_geoname_id = get_city_subdivision_geoname_id(
-            city=get_geoip_city(
-                ip_address=ip_address,
-                geoip_reader=self._geoip_reader,
-            ),
-        )
+        """Check whether user sessions for the user exist with the given device."""
         results = await self._session.scalars(
             select(UserSession).where(
-                UserSession.user_id == user_id
-                and UserSession.device == user_agent.device
-                and UserSession.subdivision_geoname_id == subdivision_geoname_id
+                UserSession.user_id == user_id and UserSession.device == device
             ),
         )
         return results.first() is not None
@@ -95,7 +78,7 @@ class UserSessionRepo:
         user_session_id: UUID,
         user_id: UUID,
     ) -> None:
-        """Delete a user session."""
+        """Delete an user session."""
         await self._session.execute(
             delete(UserSession).where(
                 UserSession.id == user_session_id and UserSession.user_id == user_id,
@@ -107,7 +90,7 @@ class UserSessionRepo:
         user_session_id: UUID,
         logged_out_at: datetime | None,
     ) -> None:
-        """Delete a user session."""
+        """Update an user session."""
         await self._session.execute(
             update(UserSession)
             .where(UserSession.id == user_session_id)

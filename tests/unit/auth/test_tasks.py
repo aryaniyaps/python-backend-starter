@@ -9,9 +9,9 @@ from app.auth.tasks import (
 from app.config import settings
 from app.lib.constants import APP_URL
 from app.lib.templates import (
-    new_login_location_html,
-    new_login_location_subject,
-    new_login_location_text,
+    new_login_device_html,
+    new_login_device_subject,
+    new_login_device_text,
     onboarding_html,
     onboarding_subject,
     onboarding_text,
@@ -106,11 +106,11 @@ def test_send_new_login_location_detected_email() -> None:
     mock_email_sender.send.assert_called_with(
         sender=settings.email_from,
         receivers=[mock_user.email],
-        subject=new_login_location_subject.render(
+        subject=new_login_device_subject.render(
             username=mock_user.username,
             device=device,
         ),
-        text=new_login_location_text.render(
+        text=new_login_device_text.render(
             username=mock_user.username,
             login_timestamp=login_timestamp,
             device=device,
@@ -118,7 +118,7 @@ def test_send_new_login_location_detected_email() -> None:
             ip_address=ip_address,
             location=location,
         ),
-        html=new_login_location_html.render(
+        html=new_login_device_html.render(
             username=mock_user.username,
             login_timestamp=login_timestamp,
             device=device,

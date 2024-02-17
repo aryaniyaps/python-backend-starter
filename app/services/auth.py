@@ -191,15 +191,12 @@ class AuthService:
                 message="Invalid credentials provided.",
             ) from exception
 
-        # FIXME: send separate emails when new login location is detected and when
-        # new device is detected? What if both login location and device are different?
-        if not await self._user_session_repo.check_if_exists(
+        if not await self._user_session_repo.check_if_device_exists(
             user_id=user.id,
-            user_agent=user_agent,
-            ip_address=request_ip,
+            device=user_agent.device,
         ):
             await task_queue.enqueue(
-                "send_new_login_location_detected_email",
+                "send_new_login_device_detected_email",
                 receiver=user.email,
                 username=user.username,
                 login_timestamp=humanize.naturaldate(datetime.now(UTC)),

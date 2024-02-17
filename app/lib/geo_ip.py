@@ -27,13 +27,6 @@ def get_city_location(city: City | None) -> str:
     return format_geoip_city(city)
 
 
-def get_city_subdivision_geoname_id(city: City | None) -> int | None:
-    """Get the most specific subdivision's geoname ID from the given city."""
-    if city is not None:
-        return city.subdivisions.most_specific.geoname_id
-    return None
-
-
 @lru_cache
 def get_geoip_reader() -> Reader:
     """Get the GeoIP database reader."""

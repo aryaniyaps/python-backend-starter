@@ -131,16 +131,16 @@ onboarding_text = environment.get_template(
 )
 
 
-# new login location detected templates
+# new login device detected templates
 
-new_login_location_subject = environment.get_template(
-    name="emails/new-login-location/subject.txt",
+new_login_device_subject = environment.get_template(
+    name="emails/new-login-device/subject.txt",
 )
 
-new_login_location_html = environment.get_template(
-    name="emails/new-login-location/body.html",
+new_login_device_html = environment.get_template(
+    name="emails/new-login-device/body.html",
 )
 
-new_login_location_text = environment.get_template(
-    name="emails/new-login-location/body.txt",
+new_login_device_text = environment.get_template(
+    name="emails/new-login-device/body.txt",
 )

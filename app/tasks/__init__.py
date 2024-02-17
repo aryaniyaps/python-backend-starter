@@ -6,9 +6,9 @@ from app.lib.templates import (
     email_verification_request_html,
     email_verification_request_subject,
     email_verification_request_text,
-    new_login_location_html,
-    new_login_location_subject,
-    new_login_location_text,
+    new_login_device_html,
+    new_login_device_subject,
+    new_login_device_text,
     onboarding_html,
     onboarding_subject,
     onboarding_text,
@@ -78,7 +78,7 @@ def send_email_verification_request_email(
     )
 
 
-def send_new_login_location_detected_email(
+def send_new_login_device_detected_email(
     _ctx: Context,
     *,
     receiver: str,
@@ -89,14 +89,14 @@ def send_new_login_location_detected_email(
     ip_address: str,
     location: str,
 ) -> None:
-    """Send a new login location detected email to the given user."""
+    """Send a new login device detected email to the given user."""
     email_sender.send(
         sender=settings.email_from,
         receivers=[receiver],
-        subject=new_login_location_subject.render(
+        subject=new_login_device_subject.render(
             device=device,
         ),
-        text=new_login_location_text.render(
+        text=new_login_device_text.render(
             username=username,
             login_timestamp=login_timestamp,
             device=device,
@@ -104,7 +104,7 @@ def send_new_login_location_detected_email(
             ip_address=ip_address,
             location=location,
         ),
-        html=new_login_location_html.render(
+        html=new_login_device_html.render(
             username=username,
             login_timestamp=login_timestamp,
             device=device,

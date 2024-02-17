@@ -20,9 +20,9 @@
 - [x] Secure password changes
 - [x] Email notifications when password changes
 - [x] Changing or resetting password logs out the user from all sessions and deletes all of their authentication tokens
-- [ ] User session tracking
-   - [x] IP address, User agent and geolocation data storage
-   - [ ] Email notifications when new login location is detected
+- [x] User session tracking
+   - [x] IP address, device and geolocation data storage
+   - [x] Email notifications when new login device is detected
 - [x] The following metadata are attached with security notifications for enhanced user security:
    - Requester IP address
    - Requester device (based on the user agent)

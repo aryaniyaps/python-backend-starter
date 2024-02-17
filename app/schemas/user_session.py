@@ -37,14 +37,22 @@ class UserSessionSchema(BaseSchema):
         ),
     ]
 
-    user_agent: Annotated[
+    device: Annotated[
         str,
         Field(
             title="User Agent",
-            description="The user agent of the user session.",
+            description="The device of the user session.",
             examples=[
                 "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36",
             ],
+        ),
+    ]
+
+    logged_out_at: Annotated[
+        datetime | None,
+        Field(
+            title="Logged Out At",
+            description="When the user logged out of the session.",
         ),
     ]
 
