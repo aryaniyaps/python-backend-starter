@@ -26,7 +26,6 @@ class OauthAccount(Base):
 
     user_id: Mapped[UUID] = mapped_column(
         ForeignKey("users.id"),
-        index=True,
         primary_key=True,
     )
 
