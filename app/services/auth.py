@@ -346,17 +346,6 @@ class AuthService:
             user_id=existing_user.id,
         )
 
-        if await self._user_session_repo.check_if_exists_after(
-            user_id=existing_user.id,
-            timestamp=password_reset_token.created_at,
-        ):
-            # If the user has logged in again after generating the password
-            # reset token, the generated token becomes invalid.
-            # TODO: review logic here
-            raise InvalidInputError(
-                message="Invalid password reset token or email provided.",
-            )
-
         await self._user_repo.update(
             user=existing_user,
             password=new_password,

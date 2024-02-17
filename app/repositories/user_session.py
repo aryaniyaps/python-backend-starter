@@ -57,15 +57,6 @@ class UserSessionRepo:
         )
         return results.first() is not None
 
-    async def check_if_exists_after(self, user_id: UUID, timestamp: datetime) -> bool:
-        """Check whether user sessions for the user which are created after the given timestamp exist."""
-        results = await self._session.scalars(
-            select(UserSession).where(
-                UserSession.user_id == user_id and UserSession.created_at > timestamp
-            ),
-        )
-        return results.first() is not None
-
     async def get_all(self, user_id: UUID) -> ScalarResult[UserSession]:
         """Get user sessions for the given user ID."""
         return await self._session.scalars(
