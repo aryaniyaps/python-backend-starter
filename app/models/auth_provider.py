@@ -25,18 +25,19 @@ class AuthProvider(Base):
         primary_key=True,
     )
 
-    user_id: Mapped[UUID] = mapped_column(
-        ForeignKey("users.id"),
+    provider_user_id: Mapped[str] = mapped_column(
         primary_key=True,
     )
 
-    provider_user_id: Mapped[str]
-
-    # password hash is only set when te provider is `email`
+    # password hash is only set when the provider is `email`
     password_hash: Mapped[str | None]
 
     created_at: Mapped[datetime] = mapped_column(
         server_default=now(),
+    )
+
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey("users.id"),
     )
 
     user: Mapped["User"] = relationship(
