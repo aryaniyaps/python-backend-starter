@@ -53,6 +53,13 @@ class UserSchema(PartialUserSchema):
         ),
     ]
 
+    has_password: Annotated[
+        bool,
+        Field(
+            description="Whether the user has their password set.",
+        ),
+    ]
+
 
 class ChangeUserPasswordInput(BaseSchema):
     new_password: Annotated[

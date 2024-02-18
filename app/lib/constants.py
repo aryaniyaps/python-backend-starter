@@ -10,6 +10,9 @@ APP_URL = "https://example.com"  # frontend app URL
 
 # usernames
 
+# note: if this value is changed, the database migrations
+# should be updated
+
 MAX_USERNAME_LENGTH = 32
 
 # password reset tokens
@@ -41,7 +44,7 @@ MIN_PASSWORD_ZXCVBN_SCORE = 3
 
 
 class OpenAPITag(Enum):
-    """Tags used for OpenAPI path operations."""
+    """OpenAPI path operation tags."""
 
     USERS = "users"
     AUTHENTICATION = "authentication"

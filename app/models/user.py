@@ -1,9 +1,10 @@
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 from uuid import UUID
 
 from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import CITEXT
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql.functions import now
 
@@ -47,21 +48,26 @@ class User(Base):
         onupdate=now(),
     )
 
-    user_passwords: Mapped[list["UserPassword"]] = relationship(
+    user_password: Mapped[Optional["UserPassword"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
 
-    password_reset_tokens: Mapped[list["PasswordResetToken"]] = relationship(
+    password_reset_tokens: Mapped[set["PasswordResetToken"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
     )
 
-    auth_providers: Mapped[list["AuthProvider"]] = relationship(
+    auth_providers: Mapped[set["AuthProvider"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
     )
 
-    user_sessions: Mapped[list["UserSession"]] = relationship(
+    user_sessions: Mapped[set["UserSession"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
     )
+
+    @hybrid_property
+    def has_password(self) -> bool:
+        """Whether the user has their password set."""
+        return self.user_password is not None

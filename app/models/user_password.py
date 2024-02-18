@@ -37,5 +37,5 @@ class UserPassword(Base):
 
     user: Mapped["User"] = relationship(
         "User",
-        back_populates="user_passwords",
+        back_populates="user_password",
     )
