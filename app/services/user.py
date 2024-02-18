@@ -13,6 +13,7 @@ from app.models.user import User
 from app.repositories.authentication_token import AuthenticationTokenRepo
 from app.repositories.email_verification_token import EmailVerificationTokenRepo
 from app.repositories.user import UserRepo
+from app.repositories.user_password import UserPasswordRepo
 from app.repositories.user_session import UserSessionRepo
 from app.worker import task_queue
 
@@ -21,6 +22,7 @@ class UserService:
     def __init__(
         self,
         user_repo: UserRepo,
+        user_password_repo: UserPasswordRepo,
         email_verification_token_repo: EmailVerificationTokenRepo,
         authentication_token_repo: AuthenticationTokenRepo,
         user_session_repo: UserSessionRepo,
@@ -28,6 +30,7 @@ class UserService:
         geoip_reader: Reader,
     ) -> None:
         self._user_repo = user_repo
+        self._user_password_repo = user_password_repo
         self._email_verification_token_repo = email_verification_token_repo
         self._authentication_token_repo = authentication_token_repo
         self._user_session_repo = user_session_repo
@@ -76,9 +79,17 @@ class UserService:
         """Update the password for the given user."""
         user = await self.get_user_by_id(user_id=user_id)
 
+        user_password = await self._user_password_repo.get(user_id=user.id)
+
+        if user_password is None:
+            # user's password cannot be updated if it wasn't set in the first place.
+            raise InvalidInputError(
+                message="Cannot update user's password.",
+            )
+
         try:
             self._password_hasher.verify(
-                hash=user.password_hash,
+                hash=user_password.hash,
                 password=current_password,
             )
         except VerifyMismatchError as exception:
@@ -97,8 +108,8 @@ class UserService:
                 message="Enter a stronger password.",
             )
 
-        await self._user_repo.update(
-            user=user,
+        await self._user_password_repo.update(
+            user_password=user_password,
             password=new_password,
         )
 
@@ -140,9 +151,18 @@ class UserService:
         """Update the user with the given ID."""
         user = await self.get_user_by_id(user_id=user_id)
 
+        user_password = await self._user_password_repo.get(user_id=user.id)
+
+        if user_password is None:
+            # FIXME: implement separate email change flow for
+            # users who don't have passwords
+            raise InvalidInputError(
+                message="Cannot send email change request.",
+            )
+
         try:
             self._password_hasher.verify(
-                hash=user.password_hash,
+                hash=user_password.hash,
                 password=current_password,
             )
         except VerifyMismatchError as exception:

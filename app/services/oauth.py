@@ -7,8 +7,10 @@ from geoip2.database import Reader
 from user_agents.parsers import UserAgent
 
 from app.lib.constants import MAX_USERNAME_LENGTH
+from app.lib.enums import AuthProviderType
 from app.lib.errors import InvalidInputError
 from app.lib.geo_ip import get_city_location, get_geoip_city
+from app.repositories.auth_provider import AuthProviderRepo
 from app.repositories.authentication_token import AuthenticationTokenRepo
 from app.repositories.user import UserRepo
 from app.repositories.user_session import UserSessionRepo
@@ -20,12 +22,14 @@ class OAuthService:
         self,
         user_repo: UserRepo,
         authentication_token_repo: AuthenticationTokenRepo,
+        auth_provider_repo: AuthProviderRepo,
         user_session_repo: UserSessionRepo,
         geoip_reader: Reader,
     ) -> None:
         self._user_repo = user_repo
         self._user_session_repo = user_session_repo
         self._authentication_token_repo = authentication_token_repo
+        self._auth_provider_repo = auth_provider_repo
         self._geoip_reader = geoip_reader
 
     async def generate_unique_username(self, display_name: str) -> str:
@@ -76,6 +80,7 @@ class OAuthService:
         if existing_user is not None:
             # login user here
             # TODO: login user here only if they have logged in with this provider before
+            # TODO: review logic here
             if not await self._user_session_repo.check_if_device_exists(
                 user_id=existing_user.id,
                 device=user_agent.device,
@@ -111,11 +116,14 @@ class OAuthService:
             display_name=openid_user.display_name,
         )
 
-        # TODO: probably create oauth account model here?
         user = await self._user_repo.create(
             username=username,
             email=openid_user.email,
-            password="",
+        )
+
+        await self._auth_provider_repo.create(
+            user_id=user.id,
+            provider=AuthProviderType.google,
         )
 
         user_session = await self._user_session_repo.create(

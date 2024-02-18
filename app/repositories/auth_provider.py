@@ -3,7 +3,8 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.auth_provider import AuthProvider, ProviderType
+from app.lib.enums import AuthProviderType
+from app.models.auth_provider import AuthProvider
 
 
 class AuthProviderRepo:
@@ -13,20 +14,20 @@ class AuthProviderRepo:
     async def create(
         self,
         user_id: UUID,
-        provider: ProviderType,
-        provider_user_id: str,
+        provider: AuthProviderType,
     ) -> AuthProvider:
         """Create a new auth provider."""
         auth_provider = AuthProvider(
             user_id=user_id,
             provider=provider,
-            provider_user_id=provider_user_id,
         )
         self._session.add(auth_provider)
         await self._session.commit()
         return auth_provider
 
-    async def get(self, user_id: UUID, provider: ProviderType) -> AuthProvider | None:
+    async def get(
+        self, user_id: UUID, provider: AuthProviderType
+    ) -> AuthProvider | None:
         """Get the auth provider with the given provider and user ID."""
         return await self._session.scalar(
             select(AuthProvider).where(
@@ -37,7 +38,7 @@ class AuthProviderRepo:
     async def update(
         self,
         user_id: UUID,
-        provider: ProviderType,
+        provider: AuthProviderType,
         password: str | None,
     ) -> None:
         """Update an auth provider."""

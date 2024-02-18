@@ -8,15 +8,18 @@ from geoip2.database import Reader
 from sqlalchemy import ScalarResult
 from user_agents.parsers import UserAgent
 
+from app.lib.enums import AuthProviderType
 from app.lib.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
 from app.lib.geo_ip import get_city_location, get_geoip_city
 from app.lib.security import check_password_strength
 from app.models.user import User
 from app.models.user_session import UserSession
+from app.repositories.auth_provider import AuthProviderRepo
 from app.repositories.authentication_token import AuthenticationTokenRepo
 from app.repositories.email_verification_token import EmailVerificationTokenRepo
 from app.repositories.password_reset_token import PasswordResetTokenRepo
 from app.repositories.user import UserRepo
+from app.repositories.user_password import UserPasswordRepo
 from app.repositories.user_session import UserSessionRepo
 from app.types.auth import UserInfo
 from app.worker import task_queue
@@ -28,7 +31,9 @@ class AuthService:
         user_session_repo: UserSessionRepo,
         password_reset_token_repo: PasswordResetTokenRepo,
         authentication_token_repo: AuthenticationTokenRepo,
+        auth_provider_repo: AuthProviderRepo,
         user_repo: UserRepo,
+        user_password_repo: UserPasswordRepo,
         email_verification_token_repo: EmailVerificationTokenRepo,
         password_hasher: PasswordHasher,
         geoip_reader: Reader,
@@ -36,7 +41,9 @@ class AuthService:
         self._user_session_repo = user_session_repo
         self._password_reset_token_repo = password_reset_token_repo
         self._authentication_token_repo = authentication_token_repo
+        self._auth_provider_repo = auth_provider_repo
         self._user_repo = user_repo
+        self._user_password_repo = user_password_repo
         self._email_verification_token_repo = email_verification_token_repo
         self._password_hasher = password_hasher
         self._geoip_reader = geoip_reader
@@ -129,6 +136,15 @@ class AuthService:
             user = await self._user_repo.create(
                 username=username,
                 email=email,
+            )
+
+            await self._auth_provider_repo.create(
+                user_id=user.id,
+                provider=AuthProviderType.email_password,
+            )
+
+            await self._user_password_repo.create(
+                user_id=user.id,
                 password=password,
             )
 
@@ -177,13 +193,23 @@ class AuthService:
             user = await self._user_repo.get_by_username(
                 username=login,
             )
-        if not user:
+
+        if user is None:
             raise InvalidInputError(
                 message="Invalid credentials provided.",
             )
+
+        user_password = await self._user_password_repo.get(user_id=user.id)
+
+        if user_password is None:
+            # user must have registered with an oauth provider
+            raise InvalidInputError(
+                message="Cannot login user with email and password.",
+            )
+
         try:
             self._password_hasher.verify(
-                hash=user.password_hash,
+                hash=user_password.hash,
                 password=password,
             )
         except VerifyMismatchError as exception:
@@ -224,11 +250,11 @@ class AuthService:
         )
 
         if self._password_hasher.check_needs_rehash(
-            hash=user.password_hash,
+            hash=user_password.hash,
         ):
             # update user's password hash
-            user = await self._user_repo.update(
-                user=user,
+            await self._user_password_repo.update(
+                user_password=user_password,
                 password=password,
             )
 
@@ -346,10 +372,21 @@ class AuthService:
             user_id=existing_user.id,
         )
 
-        await self._user_repo.update(
-            user=existing_user,
-            password=new_password,
+        user_password = await self._user_password_repo.get(
+            user_id=existing_user.id,
         )
+
+        if user_password is None:
+            # user must have registered with an oauth provider
+            await self._user_password_repo.create(
+                user_id=existing_user.id,
+                password=new_password,
+            )
+        else:
+            await self._user_password_repo.update(
+                user_password=user_password,
+                password=new_password,
+            )
 
         # logout user everywhere
         await self._authentication_token_repo.delete_all(

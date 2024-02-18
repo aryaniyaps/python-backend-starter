@@ -2,34 +2,40 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, String, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql.functions import now
 
 from app.lib.database import Base
-from app.lib.enums import AuthProviderType
 
 if TYPE_CHECKING:
     from app.models.user import User
 
 
-class AuthProvider(Base):
-    __tablename__ = "auth_providers"
+class UserPassword(Base):
+    __tablename__ = "user_passwords"
 
-    provider: Mapped[AuthProviderType] = mapped_column(
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
+        server_default=text(
+            "gen_random_uuid()",
+        ),
     )
 
-    user_id: Mapped[UUID] = mapped_column(
-        ForeignKey("users.id"),
-        primary_key=True,
+    hash: Mapped[str] = mapped_column(
+        String(128),
     )
 
     created_at: Mapped[datetime] = mapped_column(
         server_default=now(),
     )
 
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey("users.id"),
+        unique=True,
+    )
+
     user: Mapped["User"] = relationship(
         "User",
-        back_populates="user_sessions",
+        back_populates="user_passwords",
     )

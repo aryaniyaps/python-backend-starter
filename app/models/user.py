@@ -13,6 +13,7 @@ from app.lib.database import Base
 if TYPE_CHECKING:
     from app.models.auth_provider import AuthProvider
     from app.models.password_reset_token import PasswordResetToken
+    from app.models.user_password import UserPassword
     from app.models.user_session import UserSession
 
 
@@ -38,16 +39,16 @@ class User(Base):
         index=True,
     )
 
-    # password_hash: Mapped[str] = mapped_column(
-    #     String(128),
-    # )
-
     created_at: Mapped[datetime] = mapped_column(
         server_default=now(),
     )
 
     updated_at: Mapped[datetime | None] = mapped_column(
         onupdate=now(),
+    )
+
+    user_passwords: Mapped[list["UserPassword"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
     )
 
     password_reset_tokens: Mapped[list["PasswordResetToken"]] = relationship(
