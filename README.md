@@ -9,7 +9,8 @@
 - [x] Password strength validation using the [ZXCVBN](https://github.com/dropbox/zxcvbn) algorithm
 - [x] Email verification on user registration
 - [ ] HOTP email verification tokens
-- [x] Verified email change requests
+- [x] Verified email change flow for users with email-password providers
+- [ ] Email change flow for users without passwords
 - [x] Email verification tokens are sha256 hashed
 - [x] User login
    - [x] Login based on either email or username

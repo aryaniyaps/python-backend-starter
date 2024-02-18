@@ -10,6 +10,7 @@ from app.config import settings
 from app.dependencies.ip_address import get_ip_address
 from app.dependencies.oauth import get_google_sso, get_oauth_service
 from app.lib.constants import OpenAPITag
+from app.lib.enums import AuthProviderType
 from app.services.oauth import OAuthService
 from app.utils.query_params import append_query_param
 
@@ -84,6 +85,7 @@ async def google_callback(
 
         authentication_token = await oauth_service.login_or_register_user(
             openid_user=openid_user,
+            provider=AuthProviderType.google,
             request_ip=request_ip,
             user_agent=parse(user_agent),
         )

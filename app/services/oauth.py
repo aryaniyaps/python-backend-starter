@@ -58,12 +58,11 @@ class OAuthService:
     async def login_or_register_user(
         self,
         openid_user: OpenID | None,
+        provider: AuthProviderType,
         request_ip: str,
         user_agent: UserAgent,
     ) -> str:
         """Login or register the user associated with the given OpenID credentials."""
-        # TODO: We should probably have a SocialConnection/ Identity model that allows
-        # users to connect to multiple social accounts
         if (
             openid_user is None
             or openid_user.display_name is None
@@ -123,7 +122,7 @@ class OAuthService:
 
         await self._auth_provider_repo.create(
             user_id=user.id,
-            provider=AuthProviderType.google,
+            provider=provider,
         )
 
         user_session = await self._user_session_repo.create(
