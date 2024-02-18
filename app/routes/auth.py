@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Annotated, Any
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header
 from sqlalchemy import ScalarResult
