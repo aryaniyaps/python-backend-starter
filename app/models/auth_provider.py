@@ -30,6 +30,8 @@ class AuthProvider(Base):
     )
 
     # password hash is only set when the provider is `email`
+    # or maybe generate random password string when user signs up with
+    # oauth2? this is how fief, django auth, zoom etc do it.
     password_hash: Mapped[str | None]
 
     created_at: Mapped[datetime] = mapped_column(

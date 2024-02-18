@@ -159,6 +159,8 @@ class Settings(BaseSettings):
 
     # oauth2 config
 
+    default_oauth2_redirect_to: str
+
     google_client_id: SecretStr
 
     google_client_secret: SecretStr

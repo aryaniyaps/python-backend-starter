@@ -29,6 +29,7 @@ jobs:
       SERVER_SERVER_EMAIL_PASSWORD:
       SERVER_EMAIL_FROM: "noreply@example.com"
       SERVER_GEOLITE2_DATABASE_PATH: ""
+      SERVER_DEFAULT_OAUTH2_REDIRECT_TO: ""
       SERVER_GOOGLE_CLIENT_ID: "client-id"
       SERVER_GOOGLE_CLIENT_SECRET: "client-secret"
       SERVER_SENTRY_DSN: ""

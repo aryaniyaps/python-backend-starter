@@ -9,7 +9,6 @@ from user_agents.parsers import UserAgent
 from app.lib.constants import MAX_USERNAME_LENGTH
 from app.lib.errors import InvalidInputError
 from app.lib.geo_ip import get_city_location, get_geoip_city
-from app.models.user import User
 from app.repositories.authentication_token import AuthenticationTokenRepo
 from app.repositories.user import UserRepo
 from app.repositories.user_session import UserSessionRepo
@@ -54,16 +53,18 @@ class OAuthService:
 
     async def login_or_register_user(
         self,
-        openid_user: OpenID,
+        openid_user: OpenID | None,
         request_ip: str,
         user_agent: UserAgent,
-    ) -> tuple[str, User]:
+    ) -> str:
         """Login or register the user associated with the given OpenID credentials."""
-        if openid_user.email is None:
-            raise InvalidInputError(
-                message="Couldn't sign in user.",
-            )
-        if openid_user.display_name is None:
+        # TODO: We should probably have a SocialConnection/ Identity model that allows
+        # users to connect to multiple social accounts
+        if (
+            openid_user is None
+            or openid_user.display_name is None
+            or openid_user.email is None
+        ):
             raise InvalidInputError(
                 message="Couldn't sign in user.",
             )
@@ -71,6 +72,7 @@ class OAuthService:
         existing_user = await self._user_repo.get_by_email(
             email=openid_user.email,
         )
+
         if existing_user is not None:
             # login user here
             # TODO: login user here only if they have logged in with this provider before
@@ -100,12 +102,10 @@ class OAuthService:
             )
 
             # create authentication token
-            authentication_token = await self._authentication_token_repo.create(
+            return await self._authentication_token_repo.create(
                 user_id=existing_user.id,
                 user_session_id=user_session.id,
             )
-
-            return authentication_token, existing_user
 
         username = await self.generate_unique_username(
             display_name=openid_user.display_name,
@@ -135,4 +135,4 @@ class OAuthService:
             username=user.username,
         )
 
-        return authentication_token, user
+        return authentication_token

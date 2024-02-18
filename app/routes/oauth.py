@@ -6,11 +6,12 @@ from fastapi.responses import RedirectResponse
 from fastapi_sso.sso.google import GoogleSSO
 from user_agents import parse
 
+from app.config import settings
 from app.dependencies.ip_address import get_ip_address
 from app.dependencies.oauth import get_google_sso, get_oauth_service
 from app.lib.constants import OpenAPITag
-from app.lib.errors import InvalidInputError
 from app.services.oauth import OAuthService
+from app.utils.query_params import append_query_param
 
 oauth_router = APIRouter(
     prefix="/oauth",
@@ -51,7 +52,9 @@ async def google_callback(
     user_agent: Annotated[str, Header()],
     request_ip: Annotated[
         str,
-        Depends(dependency=get_ip_address),
+        Depends(
+            dependency=get_ip_address,
+        ),
     ],
     google_sso: Annotated[
         GoogleSSO,
@@ -67,30 +70,35 @@ async def google_callback(
     ],
 ) -> RedirectResponse:
     """Login or register the user with the access token received."""
-    openid_user = await google_sso.verify_and_process(request)
+    try:
+        redirect_to = settings.default_oauth2_redirect_to
 
-    if openid_user is None:
-        raise InvalidInputError(
-            message="Couldn't sign in user.",
+        if google_sso.state is not None:
+            state = loads(google_sso.state)
+            redirect_to = state.get(
+                "redirect_to",
+                settings.default_oauth2_redirect_to,
+            )
+
+        openid_user = await google_sso.verify_and_process(request)
+
+        authentication_token = await oauth_service.login_or_register_user(
+            openid_user=openid_user,
+            request_ip=request_ip,
+            user_agent=parse(user_agent),
         )
 
-    # TODO: We should probably have a SocialConnection/ Identity model that allows
-    # users to connect to multiple social accounts
-    authentication_token, user = await oauth_service.login_or_register_user(
-        openid_user=openid_user,
-        request_ip=request_ip,
-        user_agent=parse(user_agent),
-    )
+        # Construct the redirect URL with the authentication token
+        redirect_url = append_query_param(
+            redirect_to, "authentication_token", authentication_token
+        )
 
-    # TODO: get user info with access token and login/ signup user here
-    # create user session and return authentication token here via query params
-    # if any error occurs, pass the error via query params
-    if google_sso.state is not None:
-        state = loads(google_sso.state)
-        redirect_to = state.get("redirect_to", "")
-    else:
-        redirect_to = ""
+        return RedirectResponse(url=redirect_url)
 
-    return RedirectResponse(
-        url=redirect_to,
-    )
+    except Exception:
+        error_message = "An error occurred during login."
+
+        # Construct the redirect URL with the error message
+        redirect_url = append_query_param(redirect_to, "error", error_message)
+
+        return RedirectResponse(url=redirect_url)

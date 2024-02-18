@@ -56,6 +56,8 @@ class EmailVerificationTokenRepo:
     @staticmethod
     def generate_token() -> str:
         """Generate an email verification token."""
+        # TODO: see https://github.com/privacyidea/privacyidea/blob/master/privacyidea/lib/tokens/emailtoken.py
+        # they seem to be sending HOTPs for email verification
         return token_hex(32)
 
     @staticmethod
