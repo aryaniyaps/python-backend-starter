@@ -8,12 +8,14 @@
    - [x] Email notifications for onboarding
 - [x] Password strength validation using the [ZXCVBN](https://github.com/dropbox/zxcvbn) algorithm
 - [x] Email verification on user registration
+- [ ] HOTP email verification tokens
 - [x] Verified email change requests
 - [x] Email verification tokens are sha256 hashed
 - [x] User login
    - [x] Login based on either email or username
    - [x] Passwords are rehashed upon login
 - [x] Password resets
+   - [ ] HOTP password reset tokens
    - [x] Password reset tokens are sha256 hashed
    - [x] Email notifications for password reset requests
    - [x] Email notifications when password resets
