@@ -23,7 +23,6 @@
    - [x] Email notifications for password reset requests
    - [x] Email notifications when password resets
 - [x] Secure password changes
-- [ ] Tracking of old user passwords
 - [x] Email notifications when password changes
 - [x] Changing or resetting password logs out the user from all sessions and deletes all of their authentication tokens
 - [x] User session tracking
