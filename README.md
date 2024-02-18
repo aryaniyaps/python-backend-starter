@@ -12,9 +12,11 @@
 - [x] Verified email change flow for users with email-password providers
 - [ ] Email change flow for users without passwords
 - [x] Email verification tokens are sha256 hashed
-- [x] User login
+- [x] User login (email-password)
    - [x] Login based on either email or username
    - [x] Passwords are rehashed upon login
+- [ ] Social login
+   - [ ] Sign in with Google
 - [x] Password resets
    - [ ] HOTP password reset tokens
    - [x] Password reset tokens are sha256 hashed
@@ -30,7 +32,6 @@
    - Requester IP address
    - Requester device (based on the user agent)
    - Geolocation data (based on IP)
-- [ ] Sign in with Google
 - [x] Structured logging support
 - [x] Rate limiting (Moving window strategy)
    - [x] Primary rate limiting (API-wide)
