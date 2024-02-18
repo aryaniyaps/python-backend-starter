@@ -35,11 +35,15 @@ class AuthProviderRepo:
             ),
         )
 
-    async def update(
+    async def check_if_exists(
         self,
         user_id: UUID,
         provider: AuthProviderType,
-        password: str | None,
-    ) -> None:
-        """Update an auth provider."""
-        raise NotImplementedError
+    ) -> bool:
+        """Check if the given provider exists for the user ID."""
+        results = await self._session.scalars(
+            select(AuthProvider).where(
+                AuthProvider.user_id == user_id and AuthProvider.provider == provider
+            ),
+        )
+        return results.first() is not None

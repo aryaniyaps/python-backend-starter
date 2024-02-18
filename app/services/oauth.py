@@ -78,8 +78,14 @@ class OAuthService:
 
         if existing_user is not None:
             # login user here
-            # TODO: login user here only if they have logged in with this provider before
-            # TODO: review logic here
+            if not await self._auth_provider_repo.check_if_exists(
+                user_id=existing_user.id,
+                provider=provider,
+            ):
+                # users must explicitly link auth providers before login
+                raise InvalidInputError(
+                    message="Couldn't sign in with the given provider.",
+                )
             if not await self._user_session_repo.check_if_device_exists(
                 user_id=existing_user.id,
                 device=user_agent.device,
@@ -99,6 +105,7 @@ class OAuthService:
                     ),
                     ip_address=request_ip,
                 )
+
             user_session = await self._user_session_repo.create(
                 user_id=existing_user.id,
                 ip_address=request_ip,
