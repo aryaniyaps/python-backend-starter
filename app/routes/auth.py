@@ -27,7 +27,7 @@ from app.schemas.auth import (
 from app.schemas.errors import InvalidInputErrorResult
 from app.schemas.user_session import UserSessionSchema
 from app.services.auth import AuthService
-from app.types.auth import UserInfo
+from app.types.auth import AuthenticationResult, UserInfo
 
 auth_router = APIRouter(
     prefix="/auth",
@@ -112,7 +112,7 @@ async def register_user(
             dependency=get_auth_service,
         ),
     ],
-) -> dict[str, Any]:
+) -> AuthenticationResult:
     """Register a new user."""
     authentication_token, user = await auth_service.register_user(
         email=data.email,
@@ -162,7 +162,7 @@ async def login_user(
             dependency=get_auth_service,
         ),
     ],
-) -> dict[str, Any]:
+) -> AuthenticationResult:
     """Login the current user."""
     authentication_token, user = await auth_service.login_user(
         login=data.login,
