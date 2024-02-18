@@ -98,6 +98,9 @@ async def google_callback(
     except Exception:
         error_message = "An error occurred during login."
 
+        # TODO: return error codes instead of error messages to prevent/
+        # reduce misuse of error message strings
+        # (abuse case: users can enter their own error messages in the URL and redirect)
         # Construct the redirect URL with the error message
         redirect_url = append_query_param(redirect_to, "error", error_message)
 
