@@ -30,5 +30,9 @@ class OauthAccountLinkingError(BaseError):
     """Indicate that the user is trying to login with a social account that has not been linked yet."""
 
 
+class OauthAccountCreateError(BaseError):
+    """Indicate that the user's oauth account couldn't be created."""
+
+
 class UnexpectedError(BaseError):
     """Indicate that an unexpected error has occurred."""

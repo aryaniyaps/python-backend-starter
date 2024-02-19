@@ -12,7 +12,7 @@ from app.dependencies.ip_address import get_ip_address
 from app.dependencies.oauth import get_google_sso, get_oauth_service
 from app.lib.constants import OpenAPITag
 from app.lib.enums import AuthProviderType
-from app.lib.errors import InvalidInputError, OauthAccountLinkingError
+from app.lib.errors import OauthAccountCreateError, OauthAccountLinkingError
 from app.services.oauth import OAuthService
 from app.utils.query_params import append_query_param
 
@@ -99,12 +99,14 @@ async def google_callback(
 
         return RedirectResponse(url=redirect_url)
 
-    except (SSOLoginError, InvalidInputError):
+    except (SSOLoginError, OauthAccountCreateError):
         redirect_url = append_query_param(redirect_to, "error_code", "login")
         return RedirectResponse(url=redirect_url)
 
     except OauthAccountLinkingError:
-        redirect_url = append_query_param(redirect_to, "error_code", "linking")
+        redirect_url = append_query_param(
+            redirect_to, "error_code", "account_not_linked"
+        )
         return RedirectResponse(url=redirect_url)
 
     except Exception:  # noqa: BLE001

@@ -8,7 +8,7 @@ from user_agents.parsers import UserAgent
 
 from app.lib.constants import MAX_USERNAME_LENGTH
 from app.lib.enums import AuthProviderType
-from app.lib.errors import InvalidInputError, OauthAccountLinkingError
+from app.lib.errors import OauthAccountCreateError, OauthAccountLinkingError
 from app.lib.geo_ip import get_city_location, get_geoip_city
 from app.repositories.auth_provider import AuthProviderRepo
 from app.repositories.authentication_token import AuthenticationTokenRepo
@@ -68,7 +68,7 @@ class OAuthService:
             or openid_user.display_name is None
             or openid_user.email is None
         ):
-            raise InvalidInputError(
+            raise OauthAccountCreateError(
                 message="Couldn't sign in user.",
             )
 
