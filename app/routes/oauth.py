@@ -99,16 +99,18 @@ async def google_callback(
 
         return RedirectResponse(url=redirect_url)
 
-    except (SSOLoginError, OauthAccountCreateError):
-        redirect_url = append_query_param(redirect_to, "error_code", "login")
+    except SSOLoginError:
+        redirect_url = append_query_param(redirect_to, "error_code", "oauth_callback")
+        return RedirectResponse(url=redirect_url)
+
+    except OauthAccountCreateError:
+        redirect_url = append_query_param(
+            redirect_to, "error_code", "oauth_account_create"
+        )
         return RedirectResponse(url=redirect_url)
 
     except OauthAccountLinkingError:
         redirect_url = append_query_param(
-            redirect_to, "error_code", "account_not_linked"
+            redirect_to, "error_code", "oauth_account_not_linked"
         )
-        return RedirectResponse(url=redirect_url)
-
-    except Exception:  # noqa: BLE001
-        redirect_url = append_query_param(redirect_to, "error_code", "unexpected")
         return RedirectResponse(url=redirect_url)
