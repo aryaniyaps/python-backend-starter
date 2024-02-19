@@ -99,7 +99,6 @@ class RegisterUserInput(BaseSchema):
         Field(
             min_length=8,
             max_length=64,
-            pattern=r"(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W])",
             examples=[
                 "super-Secret12!",
             ],
@@ -170,7 +169,6 @@ class PasswordResetInput(BaseSchema):
         Field(
             min_length=8,
             max_length=64,
-            pattern=r"(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W])",
             examples=[
                 "super-Secret12!",
             ],

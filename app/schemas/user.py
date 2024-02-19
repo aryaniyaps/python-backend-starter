@@ -67,7 +67,6 @@ class ChangeUserPasswordInput(BaseSchema):
         Field(
             min_length=8,
             max_length=64,
-            pattern=r"(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W])",
             examples=[
                 "new-super-Secret12!",
             ],

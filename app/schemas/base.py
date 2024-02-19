@@ -12,5 +12,4 @@ class BaseSchema(BaseModel):
         from_attributes=True,
         populate_by_name=True,
         alias_generator=_snake_to_camel,
-        regex_engine="python-re",
     )
