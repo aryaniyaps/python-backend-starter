@@ -26,5 +26,9 @@ class UnauthenticatedError(BaseError):
     """Indicate that the client has not authenticated yet."""
 
 
+class OauthAccountLinkingError(BaseError):
+    """Indicate that the user is trying to login with a social account that has not been linked yet."""
+
+
 class UnexpectedError(BaseError):
     """Indicate that an unexpected error has occurred."""

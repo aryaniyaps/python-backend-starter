@@ -15,8 +15,8 @@
 - [x] User login (email-password)
    - [x] Login based on either email or username
    - [x] Passwords are rehashed upon login
-- [ ] Social login
-   - [ ] Sign in with Google
+- [x] Social login
+   - [x] Sign in with Google
 - [x] Password resets
    - [ ] HOTP password reset tokens
    - [x] Password reset tokens are sha256 hashed

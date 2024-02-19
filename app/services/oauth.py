@@ -8,7 +8,7 @@ from user_agents.parsers import UserAgent
 
 from app.lib.constants import MAX_USERNAME_LENGTH
 from app.lib.enums import AuthProviderType
-from app.lib.errors import InvalidInputError
+from app.lib.errors import InvalidInputError, OauthAccountLinkingError
 from app.lib.geo_ip import get_city_location, get_geoip_city
 from app.repositories.auth_provider import AuthProviderRepo
 from app.repositories.authentication_token import AuthenticationTokenRepo
@@ -83,7 +83,7 @@ class OAuthService:
                 provider=provider,
             ):
                 # users must explicitly link auth providers before login
-                raise InvalidInputError(
+                raise OauthAccountLinkingError(
                     message="Couldn't sign in with the given provider.",
                 )
             if not await self._user_session_repo.check_if_device_exists(

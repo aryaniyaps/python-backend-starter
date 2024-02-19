@@ -3,6 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header, Query, Request
 from fastapi.responses import RedirectResponse
+from fastapi_sso.sso.base import SSOLoginError
 from fastapi_sso.sso.google import GoogleSSO
 from user_agents import parse
 
@@ -11,6 +12,7 @@ from app.dependencies.ip_address import get_ip_address
 from app.dependencies.oauth import get_google_sso, get_oauth_service
 from app.lib.constants import OpenAPITag
 from app.lib.enums import AuthProviderType
+from app.lib.errors import InvalidInputError, OauthAccountLinkingError
 from app.services.oauth import OAuthService
 from app.utils.query_params import append_query_param
 
@@ -97,11 +99,14 @@ async def google_callback(
 
         return RedirectResponse(url=redirect_url)
 
-    except Exception:
-        # TODO: return error codes instead of error messages to prevent/
-        # reduce misuse of error message strings
-        # (abuse case: users can enter their own error messages in the URL and redirect)
-        # Construct the redirect URL with the error code
-        redirect_url = append_query_param(redirect_to, "error_code", "unexpected_error")
+    except (SSOLoginError, InvalidInputError):
+        redirect_url = append_query_param(redirect_to, "error_code", "login")
+        return RedirectResponse(url=redirect_url)
 
+    except OauthAccountLinkingError:
+        redirect_url = append_query_param(redirect_to, "error_code", "linking")
+        return RedirectResponse(url=redirect_url)
+
+    except Exception:  # noqa: BLE001
+        redirect_url = append_query_param(redirect_to, "error_code", "unexpected")
         return RedirectResponse(url=redirect_url)
