@@ -32,7 +32,7 @@ class OAuthService:
         self._auth_provider_repo = auth_provider_repo
         self._geoip_reader = geoip_reader
 
-    async def generate_unique_username(self, display_name: str) -> str:
+    async def generate_username(self, display_name: str) -> str:
         """Generate an unique username based on the given display name."""
         base_username = display_name.strip().replace(" ", "_")
 
@@ -118,7 +118,7 @@ class OAuthService:
                 user_session_id=user_session.id,
             )
 
-        username = await self.generate_unique_username(
+        username = await self.generate_username(
             display_name=openid_user.display_name,
         )
 
