@@ -15,6 +15,14 @@
 - [x] User login (email-password)
    - [x] Login based on either email or username
    - [x] Passwords are rehashed upon login
+   - [x] Email notifications when new login device is detected
+- [x] User session tracking
+   - [x] IP address, device and geolocation data storage
+- [x] The following metadata are attached with security notifications for enhanced user security:
+   - Requester IP address
+   - Requester device (based on the user agent)
+   - Geolocation data (based on IP)
+- [ ] Social authentication providers must be explicitly linked by the user
 - [x] Social login
    - [x] Sign in with Google
    - [x] Sign in with Facebook
@@ -26,13 +34,6 @@
 - [x] Secure password changes
 - [x] Email notifications when password changes
 - [x] Changing or resetting password logs out the user from all sessions and deletes all of their authentication tokens
-- [x] User session tracking
-   - [x] IP address, device and geolocation data storage
-   - [x] Email notifications when new login device is detected
-- [x] The following metadata are attached with security notifications for enhanced user security:
-   - Requester IP address
-   - Requester device (based on the user agent)
-   - Geolocation data (based on IP)
 - [x] Structured logging support
 - [x] Rate limiting (Moving window strategy)
    - [x] Primary rate limiting (API-wide)
