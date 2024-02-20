@@ -1,5 +1,6 @@
+import secrets
+import string
 from hashlib import sha256
-from secrets import token_urlsafe
 from uuid import UUID
 
 from sqlalchemy import delete, select, text
@@ -16,7 +17,7 @@ class PasswordResetTokenRepo:
     @staticmethod
     def generate_token() -> str:
         """Generate a password reset token."""
-        return token_urlsafe(16)
+        return "".join(secrets.choice(string.digits) for i in range(8))
 
     @staticmethod
     def hash_token(password_reset_token: str) -> str:

@@ -1,5 +1,6 @@
+import secrets
+import string
 from hashlib import sha256
-from secrets import token_urlsafe
 
 from sqlalchemy import delete, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -56,7 +57,7 @@ class EmailVerificationTokenRepo:
     @staticmethod
     def generate_token() -> str:
         """Generate an email verification token."""
-        return token_urlsafe(16)
+        return "".join(secrets.choice(string.digits) for i in range(8))
 
     @staticmethod
     def hash_token(email_verification_token: str) -> str:

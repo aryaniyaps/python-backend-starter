@@ -8,10 +8,10 @@
    - [x] Email notifications for onboarding
 - [x] Password strength validation using the [ZXCVBN](https://github.com/dropbox/zxcvbn) algorithm
 - [x] Email verification on user registration
-- [ ] HOTP email verification tokens
+- [x] 8 digit email verification codes
 - [x] Email change flow for users with passwords
 - [ ] Email change flow for users without passwords
-- [x] Email verification tokens are sha256 hashed
+- [x] Email verification codes are sha256 hashed
 - [x] User login (email-password)
    - [x] Login based on either email or username
    - [x] Passwords are rehashed upon login
@@ -19,8 +19,8 @@
    - [x] Sign in with Google
    - [x] Sign in with Facebook
 - [x] Password resets
-   - [ ] HOTP password reset tokens
-   - [x] Password reset tokens are sha256 hashed
+   - [x] 8 digit password reset codes
+   - [x] Password reset codes are sha256 hashed
    - [x] Email notifications for password reset requests
    - [x] Email notifications when password resets
 - [x] Secure password changes
