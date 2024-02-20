@@ -165,6 +165,10 @@ class Settings(BaseSettings):
 
     google_client_secret: SecretStr
 
+    facebook_client_id: SecretStr
+
+    facebook_client_secret: SecretStr
+
     # sentry config
 
     sentry_dsn: Annotated[

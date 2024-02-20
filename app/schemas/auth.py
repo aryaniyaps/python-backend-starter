@@ -2,6 +2,7 @@ from typing import Annotated
 
 from pydantic import EmailStr, Field, SecretStr
 
+from app.lib.constants import MAX_USERNAME_LENGTH, MIN_USERNAME_LENGTH
 from app.schemas.base import BaseSchema
 from app.schemas.user import UserSchema
 
@@ -66,8 +67,8 @@ class RegisterUserInput(BaseSchema):
     username: Annotated[
         str,
         Field(
-            max_length=32,
-            min_length=2,
+            max_length=MAX_USERNAME_LENGTH,
+            min_length=MIN_USERNAME_LENGTH,
             examples=[
                 "aryaniyaps",
             ],

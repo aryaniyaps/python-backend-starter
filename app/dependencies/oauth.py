@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import Depends
+from fastapi_sso.sso.facebook import FacebookSSO
 from fastapi_sso.sso.google import GoogleSSO
 from geoip2.database import Reader
 
@@ -64,5 +65,14 @@ def get_google_sso() -> GoogleSSO:
     return GoogleSSO(
         client_id=settings.google_client_id.get_secret_value(),
         client_secret=settings.google_client_secret.get_secret_value(),
+        allow_insecure_http=settings.is_development(),
+    )
+
+
+def get_facebook_sso() -> FacebookSSO:
+    """Get the Facebook SSO instance."""
+    return FacebookSSO(
+        client_id=settings.facebook_client_id.get_secret_value(),
+        client_secret=settings.facebook_client_secret.get_secret_value(),
         allow_insecure_http=settings.is_development(),
     )

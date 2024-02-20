@@ -17,6 +17,7 @@
    - [x] Passwords are rehashed upon login
 - [x] Social login
    - [x] Sign in with Google
+   - [x] Sign in with Facebook
 - [x] Password resets
    - [ ] HOTP password reset tokens
    - [x] Password reset tokens are sha256 hashed
@@ -122,6 +123,28 @@ To obtain the Google Client ID and Client Secret, follow these steps:
     ```
     SERVER_GOOGLE_CLIENT_ID=<Client ID>
     SERVER_GOOGLE_CLIENT_SECRET=<Client Secret>
+    ```
+
+### Oauth2 app configuration (Facebook)
+
+To configure Facebook OAuth2 authentication for your application, follow these steps:
+
+1. Go to the [Facebook Developers](https://developers.facebook.com/) website and log in with your Facebook account.
+2. If you haven't already, create a new app by navigating to the My Apps page and clicking on the Create App button. Follow the prompts to set up a new app.
+3. After creating the app, you'll be redirected to the app dashboard. In the left sidebar, select Settings > Basic.
+4. In the Basic Settings section, configure your app details including the App Domains and Privacy Policy URL as required.
+5. Under the Add Platform section, click on + Add Platform and choose Website.
+6. Enter your website URL in the Site URL field. Make sure to include the following redirect URI for OAuth callbacks *(assuming you are running at port 8000 on localhost)*:
+
+   **http://localhost:8000/api/oauth/facebook/callback**
+
+7. Once the configuration is complete, click on Save Changes.
+8. Now, navigate to the Settings > Basic section again to retrieve your App ID and App Secret.
+9. Paste the Client ID and Client secret into the `.env` file as follows:
+
+    ```
+    SERVER_FACEBOOK_CLIENT_ID=<Client ID>
+    SERVER_FACEBOOK_CLIENT_SECRET=<Client Secret>
     ```
 
 ## Running the project

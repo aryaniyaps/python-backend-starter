@@ -15,6 +15,8 @@ APP_URL = "https://example.com"  # frontend app URL
 
 MAX_USERNAME_LENGTH = 32
 
+MIN_USERNAME_LENGTH = 2
+
 # password reset tokens
 
 PASSWORD_RESET_TOKEN_EXPIRES_IN = 300  # 5 minutes

@@ -32,6 +32,8 @@ jobs:
       SERVER_DEFAULT_OAUTH2_REDIRECT_TO: ""
       SERVER_GOOGLE_CLIENT_ID: "client-id"
       SERVER_GOOGLE_CLIENT_SECRET: "client-secret"
+      SERVER_FACEBOOK_CLIENT_ID: "client-id"
+      SERVER_FACEBOOK_CLIENT_SECRET: "client-secret"
       SERVER_SENTRY_DSN: ""
       SERVER_SENTRY_SAMPLE_RATE: 1.0
 
