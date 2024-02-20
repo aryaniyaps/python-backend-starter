@@ -31,6 +31,8 @@ class UserEmail(Base):
         server_default=now(),
     )
 
+    # TODO: add attribute is_verified?
+
     user_id: Mapped[UUID] = mapped_column(
         ForeignKey("users.id"),
         unique=True,
