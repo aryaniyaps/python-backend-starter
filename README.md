@@ -8,7 +8,7 @@
    - [x] Email notifications for onboarding
 - [x] Password strength validation using the [ZXCVBN](https://github.com/dropbox/zxcvbn) algorithm
 - [x] Email verification on user registration
-- [x] 8 digit email verification codes
+- [x] 8 digit cryptographically secure email verification codes
 - [x] Email change flow for users with passwords
 - [ ] Email change flow for users without passwords
 - [x] Email verification codes are sha256 hashed
@@ -19,7 +19,7 @@
    - [x] Sign in with Google
    - [x] Sign in with Facebook
 - [x] Password resets
-   - [x] 8 digit password reset codes
+   - [x] 8 digit cryptographically secure password reset codes
    - [x] Password reset codes are sha256 hashed
    - [x] Email notifications for password reset requests
    - [x] Email notifications when password resets
