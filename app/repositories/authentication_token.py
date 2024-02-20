@@ -4,7 +4,7 @@ from uuid import UUID
 
 from redis.asyncio import Redis
 
-from app.auth.types import UserInfo
+from app.types.auth import UserInfo
 
 
 class AuthenticationTokenRepo:

@@ -11,7 +11,7 @@ from app.logger import build_worker_log_config, setup_logging
 from app.sentry import setup_sentry
 from app.tasks import (
     send_email_verification_request_email,
-    send_new_login_location_detected_email,
+    send_new_login_device_detected_email,
     send_onboarding_email,
     send_password_reset_email,
     send_password_reset_request_email,
@@ -76,7 +76,7 @@ if __name__ == "__main__":
         functions=[
             send_password_reset_email,
             send_password_reset_request_email,
-            send_new_login_location_detected_email,
+            send_new_login_device_detected_email,
             send_onboarding_email,
             send_email_verification_request_email,
         ],
