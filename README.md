@@ -103,7 +103,8 @@ To setup the project for downloading and automatically updating the Maxmind GeoL
     └── ...
     ```
 
-### Oauth2 app configuration (Google)
+### Oauth2 apps configuration
+#### Google
 
 To obtain the Google Client ID and Client Secret, follow these steps:
 
@@ -125,7 +126,7 @@ To obtain the Google Client ID and Client Secret, follow these steps:
     SERVER_GOOGLE_CLIENT_SECRET=<Client Secret>
     ```
 
-### Oauth2 app configuration (Facebook)
+#### Facebook
 
 To configure Facebook OAuth2 authentication for your application, follow these steps:
 
