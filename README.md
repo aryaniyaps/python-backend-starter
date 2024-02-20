@@ -106,7 +106,7 @@ To setup the project for downloading and automatically updating the Maxmind GeoL
 ### Oauth2 apps configuration
 #### Google
 
-To obtain the Google Client ID and Client Secret, follow these steps:
+To configure Google OAuth2 authentication for your application, follow these steps:
 
 1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
 2. [Create a new project](https://console.cloud.google.com/projectcreate) or select an existing one.

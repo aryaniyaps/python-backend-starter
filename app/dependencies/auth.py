@@ -6,15 +6,15 @@ from fastapi.security import APIKeyHeader
 from geoip2.database import Reader
 
 from app.dependencies.authentication_token import get_authentication_token_repo
-from app.dependencies.email_verification_token import get_email_verification_token_repo
-from app.dependencies.password_reset_token import get_password_reset_token_repo
+from app.dependencies.email_verification_code import get_email_verification_code_repo
+from app.dependencies.password_reset_code import get_password_reset_code_repo
 from app.dependencies.user import get_user_repo
 from app.dependencies.user_session import get_user_session_repo
 from app.lib.geo_ip import get_geoip_reader
 from app.lib.security import get_password_hasher
 from app.repositories.authentication_token import AuthenticationTokenRepo
-from app.repositories.email_verification_token import EmailVerificationTokenRepo
-from app.repositories.password_reset_token import PasswordResetTokenRepo
+from app.repositories.email_verification_code import EmailVerificationCodeRepo
+from app.repositories.password_reset_code import PasswordResetCodeRepo
 from app.repositories.user import UserRepo
 from app.repositories.user_session import UserSessionRepo
 from app.services.auth import AuthService
@@ -31,9 +31,9 @@ def get_auth_service(
         ),
     ],
     password_reset_token_repo: Annotated[
-        PasswordResetTokenRepo,
+        PasswordResetCodeRepo,
         Depends(
-            dependency=get_password_reset_token_repo,
+            dependency=get_password_reset_code_repo,
         ),
     ],
     authentication_token_repo: Annotated[
@@ -49,9 +49,9 @@ def get_auth_service(
         ),
     ],
     email_verification_token_repo: Annotated[
-        EmailVerificationTokenRepo,
+        EmailVerificationCodeRepo,
         Depends(
-            dependency=get_email_verification_token_repo,
+            dependency=get_email_verification_code_repo,
         ),
     ],
     password_hasher: Annotated[
@@ -73,7 +73,7 @@ def get_auth_service(
         password_reset_token_repo=password_reset_token_repo,
         authentication_token_repo=authentication_token_repo,
         user_repo=user_repo,
-        email_verification_token_repo=email_verification_token_repo,
+        email_verification_code_repo=email_verification_token_repo,
         password_hasher=password_hasher,
         geoip_reader=geoip_reader,
     )

@@ -11,7 +11,7 @@ from app.lib.geo_ip import get_city_location, get_geoip_city
 from app.lib.security import check_password_strength
 from app.models.user import User
 from app.repositories.authentication_token import AuthenticationTokenRepo
-from app.repositories.email_verification_token import EmailVerificationTokenRepo
+from app.repositories.email_verification_code import EmailVerificationCodeRepo
 from app.repositories.user import UserRepo
 from app.repositories.user_password import UserPasswordRepo
 from app.repositories.user_session import UserSessionRepo
@@ -23,7 +23,7 @@ class UserService:
         self,
         user_repo: UserRepo,
         user_password_repo: UserPasswordRepo,
-        email_verification_token_repo: EmailVerificationTokenRepo,
+        email_verification_code_repo: EmailVerificationCodeRepo,
         authentication_token_repo: AuthenticationTokenRepo,
         user_session_repo: UserSessionRepo,
         password_hasher: PasswordHasher,
@@ -31,7 +31,7 @@ class UserService:
     ) -> None:
         self._user_repo = user_repo
         self._user_password_repo = user_password_repo
-        self._email_verification_token_repo = email_verification_token_repo
+        self._email_verification_code_repo = email_verification_code_repo
         self._authentication_token_repo = authentication_token_repo
         self._user_session_repo = user_session_repo
         self._password_hasher = password_hasher
@@ -181,7 +181,7 @@ class UserService:
                 message="User with that email already exists.",
             )
 
-        verification_token = await self._email_verification_token_repo.create(
+        verification_token = await self._email_verification_code_repo.create(
             email=email
         )
 
@@ -205,27 +205,25 @@ class UserService:
         self,
         user_id: UUID,
         email: str,
-        email_verification_token: str,
+        email_verification_code: str,
     ) -> User:
         """Update the email for the given user."""
         user = await self.get_user_by_id(user_id=user_id)
 
-        verification_token = (
-            await self._email_verification_token_repo.get_by_token_email(
-                verification_token=email_verification_token,
-                email=email,
-            )
+        verification_code = await self._email_verification_code_repo.get_by_code_email(
+            verification_code=email_verification_code,
+            email=email,
         )
 
         if (
-            verification_token is None
-            or datetime.now(UTC) > verification_token.expires_at
+            verification_code is None
+            or datetime.now(UTC) > verification_code.expires_at
         ):
             raise InvalidInputError(
-                message="Invalid email or email verification token provided."
+                message="Invalid email or email verification code provided."
             )
 
-        await self._email_verification_token_repo.delete_all(email=email)
+        await self._email_verification_code_repo.delete_all(email=email)
 
         return await self._user_repo.update(
             user=user,

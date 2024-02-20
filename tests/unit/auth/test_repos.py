@@ -4,7 +4,7 @@ from hashlib import sha256
 import pytest
 from app.auth.models import PasswordResetToken
 from app.auth.repos import AuthRepo
-from app.lib.constants import PASSWORD_RESET_TOKEN_EXPIRES_IN
+from app.lib.constants import PASSWORD_RESET_CODE_EXPIRES_IN
 from app.users.models import User
 from redis.asyncio import Redis
 
@@ -145,7 +145,7 @@ async def test_get_password_reset_token(user: User, auth_repo: AuthRepo) -> None
     assert (
         retrieved_reset_token.expires_at - retrieved_reset_token.created_at
         == timedelta(
-            seconds=PASSWORD_RESET_TOKEN_EXPIRES_IN,
+            seconds=PASSWORD_RESET_CODE_EXPIRES_IN,
         )
     )
 

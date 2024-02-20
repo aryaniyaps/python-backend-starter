@@ -4,18 +4,18 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.lib.database import get_database_session
-from app.repositories.password_reset_token import PasswordResetTokenRepo
+from app.repositories.password_reset_code import PasswordResetCodeRepo
 
 
-def get_password_reset_token_repo(
+def get_password_reset_code_repo(
     session: Annotated[
         AsyncSession,
         Depends(
             dependency=get_database_session,
         ),
     ],
-) -> PasswordResetTokenRepo:
-    """Get the password reset token repo."""
-    return PasswordResetTokenRepo(
+) -> PasswordResetCodeRepo:
+    """Get the password reset code repo."""
+    return PasswordResetCodeRepo(
         session=session,
     )

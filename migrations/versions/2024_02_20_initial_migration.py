@@ -1,9 +1,9 @@
 """
 initial migration
 
-Revision ID: 9c87497c0f0d
+Revision ID: f3ca079c5282
 Revises: 7a23de63905c
-Create Date: 2024-02-20 17:07:43.264174
+Create Date: 2024-02-20 18:53:21.257289
 
 """
 
@@ -14,7 +14,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = "9c87497c0f0d"
+revision: str = "f3ca079c5282"
 down_revision: str | None = "7a23de63905c"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -22,31 +22,31 @@ depends_on: str | Sequence[str] | None = None
 
 def upgrade() -> None:
     op.create_table(
-        "email_verification_tokens",
+        "email_verification_codes",
         sa.Column(
             "id", sa.Uuid(), server_default=sa.text("gen_random_uuid()"), nullable=False
         ),
         sa.Column("email", postgresql.CITEXT(length=250), nullable=False),
-        sa.Column("token_hash", sa.String(length=255), nullable=False),
+        sa.Column("code_hash", sa.String(length=255), nullable=False),
         sa.Column("expires_at", sa.DateTime(timezone=True), nullable=False),
-        sa.PrimaryKeyConstraint("id", name=op.f("email_verification_tokens_pkey")),
+        sa.PrimaryKeyConstraint("id", name=op.f("email_verification_codes_pkey")),
     )
     op.create_index(
-        op.f("email_verification_tokens_email_idx"),
-        "email_verification_tokens",
+        op.f("email_verification_codes_code_hash_idx"),
+        "email_verification_codes",
+        ["code_hash"],
+        unique=False,
+    )
+    op.create_index(
+        "email_verification_codes_email_code_hash_idx",
+        "email_verification_codes",
+        ["email", "code_hash"],
+        unique=False,
+    )
+    op.create_index(
+        op.f("email_verification_codes_email_idx"),
+        "email_verification_codes",
         ["email"],
-        unique=False,
-    )
-    op.create_index(
-        "email_verification_tokens_email_token_hash_idx",
-        "email_verification_tokens",
-        ["email", "token_hash"],
-        unique=False,
-    )
-    op.create_index(
-        op.f("email_verification_tokens_token_hash_idx"),
-        "email_verification_tokens",
-        ["token_hash"],
         unique=False,
     )
     op.create_table(
@@ -115,11 +115,11 @@ def upgrade() -> None:
         ),
     )
     op.create_table(
-        "password_reset_tokens",
+        "password_reset_codes",
         sa.Column(
             "id", sa.Uuid(), server_default=sa.text("gen_random_uuid()"), nullable=False
         ),
-        sa.Column("token_hash", sa.String(length=128), nullable=False),
+        sa.Column("code_hash", sa.String(length=128), nullable=False),
         sa.Column("user_id", sa.Uuid(), nullable=False),
         sa.Column("expires_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column(
@@ -129,14 +129,14 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.ForeignKeyConstraint(
-            ["user_id"], ["users.id"], name=op.f("password_reset_tokens_user_id_fkey")
+            ["user_id"], ["users.id"], name=op.f("password_reset_codes_user_id_fkey")
         ),
-        sa.PrimaryKeyConstraint("id", name=op.f("password_reset_tokens_pkey")),
+        sa.PrimaryKeyConstraint("id", name=op.f("password_reset_codes_pkey")),
     )
     op.create_index(
-        op.f("password_reset_tokens_token_hash_idx"),
-        "password_reset_tokens",
-        ["token_hash"],
+        op.f("password_reset_codes_code_hash_idx"),
+        "password_reset_codes",
+        ["code_hash"],
         unique=True,
     )
     op.create_table(
@@ -189,24 +189,24 @@ def downgrade() -> None:
     op.drop_table("user_sessions")
     op.drop_table("user_passwords")
     op.drop_index(
-        op.f("password_reset_tokens_token_hash_idx"), table_name="password_reset_tokens"
+        op.f("password_reset_codes_code_hash_idx"), table_name="password_reset_codes"
     )
-    op.drop_table("password_reset_tokens")
+    op.drop_table("password_reset_codes")
     op.drop_table("auth_providers")
     op.drop_index(op.f("users_username_idx"), table_name="users")
     op.drop_index(op.f("users_primary_email_id_idx"), table_name="users")
     op.drop_table("users")
     op.drop_table("user_emails")
     op.drop_index(
-        op.f("email_verification_tokens_token_hash_idx"),
-        table_name="email_verification_tokens",
+        op.f("email_verification_codes_email_idx"),
+        table_name="email_verification_codes",
     )
     op.drop_index(
-        "email_verification_tokens_email_token_hash_idx",
-        table_name="email_verification_tokens",
+        "email_verification_codes_email_code_hash_idx",
+        table_name="email_verification_codes",
     )
     op.drop_index(
-        op.f("email_verification_tokens_email_idx"),
-        table_name="email_verification_tokens",
+        op.f("email_verification_codes_code_hash_idx"),
+        table_name="email_verification_codes",
     )
-    op.drop_table("email_verification_tokens")
+    op.drop_table("email_verification_codes")

@@ -12,8 +12,8 @@ if TYPE_CHECKING:
     from app.models.user import User
 
 
-class PasswordResetToken(Base):
-    __tablename__ = "password_reset_tokens"
+class PasswordResetCode(Base):
+    __tablename__ = "password_reset_codes"
 
     id: Mapped[UUID] = mapped_column(
         primary_key=True,
@@ -22,7 +22,7 @@ class PasswordResetToken(Base):
         ),
     )
 
-    token_hash: Mapped[str] = mapped_column(
+    code_hash: Mapped[str] = mapped_column(
         String(128),
         unique=True,
         index=True,
@@ -39,5 +39,5 @@ class PasswordResetToken(Base):
     )
 
     user: Mapped["User"] = relationship(
-        back_populates="password_reset_tokens",
+        back_populates="password_reset_codes",
     )

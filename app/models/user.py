@@ -14,7 +14,7 @@ from app.models.user_email import UserEmail
 
 if TYPE_CHECKING:
     from app.models.auth_provider import AuthProvider
-    from app.models.password_reset_token import PasswordResetToken
+    from app.models.password_reset_code import PasswordResetCode
     from app.models.user_password import UserPassword
     from app.models.user_session import UserSession
 
@@ -65,7 +65,7 @@ class User(Base):
         cascade="all, delete-orphan",
     )
 
-    password_reset_tokens: Mapped[set["PasswordResetToken"]] = relationship(
+    password_reset_codes: Mapped[set["PasswordResetCode"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
     )

@@ -8,14 +8,14 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.lib.database import Base
 
 
-class EmailVerificationToken(Base):
-    __tablename__ = "email_verification_tokens"
+class EmailVerificationCode(Base):
+    __tablename__ = "email_verification_codes"
 
     __table_args__ = (
         Index(
-            "email_verification_tokens_email_token_hash_idx",
+            "email_verification_codes_email_code_hash_idx",
             Column("email"),
-            Column("token_hash"),
+            Column("code_hash"),
         ),
     )
 
@@ -31,7 +31,7 @@ class EmailVerificationToken(Base):
         index=True,
     )
 
-    token_hash: Mapped[str] = mapped_column(
+    code_hash: Mapped[str] = mapped_column(
         String(255),
         index=True,
     )

@@ -17,13 +17,13 @@ MAX_USERNAME_LENGTH = 32
 
 MIN_USERNAME_LENGTH = 2
 
-# password reset tokens
+# password reset codes
 
-PASSWORD_RESET_TOKEN_EXPIRES_IN = 300  # 5 minutes
+PASSWORD_RESET_CODE_EXPIRES_IN = 300  # 5 minutes
 
-# email verification tokens
+# email verification codes
 
-EMAIL_VERIFICATION_TOKEN_EXPIRES_IN = 600  # 10 minutes
+EMAIL_VERIFICATION_CODE_EXPIRES_IN = 600  # 10 minutes
 
 # rate limiting
 

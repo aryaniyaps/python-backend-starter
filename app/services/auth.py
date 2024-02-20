@@ -16,8 +16,8 @@ from app.models.user import User
 from app.models.user_session import UserSession
 from app.repositories.auth_provider import AuthProviderRepo
 from app.repositories.authentication_token import AuthenticationTokenRepo
-from app.repositories.email_verification_token import EmailVerificationTokenRepo
-from app.repositories.password_reset_token import PasswordResetTokenRepo
+from app.repositories.email_verification_code import EmailVerificationCodeRepo
+from app.repositories.password_reset_code import PasswordResetCodeRepo
 from app.repositories.user import UserRepo
 from app.repositories.user_password import UserPasswordRepo
 from app.repositories.user_session import UserSessionRepo
@@ -29,22 +29,22 @@ class AuthService:
     def __init__(
         self,
         user_session_repo: UserSessionRepo,
-        password_reset_token_repo: PasswordResetTokenRepo,
+        password_reset_code_repo: PasswordResetCodeRepo,
         authentication_token_repo: AuthenticationTokenRepo,
         auth_provider_repo: AuthProviderRepo,
         user_repo: UserRepo,
         user_password_repo: UserPasswordRepo,
-        email_verification_token_repo: EmailVerificationTokenRepo,
+        email_verification_code_repo: EmailVerificationCodeRepo,
         password_hasher: PasswordHasher,
         geoip_reader: Reader,
     ) -> None:
         self._user_session_repo = user_session_repo
-        self._password_reset_token_repo = password_reset_token_repo
+        self._password_reset_code_repo = password_reset_code_repo
         self._authentication_token_repo = authentication_token_repo
         self._auth_provider_repo = auth_provider_repo
         self._user_repo = user_repo
         self._user_password_repo = user_password_repo
-        self._email_verification_token_repo = email_verification_token_repo
+        self._email_verification_code_repo = email_verification_code_repo
         self._password_hasher = password_hasher
         self._geoip_reader = geoip_reader
 
@@ -65,7 +65,7 @@ class AuthService:
                 message="User with that email already exists.",
             )
 
-        verification_token = await self._email_verification_token_repo.create(
+        verification_token = await self._email_verification_code_repo.create(
             email=email,
         )
 
@@ -88,7 +88,7 @@ class AuthService:
     async def register_user(
         self,
         email: str,
-        email_verification_token: str,
+        email_verification_code: str,
         username: str,
         password: str,
         request_ip: str,
@@ -116,22 +116,22 @@ class AuthService:
                     message="User with that username already exists.",
                 )
 
-            verification_token = (
-                await self._email_verification_token_repo.get_by_token_email(
-                    verification_token=email_verification_token,
+            verification_code = (
+                await self._email_verification_code_repo.get_by_code_email(
+                    verification_code=email_verification_code,
                     email=email,
                 )
             )
 
             if (
-                verification_token is None
-                or datetime.now(UTC) > verification_token.expires_at
+                verification_code is None
+                or datetime.now(UTC) > verification_code.expires_at
             ):
                 raise InvalidInputError(
-                    message="Invalid email or email verification token provided."
+                    message="Invalid email or email verification code provided."
                 )
 
-            await self._email_verification_token_repo.delete_all(email=email)
+            await self._email_verification_code_repo.delete_all(email=email)
 
             user = await self._user_repo.create(
                 username=username,
@@ -312,7 +312,7 @@ class AuthService:
         """Send a password reset request to the given user if they exist."""
         existing_user = await self._user_repo.get_by_email(email=email)
         if existing_user is not None:
-            reset_token = await self._password_reset_token_repo.create(
+            reset_token = await self._password_reset_code_repo.create(
                 user_id=existing_user.id,
             )
             await task_queue.enqueue(
@@ -334,15 +334,15 @@ class AuthService:
     async def reset_password(
         self,
         email: str,
-        reset_token: str,
+        reset_code: str,
         new_password: str,
         request_ip: str,
         user_agent: UserAgent,
     ) -> None:
         """Reset the relevant user's password with the given credentials."""
         existing_user = await self._user_repo.get_by_email(email=email)
-        password_reset_token = await self._password_reset_token_repo.get_by_reset_token(
-            reset_token=reset_token,
+        password_reset_token = await self._password_reset_code_repo.get_by_reset_code(
+            reset_code=reset_code,
         )
 
         if not (existing_user and password_reset_token):
@@ -368,7 +368,7 @@ class AuthService:
             )
 
         # delete all password reset tokens to prevent duplicate use
-        await self._password_reset_token_repo.delete_all(
+        await self._password_reset_code_repo.delete_all(
             user_id=existing_user.id,
         )
 
