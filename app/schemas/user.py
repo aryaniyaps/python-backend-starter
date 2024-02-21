@@ -66,7 +66,6 @@ class ChangeUserPasswordInput(BaseSchema):
     new_password: Annotated[
         SecretStr,
         Field(
-            min_length=8,
             max_length=64,
             examples=[
                 "new-super-Secret12!",

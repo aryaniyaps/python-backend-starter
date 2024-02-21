@@ -98,7 +98,6 @@ class RegisterUserInput(BaseSchema):
     password: Annotated[
         SecretStr,
         Field(
-            min_length=8,
             max_length=64,
             examples=[
                 "super-Secret12!",
@@ -168,7 +167,6 @@ class PasswordResetInput(BaseSchema):
     new_password: Annotated[
         SecretStr,
         Field(
-            min_length=8,
             max_length=64,
             examples=[
                 "super-Secret12!",
