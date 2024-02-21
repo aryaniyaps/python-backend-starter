@@ -210,14 +210,16 @@ class UserService:
         """Update the email for the given user."""
         user = await self.get_user_by_id(user_id=user_id)
 
-        verification_code = await self._email_verification_code_repo.get_by_code_email(
-            verification_code=verification_code,
-            email=email,
+        email_verification_code = (
+            await self._email_verification_code_repo.get_by_code_email(
+                verification_code=verification_code,
+                email=email,
+            )
         )
 
         if (
-            verification_code is None
-            or datetime.now(UTC) > verification_code.expires_at
+            email_verification_code is None
+            or datetime.now(UTC) > email_verification_code.expires_at
         ):
             raise InvalidInputError(
                 message="Invalid email or email verification code provided."
