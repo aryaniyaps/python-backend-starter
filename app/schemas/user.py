@@ -124,6 +124,9 @@ class ChangeUserEmailInput(BaseSchema):
     verification_code: Annotated[
         SecretStr,
         Field(
+            examples=[
+                "43569923",
+            ],
             title="Verification Code",
             description="The verification code for the email.",
         ),
