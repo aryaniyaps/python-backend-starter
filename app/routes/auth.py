@@ -116,7 +116,7 @@ async def register_user(
     """Register a new user."""
     authentication_token, user = await auth_service.register_user(
         email=data.email,
-        email_verification_token=data.email_verification_token.get_secret_value(),
+        email_verification_code=data.email_verification_token.get_secret_value(),
         username=data.username,
         password=data.password.get_secret_value(),
         request_ip=request_ip,
