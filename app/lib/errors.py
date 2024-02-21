@@ -27,7 +27,12 @@ class UnauthenticatedError(BaseError):
 
 
 class OauthAccountLinkingError(BaseError):
-    """Indicate that the user is trying to login with a social account that has not been linked yet."""
+    """
+    Oauth account linking error.
+
+    Indicate that the user is trying to login with a social
+    account that has not been linked yet.
+    """
 
 
 class OauthAccountCreateError(BaseError):
