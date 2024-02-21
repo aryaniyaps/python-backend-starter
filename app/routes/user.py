@@ -238,7 +238,7 @@ async def change_current_user_email(
     """Change the current user's email."""
     return await user_service.update_user_email(
         user_id=viewer_info.user_id,
-        email_verification_token=data.email_verification_token.get_secret_value(),
+        verification_code=data.verification_code.get_secret_value(),
         email=data.email,
     )
 

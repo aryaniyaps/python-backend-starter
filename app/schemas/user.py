@@ -121,11 +121,11 @@ class ChangeUserEmailInput(BaseSchema):
         ),
     ]
 
-    email_verification_token: Annotated[
+    verification_code: Annotated[
         SecretStr,
         Field(
-            title="Email Verification Token",
-            description="The verification token for the email.",
+            title="Verification Code",
+            description="The verification code for the email.",
         ),
     ]
 

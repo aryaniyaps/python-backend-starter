@@ -315,7 +315,7 @@ async def reset_password(
 ) -> None:
     """Reset the user's password."""
     await auth_service.reset_password(
-        reset_token=data.reset_token.get_secret_value(),
+        reset_code=data.reset_code.get_secret_value(),
         email=data.email,
         new_password=data.new_password.get_secret_value(),
         request_ip=request_ip,

@@ -176,14 +176,14 @@ class PasswordResetInput(BaseSchema):
         ),
     ]
 
-    reset_token: Annotated[
+    reset_code: Annotated[
         SecretStr,
         Field(
             examples=[
-                "my_reset_token",
+                "18762390",
             ],
-            title="Reset Token",
-            description="""The token used to verify the user's identity
+            title="Reset Code",
+            description="""The code used to verify the user's identity
             during the password reset process.""",
         ),
     ]
