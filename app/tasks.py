@@ -1,7 +1,7 @@
 from saq.types import Context
 
 from app.config import settings
-from app.lib.emails import email_sender
+from app.lib.emails import send_email
 from app.lib.templates import (
     email_verification_request_html,
     email_verification_request_subject,
@@ -24,16 +24,16 @@ from app.lib.templates import (
 )
 
 
-def send_onboarding_email(
+async def send_onboarding_email(
     _ctx: Context,
     *,
     receiver: str,
     username: str,
 ) -> None:
     """Send an onboarding email to the given user."""
-    email_sender.send(
+    await send_email(
         sender=settings.email_from,
-        receivers=[receiver],
+        receiver=receiver,
         subject=onboarding_subject.render(
             username=username,
         ),
@@ -46,30 +46,30 @@ def send_onboarding_email(
     )
 
 
-def send_email_verification_request_email(
+async def send_email_verification_request_email(
     _ctx: Context,
     *,
     receiver: str,
-    verification_token: str,
+    verification_code: str,
     device: str,
     browser_name: str,
     ip_address: str,
     location: str,
 ) -> None:
     """Send an email verification request to the given email."""
-    email_sender.send(
+    await send_email(
         sender=settings.email_from,
-        receivers=[receiver],
+        receiver=receiver,
         subject=email_verification_request_subject.render(),
         text=email_verification_request_text.render(
-            verification_token=verification_token,
+            verification_code=verification_code,
             device=device,
             browser_name=browser_name,
             ip_address=ip_address,
             location=location,
         ),
         html=email_verification_request_html.render(
-            verification_token=verification_token,
+            verification_code=verification_code,
             device=device,
             browser_name=browser_name,
             ip_address=ip_address,
@@ -78,7 +78,7 @@ def send_email_verification_request_email(
     )
 
 
-def send_new_login_device_detected_email(
+async def send_new_login_device_detected_email(
     _ctx: Context,
     *,
     receiver: str,
@@ -90,9 +90,9 @@ def send_new_login_device_detected_email(
     location: str,
 ) -> None:
     """Send a new login device detected email to the given user."""
-    email_sender.send(
+    await send_email(
         sender=settings.email_from,
-        receivers=[receiver],
+        receiver=receiver,
         subject=new_login_device_subject.render(
             device=device,
         ),
@@ -115,26 +115,26 @@ def send_new_login_device_detected_email(
     )
 
 
-def send_password_reset_request_email(
+async def send_password_reset_request_email(
     _ctx: Context,
     *,
     receiver: str,
     username: str,
-    password_reset_token: str,
+    password_reset_code: str,
     device: str,
     browser_name: str,
     ip_address: str,
     location: str,
 ) -> None:
     """Send a password reset request email to the given user."""
-    email_sender.send(
+    await send_email(
         sender=settings.email_from,
-        receivers=[receiver],
+        receiver=receiver,
         subject=reset_password_request_subject.render(
             username=username,
         ),
         text=reset_password_request_text.render(
-            password_reset_token=password_reset_token,
+            password_reset_code=password_reset_code,
             device=device,
             browser_name=browser_name,
             username=username,
@@ -142,7 +142,7 @@ def send_password_reset_request_email(
             location=location,
         ),
         html=reset_password_request_html.render(
-            password_reset_token=password_reset_token,
+            password_reset_code=password_reset_code,
             device=device,
             browser_name=browser_name,
             username=username,
@@ -152,7 +152,7 @@ def send_password_reset_request_email(
     )
 
 
-def send_password_reset_email(
+async def send_password_reset_email(
     _ctx: Context,
     *,
     receiver: str,
@@ -163,9 +163,9 @@ def send_password_reset_email(
     location: str,
 ) -> None:
     """Send a password reset email to the given user."""
-    email_sender.send(
+    await send_email(
         sender=settings.email_from,
-        receivers=[receiver],
+        receiver=receiver,
         subject=password_reset_subject.render(),
         text=password_reset_text.render(
             device=device,
@@ -184,7 +184,7 @@ def send_password_reset_email(
     )
 
 
-def send_password_changed_email(
+async def send_password_changed_email(
     _ctx: Context,
     *,
     receiver: str,
@@ -195,9 +195,9 @@ def send_password_changed_email(
     location: str,
 ) -> None:
     """Send a password changed email to the given user."""
-    email_sender.send(
+    await send_email(
         sender=settings.email_from,
-        receivers=[receiver],
+        receiver=receiver,
         subject=password_changed_subject.render(),
         text=password_changed_text.render(
             device=device,

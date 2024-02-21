@@ -1,7 +1,7 @@
 {% extends "emails/base/body.txt" %}
 
 {% block title %}
-Use this link to reset your password. The link is only valid for {{ token_expires_in }}.
+Use this link to reset your password. The link is only valid for {{ code_expires_in }}.
 {% endblock%}
 
 
@@ -10,11 +10,11 @@ Use this link to reset your password. The link is only valid for {{ token_expire
 Hi {{ username }},
 ************
 
-You recently requested to reset your password for your {{ app_name }} account. Use the button below to reset it. This password reset is only valid for the next {{ token_expires_in }}.
+You recently requested to reset your password for your {{ app_name }} account. Use the button below to reset it. This password reset is only valid for the next {{ code_expires_in }}.
 
-Enter the following password reset token to proceed:
+Enter the following password reset code to proceed:
 
-{{ password_reset_token }}
+{{ password_reset_code }}
 
 Where this happened:
 

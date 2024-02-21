@@ -42,7 +42,7 @@ email_verification_request_subject = environment.get_template(
 email_verification_request_html = environment.get_template(
     name="emails/email-verification-request/body.html",
     globals={
-        "token_expires_in": naturaldelta(
+        "code_expires_in": naturaldelta(
             timedelta(
                 seconds=EMAIL_VERIFICATION_CODE_EXPIRES_IN,
             ),
@@ -53,7 +53,7 @@ email_verification_request_html = environment.get_template(
 email_verification_request_text = environment.get_template(
     name="emails/email-verification-request/body.txt",
     globals={
-        "token_expires_in": naturaldelta(
+        "code_expires_in": naturaldelta(
             timedelta(
                 seconds=EMAIL_VERIFICATION_CODE_EXPIRES_IN,
             ),
@@ -70,7 +70,7 @@ reset_password_request_subject = environment.get_template(
 reset_password_request_html = environment.get_template(
     name="emails/reset-password-request/body.html",
     globals={
-        "token_expires_in": naturaldelta(
+        "code_expires_in": naturaldelta(
             timedelta(
                 seconds=PASSWORD_RESET_CODE_EXPIRES_IN,
             ),
@@ -81,7 +81,7 @@ reset_password_request_html = environment.get_template(
 reset_password_request_text = environment.get_template(
     name="emails/reset-password-request/body.txt",
     globals={
-        "token_expires_in": naturaldelta(
+        "code_expires_in": naturaldelta(
             timedelta(
                 seconds=PASSWORD_RESET_CODE_EXPIRES_IN,
             ),

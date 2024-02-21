@@ -181,15 +181,13 @@ class UserService:
                 message="User with that email already exists.",
             )
 
-        verification_token = await self._email_verification_code_repo.create(
-            email=email
-        )
+        verification_code = await self._email_verification_code_repo.create(email=email)
 
         # send verification request email
         await task_queue.enqueue(
             "send_email_verification_request_email",
             receiver=email,
-            verification_token=verification_token,
+            verification_code=verification_code,
             device=user_agent.get_device(),
             browser_name=user_agent.get_browser(),
             location=get_city_location(

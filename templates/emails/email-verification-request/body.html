@@ -21,7 +21,7 @@ Verify your email
         <p>
             We received a request to verify your email for your {{ app_name }} account.
           <strong
-            >This email verification token is only valid for the next {{ token_expires_in }}.</strong
+            >This email verification code is only valid for the next {{ code_expires_in }}.</strong
           >
         </p>
         <!-- discount body -->
@@ -29,9 +29,9 @@ Verify your email
             <tr>
               <td>
                 <p class="discount_header">
-                    Enter the following verification token to proceed:
+                    Enter the following verification code to proceed:
                 </p>
-                <p class="discount">{{ verification_token }}</p>
+                <p class="discount">{{ verification_code }}</p>
               </td>
             </tr>
         </table>

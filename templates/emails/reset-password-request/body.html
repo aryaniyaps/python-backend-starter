@@ -22,7 +22,7 @@ Reset Your Password
           You recently requested to reset your password for your {{ app_name }}
           account. Use the button below to reset it.
           <strong
-            >This password reset is only valid for the next {{ token_expires_in
+            >This password reset is only valid for the next {{ code_expires_in
             }}.</strong
           >
         </p>
@@ -31,9 +31,9 @@ Reset Your Password
           <tr>
             <td>
               <p class="discount_header">
-                  Enter the following password reset token to proceed:
+                  Enter the following password reset code to proceed:
               </p>
-              <p class="discount">{{ password_reset_token }}</p>
+              <p class="discount">{{ password_reset_code }}</p>
             </td>
           </tr>
       </table>

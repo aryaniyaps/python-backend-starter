@@ -312,14 +312,14 @@ class AuthService:
         """Send a password reset request to the given user if they exist."""
         existing_user = await self._user_repo.get_by_email(email=email)
         if existing_user is not None:
-            reset_token = await self._password_reset_code_repo.create(
+            reset_code = await self._password_reset_code_repo.create(
                 user_id=existing_user.id,
             )
             await task_queue.enqueue(
                 "send_password_reset_request_email",
                 receiver=existing_user.email,
                 username=existing_user.username,
-                password_reset_token=reset_token,
+                password_reset_code=reset_code,
                 device=user_agent.get_device(),
                 browser_name=user_agent.get_browser(),
                 location=get_city_location(
@@ -341,19 +341,19 @@ class AuthService:
     ) -> None:
         """Reset the relevant user's password with the given credentials."""
         existing_user = await self._user_repo.get_by_email(email=email)
-        password_reset_token = await self._password_reset_code_repo.get_by_reset_code(
+        password_reset_code = await self._password_reset_code_repo.get_by_reset_code(
             reset_code=reset_code,
         )
 
-        if not (existing_user and password_reset_token):
+        if not (existing_user and password_reset_code):
             raise InvalidInputError(
-                message="Invalid password reset token or email provided.",
+                message="Invalid password reset code or email provided.",
             )
 
-        if datetime.now(UTC) > password_reset_token.expires_at:
-            # password reset token has expired.
+        if datetime.now(UTC) > password_reset_code.expires_at:
+            # password reset code has expired.
             raise InvalidInputError(
-                message="Invalid password reset token or email provided.",
+                message="Invalid password reset code or email provided.",
             )
 
         if not check_password_strength(
@@ -367,7 +367,7 @@ class AuthService:
                 message="Enter a stronger password.",
             )
 
-        # delete all password reset tokens to prevent duplicate use
+        # delete all password reset codes to prevent duplicate use
         await self._password_reset_code_repo.delete_all(
             user_id=existing_user.id,
         )
