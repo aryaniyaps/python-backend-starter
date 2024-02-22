@@ -1,27 +1,14 @@
+from datetime import timedelta
+
+from humanize import naturaldelta
 from saq.types import Context
 
 from app.config import settings
-from app.lib.emails import send_email
-from app.lib.templates import (
-    email_verification_request_html,
-    email_verification_request_subject,
-    email_verification_request_text,
-    new_login_device_html,
-    new_login_device_subject,
-    new_login_device_text,
-    onboarding_html,
-    onboarding_subject,
-    onboarding_text,
-    password_changed_html,
-    password_changed_subject,
-    password_changed_text,
-    password_reset_html,
-    password_reset_subject,
-    password_reset_text,
-    reset_password_request_html,
-    reset_password_request_subject,
-    reset_password_request_text,
+from app.lib.constants import (
+    EMAIL_VERIFICATION_CODE_EXPIRES_IN,
+    PASSWORD_RESET_CODE_EXPIRES_IN,
 )
+from app.lib.emails import send_template_email
 
 
 async def send_onboarding_email(
@@ -31,18 +18,13 @@ async def send_onboarding_email(
     username: str,
 ) -> None:
     """Send an onboarding email to the given user."""
-    await send_email(
+    await send_template_email(
         sender=settings.email_from,
         receiver=receiver,
-        subject=onboarding_subject.render(
-            username=username,
-        ),
-        text=onboarding_text.render(
-            username=username,
-        ),
-        html=onboarding_html.render(
-            username=username,
-        ),
+        template="onboarding",
+        context={
+            "username": username,
+        },
     )
 
 
@@ -57,24 +39,22 @@ async def send_email_verification_request_email(
     location: str,
 ) -> None:
     """Send an email verification request to the given email."""
-    await send_email(
+    await send_template_email(
         sender=settings.email_from,
         receiver=receiver,
-        subject=email_verification_request_subject.render(),
-        text=email_verification_request_text.render(
-            verification_code=verification_code,
-            device=device,
-            browser_name=browser_name,
-            ip_address=ip_address,
-            location=location,
-        ),
-        html=email_verification_request_html.render(
-            verification_code=verification_code,
-            device=device,
-            browser_name=browser_name,
-            ip_address=ip_address,
-            location=location,
-        ),
+        template="email-verification-request",
+        context={
+            "verification_code": verification_code,
+            "code_expires_in": naturaldelta(
+                timedelta(
+                    seconds=EMAIL_VERIFICATION_CODE_EXPIRES_IN,
+                ),
+            ),
+            "device": device,
+            "browser_name": browser_name,
+            "ip_address": ip_address,
+            "location": location,
+        },
     )
 
 
@@ -90,28 +70,18 @@ async def send_new_login_device_detected_email(
     location: str,
 ) -> None:
     """Send a new login device detected email to the given user."""
-    await send_email(
+    await send_template_email(
         sender=settings.email_from,
         receiver=receiver,
-        subject=new_login_device_subject.render(
-            device=device,
-        ),
-        text=new_login_device_text.render(
-            username=username,
-            login_timestamp=login_timestamp,
-            device=device,
-            browser_name=browser_name,
-            ip_address=ip_address,
-            location=location,
-        ),
-        html=new_login_device_html.render(
-            username=username,
-            login_timestamp=login_timestamp,
-            device=device,
-            browser_name=browser_name,
-            ip_address=ip_address,
-            location=location,
-        ),
+        template="new-login-device",
+        context={
+            "username": username,
+            "login_timestamp": login_timestamp,
+            "device": device,
+            "browser_name": browser_name,
+            "ip_address": ip_address,
+            "location": location,
+        },
     )
 
 
@@ -127,28 +97,23 @@ async def send_password_reset_request_email(
     location: str,
 ) -> None:
     """Send a password reset request email to the given user."""
-    await send_email(
+    await send_template_email(
         sender=settings.email_from,
         receiver=receiver,
-        subject=reset_password_request_subject.render(
-            username=username,
-        ),
-        text=reset_password_request_text.render(
-            password_reset_code=password_reset_code,
-            device=device,
-            browser_name=browser_name,
-            username=username,
-            ip_address=ip_address,
-            location=location,
-        ),
-        html=reset_password_request_html.render(
-            password_reset_code=password_reset_code,
-            device=device,
-            browser_name=browser_name,
-            username=username,
-            ip_address=ip_address,
-            location=location,
-        ),
+        template="reset-password-request",
+        context={
+            "password_reset_code": password_reset_code,
+            "code_expires_in": naturaldelta(
+                timedelta(
+                    seconds=PASSWORD_RESET_CODE_EXPIRES_IN,
+                ),
+            ),
+            "username": username,
+            "device": device,
+            "browser_name": browser_name,
+            "ip_address": ip_address,
+            "location": location,
+        },
     )
 
 
@@ -163,24 +128,17 @@ async def send_password_reset_email(
     location: str,
 ) -> None:
     """Send a password reset email to the given user."""
-    await send_email(
+    await send_template_email(
         sender=settings.email_from,
         receiver=receiver,
-        subject=password_reset_subject.render(),
-        text=password_reset_text.render(
-            device=device,
-            browser_name=browser_name,
-            username=username,
-            ip_address=ip_address,
-            location=location,
-        ),
-        html=password_reset_html.render(
-            device=device,
-            browser_name=browser_name,
-            username=username,
-            ip_address=ip_address,
-            location=location,
-        ),
+        template="password-reset",
+        context={
+            "username": username,
+            "device": device,
+            "browser_name": browser_name,
+            "ip_address": ip_address,
+            "location": location,
+        },
     )
 
 
@@ -195,22 +153,15 @@ async def send_password_changed_email(
     location: str,
 ) -> None:
     """Send a password changed email to the given user."""
-    await send_email(
+    await send_template_email(
         sender=settings.email_from,
         receiver=receiver,
-        subject=password_changed_subject.render(),
-        text=password_changed_text.render(
-            device=device,
-            browser_name=browser_name,
-            username=username,
-            ip_address=ip_address,
-            location=location,
-        ),
-        html=password_changed_html.render(
-            device=device,
-            browser_name=browser_name,
-            username=username,
-            ip_address=ip_address,
-            location=location,
-        ),
+        template="password-changed",
+        context={
+            "username": username,
+            "device": device,
+            "browser_name": browser_name,
+            "ip_address": ip_address,
+            "location": location,
+        },
     )

@@ -1,9 +1,11 @@
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from typing import Any
 
 from aiosmtplib import SMTP
 
 from app.config import settings
+from app.lib.templates import environment
 
 if settings.email_username and settings.email_password:
     smtp_client = SMTP(
@@ -16,6 +18,34 @@ else:
     smtp_client = SMTP(
         hostname=settings.email_host,
         port=settings.email_port,
+    )
+
+
+async def send_template_email(
+    sender: str,
+    receiver: str,
+    template: str,
+    context: dict[str, Any],
+) -> None:
+    """Send an email using a template."""
+    subject_template = environment.get_template(
+        name=f"emails/{template}/subject.txt",
+    )
+
+    text_template = environment.get_template(
+        name=f"emails/{template}/body.txt",
+    )
+
+    html_template = environment.get_template(
+        name=f"emails/{template}/body.html",
+    )
+
+    await send_email(
+        sender=sender,
+        receiver=receiver,
+        subject=subject_template.render(context),
+        text=text_template.render(context),
+        html=html_template.render(context),
     )
 
 
