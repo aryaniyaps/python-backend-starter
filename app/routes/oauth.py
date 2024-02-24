@@ -93,7 +93,7 @@ async def handle_oauth_callback(
         redirect_to = settings.default_oauth2_redirect_to
 
         if sso_provider.state is not None:
-            decoded_state = base64.b64decode(sso_provider.state.encode()).decode()
+            decoded_state = base64.b64decode(sso_provider.state.encode())
             state = loads(decoded_state)
             redirect_to = state.get(
                 "redirect_to",
