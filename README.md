@@ -23,6 +23,7 @@
    - Requester device (based on the user agent)
    - Geolocation data (based on IP)
 - [ ] Social authentication providers must be explicitly linked by the user
+- [ ] Passwords can be set by users who registered via oauth2 providers
 - [x] Social login
    - [x] Sign in with Google
    - [x] Sign in with Facebook
