@@ -33,6 +33,7 @@ class EmailVerificationCode(Base):
 
     code_hash: Mapped[str] = mapped_column(
         String(255),
+        unique=True,
         index=True,
     )
 

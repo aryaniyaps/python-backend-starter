@@ -3,7 +3,9 @@ import string
 from hashlib import sha256
 from uuid import UUID
 
+import backoff
 from sqlalchemy import delete, select, text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.functions import now
 
@@ -25,6 +27,11 @@ class PasswordResetCodeRepo:
         """Hash the given password reset code."""
         return sha256(password_reset_code.encode()).hexdigest()
 
+    @backoff.on_exception(
+        backoff.constant,
+        exception=IntegrityError,
+        max_tries=2,
+    )
     async def create(
         self,
         user_id: UUID,

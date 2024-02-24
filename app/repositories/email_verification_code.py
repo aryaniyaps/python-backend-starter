@@ -2,7 +2,9 @@ import secrets
 import string
 from hashlib import sha256
 
+import backoff
 from sqlalchemy import delete, select, text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.functions import now
 
@@ -24,6 +26,11 @@ class EmailVerificationCodeRepo:
         """Hash the given email verification code."""
         return sha256(email_verification_code.encode()).hexdigest()
 
+    @backoff.on_exception(
+        backoff.constant,
+        exception=IntegrityError,
+        max_tries=2,
+    )
     async def create(self, email: str) -> str:
         """Create a new email verification code."""
         expires_at = text(
