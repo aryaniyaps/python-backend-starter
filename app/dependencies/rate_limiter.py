@@ -41,6 +41,6 @@ class RateLimiter:
             path_identifier,
         ):
             raise RateLimitExceededError(
-                message="You are being ratelimited.",
+                message="You are being rate limited.",
                 is_primary=False,
             )

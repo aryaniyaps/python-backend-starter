@@ -14,7 +14,7 @@ from app.lib.constants import APP_NAME, SUPPORT_EMAIL
 from app.lib.error_handlers import (
     handle_http_exception,
     handle_invalid_input_error,
-    handle_ratelimit_exceeded_error,
+    handle_rate_limit_exceeded_error,
     handle_resource_not_found_error,
     handle_unauthenticated_error,
     handle_unexpected_error,
@@ -117,7 +117,7 @@ def create_app() -> FastAPI:
             ResourceNotFoundError: handle_resource_not_found_error,
             UnauthenticatedError: handle_unauthenticated_error,
             UnexpectedError: handle_unexpected_error,
-            RateLimitExceededError: handle_ratelimit_exceeded_error,
+            RateLimitExceededError: handle_rate_limit_exceeded_error,
         },
         contact={
             "email": SUPPORT_EMAIL,

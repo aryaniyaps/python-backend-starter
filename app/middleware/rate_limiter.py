@@ -14,7 +14,7 @@ from app.lib.rate_limiter import (
 primary_rate_limit = parse(PRIMARY_RATE_LIMIT)
 
 # FIXME: it would be better to exempt rate limiting with a dependency
-# on the endpoint instead. Trailing slashes affect ratelimiting here and
+# on the endpoint instead. Trailing slashes affect rate limiting here and
 # we need to update the URLs whenever it changes somewhere else.
 primary_route_exemptions = [
     "GET-/health/",
@@ -62,20 +62,20 @@ async def rate_limiter_middleware(
     except AttributeError:
         secondary_window_stats = None
 
-    response.headers["X-Ratelimit-Primary-Remaining"] = str(
+    response.headers["X-Rate-Limit-Primary-Remaining"] = str(
         primary_window_stats.remaining,
     )
 
-    response.headers["X-Ratelimit-Primary-Reset"] = str(
+    response.headers["X-Rate-Limit-Primary-Reset"] = str(
         primary_window_stats.reset_time,
     )
 
     if secondary_window_stats is not None:
-        response.headers["X-Ratelimit-Secondary-Remaining"] = str(
+        response.headers["X-Rate-Limit-Secondary-Remaining"] = str(
             secondary_window_stats.remaining,
         )
 
-        response.headers["X-Ratelimit-Secondary-Reset"] = str(
+        response.headers["X-Rate-Limit-Secondary-Reset"] = str(
             secondary_window_stats.reset_time,
         )
 

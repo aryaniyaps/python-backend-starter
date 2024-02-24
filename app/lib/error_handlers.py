@@ -49,11 +49,11 @@ async def handle_validation_error(
     )
 
 
-async def handle_ratelimit_exceeded_error(
+async def handle_rate_limit_exceeded_error(
     _request: Request,
     exception: RateLimitExceededError,
 ) -> Response:
-    """Handle RateLimitExceededError expections."""
+    """Handle RateLimitExceededError exceptions."""
     return _create_error_response(
         error_result=RateLimitExceededErrorResult(
             message=str(exception),
@@ -80,7 +80,7 @@ async def handle_invalid_input_error(
     _request: Request,
     exception: InvalidInputError,
 ) -> Response:
-    """Handle InvalidInputError expections."""
+    """Handle InvalidInputError exceptions."""
     return _create_error_response(
         error_result=InvalidInputErrorResult(
             message=str(exception),
@@ -93,7 +93,7 @@ async def handle_resource_not_found_error(
     _request: Request,
     exception: ResourceNotFoundError,
 ) -> Response:
-    """Handle ResourceNotFound expections."""
+    """Handle ResourceNotFound exceptions."""
     return _create_error_response(
         error_result=ResourceNotFoundErrorResult(
             message=str(exception),
@@ -106,7 +106,7 @@ async def handle_unauthenticated_error(
     _request: Request,
     exception: UnauthenticatedError,
 ) -> Response:
-    """Handle UnauthenticatedError expections."""
+    """Handle UnauthenticatedError exceptions."""
     return _create_error_response(
         error_result=UnauthenticatedErrorResult(
             message=str(exception),
@@ -119,7 +119,7 @@ async def handle_unexpected_error(
     _request: Request,
     exception: UnexpectedError,
 ) -> Response:
-    """Handle UnexpectedError expections."""
+    """Handle UnexpectedError exceptions."""
     return _create_error_response(
         error_result=UnexpectedErrorResult(
             message=str(exception),

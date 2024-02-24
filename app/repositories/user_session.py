@@ -30,7 +30,7 @@ class UserSessionRepo:
     ) -> UserSession:
         """Create a new user session."""
         # FIXME: review device strings, we get pretty much common strings
-        # like iPhone, so we can't possibly differentitate between device versions
+        # like iPhone, so we can't possibly differentiate between device versions
         # maybe pass device IDs instead?
         user_session = UserSession(
             user_id=user_id,

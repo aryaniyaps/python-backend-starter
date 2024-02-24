@@ -34,7 +34,7 @@ class UnexpectedErrorResult(BaseSchema):
         str,
         Field(
             examples=[
-                "An unexpected error occured.",
+                "An unexpected error occurred.",
             ],
             description="A human readable message describing the error.",
         ),
@@ -113,7 +113,7 @@ class RateLimitExceededErrorResult(BaseSchema):
         str,
         Field(
             examples=[
-                "You are being ratelimited.",
+                "You are being rate limited.",
             ],
             description="A human readable message describing the error.",
         ),

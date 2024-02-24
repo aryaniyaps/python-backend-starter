@@ -43,10 +43,10 @@ def get_logging_renderer(*, human_readable: bool) -> JSONRenderer | ConsoleRende
 
 def build_shared_processors(*, human_readable: bool) -> list[Processor]:
     """Build shared logging processors."""
-    timestamper = structlog.processors.TimeStamper(fmt="iso", utc=True)
+    time_stamper = structlog.processors.TimeStamper(fmt="iso", utc=True)
     shared_processors: list[Processor] = [
         add_correlation_id,  # Add correlation ID
-        timestamper,  # Add timestamps
+        time_stamper,  # Add timestamps
         structlog.stdlib.add_log_level,  # Add log level
         structlog.stdlib.add_logger_name,  # Add logger name
         remove_color_message,  # Drop color message
