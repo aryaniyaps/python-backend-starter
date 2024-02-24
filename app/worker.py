@@ -2,20 +2,41 @@ import asyncio
 from logging.config import dictConfig
 
 from asgi_correlation_id import correlation_id
-from saq import Job, Queue
+from saq import CronJob, Job, Queue
 from saq.types import Context
 from saq.worker import Worker
 
 from app.config import settings
+from app.lib.database import get_database_session
 from app.logger import build_worker_log_config, setup_logging
 from app.sentry import setup_sentry
 from app.tasks import (
+    delete_expired_email_verification_codes,
+    delete_expired_password_reset_codes,
     send_email_verification_request_email,
     send_new_login_device_detected_email,
     send_onboarding_email,
     send_password_reset_email,
     send_password_reset_request_email,
 )
+
+
+async def startup(ctx: Context) -> None:
+    """
+    Start up handler.
+
+    Loads the database session into the context.
+    """
+    ctx["session"] = await get_database_session()
+
+
+async def shutdown(ctx: Context) -> None:
+    """
+    Shutdown handler.
+
+    Shuts down the existing database session.
+    """
+    await ctx["session"].close()
 
 
 async def before_enqueue(job: Job) -> None:
@@ -80,7 +101,19 @@ if __name__ == "__main__":
             send_onboarding_email,
             send_email_verification_request_email,
         ],
+        cron_jobs=[
+            CronJob(
+                delete_expired_password_reset_codes,
+                cron="0 * * * *",
+            ),
+            CronJob(
+                delete_expired_email_verification_codes,
+                cron="0 * * * *",
+            ),
+        ],
         concurrency=settings.saq_concurrency,
+        startup=startup,
+        shutdown=shutdown,
         before_process=before_process,
         after_process=after_process,
     )

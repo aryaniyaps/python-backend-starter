@@ -4,6 +4,7 @@ from hashlib import sha256
 
 from sqlalchemy import delete, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.functions import now
 
 from app.lib.constants import EMAIL_VERIFICATION_CODE_EXPIRES_IN
 from app.models.email_verification_code import EmailVerificationCode
@@ -12,6 +13,16 @@ from app.models.email_verification_code import EmailVerificationCode
 class EmailVerificationCodeRepo:
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
+
+    @staticmethod
+    def generate_code() -> str:
+        """Generate an email verification code."""
+        return "".join(secrets.choice(string.digits) for i in range(8))
+
+    @staticmethod
+    def hash_code(email_verification_code: str) -> str:
+        """Hash the given email verification code."""
+        return sha256(email_verification_code.encode()).hexdigest()
 
     async def create(self, email: str) -> str:
         """Create a new email verification code."""
@@ -55,12 +66,10 @@ class EmailVerificationCodeRepo:
             ),
         )
 
-    @staticmethod
-    def generate_code() -> str:
-        """Generate an email verification code."""
-        return "".join(secrets.choice(string.digits) for i in range(8))
-
-    @staticmethod
-    def hash_code(email_verification_code: str) -> str:
-        """Hash the given email verification code."""
-        return sha256(email_verification_code.encode()).hexdigest()
+    async def delete_expired(self) -> None:
+        """Delete all email verification codes which have expired."""
+        await self._session.execute(
+            delete(EmailVerificationCode).where(
+                EmailVerificationCode.expires_at <= now(),
+            ),
+        )

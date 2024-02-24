@@ -5,6 +5,7 @@ from uuid import UUID
 
 from sqlalchemy import delete, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.functions import now
 
 from app.lib.constants import PASSWORD_RESET_CODE_EXPIRES_IN
 from app.models.password_reset_code import PasswordResetCode
@@ -67,5 +68,13 @@ class PasswordResetCodeRepo:
         await self._session.execute(
             delete(PasswordResetCode).where(
                 PasswordResetCode.user_id == user_id,
+            ),
+        )
+
+    async def delete_expired(self) -> None:
+        """Delete all password reset codes which have expired."""
+        await self._session.execute(
+            delete(PasswordResetCode).where(
+                PasswordResetCode.expires_at <= now(),
             ),
         )

@@ -9,6 +9,20 @@ from app.lib.constants import (
     PASSWORD_RESET_CODE_EXPIRES_IN,
 )
 from app.lib.emails import send_template_email
+from app.repositories.email_verification_code import EmailVerificationCodeRepo
+from app.repositories.password_reset_code import PasswordResetCodeRepo
+
+
+async def delete_expired_password_reset_codes(ctx: Context) -> None:
+    """Delete expired password reset codes."""
+    # TODO: set db session for cron jobs
+    await PasswordResetCodeRepo(session=ctx["session"]).delete_expired()
+
+
+async def delete_expired_email_verification_codes(ctx: Context) -> None:
+    """Delete expired email verification codes."""
+    # TODO: set db session for cron jobs
+    await EmailVerificationCodeRepo(session=ctx["session"]).delete_expired()
 
 
 async def send_onboarding_email(
