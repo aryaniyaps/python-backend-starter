@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
 from asgi_correlation_id import CorrelationIdMiddleware
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
@@ -41,10 +41,12 @@ from app.schemas.errors import (
 
 def add_routes(app: FastAPI) -> None:
     """Register routes for the app."""
-    app.include_router(health_router)
-    app.include_router(users_router)
-    app.include_router(auth_router)
-    app.include_router(oauth_router)
+    app_router = APIRouter(prefix="/v1")
+    app_router.include_router(health_router)
+    app_router.include_router(users_router)
+    app_router.include_router(auth_router)
+    app_router.include_router(oauth_router)
+    app.include_router(app_router)
 
 
 def add_middleware(app: FastAPI) -> None:

@@ -56,7 +56,7 @@ async def send_email(
     text: str,
     html: str,
 ) -> None:
-    """Send an email."""
+    """Send an email via SMTP."""
     message = MIMEMultipart("alternative")
     message["From"] = sender
     message["To"] = receiver
