@@ -15,13 +15,11 @@ from app.repositories.password_reset_code import PasswordResetCodeRepo
 
 async def delete_expired_password_reset_codes(ctx: Context) -> None:
     """Delete expired password reset codes."""
-    # TODO: set db session for cron jobs
     await PasswordResetCodeRepo(session=ctx["session"]).delete_expired()
 
 
 async def delete_expired_email_verification_codes(ctx: Context) -> None:
     """Delete expired email verification codes."""
-    # TODO: set db session for cron jobs
     await EmailVerificationCodeRepo(session=ctx["session"]).delete_expired()
 
 

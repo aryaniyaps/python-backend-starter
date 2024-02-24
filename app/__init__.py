@@ -42,7 +42,7 @@ from app.schemas.errors import (
 
 def add_routes(app: FastAPI) -> None:
     """Register routes for the app."""
-    app_router = APIRouter(prefix="/v1")
+    app_router = APIRouter(prefix="/api/v1")
     app_router.include_router(health_router)
     app_router.include_router(users_router)
     app_router.include_router(auth_router)
