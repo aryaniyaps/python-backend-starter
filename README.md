@@ -117,7 +117,7 @@ To configure Google OAuth2 authentication for your application, follow these ste
 6. Enter the appropriate information for your application.
    The authorized redirect URIs used when creating the credentials must include the following URL *(assuming you are running at port 8000 on localhost)*:
 
-   **http://localhost:8000/api/oauth/google/callback**
+   **http://localhost:8000/v1/oauth/google/callback**
 
 7. Once created, copy the generated Client ID and Client Secret.
 8. Paste the Client ID and Client secret into the `.env` file as follows:
@@ -138,7 +138,7 @@ To configure Facebook OAuth2 authentication for your application, follow these s
 5. Under the Add Platform section, click on + Add Platform and choose Website.
 6. Enter your website URL in the Site URL field. Make sure to include the following redirect URI for OAuth callbacks *(assuming you are running at port 8000 on localhost)*:
 
-   **http://localhost:8000/api/oauth/facebook/callback**
+   **http://localhost:8000/v1/oauth/facebook/callback**
 
 7. Once the configuration is complete, click on Save Changes.
 8. Now, navigate to the Settings > Basic section again to retrieve your App ID and App Secret.
