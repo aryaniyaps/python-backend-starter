@@ -27,6 +27,7 @@ from app.lib.errors import (
     UnauthenticatedError,
     UnexpectedError,
 )
+from app.lib.openapi import generate_operation_id
 from app.middleware.rate_limiter import rate_limiter_middleware
 from app.routes.auth import auth_router
 from app.routes.health import health_router
@@ -105,6 +106,7 @@ def create_app() -> FastAPI:
                 "description": "Validation Error",
             },
         },
+        generate_unique_id_function=generate_operation_id,
         # TODO @aryaniyaps: add error handlers via `app.add_exception_handler` after
         # a generic ExceptionHandler type is implemented.
         # https://github.com/encode/starlette/pull/2403
