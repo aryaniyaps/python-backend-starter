@@ -1,5 +1,4 @@
 import base64
-from json import dumps, loads
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header, Query, Request
@@ -7,6 +6,7 @@ from fastapi.responses import RedirectResponse
 from fastapi_sso.sso.base import SSOBase, SSOLoginError
 from fastapi_sso.sso.facebook import FacebookSSO
 from fastapi_sso.sso.google import GoogleSSO
+from orjson import dumps, loads
 from user_agents import parse
 
 from app.config import settings
@@ -43,7 +43,7 @@ async def google_login(
     """Redirect the user to the Google sign in URL."""
     state_data = dumps({"redirect_to": redirect_to})
     return await google_sso.get_login_redirect(
-        state=base64.b64encode(state_data.encode()).decode(),
+        state=base64.b64encode(state_data).decode(),
         redirect_uri=str(
             request.url_for(
                 "google_callback",
@@ -71,7 +71,7 @@ async def facebook_login(
     """Redirect the user to the Facebook sign in URL."""
     state_data = dumps({"redirect_to": redirect_to})
     return await facebook_sso.get_login_redirect(
-        state=base64.b64encode(state_data.encode()).decode(),
+        state=base64.b64encode(state_data).decode(),
         redirect_uri=str(
             request.url_for(
                 "facebook_callback",
