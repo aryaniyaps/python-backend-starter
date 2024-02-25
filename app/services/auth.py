@@ -117,6 +117,8 @@ class AuthService:
         registration_options = generate_registration_options(
             rp_id=settings.rp_id,
             rp_name=settings.rp_name,
+            # TODO: pass UUID as user_id here or change db schema to use
+            # BYTEA as user IDs
             user_name=email,
             authenticator_selection=AuthenticatorSelectionCriteria(
                 authenticator_attachment=AuthenticatorAttachment.PLATFORM,
