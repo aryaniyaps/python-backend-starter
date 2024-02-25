@@ -59,23 +59,23 @@ class AuthService:
         self._geoip_reader = geoip_reader
 
     async def generate_registration_options(
-        self, username: str
+        self, email: str
     ) -> PublicKeyCredentialCreationOptions:
         """Generate options for registering a credential."""
         if (
-            await self._user_repo.get_by_username(
-                username=username,
+            await self._user_repo.get_by_email(
+                email=email,
             )
             is not None
         ):
             raise InvalidInputError(
-                message="User with that username already exists.",
+                message="User with that email already exists.",
             )
 
         registration_options = generate_registration_options(
             rp_id=settings.rp_id,
             rp_name=settings.rp_name,
-            user_name=username,
+            user_name=email,
             authenticator_selection=AuthenticatorSelectionCriteria(
                 authenticator_attachment=AuthenticatorAttachment.PLATFORM,
                 user_verification=UserVerificationRequirement.REQUIRED,
@@ -86,7 +86,7 @@ class AuthService:
 
         # store challenge server-side
         await self._webauthn_challenge_repo.create(
-            username=username,
+            email=email,
             challenge=registration_options.challenge,
         )
 
@@ -94,13 +94,13 @@ class AuthService:
 
     async def verify_registration_response(
         self,
-        username: str,
+        email: str,
         credential: RegistrationCredential,
         request_ip: str,
         user_agent: UserAgent,
     ) -> AuthenticationResult:
         """Verify the authenticator's response for registration."""
-        challenge = await self._webauthn_challenge_repo.get(username=username)
+        challenge = await self._webauthn_challenge_repo.get(email=email)
 
         if challenge is None:
             # TODO: handle error here
@@ -114,7 +114,7 @@ class AuthService:
         )
 
         user = await self._user_repo.create(
-            username=username,
+            email=email,
         )
 
         await self._webauthn_credential_repo.create(
@@ -150,16 +150,16 @@ class AuthService:
         }
 
     async def generate_authentication_options(
-        self, username: str, user_verification: UserVerificationRequirement
+        self, email: str, user_verification: UserVerificationRequirement
     ) -> PublicKeyCredentialRequestOptions:
         """Generate options for retrieving a credential."""
-        existing_user = await self._user_repo.get_by_username(
-            username=username,
+        existing_user = await self._user_repo.get_by_email(
+            email=email,
         )
 
         if existing_user is None:
             raise InvalidInputError(
-                message="User with that username doesn't exist.",
+                message="User with that email doesn't exist.",
             )
 
         existing_credentials = await self._webauthn_credential_repo.get_all(
@@ -182,7 +182,7 @@ class AuthService:
         # TODO: check for username conflicts, what if same user creates multiple
         # challenges at the same time?
         await self._webauthn_challenge_repo.create(
-            username=existing_user.username,
+            email=existing_user.email,
             challenge=authentication_options.challenge,
         )
 
@@ -190,14 +190,14 @@ class AuthService:
 
     async def verify_authentication_response(
         self,
-        username: str,
+        email: str,
         credential: AuthenticationCredential,
         request_ip: str,
         user_agent: UserAgent,
     ) -> AuthenticationResult:
         """Verify the authenticator's response for authentication."""
-        existing_user = await self._user_repo.get_by_username(
-            username=username,
+        existing_user = await self._user_repo.get_by_email(
+            email=email,
         )
 
         if existing_user is None:
@@ -214,7 +214,7 @@ class AuthService:
             raise Exception
 
         challenge = await self._webauthn_challenge_repo.get(
-            username=existing_user.username,
+            email=existing_user.email,
         )
 
         if challenge is None:

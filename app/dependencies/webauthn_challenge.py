@@ -1,19 +1,21 @@
 from typing import Annotated
 
 from fastapi import Depends
-from sqlalchemy.ext.asyncio import AsyncSession
+from redis.asyncio import Redis
 
-from app.lib.database import get_database_session
+from app.lib.redis_client import get_redis_client
 from app.repositories.webauthn_challenge import WebAuthnChallengeRepo
 
 
 def get_webauthn_challenge_repo(
-    session: Annotated[
-        AsyncSession,
+    redis_client: Annotated[
+        Redis,
         Depends(
-            dependency=get_database_session,
+            dependency=get_redis_client,
         ),
     ],
 ) -> WebAuthnChallengeRepo:
     """Get the WebAuthn challenge repo."""
-    return WebAuthnChallengeRepo(session=session)
+    return WebAuthnChallengeRepo(
+        redis_client=redis_client,
+    )

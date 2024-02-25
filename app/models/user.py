@@ -25,8 +25,8 @@ class User(Base):
         ),
     )
 
-    username: Mapped[str] = mapped_column(
-        CITEXT(MAX_USERNAME_LENGTH),
+    email: Mapped[str] = mapped_column(
+        CITEXT(255),
         unique=True,
         index=True,
     )

@@ -53,7 +53,7 @@ async def registration_options(
 ) -> PublicKeyCredentialCreationOptions:
     """Generate options for registering a credential."""
     return await auth_service.generate_registration_options(
-        username=data.username,
+        email=data.email,
     )
 
 
@@ -79,7 +79,7 @@ async def registration_verification(
 ) -> AuthenticationResult:
     """Verify the authenticator's response for registration."""
     return await auth_service.verify_registration_response(
-        username=data.username,
+        email=data.email,
         credential=data.credential,
         request_ip=request_ip,
         user_agent=parse(user_agent),
@@ -101,7 +101,7 @@ async def authentication_options(
 ) -> PublicKeyCredentialRequestOptions:
     """Generate options for retrieving a credential."""
     return await auth_service.generate_authentication_options(
-        username=data.username,
+        email=data.email,
         user_verification=data.user_verification,
     )
 
@@ -128,7 +128,7 @@ async def authentication_verification(
 ) -> AuthenticationResult:
     """Verify the authenticator's response for authentication."""
     return await auth_service.verify_authentication_response(
-        username=data.username,
+        email=data.email,
         credential=data.credential,
         request_ip=request_ip,
         user_agent=parse(user_agent),

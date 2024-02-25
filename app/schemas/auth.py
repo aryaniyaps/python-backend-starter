@@ -7,26 +7,25 @@ from webauthn.helpers.structs import (
     UserVerificationRequirement,
 )
 
-from app.lib.constants import MAX_USERNAME_LENGTH, MIN_USERNAME_LENGTH
+from app.lib.constants import MAX_USERNAME_LENGTH
 from app.schemas.base import BaseSchema
 from app.schemas.user import UserSchema
 
 
 class RegistrationOptionsInput(BaseSchema):
-    username: Annotated[
-        str,
+    email: Annotated[
+        EmailStr,
         Field(
-            max_length=MAX_USERNAME_LENGTH,
-            min_length=MIN_USERNAME_LENGTH,
+            max_length=255,
         ),
     ]
 
 
 class RegistrationVerificationInput(BaseSchema):
-    username: Annotated[
-        str,
+    email: Annotated[
+        EmailStr,
         Field(
-            max_length=MAX_USERNAME_LENGTH,
+            max_length=255,
         ),
     ]
 
@@ -34,10 +33,10 @@ class RegistrationVerificationInput(BaseSchema):
 
 
 class AuthenticationOptionsInput(BaseSchema):
-    username: Annotated[
-        str,
+    email: Annotated[
+        EmailStr,
         Field(
-            max_length=MAX_USERNAME_LENGTH,
+            max_length=255,
         ),
     ]
 
@@ -45,10 +44,10 @@ class AuthenticationOptionsInput(BaseSchema):
 
 
 class AuthenticationVerificationInput(BaseSchema):
-    username: Annotated[
-        str,
+    email: Annotated[
+        EmailStr,
         Field(
-            max_length=MAX_USERNAME_LENGTH,
+            max_length=255,
         ),
     ]
 

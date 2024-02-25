@@ -12,12 +12,10 @@ class UserRepo:
 
     async def create(
         self,
-        username: str,
+        email: str,
     ) -> User:
         """Create a new user."""
-        user = User(
-            username=username,
-        )
+        user = User(email=email)
         self._session.add(user)
         await self._session.commit()
         return user
@@ -26,12 +24,9 @@ class UserRepo:
         self,
         user: User,
         *,
-        username: str | None = None,
         email: str | None = None,
     ) -> User:
         """Update the given user."""
-        if username is not None:
-            user.username = username
         if email is not None:
             user.email = email
 
@@ -47,17 +42,6 @@ class UserRepo:
         return await self._session.scalar(
             select(User).where(
                 User.id == user_id,
-            ),
-        )
-
-    async def get_by_username(
-        self,
-        username: str,
-    ) -> User | None:
-        """Get an user by username."""
-        return await self._session.scalar(
-            select(User).where(
-                User.username == username,
             ),
         )
 
