@@ -1,10 +1,43 @@
 from typing import Annotated
 
-from pydantic import EmailStr, Field, SecretStr
+from pydantic import EmailStr, Field, Json, SecretStr
+from webauthn.helpers.structs import RegistrationCredential, UserVerificationRequirement
 
 from app.lib.constants import MAX_USERNAME_LENGTH, MIN_USERNAME_LENGTH
 from app.schemas.base import BaseSchema
 from app.schemas.user import UserSchema
+
+
+class RegistrationOptionsInput(BaseSchema):
+    username: Annotated[
+        str,
+        Field(
+            max_length=MAX_USERNAME_LENGTH,
+            min_length=MIN_USERNAME_LENGTH,
+        ),
+    ]
+
+
+class RegistrationVerificationInput(BaseSchema):
+    username: Annotated[
+        str,
+        Field(
+            max_length=MAX_USERNAME_LENGTH,
+        ),
+    ]
+
+    credential: Json[RegistrationCredential]
+
+
+class AuthenticationOptionsInput(BaseSchema):
+    username: Annotated[
+        str | None,
+        Field(
+            max_length=MAX_USERNAME_LENGTH,
+        ),
+    ]
+
+    user_verification: UserVerificationRequirement
 
 
 class LoginUserInput(BaseSchema):
@@ -135,55 +168,3 @@ class LogoutInput(BaseSchema):
             description="Whether the current user's session should be remembered.",
         ),
     ] = True
-
-
-class PasswordResetRequestInput(BaseSchema):
-    email: Annotated[
-        EmailStr,
-        Field(
-            max_length=250,
-            examples=[
-                "aryan@example.com",
-            ],
-            description="""The email address associated with the user account
-            for which a password reset is requested.""",
-        ),
-    ]
-
-
-class PasswordResetInput(BaseSchema):
-    email: Annotated[
-        EmailStr,
-        Field(
-            max_length=250,
-            examples=[
-                "aryan@example.com",
-            ],
-            description="""The email address associated with the user account
-            for which the password is being reset.""",
-        ),
-    ]
-
-    new_password: Annotated[
-        SecretStr,
-        Field(
-            max_length=64,
-            examples=[
-                "super-Secret12!",
-            ],
-            title="New Password",
-            description="The new password for the user account.",
-        ),
-    ]
-
-    reset_code: Annotated[
-        SecretStr,
-        Field(
-            examples=[
-                "18762390",
-            ],
-            title="Reset Code",
-            description="""The code used to verify the user's identity
-            during the password reset process.""",
-        ),
-    ]

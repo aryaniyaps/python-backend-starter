@@ -15,7 +15,6 @@ from app.schemas.errors import InvalidInputErrorResult, ResourceNotFoundErrorRes
 from app.schemas.user import (
     ChangeUserEmailInput,
     ChangeUserEmailRequestInput,
-    ChangeUserPasswordInput,
     PartialUserSchema,
     UpdateUserInput,
     UserSchema,
@@ -98,56 +97,6 @@ async def update_current_user(
     return await user_service.update_user(
         user_id=viewer_info.user_id,
         username=data.username,
-    )
-
-
-@users_router.patch(
-    "/@me/password",
-    response_model=UserSchema,
-    responses={
-        HTTPStatus.BAD_REQUEST: {
-            "model": InvalidInputErrorResult,
-            "description": "Invalid Input Error",
-        },
-    },
-    summary="Change the current user's password.",
-    dependencies=[
-        Depends(
-            dependency=RateLimiter(
-                limit="15/hour",
-            ),
-        ),
-    ],
-)
-async def change_current_user_password(
-    data: ChangeUserPasswordInput,
-    request_ip: Annotated[
-        str,
-        Depends(
-            dependency=get_ip_address,
-        ),
-    ],
-    user_agent: Annotated[str, Header()],
-    viewer_info: Annotated[
-        UserInfo,
-        Depends(
-            dependency=get_viewer_info,
-        ),
-    ],
-    user_service: Annotated[
-        UserService,
-        Depends(
-            dependency=get_user_service,
-        ),
-    ],
-) -> User:
-    """Change the current user's password."""
-    return await user_service.update_user_password(
-        user_id=viewer_info.user_id,
-        current_password=data.current_password.get_secret_value(),
-        new_password=data.new_password.get_secret_value(),
-        request_ip=request_ip,
-        user_agent=parse(user_agent),
     )
 
 

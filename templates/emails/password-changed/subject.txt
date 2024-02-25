@@ -1,1 +1,0 @@
-Your {{ app_name }} password has been changed

@@ -1,10 +1,9 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import ForeignKey, text
 from sqlalchemy.dialects.postgresql import CITEXT
-from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql.functions import now
 
@@ -13,9 +12,7 @@ from app.lib.database import Base
 from app.models.user_email import UserEmail
 
 if TYPE_CHECKING:
-    from app.models.auth_provider import AuthProvider
-    from app.models.password_reset_code import PasswordResetCode
-    from app.models.user_password import UserPassword
+    from app.models.authenticator import Authenticator
     from app.models.user_session import UserSession
 
 
@@ -48,10 +45,6 @@ class User(Base):
         onupdate=now(),
     )
 
-    user_password: Mapped[Optional["UserPassword"]] = relationship(
-        back_populates="user", cascade="all, delete-orphan"
-    )
-
     user_emails: Mapped[set["UserEmail"]] = relationship(
         back_populates="user",
         primaryjoin=lambda: User.id == UserEmail.user_id,
@@ -65,12 +58,7 @@ class User(Base):
         cascade="all, delete-orphan",
     )
 
-    password_reset_codes: Mapped[set["PasswordResetCode"]] = relationship(
-        back_populates="user",
-        cascade="all, delete-orphan",
-    )
-
-    auth_providers: Mapped[set["AuthProvider"]] = relationship(
+    authenticators: Mapped[set["Authenticator"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
     )
@@ -79,8 +67,3 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan",
     )
-
-    @hybrid_property
-    def has_password(self) -> bool:
-        """Whether the user has their password set."""
-        return self.user_password is not None

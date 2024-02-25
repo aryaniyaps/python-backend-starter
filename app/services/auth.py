@@ -2,24 +2,27 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 import humanize
-from argon2 import PasswordHasher
-from argon2.exceptions import HashingError, VerifyMismatchError
 from geoip2.database import Reader
 from sqlalchemy import ScalarResult
 from user_agents.parsers import UserAgent
+from webauthn import generate_registration_options, verify_registration_response
+from webauthn.helpers.structs import (
+    AttestationConveyancePreference,
+    PublicKeyCredentialCreationOptions,
+    RegistrationCredential,
+)
 
+from app.config import settings
 from app.lib.enums import AuthProviderType
 from app.lib.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
 from app.lib.geo_ip import get_city_location, get_geoip_city
-from app.lib.security import check_password_strength
 from app.models.user import User
 from app.models.user_session import UserSession
 from app.repositories.auth_provider import AuthProviderRepo
 from app.repositories.authentication_token import AuthenticationTokenRepo
+from app.repositories.authenticator import AuthenticatorRepo
 from app.repositories.email_verification_code import EmailVerificationCodeRepo
-from app.repositories.password_reset_code import PasswordResetCodeRepo
 from app.repositories.user import UserRepo
-from app.repositories.user_password import UserPasswordRepo
 from app.repositories.user_session import UserSessionRepo
 from app.types.auth import UserInfo
 from app.worker import task_queue
@@ -29,24 +32,67 @@ class AuthService:
     def __init__(
         self,
         user_session_repo: UserSessionRepo,
-        password_reset_code_repo: PasswordResetCodeRepo,
+        authenticator_repo: AuthenticatorRepo,
         authentication_token_repo: AuthenticationTokenRepo,
         auth_provider_repo: AuthProviderRepo,
         user_repo: UserRepo,
-        user_password_repo: UserPasswordRepo,
         email_verification_code_repo: EmailVerificationCodeRepo,
-        password_hasher: PasswordHasher,
         geoip_reader: Reader,
     ) -> None:
         self._user_session_repo = user_session_repo
-        self._password_reset_code_repo = password_reset_code_repo
+        self._authenticator_repo = authenticator_repo
         self._authentication_token_repo = authentication_token_repo
         self._auth_provider_repo = auth_provider_repo
         self._user_repo = user_repo
-        self._user_password_repo = user_password_repo
         self._email_verification_code_repo = email_verification_code_repo
-        self._password_hasher = password_hasher
         self._geoip_reader = geoip_reader
+
+    async def generate_registration_options(
+        self, username: str
+    ) -> PublicKeyCredentialCreationOptions:
+        """Generate options for registering a credential."""
+        if (
+            await self._user_repo.get_by_username(
+                username=username,
+            )
+            is not None
+        ):
+            raise InvalidInputError(
+                message="User with that username already exists.",
+            )
+        return generate_registration_options(
+            rp_id=settings.rp_id,
+            rp_name=settings.rp_name,
+            user_name=username,
+            timeout=60000,
+            attestation=AttestationConveyancePreference.NONE,
+        )
+
+    async def verify_registration_response(
+        self, username: str, credential: RegistrationCredential
+    ) -> None:
+        user = await self._user_repo.get_by_username(username=username)
+
+        if user is None:
+            # handle case here
+            return
+
+        verified_registration = verify_registration_response(
+            credential=credential,
+            expected_challenge=b"",
+            expected_rp_id=settings.rp_id,
+            expected_origin=settings.rp_expected_origin,
+        )
+
+        await self._authenticator_repo.create(
+            user_id=user.id,
+            credential_id=str(verified_registration.credential_id),
+            credential_public_key=str(verified_registration.credential_public_key),
+            sign_count=verified_registration.sign_count,
+            credential_backed_up=verified_registration.credential_backed_up,
+            credential_device_type=verified_registration.credential_device_type,
+            transports=credential.response.transports,
+        )
 
     async def send_email_verification_request(
         self,
@@ -302,113 +348,3 @@ class AuthService:
                 message="Invalid authentication token provided.",
             )
         return user_info
-
-    async def send_password_reset_request(
-        self,
-        email: str,
-        user_agent: UserAgent,
-        request_ip: str,
-    ) -> None:
-        """Send a password reset request to the given user if they exist."""
-        existing_user = await self._user_repo.get_by_email(email=email)
-        if existing_user is not None:
-            reset_code = await self._password_reset_code_repo.create(
-                user_id=existing_user.id,
-            )
-            await task_queue.enqueue(
-                "send_password_reset_request_email",
-                receiver=existing_user.email,
-                username=existing_user.username,
-                password_reset_code=reset_code,
-                device=user_agent.get_device(),
-                browser_name=user_agent.get_browser(),
-                location=get_city_location(
-                    city=get_geoip_city(
-                        ip_address=request_ip,
-                        geoip_reader=self._geoip_reader,
-                    ),
-                ),
-                ip_address=request_ip,
-            )
-
-    async def reset_password(
-        self,
-        email: str,
-        reset_code: str,
-        new_password: str,
-        request_ip: str,
-        user_agent: UserAgent,
-    ) -> None:
-        """Reset the relevant user's password with the given credentials."""
-        existing_user = await self._user_repo.get_by_email(email=email)
-        password_reset_code = await self._password_reset_code_repo.get_by_reset_code(
-            reset_code=reset_code,
-        )
-
-        if not (existing_user and password_reset_code):
-            raise InvalidInputError(
-                message="Invalid password reset code or email provided.",
-            )
-
-        if datetime.now(UTC) > password_reset_code.expires_at:
-            # password reset code has expired.
-            raise InvalidInputError(
-                message="Invalid password reset code or email provided.",
-            )
-
-        if not check_password_strength(
-            password=new_password,
-            context={
-                "username": existing_user.username,
-                "email": existing_user.email,
-            },
-        ):
-            raise InvalidInputError(
-                message="Enter a stronger password.",
-            )
-
-        # delete all password reset codes to prevent duplicate use
-        await self._password_reset_code_repo.delete_all(
-            user_id=existing_user.id,
-        )
-
-        user_password = await self._user_password_repo.get(
-            user_id=existing_user.id,
-        )
-
-        if user_password is None:
-            # user must have registered with an oauth provider
-            await self._user_password_repo.create(
-                user_id=existing_user.id,
-                password=new_password,
-            )
-        else:
-            await self._user_password_repo.update(
-                user_password=user_password,
-                password=new_password,
-            )
-
-        # logout user everywhere
-        await self._authentication_token_repo.delete_all(
-            user_id=existing_user.id,
-        )
-
-        await self._user_session_repo.logout_all(
-            user_id=existing_user.id,
-        )
-
-        # send password reset mail
-        await task_queue.enqueue(
-            "send_password_reset_email",
-            receiver=existing_user.email,
-            username=existing_user.username,
-            device=user_agent.get_device(),
-            browser_name=user_agent.get_browser(),
-            location=get_city_location(
-                city=get_geoip_city(
-                    ip_address=request_ip,
-                    geoip_reader=self._geoip_reader,
-                ),
-            ),
-            ip_address=request_ip,
-        )

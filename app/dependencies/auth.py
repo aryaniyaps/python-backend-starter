@@ -1,20 +1,20 @@
 from typing import Annotated
 
-from argon2 import PasswordHasher
 from fastapi import Depends, Security
 from fastapi.security import APIKeyHeader
 from geoip2.database import Reader
 
+from app.dependencies.auth_provider import get_auth_provider_repo
 from app.dependencies.authentication_token import get_authentication_token_repo
+from app.dependencies.authenticator import get_authenticator_repo
 from app.dependencies.email_verification_code import get_email_verification_code_repo
-from app.dependencies.password_reset_code import get_password_reset_code_repo
 from app.dependencies.user import get_user_repo
 from app.dependencies.user_session import get_user_session_repo
 from app.lib.geo_ip import get_geoip_reader
-from app.lib.security import get_password_hasher
+from app.repositories.auth_provider import AuthProviderRepo
 from app.repositories.authentication_token import AuthenticationTokenRepo
+from app.repositories.authenticator import AuthenticatorRepo
 from app.repositories.email_verification_code import EmailVerificationCodeRepo
-from app.repositories.password_reset_code import PasswordResetCodeRepo
 from app.repositories.user import UserRepo
 from app.repositories.user_session import UserSessionRepo
 from app.services.auth import AuthService
@@ -30,10 +30,16 @@ def get_auth_service(
             dependency=get_user_session_repo,
         ),
     ],
-    password_reset_token_repo: Annotated[
-        PasswordResetCodeRepo,
+    authenticator_repo: Annotated[
+        AuthenticatorRepo,
         Depends(
-            dependency=get_password_reset_code_repo,
+            dependency=get_authenticator_repo,
+        ),
+    ],
+    auth_provider_repo: Annotated[
+        AuthProviderRepo,
+        Depends(
+            dependency=get_auth_provider_repo,
         ),
     ],
     authentication_token_repo: Annotated[
@@ -54,12 +60,6 @@ def get_auth_service(
             dependency=get_email_verification_code_repo,
         ),
     ],
-    password_hasher: Annotated[
-        PasswordHasher,
-        Depends(
-            dependency=get_password_hasher,
-        ),
-    ],
     geoip_reader: Annotated[
         Reader,
         Depends(
@@ -70,11 +70,11 @@ def get_auth_service(
     """Get the auth service."""
     return AuthService(
         user_session_repo=user_session_repo,
-        password_reset_token_repo=password_reset_token_repo,
+        authenticator_repo=authenticator_repo,
+        auth_provider_repo=auth_provider_repo,
         authentication_token_repo=authentication_token_repo,
         user_repo=user_repo,
         email_verification_code_repo=email_verification_token_repo,
-        password_hasher=password_hasher,
         geoip_reader=geoip_reader,
     )
 

@@ -61,6 +61,35 @@ class Settings(BaseSettings):
 
     server_url: str = "http://localhost:8000"
 
+    # webauthn config
+
+    rp_id: Annotated[
+        str,
+        Field(
+            examples=[
+                "example.com",
+            ],
+        ),
+    ]
+
+    rp_name: Annotated[
+        str,
+        Field(
+            examples=[
+                "Example Inc.",
+            ],
+        ),
+    ]
+
+    rp_expected_origin: Annotated[
+        str,
+        Field(
+            examples=[
+                "",
+            ],
+        ),
+    ]
+
     # database config
 
     database_url: Annotated[

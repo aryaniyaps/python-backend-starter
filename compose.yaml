@@ -51,3 +51,7 @@ secrets:
 volumes:
   postgres_data:
   redis_data:
+
+networks:
+  apisix:
+    driver: bridge

@@ -4,6 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Header
 from sqlalchemy import ScalarResult
 from user_agents import parse
+from webauthn.helpers.structs import PublicKeyCredentialCreationOptions
 
 from app.dependencies.auth import (
     authentication_token_header,
@@ -15,14 +16,15 @@ from app.dependencies.rate_limiter import RateLimiter
 from app.lib.constants import OpenAPITag
 from app.models.user_session import UserSession
 from app.schemas.auth import (
+    AuthenticationOptionsInput,
     EmailVerificationRequestInput,
     LoginUserInput,
     LoginUserResult,
     LogoutInput,
-    PasswordResetInput,
-    PasswordResetRequestInput,
     RegisterUserInput,
     RegisterUserResult,
+    RegistrationOptionsInput,
+    RegistrationVerificationInput,
 )
 from app.schemas.errors import InvalidInputErrorResult
 from app.schemas.user_session import UserSessionSchema
@@ -33,6 +35,56 @@ auth_router = APIRouter(
     prefix="/auth",
     tags=[OpenAPITag.AUTHENTICATION],
 )
+
+
+@auth_router.post(
+    "/registration/options",
+    response_model=PublicKeyCredentialCreationOptions,
+)
+async def registration_options(
+    data: RegistrationOptionsInput,
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=get_auth_service,
+        ),
+    ],
+) -> PublicKeyCredentialCreationOptions:
+    """Generate options for registering a credential."""
+    return await auth_service.generate_registration_options(
+        username=data.username,
+    )
+
+
+@auth_router.post("/registration/verification")
+async def registration_verification(
+    data: RegistrationVerificationInput,
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=get_auth_service,
+        ),
+    ],
+) -> None:
+    return await auth_service.verify_registration_response(
+        username=data.username,
+        credential=data.credential,
+    )
+
+
+@auth_router.post("/authentication/options")
+async def authentication_options(data: AuthenticationOptionsInput) -> None:
+    pass
+
+
+@auth_router.post("/authentication/verification")
+async def authentication_verification() -> None:
+    pass
+
+
+@auth_router.delete("/credentials/{credential_id}")
+async def delete_credential() -> None:
+    pass
 
 
 @auth_router.post(
@@ -239,85 +291,3 @@ async def get_user_sessions(
 ) -> ScalarResult[UserSession]:
     """Get the current user's user sessions."""
     return await auth_service.get_user_sessions(user_id=viewer_info.user_id)
-
-
-@auth_router.post(
-    "/reset-password-request",
-    status_code=HTTPStatus.ACCEPTED,
-    summary="Send a password reset request.",
-    response_model=None,
-    dependencies=[
-        Depends(
-            dependency=RateLimiter(
-                limit="20/hour",
-            ),
-        ),
-    ],
-)
-async def request_password_reset(
-    data: PasswordResetRequestInput,
-    request_ip: Annotated[
-        str,
-        Depends(
-            dependency=get_ip_address,
-        ),
-    ],
-    user_agent: Annotated[str, Header()],
-    auth_service: Annotated[
-        AuthService,
-        Depends(
-            dependency=get_auth_service,
-        ),
-    ],
-) -> None:
-    """Send a password reset request to the given email."""
-    await auth_service.send_password_reset_request(
-        email=data.email,
-        user_agent=parse(user_agent),
-        request_ip=request_ip,
-    )
-
-
-@auth_router.post(
-    "/reset-password",
-    status_code=HTTPStatus.NO_CONTENT,
-    summary="Reset user password.",
-    responses={
-        HTTPStatus.BAD_REQUEST: {
-            "model": InvalidInputErrorResult,
-            "description": "Invalid Input Error",
-        },
-    },
-    response_model=None,
-    dependencies=[
-        Depends(
-            dependency=RateLimiter(
-                limit="20/hour",
-            ),
-        ),
-    ],
-)
-async def reset_password(
-    data: PasswordResetInput,
-    request_ip: Annotated[
-        str,
-        Depends(
-            dependency=get_ip_address,
-        ),
-    ],
-    user_agent: Annotated[str, Header()],
-    auth_service: Annotated[
-        AuthService,
-        Depends(
-            dependency=get_auth_service,
-        ),
-    ],
-) -> None:
-    """Reset the user's password."""
-    await auth_service.reset_password(
-        reset_code=data.reset_code.get_secret_value(),
-        email=data.email,
-        new_password=data.new_password.get_secret_value(),
-        request_ip=request_ip,
-        user_agent=parse(user_agent),
-    )

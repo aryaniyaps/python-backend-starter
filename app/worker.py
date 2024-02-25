@@ -12,12 +12,9 @@ from app.logger import build_worker_log_config, setup_logging
 from app.sentry import setup_sentry
 from app.tasks import (
     delete_expired_email_verification_codes,
-    delete_expired_password_reset_codes,
     send_email_verification_request_email,
     send_new_login_device_detected_email,
     send_onboarding_email,
-    send_password_reset_email,
-    send_password_reset_request_email,
 )
 
 
@@ -95,17 +92,11 @@ if __name__ == "__main__":
     worker = Worker(
         queue=task_queue,
         functions=[
-            send_password_reset_email,
-            send_password_reset_request_email,
             send_new_login_device_detected_email,
             send_onboarding_email,
             send_email_verification_request_email,
         ],
         cron_jobs=[
-            CronJob(
-                delete_expired_password_reset_codes,
-                cron="0 * * * *",
-            ),
             CronJob(
                 delete_expired_email_verification_codes,
                 cron="0 * * * *",
