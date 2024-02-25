@@ -20,9 +20,9 @@ jobs:
       SERVER_CORS_ALLOW_ORIGINS: '["*"]'
       SERVER_SERVER_URL: 'http://localhost:8000'
       SERVER_OPENAPI_URL:
-      SERVER_RP_ID: "example.com"
-      SERVER_RP_NAME: "Example Inc."
-      SERVER_RP_EXPECTED_ORIGIN: ""
+      SERVER_RP_ID: 'localhost'
+      SERVER_RP_NAME: 'Starter'
+      SERVER_RP_EXPECTED_ORIGIN: 'http://localhost:8000'
       SERVER_REDIS_URL: "redis://:pass@localhost:6379/1"
       SERVER_SAQ_BROKER_URL: "redis://:pass@localhost:6379/2"
       SERVER_SAQ_CONCURRENCY: 10

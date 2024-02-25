@@ -1,7 +1,11 @@
 from typing import Annotated
 
 from pydantic import EmailStr, Field, Json, SecretStr
-from webauthn.helpers.structs import RegistrationCredential, UserVerificationRequirement
+from webauthn.helpers.structs import (
+    AuthenticationCredential,
+    RegistrationCredential,
+    UserVerificationRequirement,
+)
 
 from app.lib.constants import MAX_USERNAME_LENGTH, MIN_USERNAME_LENGTH
 from app.schemas.base import BaseSchema
@@ -31,13 +35,24 @@ class RegistrationVerificationInput(BaseSchema):
 
 class AuthenticationOptionsInput(BaseSchema):
     username: Annotated[
-        str | None,
+        str,
         Field(
             max_length=MAX_USERNAME_LENGTH,
         ),
     ]
 
     user_verification: UserVerificationRequirement
+
+
+class AuthenticationVerificationInput(BaseSchema):
+    username: Annotated[
+        str,
+        Field(
+            max_length=MAX_USERNAME_LENGTH,
+        ),
+    ]
+
+    credential: Json[AuthenticationCredential]
 
 
 class LoginUserInput(BaseSchema):

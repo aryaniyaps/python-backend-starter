@@ -4,7 +4,10 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Header
 from sqlalchemy import ScalarResult
 from user_agents import parse
-from webauthn.helpers.structs import PublicKeyCredentialCreationOptions
+from webauthn.helpers.structs import (
+    PublicKeyCredentialCreationOptions,
+    PublicKeyCredentialRequestOptions,
+)
 
 from app.dependencies.auth import (
     authentication_token_header,
@@ -17,6 +20,7 @@ from app.lib.constants import OpenAPITag
 from app.models.user_session import UserSession
 from app.schemas.auth import (
     AuthenticationOptionsInput,
+    AuthenticationVerificationInput,
     EmailVerificationRequestInput,
     LoginUserInput,
     LoginUserResult,
@@ -66,20 +70,48 @@ async def registration_verification(
         ),
     ],
 ) -> None:
+    """Verify the authenticator's response for registration."""
     return await auth_service.verify_registration_response(
         username=data.username,
         credential=data.credential,
     )
 
 
-@auth_router.post("/authentication/options")
-async def authentication_options(data: AuthenticationOptionsInput) -> None:
-    pass
+@auth_router.post(
+    "/authentication/options",
+    response_model=PublicKeyCredentialRequestOptions,
+)
+async def authentication_options(
+    data: AuthenticationOptionsInput,
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=get_auth_service,
+        ),
+    ],
+) -> PublicKeyCredentialRequestOptions:
+    """Generate options for retrieving a credential."""
+    return await auth_service.generate_authentication_options(
+        username=data.username,
+        user_verification=data.user_verification,
+    )
 
 
 @auth_router.post("/authentication/verification")
-async def authentication_verification() -> None:
-    pass
+async def authentication_verification(
+    data: AuthenticationVerificationInput,
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=get_auth_service,
+        ),
+    ],
+) -> None:
+    """Verify the authenticator's response for authentication."""
+    return await auth_service.verify_authentication_response(
+        username=data.username,
+        credential=data.credential,
+    )
 
 
 @auth_router.delete("/credentials/{credential_id}")

@@ -2,9 +2,10 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import ForeignKey, text
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql.functions import now
+from webauthn.helpers.structs import AuthenticatorTransport
 
 from app.lib.database import Base
 
@@ -12,19 +13,11 @@ if TYPE_CHECKING:
     from app.models.user import User
 
 
-class Authenticator(Base):
-    __tablename__ = "authenticators"
+class WebAuthnCredential(Base):
+    __tablename__ = "webauthn_credentials"
 
-    id: Mapped[UUID] = mapped_column(
+    id: Mapped[str] = mapped_column(
         primary_key=True,
-        server_default=text(
-            "gen_random_uuid()",
-        ),
-    )
-
-    credential_id: Mapped[str] = mapped_column(
-        unique=True,
-        index=True,
     )
 
     user_id: Mapped[UUID] = mapped_column(
@@ -32,15 +25,15 @@ class Authenticator(Base):
         index=True,
     )
 
-    credential_public_key: Mapped[str]
+    public_key: Mapped[str]
 
     sign_count: Mapped[int]
 
-    credential_device_type: Mapped[str]
+    device_type: Mapped[str]
 
-    credential_backed_up: Mapped[bool]
+    backed_up: Mapped[bool]
 
-    transports: Mapped[str | None]
+    transports: Mapped[list[AuthenticatorTransport] | None]
 
     created_at: Mapped[datetime] = mapped_column(
         server_default=now(),
@@ -48,5 +41,5 @@ class Authenticator(Base):
 
     user: Mapped["User"] = relationship(
         "User",
-        back_populates="authenticators",
+        back_populates="webauthn_credentials",
     )

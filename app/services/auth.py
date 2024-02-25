@@ -5,11 +5,22 @@ import humanize
 from geoip2.database import Reader
 from sqlalchemy import ScalarResult
 from user_agents.parsers import UserAgent
-from webauthn import generate_registration_options, verify_registration_response
+from webauthn import (
+    generate_authentication_options,
+    generate_registration_options,
+    verify_authentication_response,
+    verify_registration_response,
+)
 from webauthn.helpers.structs import (
-    AttestationConveyancePreference,
+    AuthenticationCredential,
+    AuthenticatorAttachment,
+    AuthenticatorSelectionCriteria,
     PublicKeyCredentialCreationOptions,
+    PublicKeyCredentialDescriptor,
+    PublicKeyCredentialRequestOptions,
     RegistrationCredential,
+    ResidentKeyRequirement,
+    UserVerificationRequirement,
 )
 
 from app.config import settings
@@ -20,10 +31,10 @@ from app.models.user import User
 from app.models.user_session import UserSession
 from app.repositories.auth_provider import AuthProviderRepo
 from app.repositories.authentication_token import AuthenticationTokenRepo
-from app.repositories.authenticator import AuthenticatorRepo
 from app.repositories.email_verification_code import EmailVerificationCodeRepo
 from app.repositories.user import UserRepo
 from app.repositories.user_session import UserSessionRepo
+from app.repositories.webauthn_credential import WebAuthnCredentialRepo
 from app.types.auth import UserInfo
 from app.worker import task_queue
 
@@ -32,7 +43,7 @@ class AuthService:
     def __init__(
         self,
         user_session_repo: UserSessionRepo,
-        authenticator_repo: AuthenticatorRepo,
+        webauthn_credential_repo: WebAuthnCredentialRepo,
         authentication_token_repo: AuthenticationTokenRepo,
         auth_provider_repo: AuthProviderRepo,
         user_repo: UserRepo,
@@ -40,7 +51,7 @@ class AuthService:
         geoip_reader: Reader,
     ) -> None:
         self._user_session_repo = user_session_repo
-        self._authenticator_repo = authenticator_repo
+        self._webauthn_credential_repo = webauthn_credential_repo
         self._authentication_token_repo = authentication_token_repo
         self._auth_provider_repo = auth_provider_repo
         self._user_repo = user_repo
@@ -60,23 +71,32 @@ class AuthService:
             raise InvalidInputError(
                 message="User with that username already exists.",
             )
-        return generate_registration_options(
+
+        registration_options = generate_registration_options(
             rp_id=settings.rp_id,
             rp_name=settings.rp_name,
+            user_id=username.encode(),
             user_name=username,
-            timeout=60000,
-            attestation=AttestationConveyancePreference.NONE,
+            user_display_name=username,
+            authenticator_selection=AuthenticatorSelectionCriteria(
+                authenticator_attachment=AuthenticatorAttachment.PLATFORM,
+                user_verification=UserVerificationRequirement.REQUIRED,
+                resident_key=ResidentKeyRequirement.PREFERRED,
+                require_resident_key=False,
+            ),
         )
+
+        challenge = registration_options.challenge
+
+        # TODO: store challenge here
+
+        return registration_options
 
     async def verify_registration_response(
         self, username: str, credential: RegistrationCredential
     ) -> None:
-        user = await self._user_repo.get_by_username(username=username)
-
-        if user is None:
-            # handle case here
-            return
-
+        """Verify the authenticator's response for registration."""
+        # TODO: get challenge here
         verified_registration = verify_registration_response(
             credential=credential,
             expected_challenge=b"",
@@ -84,14 +104,75 @@ class AuthService:
             expected_origin=settings.rp_expected_origin,
         )
 
-        await self._authenticator_repo.create(
+        user = await self._user_repo.create(
+            username=username,
+        )
+
+        await self._webauthn_credential_repo.create(
             user_id=user.id,
             credential_id=str(verified_registration.credential_id),
-            credential_public_key=str(verified_registration.credential_public_key),
+            public_key=str(verified_registration.credential_public_key),
             sign_count=verified_registration.sign_count,
-            credential_backed_up=verified_registration.credential_backed_up,
-            credential_device_type=verified_registration.credential_device_type,
+            backed_up=verified_registration.credential_backed_up,
+            device_type=verified_registration.credential_device_type,
             transports=credential.response.transports,
+        )
+
+    async def generate_authentication_options(
+        self, username: str, user_verification: UserVerificationRequirement
+    ) -> PublicKeyCredentialRequestOptions:
+        """Generate options for retrieving a credential."""
+        existing_user = await self._user_repo.get_by_username(
+            username=username,
+        )
+
+        if existing_user is None:
+            raise InvalidInputError(
+                message="User with that username doesn't exist.",
+            )
+
+        existing_credentials = await self._webauthn_credential_repo.get_all(
+            user_id=existing_user.id,
+        )
+
+        authentication_options = generate_authentication_options(
+            rp_id=settings.rp_id,
+            user_verification=user_verification,
+            allow_credentials=[
+                PublicKeyCredentialDescriptor(
+                    id=credential.id.encode(),
+                    transports=credential.transports,
+                )
+                for credential in existing_credentials
+            ],
+        )
+
+        challenge = authentication_options.challenge
+
+        # TODO: store challenge here
+
+        return authentication_options
+
+    async def verify_authentication_response(
+        self, username: str, credential: AuthenticationCredential
+    ) -> None:
+        """Verify the authenticator's response for authentication."""
+        # TODO: get challenge here
+        existing_user = await self._user_repo.get_by_username(
+            username=username,
+        )
+
+        existing_credential = await self._webauthn_credential_repo.get(
+            credential_id=credential.id
+        )
+
+        verified_authentication = verify_authentication_response(
+            credential=credential,
+            expected_challenge=b"",
+            expected_rp_id=settings.rp_id,
+            expected_origin=settings.rp_expected_origin,
+            credential_current_sign_count=existing_credential.sign_count,
+            credential_public_key=existing_credential.public_key.encode(),
         )
 
     async def send_email_verification_request(

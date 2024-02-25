@@ -6,17 +6,17 @@ from geoip2.database import Reader
 
 from app.dependencies.auth_provider import get_auth_provider_repo
 from app.dependencies.authentication_token import get_authentication_token_repo
-from app.dependencies.authenticator import get_authenticator_repo
 from app.dependencies.email_verification_code import get_email_verification_code_repo
 from app.dependencies.user import get_user_repo
 from app.dependencies.user_session import get_user_session_repo
+from app.dependencies.webauthn_credential import get_webauthn_credential_repo
 from app.lib.geo_ip import get_geoip_reader
 from app.repositories.auth_provider import AuthProviderRepo
 from app.repositories.authentication_token import AuthenticationTokenRepo
-from app.repositories.authenticator import AuthenticatorRepo
 from app.repositories.email_verification_code import EmailVerificationCodeRepo
 from app.repositories.user import UserRepo
 from app.repositories.user_session import UserSessionRepo
+from app.repositories.webauthn_credential import WebAuthnCredentialRepo
 from app.services.auth import AuthService
 from app.types.auth import UserInfo
 
@@ -30,10 +30,10 @@ def get_auth_service(
             dependency=get_user_session_repo,
         ),
     ],
-    authenticator_repo: Annotated[
-        AuthenticatorRepo,
+    webauthn_credential_repo: Annotated[
+        WebAuthnCredentialRepo,
         Depends(
-            dependency=get_authenticator_repo,
+            dependency=get_webauthn_credential_repo,
         ),
     ],
     auth_provider_repo: Annotated[
@@ -70,7 +70,7 @@ def get_auth_service(
     """Get the auth service."""
     return AuthService(
         user_session_repo=user_session_repo,
-        authenticator_repo=authenticator_repo,
+        webauthn_credential_repo=webauthn_credential_repo,
         auth_provider_repo=auth_provider_repo,
         authentication_token_repo=authentication_token_repo,
         user_repo=user_repo,
