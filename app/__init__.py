@@ -31,7 +31,6 @@ from app.lib.openapi import generate_operation_id
 from app.middleware.rate_limiter import rate_limiter_middleware
 from app.routes.auth import auth_router
 from app.routes.health import health_router
-from app.routes.oauth import oauth_router
 from app.routes.user import users_router
 from app.schemas.errors import (
     RateLimitExceededErrorResult,
@@ -46,7 +45,6 @@ def add_routes(app: FastAPI) -> None:
     app_router.include_router(health_router)
     app_router.include_router(users_router)
     app_router.include_router(auth_router)
-    app_router.include_router(oauth_router)
     app.include_router(app_router)
 
 
