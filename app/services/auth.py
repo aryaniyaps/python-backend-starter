@@ -17,6 +17,7 @@ from webauthn.helpers.structs import (
     PublicKeyCredentialCreationOptions,
     PublicKeyCredentialDescriptor,
     PublicKeyCredentialRequestOptions,
+    PublicKeyCredentialType,
     RegistrationCredential,
     ResidentKeyRequirement,
     UserVerificationRequirement,
@@ -34,6 +35,8 @@ from app.repositories.webauthn_challenge import WebAuthnChallengeRepo
 from app.repositories.webauthn_credential import WebAuthnCredentialRepo
 from app.types.auth import AuthenticationResult, UserInfo
 from app.worker import task_queue
+
+# reference: https://github.com/maximousblk/passkeys-demo/blob/main/server.ts
 
 
 class AuthService:
@@ -153,10 +156,6 @@ class AuthService:
             require_user_verification=True,
         )
 
-        if not verified_registration.user_verified:
-            # TODO: handle exception here
-            raise Exception
-
         user = await self._user_repo.create(
             email=email,
         )
@@ -196,7 +195,7 @@ class AuthService:
         }
 
     async def generate_login_options(
-        self, email: str, user_verification: UserVerificationRequirement
+        self, email: str
     ) -> PublicKeyCredentialRequestOptions:
         """Generate options for retrieving a credential."""
         existing_user = await self._user_repo.get_by_email(
@@ -214,10 +213,11 @@ class AuthService:
 
         authentication_options = generate_authentication_options(
             rp_id=settings.rp_id,
-            user_verification=user_verification,
+            user_verification=UserVerificationRequirement.REQUIRED,
             allow_credentials=[
                 PublicKeyCredentialDescriptor(
                     id=credential.id.encode(),
+                    type=PublicKeyCredentialType.PUBLIC_KEY,
                     transports=credential.transports,
                 )
                 for credential in existing_credentials
@@ -236,15 +236,18 @@ class AuthService:
 
     async def verify_login_response(
         self,
-        email: str,
         credential: AuthenticationCredential,
         request_ip: str,
         user_agent: UserAgent,
     ) -> AuthenticationResult:
         """Verify the authenticator's response for authentication."""
-        existing_user = await self._user_repo.get_by_email(
-            email=email,
-        )
+        user_id = credential.response.user_handle
+
+        if user_id is None:
+            # TODO: raise unauthorized error here
+            raise Exception
+
+        existing_user = await self._user_repo.get(user_id=user_id)
 
         if existing_user is None:
             # TODO: handle error here

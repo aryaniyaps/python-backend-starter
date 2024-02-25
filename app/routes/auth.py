@@ -19,13 +19,13 @@ from app.lib.constants import OpenAPITag
 from app.models.user_session import UserSession
 from app.schemas.auth import (
     AuthenticateUserResult,
-    AuthenticationOptionsInput,
-    AuthenticationVerificationInput,
     EmailVerificationRequestInput,
+    LoginOptionsInput,
+    LoginVerificationInput,
     LogoutInput,
+    RegisterOptionsInput,
     RegisterUserResult,
-    RegistrationOptionsInput,
-    RegistrationVerificationInput,
+    RegisterVerificationInput,
 )
 from app.schemas.errors import InvalidInputErrorResult
 from app.schemas.user_session import UserSessionSchema
@@ -36,109 +36,6 @@ auth_router = APIRouter(
     prefix="/auth",
     tags=[OpenAPITag.AUTHENTICATION],
 )
-
-
-@auth_router.post(
-    "/register/options",
-    response_model=PublicKeyCredentialCreationOptions,
-)
-async def registration_options(
-    data: RegistrationOptionsInput,
-    auth_service: Annotated[
-        AuthService,
-        Depends(
-            dependency=get_auth_service,
-        ),
-    ],
-) -> PublicKeyCredentialCreationOptions:
-    """Generate options for registering a credential."""
-    return await auth_service.generate_registration_options(
-        email=data.email,
-        verification_code=data.verification_code,
-    )
-
-
-@auth_router.post(
-    "/register/verification",
-    response_model=RegisterUserResult,
-)
-async def registration_verification(
-    data: RegistrationVerificationInput,
-    user_agent: Annotated[str, Header()],
-    request_ip: Annotated[
-        str,
-        Depends(
-            dependency=get_ip_address,
-        ),
-    ],
-    auth_service: Annotated[
-        AuthService,
-        Depends(
-            dependency=get_auth_service,
-        ),
-    ],
-) -> AuthenticationResult:
-    """Verify the authenticator's response for registration."""
-    return await auth_service.verify_registration_response(
-        email=data.email,
-        credential=data.credential,
-        request_ip=request_ip,
-        user_agent=parse(user_agent),
-    )
-
-
-@auth_router.post(
-    "/login/options",
-    response_model=PublicKeyCredentialRequestOptions,
-)
-async def login_options(
-    data: AuthenticationOptionsInput,
-    auth_service: Annotated[
-        AuthService,
-        Depends(
-            dependency=get_auth_service,
-        ),
-    ],
-) -> PublicKeyCredentialRequestOptions:
-    """Generate options for retrieving a credential."""
-    return await auth_service.generate_login_options(
-        email=data.email,
-        user_verification=data.user_verification,
-    )
-
-
-@auth_router.post(
-    "/login/verification",
-    response_model=AuthenticateUserResult,
-)
-async def login_verification(
-    data: AuthenticationVerificationInput,
-    user_agent: Annotated[str, Header()],
-    request_ip: Annotated[
-        str,
-        Depends(
-            dependency=get_ip_address,
-        ),
-    ],
-    auth_service: Annotated[
-        AuthService,
-        Depends(
-            dependency=get_auth_service,
-        ),
-    ],
-) -> AuthenticationResult:
-    """Verify the authenticator's response for login."""
-    return await auth_service.verify_login_response(
-        email=data.email,
-        credential=data.credential,
-        request_ip=request_ip,
-        user_agent=parse(user_agent),
-    )
-
-
-@auth_router.delete("/credentials/{credential_id}")
-async def delete_credential() -> None:
-    pass
 
 
 @auth_router.post(
@@ -182,6 +79,107 @@ async def request_email_verification(
         user_agent=parse(user_agent),
         request_ip=request_ip,
     )
+
+
+@auth_router.post(
+    "/register/options",
+    response_model=PublicKeyCredentialCreationOptions,
+)
+async def registration_options(
+    data: RegisterOptionsInput,
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=get_auth_service,
+        ),
+    ],
+) -> PublicKeyCredentialCreationOptions:
+    """Generate options for registering a credential."""
+    return await auth_service.generate_registration_options(
+        email=data.email,
+        verification_code=data.verification_code,
+    )
+
+
+@auth_router.post(
+    "/register/verification",
+    response_model=RegisterUserResult,
+)
+async def registration_verification(
+    data: RegisterVerificationInput,
+    user_agent: Annotated[str, Header()],
+    request_ip: Annotated[
+        str,
+        Depends(
+            dependency=get_ip_address,
+        ),
+    ],
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=get_auth_service,
+        ),
+    ],
+) -> AuthenticationResult:
+    """Verify the authenticator's response for registration."""
+    return await auth_service.verify_registration_response(
+        email=data.email,
+        credential=data.credential,
+        request_ip=request_ip,
+        user_agent=parse(user_agent),
+    )
+
+
+@auth_router.post(
+    "/login/options",
+    response_model=PublicKeyCredentialRequestOptions,
+)
+async def login_options(
+    data: LoginOptionsInput,
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=get_auth_service,
+        ),
+    ],
+) -> PublicKeyCredentialRequestOptions:
+    """Generate options for retrieving a credential."""
+    return await auth_service.generate_login_options(
+        email=data.email,
+    )
+
+
+@auth_router.post(
+    "/login/verification",
+    response_model=AuthenticateUserResult,
+)
+async def login_verification(
+    data: LoginVerificationInput,
+    user_agent: Annotated[str, Header()],
+    request_ip: Annotated[
+        str,
+        Depends(
+            dependency=get_ip_address,
+        ),
+    ],
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=get_auth_service,
+        ),
+    ],
+) -> AuthenticationResult:
+    """Verify the authenticator's response for login."""
+    return await auth_service.verify_login_response(
+        credential=data.credential,
+        request_ip=request_ip,
+        user_agent=parse(user_agent),
+    )
+
+
+@auth_router.delete("/credentials/{credential_id}")
+async def delete_credential() -> None:
+    pass
 
 
 @auth_router.post(

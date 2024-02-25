@@ -4,14 +4,13 @@ from pydantic import EmailStr, Field, Json
 from webauthn.helpers.structs import (
     AuthenticationCredential,
     RegistrationCredential,
-    UserVerificationRequirement,
 )
 
 from app.schemas.base import BaseSchema
 from app.schemas.user import UserSchema
 
 
-class RegistrationOptionsInput(BaseSchema):
+class RegisterOptionsInput(BaseSchema):
     email: Annotated[
         EmailStr,
         Field(
@@ -29,7 +28,7 @@ class RegistrationOptionsInput(BaseSchema):
     ]
 
 
-class RegistrationVerificationInput(BaseSchema):
+class RegisterVerificationInput(BaseSchema):
     email: Annotated[
         EmailStr,
         Field(
@@ -40,7 +39,7 @@ class RegistrationVerificationInput(BaseSchema):
     credential: Json[RegistrationCredential]
 
 
-class AuthenticationOptionsInput(BaseSchema):
+class LoginOptionsInput(BaseSchema):
     email: Annotated[
         EmailStr,
         Field(
@@ -48,17 +47,8 @@ class AuthenticationOptionsInput(BaseSchema):
         ),
     ]
 
-    user_verification: UserVerificationRequirement
 
-
-class AuthenticationVerificationInput(BaseSchema):
-    email: Annotated[
-        EmailStr,
-        Field(
-            max_length=255,
-        ),
-    ]
-
+class LoginVerificationInput(BaseSchema):
     credential: Json[AuthenticationCredential]
 
 
