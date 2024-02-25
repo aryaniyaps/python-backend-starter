@@ -26,7 +26,6 @@ from app.config import settings
 from app.lib.errors import InvalidInputError, UnauthenticatedError
 from app.lib.geo_ip import get_city_location, get_geoip_city
 from app.models.user_session import UserSession
-from app.repositories.auth_provider import AuthProviderRepo
 from app.repositories.authentication_token import AuthenticationTokenRepo
 from app.repositories.email_verification_code import EmailVerificationCodeRepo
 from app.repositories.user import UserRepo
@@ -44,7 +43,6 @@ class AuthService:
         webauthn_credential_repo: WebAuthnCredentialRepo,
         webauthn_challenge_repo: WebAuthnChallengeRepo,
         authentication_token_repo: AuthenticationTokenRepo,
-        auth_provider_repo: AuthProviderRepo,
         user_repo: UserRepo,
         email_verification_code_repo: EmailVerificationCodeRepo,
         geoip_reader: Reader,
@@ -53,7 +51,6 @@ class AuthService:
         self._webauthn_credential_repo = webauthn_credential_repo
         self._webauthn_challenge_repo = webauthn_challenge_repo
         self._authentication_token_repo = authentication_token_repo
-        self._auth_provider_repo = auth_provider_repo
         self._user_repo = user_repo
         self._email_verification_code_repo = email_verification_code_repo
         self._geoip_reader = geoip_reader

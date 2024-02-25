@@ -5,7 +5,7 @@
 groups = ["default", "dev", "test"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:5f933f61e043b56c82b9298e0728a157f28b5467eee78f88487268ec57d6f7d1"
+content_hash = "sha256:82f621c28d434ff14a2ae2ffb6a96e1784bde0344f0dc7bbaee7b1bb9e5dfe26"
 
 [[package]]
 name = "aiohttp"
@@ -143,17 +143,6 @@ groups = ["default"]
 files = [
     {file = "asn1crypto-1.5.1-py2.py3-none-any.whl", hash = "sha256:db4e40728b728508912cbb3d44f19ce188f218e9eba635821bb4b68564f8fd67"},
     {file = "asn1crypto-1.5.1.tar.gz", hash = "sha256:13ae38502be632115abf8a24cbe5f4da52e3b5231990aff31123c805306ccb9c"},
-]
-
-[[package]]
-name = "astroid"
-version = "3.0.3"
-requires_python = ">=3.8.0"
-summary = "An abstract syntax tree for Python with inference support."
-groups = ["default"]
-files = [
-    {file = "astroid-3.0.3-py3-none-any.whl", hash = "sha256:92fcf218b89f449cdf9f7b39a269f8d5d617b27be68434912e11e79203963a17"},
-    {file = "astroid-3.0.3.tar.gz", hash = "sha256:4148645659b08b70d72460ed1921158027a9e53ae8b7234149b1400eddacbb93"},
 ]
 
 [[package]]
@@ -457,18 +446,6 @@ files = [
 ]
 
 [[package]]
-name = "dill"
-version = "0.3.8"
-requires_python = ">=3.8"
-summary = "serialize all of Python"
-groups = ["default"]
-marker = "python_version >= \"3.11\""
-files = [
-    {file = "dill-0.3.8-py3-none-any.whl", hash = "sha256:c36ca9ffb54365bdd2f8eb3eff7d2a21237f8452b57ace88b1ac615b7e815bd7"},
-    {file = "dill-0.3.8.tar.gz", hash = "sha256:3ebe3c479ad625c4553aca177444d89b486b1d84982eeacded644afc0cf797ca"},
-]
-
-[[package]]
 name = "dnspython"
 version = "2.5.0"
 requires_python = ">=3.8"
@@ -508,24 +485,6 @@ dependencies = [
 files = [
     {file = "fastapi-0.109.2-py3-none-any.whl", hash = "sha256:2c9bab24667293b501cad8dd388c05240c850b58ec5876ee3283c47d6e1e3a4d"},
     {file = "fastapi-0.109.2.tar.gz", hash = "sha256:f3817eac96fe4f65a2ebb4baa000f394e55f5fccdaf7f75250804bc58f354f73"},
-]
-
-[[package]]
-name = "fastapi-sso"
-version = "0.12.0"
-requires_python = ">=3.8,<4.0"
-summary = "FastAPI plugin to enable SSO to most common providers (such as Facebook login, Google login and login via Microsoft Office 365 Account)"
-groups = ["default"]
-dependencies = [
-    "fastapi>=0.80",
-    "httpx>=0.23.0",
-    "oauthlib>=3.1.0",
-    "pydantic[email]>=1.8.0",
-    "pylint<4.0.0,>=3.0.3",
-]
-files = [
-    {file = "fastapi_sso-0.12.0-py3-none-any.whl", hash = "sha256:59e9f10a4a55764d26af71279d8329dfebe049d0ebd24b1e6887f094ac344415"},
-    {file = "fastapi_sso-0.12.0.tar.gz", hash = "sha256:400f88a189b958f83531340c4b63a02e0e7c8c7557a5b29df3291c03322a4cad"},
 ]
 
 [[package]]
@@ -631,7 +590,7 @@ name = "httpcore"
 version = "1.0.2"
 requires_python = ">=3.8"
 summary = "A minimal low-level HTTP client."
-groups = ["default", "test"]
+groups = ["test"]
 dependencies = [
     "certifi",
     "h11<0.15,>=0.13",
@@ -670,7 +629,7 @@ name = "httpx"
 version = "0.26.0"
 requires_python = ">=3.8"
 summary = "The next generation HTTP client."
-groups = ["default", "test"]
+groups = ["test"]
 dependencies = [
     "anyio",
     "certifi",
@@ -725,17 +684,6 @@ groups = ["test"]
 files = [
     {file = "iniconfig-2.0.0-py3-none-any.whl", hash = "sha256:b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374"},
     {file = "iniconfig-2.0.0.tar.gz", hash = "sha256:2d91e135bf72d31a410b17c16da610a82cb55f6b0477d1a902134b24a455b8b3"},
-]
-
-[[package]]
-name = "isort"
-version = "5.13.2"
-requires_python = ">=3.8.0"
-summary = "A Python utility / library to sort Python imports."
-groups = ["default"]
-files = [
-    {file = "isort-5.13.2-py3-none-any.whl", hash = "sha256:8ca5e72a8d85860d5a3fa69b8745237f2939afe12dbf656afbcb47fe72d947a6"},
-    {file = "isort-5.13.2.tar.gz", hash = "sha256:48fdfcb9face5d58a4f6dde2e72a1fb8dcaf8ab26f95ab49fab84c2ddefb0109"},
 ]
 
 [[package]]
@@ -867,17 +815,6 @@ files = [
 ]
 
 [[package]]
-name = "mccabe"
-version = "0.7.0"
-requires_python = ">=3.6"
-summary = "McCabe checker, plugin for flake8"
-groups = ["default"]
-files = [
-    {file = "mccabe-0.7.0-py2.py3-none-any.whl", hash = "sha256:6c2d30ab6be0e4a46919781807b4f0d834ebdd6c6e3dca0bda5a15f863427b6e"},
-    {file = "mccabe-0.7.0.tar.gz", hash = "sha256:348e0240c33b60bbdf4e523192ef919f28cb2c3d7d5c7794f74009290f236325"},
-]
-
-[[package]]
 name = "mdurl"
 version = "0.1.2"
 requires_python = ">=3.7"
@@ -966,27 +903,6 @@ files = [
 ]
 
 [[package]]
-name = "nanoid"
-version = "2.0.0"
-summary = "A tiny, secure, URL-friendly, unique string ID generator for Python"
-groups = ["default"]
-files = [
-    {file = "nanoid-2.0.0-py3-none-any.whl", hash = "sha256:90aefa650e328cffb0893bbd4c236cfd44c48bc1f2d0b525ecc53c3187b653bb"},
-    {file = "nanoid-2.0.0.tar.gz", hash = "sha256:5a80cad5e9c6e9ae3a41fa2fb34ae189f7cb420b2a5d8f82bd9d23466e4efa68"},
-]
-
-[[package]]
-name = "oauthlib"
-version = "3.2.2"
-requires_python = ">=3.6"
-summary = "A generic, spec-compliant, thorough implementation of the OAuth request-signing logic"
-groups = ["default"]
-files = [
-    {file = "oauthlib-3.2.2-py3-none-any.whl", hash = "sha256:8139f29aac13e25d502680e9e19963e83f16838d48a0d71c287fe40e7067fbca"},
-    {file = "oauthlib-3.2.2.tar.gz", hash = "sha256:9859c40929662bec5d64f34d01c99e093149682a3f38915dc0655d5a633dd918"},
-]
-
-[[package]]
 name = "orjson"
 version = "3.9.14"
 requires_python = ">=3.8"
@@ -1042,7 +958,7 @@ name = "platformdirs"
 version = "4.2.0"
 requires_python = ">=3.8"
 summary = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
-groups = ["default", "dev"]
+groups = ["dev"]
 files = [
     {file = "platformdirs-4.2.0-py3-none-any.whl", hash = "sha256:0614df2a2f37e1a662acbd8e2b25b92ccf8632929bc6d43467e17fe89c75e068"},
     {file = "platformdirs-4.2.0.tar.gz", hash = "sha256:ef0cc731df711022c174543cb70a9b5bd22e5a9337c8624ef2c2ceb8ddad8768"},
@@ -1182,27 +1098,6 @@ groups = ["dev"]
 files = [
     {file = "pygments-2.17.2-py3-none-any.whl", hash = "sha256:b27c2826c47d0f3219f29554824c30c5e8945175d888647acd804ddd04af846c"},
     {file = "pygments-2.17.2.tar.gz", hash = "sha256:da46cec9fd2de5be3a8a784f434e4c4ab670b4ff54d605c4c2717e9d49c4c367"},
-]
-
-[[package]]
-name = "pylint"
-version = "3.0.3"
-requires_python = ">=3.8.0"
-summary = "python code static checker"
-groups = ["default"]
-dependencies = [
-    "astroid<=3.1.0-dev0,>=3.0.1",
-    "colorama>=0.4.5; sys_platform == \"win32\"",
-    "dill>=0.3.6; python_version >= \"3.11\"",
-    "dill>=0.3.7; python_version >= \"3.12\"",
-    "isort!=5.13.0,<6,>=4.2.5",
-    "mccabe<0.8,>=0.6",
-    "platformdirs>=2.2.0",
-    "tomlkit>=0.10.1",
-]
-files = [
-    {file = "pylint-3.0.3-py3-none-any.whl", hash = "sha256:7a1585285aefc5165db81083c3e06363a27448f6b467b3b0f30dbd0ac1f73810"},
-    {file = "pylint-3.0.3.tar.gz", hash = "sha256:58c2398b0301e049609a8429789ec6edf3aabe9b6c5fec916acd18639c16de8b"},
 ]
 
 [[package]]
@@ -1542,17 +1437,6 @@ files = [
 ]
 
 [[package]]
-name = "tomlkit"
-version = "0.12.3"
-requires_python = ">=3.7"
-summary = "Style preserving TOML library"
-groups = ["default"]
-files = [
-    {file = "tomlkit-0.12.3-py3-none-any.whl", hash = "sha256:b0a645a9156dc7cb5d3a1f0d4bab66db287fcb8e0430bdd4664a095ea16414ba"},
-    {file = "tomlkit-0.12.3.tar.gz", hash = "sha256:75baf5012d06501f07bee5bf8e801b9f343e7aac5a92581f20f80ce632e6b5a4"},
-]
-
-[[package]]
 name = "typing-extensions"
 version = "4.9.0"
 requires_python = ">=3.8"
@@ -1846,45 +1730,4 @@ files = [
     {file = "yarl-1.9.4-cp312-cp312-win_amd64.whl", hash = "sha256:a9bd00dc3bc395a662900f33f74feb3e757429e545d831eef5bb280252631984"},
     {file = "yarl-1.9.4-py3-none-any.whl", hash = "sha256:928cecb0ef9d5a7946eb6ff58417ad2fe9375762382f1bf5c55e61645f2c43ad"},
     {file = "yarl-1.9.4.tar.gz", hash = "sha256:566db86717cf8080b99b58b083b773a908ae40f06681e87e589a976faf8246bf"},
-]
-
-[[package]]
-name = "zxcvbn-rs-py"
-version = "0.1.0"
-requires_python = ">=3.7"
-summary = "Python bindings for zxcvbn-rs, the Rust implementation of zxcvbn"
-groups = ["default"]
-files = [
-    {file = "zxcvbn_rs_py-0.1.0-cp311-cp311-macosx_10_7_x86_64.whl", hash = "sha256:22a9e879ad411f14ad22c2437cc552d02a7d0db741712e641a24fe00610e32a2"},
-    {file = "zxcvbn_rs_py-0.1.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:0871a3704b7f8c1aa24f4b47839eeab6f351aa053d3423c681f42931a75017e1"},
-    {file = "zxcvbn_rs_py-0.1.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:e81c0719dda1cd1b5ceccc0003bdd95381f67cf81a1c4f3f7c724b0dc8634787"},
-    {file = "zxcvbn_rs_py-0.1.0-cp311-cp311-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:1eff7d758b8e171f4ffd6872bbf44d9452c53619ea715541031687942e17b640"},
-    {file = "zxcvbn_rs_py-0.1.0-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:2bf2f1044bcf161d1d87ddce8d23b2cd23037ed4918f135d5fa90009c4d86aa4"},
-    {file = "zxcvbn_rs_py-0.1.0-cp311-cp311-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:7aa147287ec11062b3d63e8539b77e33f13f9fa0e96f4e31a9573f315f03df55"},
-    {file = "zxcvbn_rs_py-0.1.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4f4a2418e50be9edfb50875f2536235508d155c32501031edbfcceb2fa86f4f6"},
-    {file = "zxcvbn_rs_py-0.1.0-cp311-cp311-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:9e4211b87f9e6b9ac242d8779600f2a8d12a2549f31b281e8fd9a786691afecc"},
-    {file = "zxcvbn_rs_py-0.1.0-cp311-none-win32.whl", hash = "sha256:0d0e8e0be3f4dc8105e37bb6f43d556df45aa94aac746e15d06c8a521053afa8"},
-    {file = "zxcvbn_rs_py-0.1.0-cp311-none-win_amd64.whl", hash = "sha256:978a9062ba3c8bdb9cbbb2379b40f4267fe63e72a175cb11978bf4022c7aa808"},
-    {file = "zxcvbn_rs_py-0.1.0-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a7d65d8ee84446fafc7af04c74498125792de98ab7be0b952af01d94f8ce9920"},
-    {file = "zxcvbn_rs_py-0.1.0-cp312-cp312-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:1de48c6cd9e7d776d46beea8d80c2fdcc16f4703a1e5e7083c31e0d8771431e7"},
-    {file = "zxcvbn_rs_py-0.1.0-cp312-cp312-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:8a84d21903242113a56d36e722dad386f1839e7f86b11b0670bd96303d3aa2aa"},
-    {file = "zxcvbn_rs_py-0.1.0-pp37-pypy37_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:0fb1438726515557fef6b583c834f0e4127464a1a47a5894cf228d37f1c72480"},
-    {file = "zxcvbn_rs_py-0.1.0-pp37-pypy37_pp73-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:54d987efaa850f4ea772d5f95ef780bb9880be2e564179c88fb1c99ef3036e4b"},
-    {file = "zxcvbn_rs_py-0.1.0-pp37-pypy37_pp73-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:c0610082198af100e0d0e1caad5eefb751783718627d029712f83d7d2e83d204"},
-    {file = "zxcvbn_rs_py-0.1.0-pp37-pypy37_pp73-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:5baa0b9588cac8e1a3de176b50bc4e199e50841645a546000e6d9ae5b6d3ba52"},
-    {file = "zxcvbn_rs_py-0.1.0-pp37-pypy37_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:49973c115e07b4c264c46cac2f6dbebd19b1d3d699713c313b68ac21d8b60c3c"},
-    {file = "zxcvbn_rs_py-0.1.0-pp37-pypy37_pp73-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:8ddc5ebb7a89e6dac3b9e3c8682daea18652fc9337516d4685b1cec7083ec7ed"},
-    {file = "zxcvbn_rs_py-0.1.0-pp38-pypy38_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:25a6f54468a2f4853a81f77648cb8cafda6c00ce2e542a2d97b1a97fef2893f2"},
-    {file = "zxcvbn_rs_py-0.1.0-pp38-pypy38_pp73-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:e79eaf225bbebe55ab7cd89c7e33ae269c6a49f44a24f2497197a7e9d08cf700"},
-    {file = "zxcvbn_rs_py-0.1.0-pp38-pypy38_pp73-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:9750411bb5ef4d2e500a4603119986d61505a86f8409ac73dc92ac2309c812c1"},
-    {file = "zxcvbn_rs_py-0.1.0-pp38-pypy38_pp73-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:403b3148726d530430671a12ea5426a33587c266ece4228c6b12bb832a537ed1"},
-    {file = "zxcvbn_rs_py-0.1.0-pp38-pypy38_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:7e1cd90bb72170d0293db06aed73495b65f8a8b9f31e2123f1d5fca84c33b805"},
-    {file = "zxcvbn_rs_py-0.1.0-pp38-pypy38_pp73-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:acabffc2114d95c32733273264c021db939017590c46b66f0716fd521b2712c7"},
-    {file = "zxcvbn_rs_py-0.1.0-pp39-pypy39_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:b183e95b012cecb177fae5733777fb9086e9e636005fb52227b8e2ad2a256375"},
-    {file = "zxcvbn_rs_py-0.1.0-pp39-pypy39_pp73-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:ca8c2d0fdb3333a6b0ab9260905f6249cee3413672a5bbdd1e6d2f64c89f603b"},
-    {file = "zxcvbn_rs_py-0.1.0-pp39-pypy39_pp73-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:27f4281b4772b5212a2ffa19e7f8e8b90fe7e84553f4d6ba56d984983e239e79"},
-    {file = "zxcvbn_rs_py-0.1.0-pp39-pypy39_pp73-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:8ecc864c0e1690d0d1d870c9f8f618c0b115b991ece93b2c17d29a6ace19d093"},
-    {file = "zxcvbn_rs_py-0.1.0-pp39-pypy39_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:0884729fe0b183f4537b71b080b91536edbc5df633f133d7c9324f1d26046e6f"},
-    {file = "zxcvbn_rs_py-0.1.0-pp39-pypy39_pp73-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:faaae7eec0b1b2331a3356286af373ea3f44b76f745750d496918cc707c7093f"},
-    {file = "zxcvbn_rs_py-0.1.0.tar.gz", hash = "sha256:ea7578672e763954bded1b62567e6c824fa646ebbdb69bd19ed6fbe94e8114ac"},
 ]

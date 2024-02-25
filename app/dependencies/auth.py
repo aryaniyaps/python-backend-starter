@@ -4,7 +4,6 @@ from fastapi import Depends, Security
 from fastapi.security import APIKeyHeader
 from geoip2.database import Reader
 
-from app.dependencies.auth_provider import get_auth_provider_repo
 from app.dependencies.authentication_token import get_authentication_token_repo
 from app.dependencies.email_verification_code import get_email_verification_code_repo
 from app.dependencies.user import get_user_repo
@@ -12,7 +11,6 @@ from app.dependencies.user_session import get_user_session_repo
 from app.dependencies.webauthn_challenge import get_webauthn_challenge_repo
 from app.dependencies.webauthn_credential import get_webauthn_credential_repo
 from app.lib.geo_ip import get_geoip_reader
-from app.repositories.auth_provider import AuthProviderRepo
 from app.repositories.authentication_token import AuthenticationTokenRepo
 from app.repositories.email_verification_code import EmailVerificationCodeRepo
 from app.repositories.user import UserRepo
@@ -42,12 +40,6 @@ def get_auth_service(
         WebAuthnChallengeRepo,
         Depends(
             dependency=get_webauthn_challenge_repo,
-        ),
-    ],
-    auth_provider_repo: Annotated[
-        AuthProviderRepo,
-        Depends(
-            dependency=get_auth_provider_repo,
         ),
     ],
     authentication_token_repo: Annotated[
@@ -80,7 +72,6 @@ def get_auth_service(
         user_session_repo=user_session_repo,
         webauthn_credential_repo=webauthn_credential_repo,
         webauthn_challenge_repo=webauthn_challenge_repo,
-        auth_provider_repo=auth_provider_repo,
         authentication_token_repo=authentication_token_repo,
         user_repo=user_repo,
         email_verification_code_repo=email_verification_token_repo,
