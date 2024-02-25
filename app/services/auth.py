@@ -58,10 +58,13 @@ class AuthService:
         self._email_verification_code_repo = email_verification_code_repo
         self._geoip_reader = geoip_reader
 
-    async def generate_registration_options(
-        self, email: str
-    ) -> PublicKeyCredentialCreationOptions:
-        """Generate options for registering a credential."""
+    async def send_email_verification_request(
+        self,
+        email: str,
+        user_agent: UserAgent,
+        request_ip: str,
+    ) -> None:
+        """Send an email verification request to the given email."""
         if (
             await self._user_repo.get_by_email(
                 email=email,
@@ -71,6 +74,45 @@ class AuthService:
             raise InvalidInputError(
                 message="User with that email already exists.",
             )
+
+        verification_token = await self._email_verification_code_repo.create(
+            email=email,
+        )
+
+        # send verification request email
+        await task_queue.enqueue(
+            "send_email_verification_request_email",
+            receiver=email,
+            verification_token=verification_token,
+            device=user_agent.get_device(),
+            browser_name=user_agent.get_browser(),
+            location=get_city_location(
+                city=get_geoip_city(
+                    ip_address=request_ip,
+                    geoip_reader=self._geoip_reader,
+                ),
+            ),
+            ip_address=request_ip,
+        )
+
+    async def generate_registration_options(
+        self,
+        email: str,
+        verification_code: str,
+    ) -> PublicKeyCredentialCreationOptions:
+        """Generate options for registering a credential."""
+        if (
+            await self._email_verification_code_repo.get_by_code_email(
+                verification_code=verification_code,
+                email=email,
+            )
+            is not None
+        ):
+            raise InvalidInputError(
+                message="Invalid email verification code passed.",
+            )
+
+        # TODO: delete email verification code
 
         registration_options = generate_registration_options(
             rp_id=settings.rp_id,
@@ -230,7 +272,11 @@ class AuthService:
             credential_public_key=existing_credential.public_key.encode(),
         )
 
-        # TODO: update credential sign count here
+        # update credential sign count
+        await self._webauthn_credential_repo.update(
+            webauthn_credential=existing_credential,
+            sign_count=verified_authentication.new_sign_count,
+        )
 
         if not await self._user_session_repo.check_if_device_exists(
             user_id=existing_user.id,
@@ -267,43 +313,6 @@ class AuthService:
             "authentication_token": authentication_token,
             "user": existing_user,
         }
-
-    async def send_email_verification_request(
-        self,
-        email: str,
-        user_agent: UserAgent,
-        request_ip: str,
-    ) -> None:
-        """Send an email verification request to the given email."""
-        if (
-            await self._user_repo.get_by_email(
-                email=email,
-            )
-            is not None
-        ):
-            raise InvalidInputError(
-                message="User with that email already exists.",
-            )
-
-        verification_token = await self._email_verification_code_repo.create(
-            email=email,
-        )
-
-        # send verification request email
-        await task_queue.enqueue(
-            "send_email_verification_request_email",
-            receiver=email,
-            verification_token=verification_token,
-            device=user_agent.get_device(),
-            browser_name=user_agent.get_browser(),
-            location=get_city_location(
-                city=get_geoip_city(
-                    ip_address=request_ip,
-                    geoip_reader=self._geoip_reader,
-                ),
-            ),
-            ip_address=request_ip,
-        )
 
     async def get_user_sessions(self, user_id: UUID) -> list[UserSession]:
         """Get user sessions for the given user ID."""

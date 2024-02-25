@@ -7,7 +7,6 @@ from webauthn.helpers.structs import (
     UserVerificationRequirement,
 )
 
-from app.lib.constants import MAX_USERNAME_LENGTH
 from app.schemas.base import BaseSchema
 from app.schemas.user import UserSchema
 
@@ -17,6 +16,15 @@ class RegistrationOptionsInput(BaseSchema):
         EmailStr,
         Field(
             max_length=255,
+        ),
+    ]
+
+    verification_code: Annotated[
+        str,
+        Field(
+            examples=[
+                "88765432",
+            ],
         ),
     ]
 

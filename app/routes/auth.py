@@ -54,6 +54,7 @@ async def registration_options(
     """Generate options for registering a credential."""
     return await auth_service.generate_registration_options(
         email=data.email,
+        verification_code=data.verification_code,
     )
 
 

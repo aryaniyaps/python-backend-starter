@@ -36,6 +36,17 @@ class WebAuthnCredentialRepo:
         await self._session.commit()
         return webauthn_credential
 
+    async def update(
+        self,
+        webauthn_credential: WebAuthnCredential,
+        *,
+        sign_count: int,
+    ) -> None:
+        """Update the given WebAuthn credential."""
+        webauthn_credential.sign_count = sign_count
+        self._session.add(webauthn_credential)
+        await self._session.commit()
+
     async def get(self, credential_id: str, user_id: UUID) -> WebAuthnCredential | None:
         """Get WebAuthn credential by ID and user ID."""
         return await self._session.scalar(
