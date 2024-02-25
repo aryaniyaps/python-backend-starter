@@ -150,11 +150,18 @@ class AuthService:
             expected_challenge=challenge,
             expected_rp_id=settings.rp_id,
             expected_origin=settings.rp_expected_origin,
+            require_user_verification=True,
         )
+
+        if not verified_registration.user_verified:
+            # TODO: handle exception here
+            raise Exception
 
         user = await self._user_repo.create(
             email=email,
         )
+
+        # TODO: delete challenge here
 
         await self._webauthn_credential_repo.create(
             user_id=user.id,
@@ -188,7 +195,7 @@ class AuthService:
             "user": user,
         }
 
-    async def generate_authentication_options(
+    async def generate_login_options(
         self, email: str, user_verification: UserVerificationRequirement
     ) -> PublicKeyCredentialRequestOptions:
         """Generate options for retrieving a credential."""
@@ -227,7 +234,7 @@ class AuthService:
 
         return authentication_options
 
-    async def verify_authentication_response(
+    async def verify_login_response(
         self,
         email: str,
         credential: AuthenticationCredential,

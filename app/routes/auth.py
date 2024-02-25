@@ -88,10 +88,10 @@ async def registration_verification(
 
 
 @auth_router.post(
-    "/authentication/options",
+    "/login/options",
     response_model=PublicKeyCredentialRequestOptions,
 )
-async def authentication_options(
+async def login_options(
     data: AuthenticationOptionsInput,
     auth_service: Annotated[
         AuthService,
@@ -101,17 +101,17 @@ async def authentication_options(
     ],
 ) -> PublicKeyCredentialRequestOptions:
     """Generate options for retrieving a credential."""
-    return await auth_service.generate_authentication_options(
+    return await auth_service.generate_login_options(
         email=data.email,
         user_verification=data.user_verification,
     )
 
 
 @auth_router.post(
-    "/authentication/verification",
+    "/login/verification",
     response_model=AuthenticateUserResult,
 )
-async def authentication_verification(
+async def login_verification(
     data: AuthenticationVerificationInput,
     user_agent: Annotated[str, Header()],
     request_ip: Annotated[
@@ -127,8 +127,8 @@ async def authentication_verification(
         ),
     ],
 ) -> AuthenticationResult:
-    """Verify the authenticator's response for authentication."""
-    return await auth_service.verify_authentication_response(
+    """Verify the authenticator's response for login."""
+    return await auth_service.verify_login_response(
         email=data.email,
         credential=data.credential,
         request_ip=request_ip,
