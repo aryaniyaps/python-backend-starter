@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from pydantic import EmailStr, Field, Json, SecretStr
+from pydantic import EmailStr, Field, Json
 from webauthn.helpers.structs import (
     AuthenticationCredential,
     RegistrationCredential,
@@ -55,30 +55,20 @@ class AuthenticationVerificationInput(BaseSchema):
     credential: Json[AuthenticationCredential]
 
 
-class LoginUserInput(BaseSchema):
-    login: Annotated[
-        str | EmailStr,
+class EmailVerificationRequestInput(BaseSchema):
+    email: Annotated[
+        EmailStr,
         Field(
+            max_length=250,
             examples=[
-                "aryaniyaps",
-                "aryaniyaps@example.com",
+                "aryan@example.com",
             ],
-            description="The identifier of the user account (username or email).",
-        ),
-    ]
-
-    password: Annotated[
-        SecretStr,
-        Field(
-            examples=[
-                "super-Secret12!",
-            ],
-            description="The password associated with the user account.",
+            description="The email address to send the email verification request to.",
         ),
     ]
 
 
-class LoginUserResult(BaseSchema):
+class AuthenticateUserResult(BaseSchema):
     authentication_token: Annotated[
         str,
         Field(
@@ -94,63 +84,6 @@ class LoginUserResult(BaseSchema):
         UserSchema,
         Field(
             description="The logged in user.",
-        ),
-    ]
-
-
-class EmailVerificationRequestInput(BaseSchema):
-    email: Annotated[
-        EmailStr,
-        Field(
-            max_length=250,
-            examples=[
-                "aryan@example.com",
-            ],
-            description="The email address to send the email verification request to.",
-        ),
-    ]
-
-
-class RegisterUserInput(BaseSchema):
-    username: Annotated[
-        str,
-        Field(
-            max_length=MAX_USERNAME_LENGTH,
-            min_length=MIN_USERNAME_LENGTH,
-            examples=[
-                "aryaniyaps",
-            ],
-            description="The desired username for the new user account.",
-        ),
-    ]
-
-    email: Annotated[
-        EmailStr,
-        Field(
-            max_length=250,
-            examples=[
-                "aryan@example.com",
-            ],
-            description="The email address associated with the new user account.",
-        ),
-    ]
-
-    email_verification_token: Annotated[
-        SecretStr,
-        Field(
-            title="Email Verification Token",
-            description="The verification token for the email address.",
-        ),
-    ]
-
-    password: Annotated[
-        SecretStr,
-        Field(
-            max_length=64,
-            examples=[
-                "super-Secret12!",
-            ],
-            description="The password for the new user account.",
         ),
     ]
 

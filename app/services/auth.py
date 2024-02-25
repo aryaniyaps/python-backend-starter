@@ -24,8 +24,7 @@ from webauthn.helpers.structs import (
 )
 
 from app.config import settings
-from app.lib.enums import AuthProviderType
-from app.lib.errors import InvalidInputError, UnauthenticatedError, UnexpectedError
+from app.lib.errors import InvalidInputError, UnauthenticatedError
 from app.lib.geo_ip import get_city_location, get_geoip_city
 from app.models.user import User
 from app.models.user_session import UserSession
@@ -93,8 +92,12 @@ class AuthService:
         return registration_options
 
     async def verify_registration_response(
-        self, username: str, credential: RegistrationCredential
-    ) -> None:
+        self,
+        username: str,
+        credential: RegistrationCredential,
+        request_ip: str,
+        user_agent: UserAgent,
+    ) -> tuple[str, User]:
         """Verify the authenticator's response for registration."""
         # TODO: get challenge here
         verified_registration = verify_registration_response(
@@ -117,6 +120,25 @@ class AuthService:
             device_type=verified_registration.credential_device_type,
             transports=credential.response.transports,
         )
+
+        user_session = await self._user_session_repo.create(
+            user_id=user.id,
+            ip_address=request_ip,
+            user_agent=user_agent,
+        )
+
+        authentication_token = await self._authentication_token_repo.create(
+            user_id=user.id,
+            user_session_id=user_session.id,
+        )
+
+        await task_queue.enqueue(
+            "send_onboarding_email",
+            receiver=user.email,
+            username=user.username,
+        )
+
+        return authentication_token, user
 
     async def generate_authentication_options(
         self, username: str, user_verification: UserVerificationRequirement
@@ -154,18 +176,26 @@ class AuthService:
         return authentication_options
 
     async def verify_authentication_response(
-        self, username: str, credential: AuthenticationCredential
-    ) -> None:
+        self,
+        username: str,
+        credential: AuthenticationCredential,
+        request_ip: str,
+        user_agent: UserAgent,
+    ) -> tuple[str, User]:
         """Verify the authenticator's response for authentication."""
-        # TODO: get challenge here
         existing_user = await self._user_repo.get_by_username(
             username=username,
         )
+
+        if existing_user is None:
+            # TODO: handle error ehre
+            raise Exception
 
         existing_credential = await self._webauthn_credential_repo.get(
             credential_id=credential.id
         )
 
+        # TODO: get challenge here
         verified_authentication = verify_authentication_response(
             credential=credential,
             expected_challenge=b"",
@@ -174,6 +204,39 @@ class AuthService:
             credential_current_sign_count=existing_credential.sign_count,
             credential_public_key=existing_credential.public_key.encode(),
         )
+
+        if not await self._user_session_repo.check_if_device_exists(
+            user_id=existing_user.id,
+            device=user_agent.device,
+        ):
+            await task_queue.enqueue(
+                "send_new_login_device_detected_email",
+                receiver=existing_user.email,
+                username=existing_user.username,
+                login_timestamp=humanize.naturaldate(datetime.now(UTC)),
+                device=user_agent.get_device(),
+                browser_name=user_agent.get_browser(),
+                location=get_city_location(
+                    city=get_geoip_city(
+                        ip_address=request_ip,
+                        geoip_reader=self._geoip_reader,
+                    ),
+                ),
+                ip_address=request_ip,
+            )
+
+        user_session = await self._user_session_repo.create(
+            user_id=existing_user.id,
+            ip_address=request_ip,
+            user_agent=user_agent,
+        )
+
+        authentication_token = await self._authentication_token_repo.create(
+            user_id=existing_user.id,
+            user_session_id=user_session.id,
+        )
+
+        return authentication_token, existing_user
 
     async def send_email_verification_request(
         self,
@@ -211,181 +274,6 @@ class AuthService:
             ),
             ip_address=request_ip,
         )
-
-    async def register_user(
-        self,
-        email: str,
-        email_verification_code: str,
-        username: str,
-        password: str,
-        request_ip: str,
-        user_agent: UserAgent,
-    ) -> tuple[str, User]:
-        """Register a new user."""
-        if not check_password_strength(
-            password=password,
-            context={
-                "username": username,
-                "email": email,
-            },
-        ):
-            raise InvalidInputError(
-                message="Enter a stronger password.",
-            )
-        try:
-            if (
-                await self._user_repo.get_by_username(
-                    username=username,
-                )
-                is not None
-            ):
-                raise InvalidInputError(
-                    message="User with that username already exists.",
-                )
-
-            verification_code = (
-                await self._email_verification_code_repo.get_by_code_email(
-                    verification_code=email_verification_code,
-                    email=email,
-                )
-            )
-
-            if (
-                verification_code is None
-                or datetime.now(UTC) > verification_code.expires_at
-            ):
-                raise InvalidInputError(
-                    message="Invalid email or email verification code provided."
-                )
-
-            await self._email_verification_code_repo.delete_all(email=email)
-
-            user = await self._user_repo.create(
-                username=username,
-                email=email,
-            )
-
-            await self._auth_provider_repo.create(
-                user_id=user.id,
-                provider=AuthProviderType.email_password,
-            )
-
-            await self._user_password_repo.create(
-                user_id=user.id,
-                password=password,
-            )
-
-            user_session = await self._user_session_repo.create(
-                user_id=user.id,
-                ip_address=request_ip,
-                user_agent=user_agent,
-            )
-        except HashingError as exception:
-            raise UnexpectedError(
-                message="Could not create user. Please try again.",
-            ) from exception
-
-        authentication_token = await self._authentication_token_repo.create(
-            user_id=user.id,
-            user_session_id=user_session.id,
-        )
-        await task_queue.enqueue(
-            "send_onboarding_email",
-            receiver=user.email,
-            username=user.username,
-        )
-
-        return authentication_token, user
-
-    async def login_user(
-        self,
-        login: str,
-        password: str,
-        user_agent: UserAgent,
-        request_ip: str,
-    ) -> tuple[str, User]:
-        """
-        Login a user.
-
-        Check the given credentials and return the relevant authentication
-        token and user and if they are valid.
-        """
-        if "@" in login:
-            # if "@" is present, assume it's an email
-            user = await self._user_repo.get_by_email(
-                email=login,
-            )
-        else:
-            # assume it's an username
-            user = await self._user_repo.get_by_username(
-                username=login,
-            )
-
-        if user is None:
-            raise InvalidInputError(
-                message="Invalid credentials provided.",
-            )
-
-        user_password = await self._user_password_repo.get(user_id=user.id)
-
-        if user_password is None:
-            # user must have registered with an oauth provider
-            raise InvalidInputError(
-                message="Cannot login user with email and password.",
-            )
-
-        try:
-            self._password_hasher.verify(
-                hash=user_password.hash,
-                password=password,
-            )
-        except VerifyMismatchError as exception:
-            raise InvalidInputError(
-                message="Invalid credentials provided.",
-            ) from exception
-
-        if not await self._user_session_repo.check_if_device_exists(
-            user_id=user.id,
-            device=user_agent.device,
-        ):
-            await task_queue.enqueue(
-                "send_new_login_device_detected_email",
-                receiver=user.email,
-                username=user.username,
-                login_timestamp=humanize.naturaldate(datetime.now(UTC)),
-                device=user_agent.get_device(),
-                browser_name=user_agent.get_browser(),
-                location=get_city_location(
-                    city=get_geoip_city(
-                        ip_address=request_ip,
-                        geoip_reader=self._geoip_reader,
-                    ),
-                ),
-                ip_address=request_ip,
-            )
-
-        user_session = await self._user_session_repo.create(
-            user_id=user.id,
-            ip_address=request_ip,
-            user_agent=user_agent,
-        )
-
-        # create authentication token
-        authentication_token = await self._authentication_token_repo.create(
-            user_id=user.id,
-            user_session_id=user_session.id,
-        )
-
-        if self._password_hasher.check_needs_rehash(
-            hash=user_password.hash,
-        ):
-            # update user's password hash
-            await self._user_password_repo.update(
-                user_password=user_password,
-                password=password,
-            )
-
-        return authentication_token, user
 
     async def get_user_sessions(self, user_id: UUID) -> ScalarResult[UserSession]:
         """Get user sessions for the given user ID."""

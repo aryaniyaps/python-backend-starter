@@ -19,13 +19,11 @@ from app.dependencies.rate_limiter import RateLimiter
 from app.lib.constants import OpenAPITag
 from app.models.user_session import UserSession
 from app.schemas.auth import (
+    AuthenticateUserResult,
     AuthenticationOptionsInput,
     AuthenticationVerificationInput,
     EmailVerificationRequestInput,
-    LoginUserInput,
-    LoginUserResult,
     LogoutInput,
-    RegisterUserInput,
     RegisterUserResult,
     RegistrationOptionsInput,
     RegistrationVerificationInput,
@@ -60,21 +58,38 @@ async def registration_options(
     )
 
 
-@auth_router.post("/registration/verification")
+@auth_router.post(
+    "/registration/verification",
+    response_model=RegisterUserResult,
+)
 async def registration_verification(
     data: RegistrationVerificationInput,
+    user_agent: Annotated[str, Header()],
+    request_ip: Annotated[
+        str,
+        Depends(
+            dependency=get_ip_address,
+        ),
+    ],
     auth_service: Annotated[
         AuthService,
         Depends(
             dependency=get_auth_service,
         ),
     ],
-) -> None:
+) -> AuthenticationResult:
     """Verify the authenticator's response for registration."""
-    return await auth_service.verify_registration_response(
+    authentication_token, user = await auth_service.verify_registration_response(
         username=data.username,
         credential=data.credential,
+        request_ip=request_ip,
+        user_agent=parse(user_agent),
     )
+
+    return {
+        "authentication_token": authentication_token,
+        "user": user,
+    }
 
 
 @auth_router.post(
@@ -97,21 +112,38 @@ async def authentication_options(
     )
 
 
-@auth_router.post("/authentication/verification")
+@auth_router.post(
+    "/authentication/verification",
+    response_model=AuthenticateUserResult,
+)
 async def authentication_verification(
     data: AuthenticationVerificationInput,
+    user_agent: Annotated[str, Header()],
+    request_ip: Annotated[
+        str,
+        Depends(
+            dependency=get_ip_address,
+        ),
+    ],
     auth_service: Annotated[
         AuthService,
         Depends(
             dependency=get_auth_service,
         ),
     ],
-) -> None:
+) -> AuthenticationResult:
     """Verify the authenticator's response for authentication."""
-    return await auth_service.verify_authentication_response(
+    authentication_token, user = await auth_service.verify_authentication_response(
         username=data.username,
         credential=data.credential,
+        request_ip=request_ip,
+        user_agent=parse(user_agent),
     )
+
+    return {
+        "authentication_token": authentication_token,
+        "user": user,
+    }
 
 
 @auth_router.delete("/credentials/{credential_id}")
@@ -160,104 +192,6 @@ async def request_email_verification(
         user_agent=parse(user_agent),
         request_ip=request_ip,
     )
-
-
-@auth_router.post(
-    "/register",
-    response_model=RegisterUserResult,
-    status_code=HTTPStatus.CREATED,
-    summary="Register a new user.",
-    responses={
-        HTTPStatus.BAD_REQUEST: {
-            "model": InvalidInputErrorResult,
-            "description": "Invalid Input Error",
-        },
-    },
-    dependencies=[
-        Depends(
-            dependency=RateLimiter(
-                limit="15/hour",
-            ),
-        ),
-    ],
-)
-async def register_user(
-    data: RegisterUserInput,
-    user_agent: Annotated[str, Header()],
-    request_ip: Annotated[
-        str,
-        Depends(
-            dependency=get_ip_address,
-        ),
-    ],
-    auth_service: Annotated[
-        AuthService,
-        Depends(
-            dependency=get_auth_service,
-        ),
-    ],
-) -> AuthenticationResult:
-    """Register a new user."""
-    authentication_token, user = await auth_service.register_user(
-        email=data.email,
-        email_verification_code=data.email_verification_token.get_secret_value(),
-        username=data.username,
-        password=data.password.get_secret_value(),
-        request_ip=request_ip,
-        user_agent=parse(user_agent),
-    )
-
-    return {
-        "authentication_token": authentication_token,
-        "user": user,
-    }
-
-
-@auth_router.post(
-    "/login",
-    response_model=LoginUserResult,
-    summary="Login the current user.",
-    responses={
-        HTTPStatus.BAD_REQUEST: {
-            "model": InvalidInputErrorResult,
-            "description": "Invalid Input Error",
-        },
-    },
-    dependencies=[
-        Depends(
-            dependency=RateLimiter(
-                limit="100/hour",
-            ),
-        ),
-    ],
-)
-async def login_user(
-    data: LoginUserInput,
-    user_agent: Annotated[str, Header()],
-    request_ip: Annotated[
-        str,
-        Depends(
-            dependency=get_ip_address,
-        ),
-    ],
-    auth_service: Annotated[
-        AuthService,
-        Depends(
-            dependency=get_auth_service,
-        ),
-    ],
-) -> AuthenticationResult:
-    """Login the current user."""
-    authentication_token, user = await auth_service.login_user(
-        login=data.login,
-        password=data.password.get_secret_value(),
-        user_agent=parse(user_agent),
-        request_ip=request_ip,
-    )
-    return {
-        "authentication_token": authentication_token,
-        "user": user,
-    }
 
 
 @auth_router.post(
