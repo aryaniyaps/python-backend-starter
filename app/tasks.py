@@ -20,7 +20,7 @@ async def send_onboarding_email(
     _ctx: Context,
     *,
     receiver: str,
-    username: str,
+    email: str,
 ) -> None:
     """Send an onboarding email to the given user."""
     await send_template_email(
@@ -28,7 +28,7 @@ async def send_onboarding_email(
         receiver=receiver,
         template="onboarding",
         context={
-            "username": username,
+            "email": email,
         },
     )
 

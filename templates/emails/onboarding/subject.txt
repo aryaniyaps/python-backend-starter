@@ -1,1 +1,1 @@
-Hi {{ username }}, Welcome to {{ app_name }}!
+Welcome to {{ app_name }}!

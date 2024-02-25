@@ -7,7 +7,7 @@ Welcome to {{ app_name }}!
 
 {% block content %}
 ************
-Dear {{ username }},
+Hey {{ email }},
 ************
 
 We are delighted to welcome you to {{ app_name }}! Thank you for choosing us as your partner on this exciting journey.

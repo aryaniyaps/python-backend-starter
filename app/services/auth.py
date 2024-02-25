@@ -180,7 +180,7 @@ class AuthService:
         await task_queue.enqueue(
             "send_onboarding_email",
             receiver=user.email,
-            username=user.username,
+            email=user.email,
         )
 
         return {
