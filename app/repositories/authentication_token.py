@@ -8,10 +8,7 @@ from app.types.auth import UserInfo
 
 
 class AuthenticationTokenRepo:
-    def __init__(
-        self,
-        redis_client: Redis,
-    ) -> None:
+    def __init__(self, redis_client: Redis) -> None:
         self._redis_client = redis_client
 
     async def create(

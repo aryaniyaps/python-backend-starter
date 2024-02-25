@@ -31,6 +31,7 @@ from app.repositories.authentication_token import AuthenticationTokenRepo
 from app.repositories.email_verification_code import EmailVerificationCodeRepo
 from app.repositories.user import UserRepo
 from app.repositories.user_session import UserSessionRepo
+from app.repositories.webauthn_challenge import WebAuthnChallengeRepo
 from app.repositories.webauthn_credential import WebAuthnCredentialRepo
 from app.types.auth import AuthenticationResult, UserInfo
 from app.worker import task_queue
@@ -41,6 +42,7 @@ class AuthService:
         self,
         user_session_repo: UserSessionRepo,
         webauthn_credential_repo: WebAuthnCredentialRepo,
+        webauthn_challenge_repo: WebAuthnChallengeRepo,
         authentication_token_repo: AuthenticationTokenRepo,
         auth_provider_repo: AuthProviderRepo,
         user_repo: UserRepo,
@@ -49,6 +51,7 @@ class AuthService:
     ) -> None:
         self._user_session_repo = user_session_repo
         self._webauthn_credential_repo = webauthn_credential_repo
+        self._webauthn_challenge_repo = webauthn_challenge_repo
         self._authentication_token_repo = authentication_token_repo
         self._auth_provider_repo = auth_provider_repo
         self._user_repo = user_repo
@@ -72,9 +75,7 @@ class AuthService:
         registration_options = generate_registration_options(
             rp_id=settings.rp_id,
             rp_name=settings.rp_name,
-            user_id=username.encode(),
             user_name=username,
-            user_display_name=username,
             authenticator_selection=AuthenticatorSelectionCriteria(
                 authenticator_attachment=AuthenticatorAttachment.PLATFORM,
                 user_verification=UserVerificationRequirement.REQUIRED,
@@ -83,9 +84,11 @@ class AuthService:
             ),
         )
 
-        challenge = registration_options.challenge
-
-        # TODO: store challenge here
+        # store challenge server-side
+        await self._webauthn_challenge_repo.create(
+            username=username,
+            challenge=registration_options.challenge,
+        )
 
         return registration_options
 
@@ -97,10 +100,15 @@ class AuthService:
         user_agent: UserAgent,
     ) -> AuthenticationResult:
         """Verify the authenticator's response for registration."""
-        # TODO: get challenge here
+        challenge = await self._webauthn_challenge_repo.get(username=username)
+
+        if challenge is None:
+            # TODO: handle error here
+            raise Exception
+
         verified_registration = verify_registration_response(
             credential=credential,
-            expected_challenge=b"",
+            expected_challenge=challenge,
             expected_rp_id=settings.rp_id,
             expected_origin=settings.rp_expected_origin,
         )
@@ -170,9 +178,13 @@ class AuthService:
             ],
         )
 
-        challenge = authentication_options.challenge
-
-        # TODO: store challenge here
+        # store challenge server-side
+        # TODO: check for username conflicts, what if same user creates multiple
+        # challenges at the same time?
+        await self._webauthn_challenge_repo.create(
+            username=existing_user.username,
+            challenge=authentication_options.challenge,
+        )
 
         return authentication_options
 
@@ -201,15 +213,24 @@ class AuthService:
             # TODO: handle error here
             raise Exception
 
-        # TODO: get challenge here
+        challenge = await self._webauthn_challenge_repo.get(
+            username=existing_user.username,
+        )
+
+        if challenge is None:
+            # TODO: handle error here
+            raise Exception
+
         verified_authentication = verify_authentication_response(
             credential=credential,
-            expected_challenge=b"",
+            expected_challenge=challenge,
             expected_rp_id=settings.rp_id,
             expected_origin=settings.rp_expected_origin,
             credential_current_sign_count=existing_credential.sign_count,
             credential_public_key=existing_credential.public_key.encode(),
         )
+
+        # TODO: update credential sign count here
 
         if not await self._user_session_repo.check_if_device_exists(
             user_id=existing_user.id,
