@@ -7,7 +7,7 @@ New login to your {{ app_name }} account from {{ device }}
 
 {% block content %}
 ************
-Hi {{ username }},
+Hey {{ email }},
 ************
 
 We noticed a new login to your {{ app_name }} account on {{ login_timestamp }}.

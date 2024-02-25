@@ -67,7 +67,7 @@ async def send_new_login_device_detected_email(
     _ctx: Context,
     *,
     receiver: str,
-    username: str,
+    email: str,
     login_timestamp: str,
     device: str,
     browser_name: str,
@@ -80,7 +80,7 @@ async def send_new_login_device_detected_email(
         receiver=receiver,
         template="new-login-device",
         context={
-            "username": username,
+            "email": email,
             "login_timestamp": login_timestamp,
             "device": device,
             "browser_name": browser_name,

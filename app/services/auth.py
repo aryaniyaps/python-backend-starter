@@ -282,7 +282,7 @@ class AuthService:
             await task_queue.enqueue(
                 "send_new_login_device_detected_email",
                 receiver=existing_user.email,
-                username=existing_user.username,
+                email=existing_user.email,
                 login_timestamp=humanize.naturaldate(datetime.now(UTC)),
                 device=user_agent.get_device(),
                 browser_name=user_agent.get_browser(),
