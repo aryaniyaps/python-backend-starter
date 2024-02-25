@@ -12,6 +12,10 @@ APP_URL = "https://example.com"  # frontend app URL
 
 EMAIL_VERIFICATION_CODE_EXPIRES_IN = 600  # 10 minutes
 
+# webauthn challenges
+
+WEBAUTHN_CHALLENGE_TTL = 300  # 5 minutes
+
 # rate limiting
 
 PRIMARY_RATE_LIMIT = "5000/hour"

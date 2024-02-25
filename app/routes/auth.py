@@ -39,7 +39,7 @@ auth_router = APIRouter(
 
 
 @auth_router.post(
-    "/registration/options",
+    "/register/options",
     response_model=PublicKeyCredentialCreationOptions,
 )
 async def registration_options(
@@ -59,7 +59,7 @@ async def registration_options(
 
 
 @auth_router.post(
-    "/registration/verification",
+    "/register/verification",
     response_model=RegisterUserResult,
 )
 async def registration_verification(

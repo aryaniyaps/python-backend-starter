@@ -1,5 +1,7 @@
 from redis.asyncio import Redis
 
+from app.lib.constants import WEBAUTHN_CHALLENGE_TTL
+
 
 class WebAuthnChallengeRepo:
     def __init__(self, redis_client: Redis) -> None:
@@ -12,6 +14,7 @@ class WebAuthnChallengeRepo:
                 email=email,
             ),
             value=challenge,
+            ex=WEBAUTHN_CHALLENGE_TTL,
         )
 
     async def get(self, *, email: str) -> bytes | None:
