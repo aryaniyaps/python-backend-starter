@@ -2,7 +2,6 @@ from http import HTTPStatus
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header
-from sqlalchemy import ScalarResult
 from user_agents import parse
 from webauthn.helpers.structs import (
     PublicKeyCredentialCreationOptions,
@@ -79,17 +78,12 @@ async def registration_verification(
     ],
 ) -> AuthenticationResult:
     """Verify the authenticator's response for registration."""
-    authentication_token, user = await auth_service.verify_registration_response(
+    return await auth_service.verify_registration_response(
         username=data.username,
         credential=data.credential,
         request_ip=request_ip,
         user_agent=parse(user_agent),
     )
-
-    return {
-        "authentication_token": authentication_token,
-        "user": user,
-    }
 
 
 @auth_router.post(
@@ -133,17 +127,12 @@ async def authentication_verification(
     ],
 ) -> AuthenticationResult:
     """Verify the authenticator's response for authentication."""
-    authentication_token, user = await auth_service.verify_authentication_response(
+    return await auth_service.verify_authentication_response(
         username=data.username,
         credential=data.credential,
         request_ip=request_ip,
         user_agent=parse(user_agent),
     )
-
-    return {
-        "authentication_token": authentication_token,
-        "user": user,
-    }
 
 
 @auth_router.delete("/credentials/{credential_id}")
@@ -254,6 +243,8 @@ async def get_user_sessions(
             dependency=get_viewer_info,
         ),
     ],
-) -> ScalarResult[UserSession]:
+) -> list[UserSession]:
     """Get the current user's user sessions."""
-    return await auth_service.get_user_sessions(user_id=viewer_info.user_id)
+    return await auth_service.get_user_sessions(
+        user_id=viewer_info.user_id,
+    )

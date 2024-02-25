@@ -36,11 +36,12 @@ class WebAuthnCredentialRepo:
         await self._session.commit()
         return webauthn_credential
 
-    async def get(self, credential_id: str) -> WebAuthnCredential | None:
-        """Get WebAuthn credential by ID."""
+    async def get(self, credential_id: str, user_id: UUID) -> WebAuthnCredential | None:
+        """Get WebAuthn credential by ID and user ID."""
         return await self._session.scalar(
             select(WebAuthnCredential).where(
-                WebAuthnCredential.id == credential_id,
+                WebAuthnCredential.id == credential_id
+                and WebAuthnCredential.user_id == user_id,
             ),
         )
 

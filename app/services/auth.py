@@ -3,7 +3,6 @@ from uuid import UUID
 
 import humanize
 from geoip2.database import Reader
-from sqlalchemy import ScalarResult
 from user_agents.parsers import UserAgent
 from webauthn import (
     generate_authentication_options,
@@ -26,7 +25,6 @@ from webauthn.helpers.structs import (
 from app.config import settings
 from app.lib.errors import InvalidInputError, UnauthenticatedError
 from app.lib.geo_ip import get_city_location, get_geoip_city
-from app.models.user import User
 from app.models.user_session import UserSession
 from app.repositories.auth_provider import AuthProviderRepo
 from app.repositories.authentication_token import AuthenticationTokenRepo
@@ -34,7 +32,7 @@ from app.repositories.email_verification_code import EmailVerificationCodeRepo
 from app.repositories.user import UserRepo
 from app.repositories.user_session import UserSessionRepo
 from app.repositories.webauthn_credential import WebAuthnCredentialRepo
-from app.types.auth import UserInfo
+from app.types.auth import AuthenticationResult, UserInfo
 from app.worker import task_queue
 
 
@@ -97,7 +95,7 @@ class AuthService:
         credential: RegistrationCredential,
         request_ip: str,
         user_agent: UserAgent,
-    ) -> tuple[str, User]:
+    ) -> AuthenticationResult:
         """Verify the authenticator's response for registration."""
         # TODO: get challenge here
         verified_registration = verify_registration_response(
@@ -138,7 +136,10 @@ class AuthService:
             username=user.username,
         )
 
-        return authentication_token, user
+        return {
+            "authentication_token": authentication_token,
+            "user": user,
+        }
 
     async def generate_authentication_options(
         self, username: str, user_verification: UserVerificationRequirement
@@ -181,19 +182,24 @@ class AuthService:
         credential: AuthenticationCredential,
         request_ip: str,
         user_agent: UserAgent,
-    ) -> tuple[str, User]:
+    ) -> AuthenticationResult:
         """Verify the authenticator's response for authentication."""
         existing_user = await self._user_repo.get_by_username(
             username=username,
         )
 
         if existing_user is None:
-            # TODO: handle error ehre
+            # TODO: handle error here
             raise Exception
 
         existing_credential = await self._webauthn_credential_repo.get(
-            credential_id=credential.id
+            credential_id=credential.id,
+            user_id=existing_user.id,
         )
+
+        if existing_credential is None:
+            # TODO: handle error here
+            raise Exception
 
         # TODO: get challenge here
         verified_authentication = verify_authentication_response(
@@ -236,7 +242,10 @@ class AuthService:
             user_session_id=user_session.id,
         )
 
-        return authentication_token, existing_user
+        return {
+            "authentication_token": authentication_token,
+            "user": existing_user,
+        }
 
     async def send_email_verification_request(
         self,
@@ -275,7 +284,7 @@ class AuthService:
             ip_address=request_ip,
         )
 
-    async def get_user_sessions(self, user_id: UUID) -> ScalarResult[UserSession]:
+    async def get_user_sessions(self, user_id: UUID) -> list[UserSession]:
         """Get user sessions for the given user ID."""
         return await self._user_session_repo.get_all(
             user_id=user_id,

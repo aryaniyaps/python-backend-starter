@@ -2,7 +2,7 @@ from datetime import datetime
 from uuid import UUID
 
 from geoip2.database import Reader
-from sqlalchemy import ScalarResult, delete, select, text, update
+from sqlalchemy import delete, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from user_agents.parsers import UserAgent
 
@@ -60,13 +60,15 @@ class UserSessionRepo:
         )
         return results.first() is not None
 
-    async def get_all(self, user_id: UUID) -> ScalarResult[UserSession]:
+    async def get_all(self, user_id: UUID) -> list[UserSession]:
         """Get user sessions for the given user ID."""
-        return await self._session.scalars(
+        sessions = await self._session.scalars(
             select(UserSession).where(
                 UserSession.user_id == user_id,
             ),
         )
+
+        return list(sessions)
 
     async def delete(
         self,
