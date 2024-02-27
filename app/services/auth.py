@@ -1,5 +1,5 @@
 from datetime import UTC, datetime
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import humanize
 from geoip2.database import Reader
@@ -96,9 +96,7 @@ class AuthService:
         )
 
     async def generate_registration_options(
-        self,
-        email: str,
-        verification_code: str,
+        self, email: str, verification_code: str, display_name: str
     ) -> PublicKeyCredentialCreationOptions:
         """Generate options for registering a credential."""
         if (
@@ -106,20 +104,22 @@ class AuthService:
                 verification_code=verification_code,
                 email=email,
             )
-            is not None
+            is None
         ):
             raise InvalidInputError(
                 message="Invalid email verification code passed.",
             )
 
-        # TODO: delete email verification code
+        # delete existing email verification codes
+        await self._email_verification_code_repo.delete_all(email=email)
 
         registration_options = generate_registration_options(
             rp_id=settings.rp_id,
             rp_name=settings.rp_name,
-            # TODO: pass UUID as user_id here or change db schema to use
-            # BYTEA as user IDs
+            # generate user ID (UUID)
+            user_id=uuid4().bytes,
             user_name=email,
+            user_display_name=display_name,
             authenticator_selection=AuthenticatorSelectionCriteria(
                 authenticator_attachment=AuthenticatorAttachment.PLATFORM,
                 user_verification=UserVerificationRequirement.REQUIRED,
@@ -139,11 +139,14 @@ class AuthService:
     async def verify_registration_response(
         self,
         email: str,
+        display_name: str,
         credential: RegistrationCredential,
         request_ip: str,
         user_agent: UserAgent,
     ) -> AuthenticationResult:
         """Verify the authenticator's response for registration."""
+        # TODO: get user ID here (reference example uses a cookie)
+        # we could set the challenge as key and user ID as value in redis
         challenge = await self._webauthn_challenge_repo.get(email=email)
 
         if challenge is None:
@@ -159,7 +162,9 @@ class AuthService:
         )
 
         user = await self._user_repo.create(
+            user_id=user_id,
             email=email,
+            display_name=display_name,
         )
 
         # TODO: delete challenge here
@@ -249,7 +254,11 @@ class AuthService:
             # TODO: raise unauthorized error here
             raise Exception
 
-        existing_user = await self._user_repo.get(user_id=user_id)
+        existing_user = await self._user_repo.get(
+            user_id=UUID(
+                bytes=user_id,
+            ),
+        )
 
         if existing_user is None:
             # TODO: handle error here

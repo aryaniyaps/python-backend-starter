@@ -12,10 +12,17 @@ class UserRepo:
 
     async def create(
         self,
+        *,
+        user_id: UUID,
         email: str,
+        display_name: str,
     ) -> User:
         """Create a new user."""
-        user = User(email=email)
+        user = User(
+            id=user_id,
+            email=email,
+            display_name=display_name,
+        )
         self._session.add(user)
         await self._session.commit()
         return user

@@ -98,6 +98,7 @@ async def registration_options(
     return await auth_service.generate_registration_options(
         email=data.email,
         verification_code=data.verification_code,
+        display_name=data.display_name,
     )
 
 

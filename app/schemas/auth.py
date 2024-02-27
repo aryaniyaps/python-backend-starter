@@ -27,12 +27,32 @@ class RegisterOptionsInput(BaseSchema):
         ),
     ]
 
+    display_name: Annotated[
+        str,
+        Field(
+            max_length=70,
+            examples=[
+                "Aryan Iyappan",
+            ],
+        ),
+    ]
+
 
 class RegisterVerificationInput(BaseSchema):
     email: Annotated[
         EmailStr,
         Field(
             max_length=255,
+        ),
+    ]
+
+    display_name: Annotated[
+        str,
+        Field(
+            max_length=70,
+            examples=[
+                "Aryan Iyappan",
+            ],
         ),
     ]
 

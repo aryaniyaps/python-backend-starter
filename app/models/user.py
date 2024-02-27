@@ -30,6 +30,10 @@ class User(Base):
         index=True,
     )
 
+    display_name: Mapped[str] = mapped_column(
+        CITEXT(70),
+    )
+
     created_at: Mapped[datetime] = mapped_column(
         server_default=now(),
     )
