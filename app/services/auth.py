@@ -1,3 +1,4 @@
+import base64
 from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
@@ -113,11 +114,13 @@ class AuthService:
         # delete existing email verification codes
         await self._email_verification_code_repo.delete_all(email=email)
 
+        # generate user ID (UUID)
+        user_id = uuid4()
+
         registration_options = generate_registration_options(
             rp_id=settings.rp_id,
             rp_name=settings.rp_name,
-            # generate user ID (UUID)
-            user_id=uuid4().bytes,
+            user_id=user_id.bytes,
             user_name=email,
             user_display_name=display_name,
             authenticator_selection=AuthenticatorSelectionCriteria(
@@ -130,8 +133,8 @@ class AuthService:
 
         # store challenge server-side
         await self._webauthn_challenge_repo.create(
-            email=email,
-            challenge=registration_options.challenge,
+            challenge=registration_options.challenge.decode(),
+            user_id=user_id,
         )
 
         return registration_options
@@ -145,11 +148,15 @@ class AuthService:
         user_agent: UserAgent,
     ) -> AuthenticationResult:
         """Verify the authenticator's response for registration."""
-        # TODO: get user ID here (reference example uses a cookie)
-        # we could set the challenge as key and user ID as value in redis
-        challenge = await self._webauthn_challenge_repo.get(email=email)
+        client_data = base64.decode(credential.response.client_data_json.decode())
 
-        if challenge is None:
+        challenge = credential.response.client_data_json["challenge"]
+
+        user_id = await self._webauthn_challenge_repo.get(
+            challenge=challenge,
+        )
+
+        if user_id is None:
             # TODO: handle error here
             raise Exception
 
@@ -167,7 +174,8 @@ class AuthService:
             display_name=display_name,
         )
 
-        # TODO: delete challenge here
+        # delete challenge server-side
+        await self._webauthn_challenge_repo.delete(challenge=challenge)
 
         await self._webauthn_credential_repo.create(
             user_id=user.id,
@@ -232,11 +240,9 @@ class AuthService:
         )
 
         # store challenge server-side
-        # TODO: check for username conflicts, what if same user creates multiple
-        # challenges at the same time?
         await self._webauthn_challenge_repo.create(
-            email=existing_user.email,
-            challenge=authentication_options.challenge,
+            challenge=authentication_options.challenge.decode(),
+            user_id=existing_user.id,
         )
 
         return authentication_options
@@ -255,9 +261,7 @@ class AuthService:
             raise Exception
 
         existing_user = await self._user_repo.get(
-            user_id=UUID(
-                bytes=user_id,
-            ),
+            user_id=UUID(bytes=user_id),
         )
 
         if existing_user is None:
@@ -273,9 +277,10 @@ class AuthService:
             # TODO: handle error here
             raise Exception
 
-        challenge = await self._webauthn_challenge_repo.get(
-            email=existing_user.email,
-        )
+        # TODO: get challenge from credential
+        # see: https://github.com/rayriffy/juri/blob/main/web/src/routes/api/login/%2Bserver.ts
+
+        challenge = ""
 
         if challenge is None:
             # TODO: handle error here
@@ -283,12 +288,15 @@ class AuthService:
 
         verified_authentication = verify_authentication_response(
             credential=credential,
-            expected_challenge=challenge,
+            expected_challenge=challenge.encode(),
             expected_rp_id=settings.rp_id,
             expected_origin=settings.rp_expected_origin,
             credential_current_sign_count=existing_credential.sign_count,
             credential_public_key=existing_credential.public_key.encode(),
         )
+
+        # delete challenge server-side
+        await self._webauthn_challenge_repo.delete(challenge=challenge)
 
         # update credential sign count
         await self._webauthn_credential_repo.update(
