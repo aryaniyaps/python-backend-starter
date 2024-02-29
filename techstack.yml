@@ -2,7 +2,7 @@ repo_name: aryaniyaps/python-backend-starter
 report_id: 71b2893c5646c5a01051ef2d35db7954
 version: 0.1
 repo_type: Public
-timestamp: '2024-01-20T08:12:18+00:00'
+timestamp: '2024-02-29T19:31:17+00:00'
 requested_by: aryaniyaps
 provider: github
 branch: main
@@ -201,6 +201,19 @@ tools:
   detection_source: pyproject.toml
   last_updated_by: Aryan Iyappan
   last_updated_on: 2024-01-19 04:44:38.000000000 Z
+  vulnerabilities:
+  - name: python-multipart vulnerable to Content-Type Header ReDoS
+    cve_id: CVE-2024-24762
+    cve_url: https://github.com/advisories/GHSA-2jv5-9r88-3w3p
+    detected_date: Feb 17
+    severity: high
+    first_patched: 0.36.2
+  - name: 'Duplicate Advisory: Starlette Content-Type Header ReDoS'
+    cve_id: 
+    cve_url: https://github.com/advisories/GHSA-93gm-qmq6-w238
+    detected_date: Feb 6
+    severity: high
+    first_patched: 0.36.2
 - name: user-agents
   description: A library to identify devices
   package_url: https://pypi.org/project/user-agents
