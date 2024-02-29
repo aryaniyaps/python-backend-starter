@@ -268,7 +268,8 @@ class AuthService:
         user_agent: UserAgent,
     ) -> AuthenticationResult:
         """Verify the authenticator's response for authentication."""
-        user_id = credential.response.user_handle
+        # TODO: check if its okay if we don't use the user_handle here
+        # user_id = credential.response.user_handle
 
         client_data = orjson.loads(
             base64.b64decode(credential.response.client_data_json)
@@ -276,16 +277,14 @@ class AuthService:
 
         challenge = client_data["challenge"]
 
-        challenge_user_id = await self._webauthn_challenge_repo.get(challenge=challenge)
+        user_id = await self._webauthn_challenge_repo.get(challenge=challenge)
 
-        if challenge_user_id is None:
+        if user_id is None:
             raise InvalidInputError(
                 message="Challenge response doesn't match.",
             )
 
-        existing_user = await self._user_repo.get(
-            user_id=UUID(bytes=user_id),
-        )
+        existing_user = await self._user_repo.get(user_id=user_id)
 
         if existing_user is None:
             # TODO: handle error here
@@ -298,7 +297,7 @@ class AuthService:
 
         if existing_credential is None:
             raise InvalidInputError(
-                message="Webauthn credential not found.",
+                message="Webauthn credential doesn't exist.",
             )
 
         verified_authentication = verify_authentication_response(

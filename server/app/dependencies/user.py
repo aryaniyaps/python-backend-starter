@@ -1,6 +1,5 @@
 from typing import Annotated
 
-from argon2 import PasswordHasher
 from fastapi import Depends
 from geoip2.database import Reader
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,7 +9,6 @@ from app.dependencies.email_verification_code import get_email_verification_code
 from app.dependencies.user_session import get_user_session_repo
 from app.lib.database import get_database_session
 from app.lib.geo_ip import get_geoip_reader
-from app.lib.security import get_password_hasher
 from app.repositories.authentication_token import AuthenticationTokenRepo
 from app.repositories.email_verification_code import EmailVerificationCodeRepo
 from app.repositories.user import UserRepo
@@ -25,18 +23,9 @@ def get_user_repo(
             dependency=get_database_session,
         ),
     ],
-    password_hasher: Annotated[
-        PasswordHasher,
-        Depends(
-            dependency=get_password_hasher,
-        ),
-    ],
 ) -> UserRepo:
     """Get the user repo."""
-    return UserRepo(
-        session=session,
-        password_hasher=password_hasher,
-    )
+    return UserRepo(session=session)
 
 
 def get_user_service(
@@ -64,12 +53,6 @@ def get_user_service(
             dependency=get_email_verification_code_repo,
         ),
     ],
-    password_hasher: Annotated[
-        PasswordHasher,
-        Depends(
-            dependency=get_password_hasher,
-        ),
-    ],
     geoip_reader: Annotated[
         Reader,
         Depends(
@@ -83,6 +66,5 @@ def get_user_service(
         email_verification_token_repo=email_verification_token_repo,
         user_session_repo=user_session_repo,
         authentication_token_repo=authentication_token_repo,
-        password_hasher=password_hasher,
         geoip_reader=geoip_reader,
     )

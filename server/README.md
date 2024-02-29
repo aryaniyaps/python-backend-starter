@@ -4,17 +4,13 @@
 
 - [x] User registration
    - [x] Authentication tokens are sha256 hashed
-   - [x] Passwords are securely hashed with Argon2
    - [x] Email notifications for onboarding
-- [x] Password strength validation using the [ZXCVBN](https://github.com/dropbox/zxcvbn) algorithm
 - [x] Email verification on user registration
 - [x] 8 digit cryptographically secure email verification codes
-- [x] Email change flow for users with passwords
-- [ ] Email change flow for users without passwords
+- [ ] Email change flow (secured with passkeys)
 - [x] Email verification codes are sha256 hashed
-- [x] User login (email-password)
-   - [x] Login based on either email or username
-   - [x] Passwords are rehashed upon login
+- [x] User login (passkeys)
+   - [x] Login based on email
    - [x] Email notifications when new login device is detected
 - [x] User session tracking
    - [x] IP address, device and geolocation data storage
@@ -22,19 +18,6 @@
    - Requester IP address
    - Requester device (based on the user agent)
    - Geolocation data (based on IP)
-- [ ] Social authentication providers must be explicitly linked by the user
-- [ ] Passwords can be set by users who registered via oauth2 providers
-- [x] Social login
-   - [x] Sign in with Google
-   - [x] Sign in with Facebook
-- [x] Password resets
-   - [x] 8 digit cryptographically secure password reset codes
-   - [x] Password reset codes are sha256 hashed
-   - [x] Email notifications for password reset requests
-   - [x] Email notifications when password resets
-- [x] Secure password changes
-- [x] Email notifications when password changes
-- [x] Changing or resetting password logs out the user from all sessions and deletes all of their authentication tokens
 - [x] Structured logging support
 - [x] Rate limiting (Moving window strategy)
    - [x] Primary rate limiting (API-wide)
@@ -105,50 +88,7 @@ To setup the project for downloading and automatically updating the Maxmind GeoL
     └── ...
     ```
 
-### Oauth2 apps configuration
-#### Google
 
-To configure Google OAuth2 authentication for your application, follow these steps:
-
-1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
-2. [Create a new project](https://console.cloud.google.com/projectcreate) or select an existing one.
-3. Navigate to the *Credentials* tab.
-4. Click on *Create credentials* and select *OAuth client ID*.
-5. Choose *Web application* as the application type.
-6. Enter the appropriate information for your application.
-   The authorized redirect URIs used when creating the credentials must include the following URL *(assuming you are running at port 8000 on localhost)*:
-
-   **http://localhost:8000/api/v1/oauth/google/callback**
-
-7. Once created, copy the generated Client ID and Client Secret.
-8. Paste the Client ID and Client secret into the `.env` file as follows:
-
-    ```
-    SERVER_GOOGLE_CLIENT_ID=<Client ID>
-    SERVER_GOOGLE_CLIENT_SECRET=<Client Secret>
-    ```
-
-#### Facebook
-
-To configure Facebook OAuth2 authentication for your application, follow these steps:
-
-1. Go to the [Facebook Developers](https://developers.facebook.com/) website and log in with your Facebook account.
-2. If you haven't already, create a new app by navigating to the My Apps page and clicking on the Create App button. Follow the prompts to set up a new app.
-3. After creating the app, you'll be redirected to the app dashboard. In the left sidebar, select Settings > Basic.
-4. In the Basic Settings section, configure your app details including the App Domains and Privacy Policy URL as required.
-5. Under the Add Platform section, click on + Add Platform and choose Website.
-6. Enter your website URL in the Site URL field. Make sure to include the following redirect URI for OAuth callbacks *(assuming you are running at port 8000 on localhost)*:
-
-   **http://localhost:8000/api/v1/oauth/facebook/callback**
-
-7. Once the configuration is complete, click on Save Changes.
-8. Now, navigate to the Settings > Basic section again to retrieve your App ID and App Secret.
-9. Paste the Client ID and Client secret into the `.env` file as follows:
-
-    ```
-    SERVER_FACEBOOK_CLIENT_ID=<Client ID>
-    SERVER_FACEBOOK_CLIENT_SECRET=<Client Secret>
-    ```
 
 ## Running the project
 

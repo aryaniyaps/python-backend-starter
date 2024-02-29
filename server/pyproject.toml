@@ -63,6 +63,8 @@ include = [
 exclude = [] # exclude packages matching these glob patterns (empty by default)
 namespaces = false # to disable scanning PEP 420 namespaces (true by default)
 
+[tool.pytest.ini_options]
+timeout = 5
 
 [tool.mypy]
 plugins = ["pydantic.mypy"]
