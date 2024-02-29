@@ -63,24 +63,7 @@ class UserService:
         """Update the user with the given ID."""
         user = await self.get_user_by_id(user_id=user_id)
 
-        user_password = await self._user_password_repo.get(user_id=user.id)
-
-        if user_password is None:
-            # FIXME: implement separate email change flow for
-            # users who don't have passwords
-            raise InvalidInputError(
-                message="Cannot send email change request.",
-            )
-
-        try:
-            self._password_hasher.verify(
-                hash=user_password.hash,
-                password=current_password,
-            )
-        except VerifyMismatchError as exception:
-            raise InvalidInputError(
-                message="Invalid current password provided.",
-            ) from exception
+        # TODO: reauthenticate here using webauthn
 
         if (
             email
