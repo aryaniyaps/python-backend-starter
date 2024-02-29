@@ -99,16 +99,21 @@ class AuthService:
         )
 
     async def generate_registration_options(
-        self, *, email: str, verification_code: str, display_name: str
+        self,
+        *,
+        email: str,
+        verification_code: str,
+        display_name: str,
     ) -> PublicKeyCredentialCreationOptions:
         """Generate options for registering a credential."""
-        if (
+        email_verification_code = (
             await self._email_verification_code_repo.get_by_code_email(
                 verification_code=verification_code,
                 email=email,
             )
-            is None
-        ):
+        )
+
+        if email_verification_code is None or email_verification_code.email != email:
             raise InvalidInputError(
                 message="Invalid email verification code passed.",
             )
@@ -175,7 +180,7 @@ class AuthService:
 
         if not verified_registration.user_verified:
             raise InvalidInputError(
-                message="Could not verify user.",
+                message="Couldn't verify user.",
             )
 
         user = await self._user_repo.create(
