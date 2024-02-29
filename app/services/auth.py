@@ -62,6 +62,7 @@ class AuthService:
 
     async def send_email_verification_request(
         self,
+        *,
         email: str,
         user_agent: UserAgent,
         request_ip: str,
@@ -98,7 +99,7 @@ class AuthService:
         )
 
     async def generate_registration_options(
-        self, email: str, verification_code: str, display_name: str
+        self, *, email: str, verification_code: str, display_name: str
     ) -> PublicKeyCredentialCreationOptions:
         """Generate options for registering a credential."""
         if (
@@ -142,6 +143,7 @@ class AuthService:
 
     async def verify_registration_response(
         self,
+        *,
         email: str,
         display_name: str,
         credential: RegistrationCredential,
@@ -218,7 +220,7 @@ class AuthService:
         }
 
     async def generate_login_options(
-        self, email: str
+        self, *, email: str
     ) -> PublicKeyCredentialRequestOptions:
         """Generate options for retrieving a credential."""
         existing_user = await self._user_repo.get_by_email(
@@ -257,6 +259,7 @@ class AuthService:
 
     async def verify_login_response(
         self,
+        *,
         credential: AuthenticationCredential,
         request_ip: str,
         user_agent: UserAgent,
@@ -349,7 +352,7 @@ class AuthService:
             "user": existing_user,
         }
 
-    async def get_user_sessions(self, user_id: UUID) -> list[UserSession]:
+    async def get_user_sessions(self, *, user_id: UUID) -> list[UserSession]:
         """Get user sessions for the given user ID."""
         return await self._user_session_repo.get_all(
             user_id=user_id,
@@ -357,10 +360,10 @@ class AuthService:
 
     async def logout_user(
         self,
+        *,
         authentication_token: str,
         user_session_id: UUID,
         user_id: UUID,
-        *,
         remember_session: bool,
     ) -> None:
         """Logout the user."""

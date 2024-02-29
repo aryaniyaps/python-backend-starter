@@ -29,7 +29,7 @@ class UserService:
         self._user_session_repo = user_session_repo
         self._geoip_reader = geoip_reader
 
-    async def get_user_by_id(self, user_id: UUID) -> User:
+    async def get_user_by_id(self, *, user_id: UUID) -> User:
         """Get a user by ID."""
         user = await self._user_repo.get(user_id=user_id)
         if user is None:
@@ -40,28 +40,20 @@ class UserService:
 
     async def update_user(
         self,
+        *,
         user_id: UUID,
-        username: str | None = None,
+        display_name: str | None = None,
     ) -> User:
         """Update the user with the given ID."""
         user = await self.get_user_by_id(user_id=user_id)
-        if (
-            username
-            and await self._user_repo.get_by_username(
-                username=username,
-            )
-            is not None
-        ):
-            raise InvalidInputError(
-                message="User with that username already exists.",
-            )
         return await self._user_repo.update(
             user=user,
-            username=username,
+            display_name=display_name,
         )
 
     async def send_change_email_request(
         self,
+        *,
         user_id: UUID,
         email: str,
         current_password: str,
@@ -121,6 +113,7 @@ class UserService:
 
     async def update_user_email(
         self,
+        *,
         user_id: UUID,
         email: str,
         verification_code: str,

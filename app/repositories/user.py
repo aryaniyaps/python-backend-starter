@@ -20,8 +20,8 @@ class UserRepo:
         """Create a new user."""
         user = User(
             id=user_id,
-            email=email,
             display_name=display_name,
+            email=email,
         )
         self._session.add(user)
         await self._session.commit()
@@ -31,9 +31,13 @@ class UserRepo:
         self,
         user: User,
         *,
+        display_name: str | None = None,
         email: str | None = None,
     ) -> User:
         """Update the given user."""
+        if display_name is not None:
+            user.display_name = display_name
+
         if email is not None:
             user.email = email
 
