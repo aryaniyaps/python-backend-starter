@@ -121,11 +121,9 @@ class UserService:
         """Update the email for the given user."""
         user = await self.get_user_by_id(user_id=user_id)
 
-        email_verification_code = (
-            await self._email_verification_code_repo.get_by_code_email(
-                verification_code=verification_code,
-                email=email,
-            )
+        email_verification_code = await self._email_verification_code_repo.get(
+            verification_code=verification_code,
+            email=email,
         )
 
         if (

@@ -51,7 +51,7 @@ class EmailVerificationCodeRepo:
         await self._session.commit()
         return verification_code
 
-    async def get_by_code_email(
+    async def get(
         self, verification_code: str, email: str
     ) -> EmailVerificationCode | None:
         """Get an email verification code by code and email."""

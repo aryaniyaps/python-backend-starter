@@ -106,11 +106,9 @@ class AuthService:
         display_name: str,
     ) -> PublicKeyCredentialCreationOptions:
         """Generate options for registering a credential."""
-        email_verification_code = (
-            await self._email_verification_code_repo.get_by_code_email(
-                verification_code=verification_code,
-                email=email,
-            )
+        email_verification_code = await self._email_verification_code_repo.get(
+            verification_code=verification_code,
+            email=email,
         )
 
         if email_verification_code is None or email_verification_code.email != email:
