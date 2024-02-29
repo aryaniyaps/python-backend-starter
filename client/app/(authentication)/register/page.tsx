@@ -10,7 +10,7 @@ import {
 } from '@nextui-org/react';
 export default function RegisterPage() {
   return (
-    <Card isFooterBlurred fullWidth>
+    <Card isFooterBlurred fullWidth className='px-unit-2'>
       <CardHeader>
         <h1 className='text-md font-semibold'>Create a {APP_NAME} account</h1>
       </CardHeader>

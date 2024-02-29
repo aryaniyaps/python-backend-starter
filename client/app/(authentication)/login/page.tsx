@@ -10,7 +10,7 @@ import {
 
 export default function LoginPage() {
   return (
-    <Card isFooterBlurred fullWidth>
+    <Card isFooterBlurred fullWidth className='px-unit-2'>
       <CardHeader>
         <h1 className='text-md font-semibold'>Sign in with {APP_NAME}</h1>
       </CardHeader>
