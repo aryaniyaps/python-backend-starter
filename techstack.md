@@ -3,11 +3,11 @@
 ## Tech Stack
 aryaniyaps/python-backend-starter is built on the following main stack:
 
-- [Python](https://www.python.org) – Languages
 - [Mako](https://github.com/zzzeek/mako) – Templating Languages & Extensions
-- [Shell](https://en.wikipedia.org/wiki/Shell_script) – Shells
-- [GitHub Actions](https://github.com/features/actions) – Continuous Integration
+- [Python](https://www.python.org) – Languages
 - [FastAPI](https://fastapi.tiangolo.com/) – Microframeworks (Backend)
+- [GitHub Actions](https://github.com/features/actions) – Continuous Integration
+- [Shell](https://en.wikipedia.org/wiki/Shell_script) – Shells
 
 Full tech stack [here](/techstack.md)
 
@@ -17,11 +17,11 @@ Full tech stack [here](/techstack.md)
 ## Tech Stack
 aryaniyaps/python-backend-starter is built on the following main stack:
 
-- <img width='25' height='25' src='https://img.stackshare.io/service/993/pUBY5pVj.png' alt='Python'/> [Python](https://www.python.org) – Languages
 - <img width='25' height='25' src='https://img.stackshare.io/service/3583/default_43e3ee00dcc48a40f6fcba33551e4f5a99a10537.png' alt='Mako'/> [Mako](https://github.com/zzzeek/mako) – Templating Languages & Extensions
-- <img width='25' height='25' src='https://img.stackshare.io/service/4631/default_c2062d40130562bdc836c13dbca02d318205a962.png' alt='Shell'/> [Shell](https://en.wikipedia.org/wiki/Shell_script) – Shells
-- <img width='25' height='25' src='https://img.stackshare.io/service/11563/actions.png' alt='GitHub Actions'/> [GitHub Actions](https://github.com/features/actions) – Continuous Integration
+- <img width='25' height='25' src='https://img.stackshare.io/service/993/pUBY5pVj.png' alt='Python'/> [Python](https://www.python.org) – Languages
 - <img width='25' height='25' src='https://img.stackshare.io/service/25014/default_f6ff39141b468e832d1bc59fc98a060df604d44d.png' alt='FastAPI'/> [FastAPI](https://fastapi.tiangolo.com/) – Microframeworks (Backend)
+- <img width='25' height='25' src='https://img.stackshare.io/service/11563/actions.png' alt='GitHub Actions'/> [GitHub Actions](https://github.com/features/actions) – Continuous Integration
+- <img width='25' height='25' src='https://img.stackshare.io/service/4631/default_c2062d40130562bdc836c13dbca02d318205a962.png' alt='Shell'/> [Shell](https://en.wikipedia.org/wiki/Shell_script) – Shells
 
 Full tech stack [here](/techstack.md)
 
@@ -32,7 +32,7 @@ Full tech stack [here](/techstack.md)
 # Tech Stack File
 ![](https://img.stackshare.io/repo.svg "repo") [aryaniyaps/python-backend-starter](https://github.com/aryaniyaps/python-backend-starter)![](https://img.stackshare.io/public_badge.svg "public")
 <br/><br/>
-|17<br/>Tools used|01/20/24 <br/>Report generated|
+|17<br/>Tools used|02/29/24 <br/>Report generated|
 |------|------|
 </div>
 
@@ -126,7 +126,7 @@ Full tech stack [here](/techstack.md)
 |[pydantic](https://pypi.org/project/pydantic)|N/A|01/12/24|Aryan Iyappan |MIT|N/A|
 |[redis](https://pypi.org/project/redis)|v5.0.1|01/12/24|Aryan Iyappan |MIT|N/A|
 |[rq](https://pypi.org/project/rq)|v1.15.1|11/25/23|Aryan Iyappan |BSD-3-Clause|N/A|
-|[starlette](https://pypi.org/project/starlette)|v0.35.1|01/19/24|Aryan Iyappan |BSD-3-Clause|N/A|
+|[starlette](https://pypi.org/project/starlette)|v0.35.1|01/19/24|Aryan Iyappan |BSD-3-Clause|[CVE-2024-24762](https://github.com/advisories/GHSA-2jv5-9r88-3w3p) (High)<br/>[](https://github.com/advisories/GHSA-93gm-qmq6-w238) (High)|
 |[user-agents](https://pypi.org/project/user-agents)|v2.2.0|01/19/24|Aryan Iyappan |MIT|N/A|
 |[uvicorn](https://pypi.org/project/uvicorn)|N/A|01/18/24|Aryan Iyappan |BSD-3-Clause|N/A|
 
