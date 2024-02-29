@@ -19,6 +19,7 @@ from app.lib.constants import OpenAPITag
 from app.models.user_session import UserSession
 from app.schemas.auth import (
     AuthenticateUserResult,
+    CreateWebAuthnCredentialInput,
     EmailVerificationRequestInput,
     LoginOptionsInput,
     LoginVerificationInput,
@@ -179,9 +180,9 @@ async def login_verification(
     )
 
 
-@auth_router.delete("/credentials/{credential_id}")
-async def delete_credential() -> None:
-    pass
+@auth_router.post("/webauthn-credentials")
+async def create_webauthn_credential(data: CreateWebAuthnCredentialInput) -> None:
+    """Create a new webauthn credential."""
 
 
 @auth_router.post(

@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import ForeignKey
+from sqlalchemy.dialects.postgresql import ARRAY, ENUM
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql.functions import now
 from webauthn.helpers.structs import AuthenticatorTransport
@@ -33,7 +34,9 @@ class WebAuthnCredential(Base):
 
     backed_up: Mapped[bool]
 
-    transports: Mapped[list[AuthenticatorTransport] | None]
+    transports: Mapped[list[AuthenticatorTransport] | None] = mapped_column(
+        ARRAY(ENUM(AuthenticatorTransport)),
+    )
 
     created_at: Mapped[datetime] = mapped_column(
         server_default=now(),

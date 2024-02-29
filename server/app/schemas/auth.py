@@ -72,6 +72,10 @@ class LoginVerificationInput(BaseSchema):
     credential: Json[AuthenticationCredential]
 
 
+class CreateWebAuthnCredentialInput(BaseSchema):
+    pass
+
+
 class EmailVerificationRequestInput(BaseSchema):
     email: Annotated[
         EmailStr,
