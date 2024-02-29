@@ -2,8 +2,8 @@ from http import HTTPStatus
 from typing import Annotated
 from uuid import UUID
 
+import user_agents
 from fastapi import APIRouter, Depends, Header, Path
-from user_agents import parse
 
 from app.dependencies.auth import get_viewer_info
 from app.dependencies.ip_address import get_ip_address
@@ -146,7 +146,7 @@ async def request_current_user_email_change(
         user_id=viewer_info.user_id,
         email=data.email,
         current_password=data.current_password.get_secret_value(),
-        user_agent=parse(user_agent),
+        user_agent=user_agents.parse(user_agent),
         request_ip=request_ip,
     )
 

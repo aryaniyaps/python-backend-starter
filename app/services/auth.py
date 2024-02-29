@@ -3,6 +3,7 @@ from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 import humanize
+import orjson
 from geoip2.database import Reader
 from user_agents.parsers import UserAgent
 from webauthn import (
@@ -126,7 +127,7 @@ class AuthService:
             authenticator_selection=AuthenticatorSelectionCriteria(
                 authenticator_attachment=AuthenticatorAttachment.PLATFORM,
                 user_verification=UserVerificationRequirement.REQUIRED,
-                resident_key=ResidentKeyRequirement.REQUIRED,
+                resident_key=ResidentKeyRequirement.PREFERRED,
                 require_resident_key=False,
             ),
         )
@@ -148,25 +149,32 @@ class AuthService:
         user_agent: UserAgent,
     ) -> AuthenticationResult:
         """Verify the authenticator's response for registration."""
-        client_data = base64.decode(credential.response.client_data_json.decode())
+        client_data = orjson.loads(
+            base64.b64decode(credential.response.client_data_json)
+        )
 
-        challenge = credential.response.client_data_json["challenge"]
+        challenge = client_data["challenge"]
 
         user_id = await self._webauthn_challenge_repo.get(
             challenge=challenge,
         )
 
         if user_id is None:
-            # TODO: handle error here
-            raise Exception
+            raise InvalidInputError(
+                message="Challenge response doesn't match.",
+            )
 
         verified_registration = verify_registration_response(
             credential=credential,
             expected_challenge=challenge,
             expected_rp_id=settings.rp_id,
             expected_origin=settings.rp_expected_origin,
-            require_user_verification=True,
         )
+
+        if not verified_registration.user_verified:
+            raise InvalidInputError(
+                message="Could not verify user.",
+            )
 
         user = await self._user_repo.create(
             user_id=user_id,
@@ -228,7 +236,7 @@ class AuthService:
 
         authentication_options = generate_authentication_options(
             rp_id=settings.rp_id,
-            user_verification=UserVerificationRequirement.REQUIRED,
+            user_verification=UserVerificationRequirement.DISCOURAGED,
             allow_credentials=[
                 PublicKeyCredentialDescriptor(
                     id=credential.id.encode(),
@@ -256,9 +264,18 @@ class AuthService:
         """Verify the authenticator's response for authentication."""
         user_id = credential.response.user_handle
 
-        if user_id is None:
-            # TODO: raise unauthorized error here
-            raise Exception
+        client_data = orjson.loads(
+            base64.b64decode(credential.response.client_data_json)
+        )
+
+        challenge = client_data["challenge"]
+
+        challenge_user_id = await self._webauthn_challenge_repo.get(challenge=challenge)
+
+        if challenge_user_id is None:
+            raise InvalidInputError(
+                message="Challenge response doesn't match.",
+            )
 
         existing_user = await self._user_repo.get(
             user_id=UUID(bytes=user_id),
@@ -274,17 +291,9 @@ class AuthService:
         )
 
         if existing_credential is None:
-            # TODO: handle error here
-            raise Exception
-
-        # TODO: get challenge from credential
-        # see: https://github.com/rayriffy/juri/blob/main/web/src/routes/api/login/%2Bserver.ts
-
-        challenge = ""
-
-        if challenge is None:
-            # TODO: handle error here
-            raise Exception
+            raise InvalidInputError(
+                message="Webauthn credential not found.",
+            )
 
         verified_authentication = verify_authentication_response(
             credential=credential,
@@ -359,15 +368,16 @@ class AuthService:
             authentication_token=authentication_token,
             user_id=user_id,
         )
-        if not remember_session:
-            return await self._user_session_repo.delete(
+        if remember_session:
+            await self._user_session_repo.update(
+                user_session_id=user_session_id,
+                logged_out_at=datetime.now(UTC),
+            )
+        else:
+            await self._user_session_repo.delete(
                 user_session_id=user_session_id,
                 user_id=user_id,
             )
-        return await self._user_session_repo.update(
-            user_session_id=user_session_id,
-            logged_out_at=datetime.now(UTC),
-        )
 
     async def get_user_info_for_authentication_token(
         self, authentication_token: str

@@ -1,8 +1,8 @@
 from http import HTTPStatus
 from typing import Annotated
 
+import user_agents
 from fastapi import APIRouter, Depends, Header
-from user_agents import parse
 from webauthn.helpers.structs import (
     PublicKeyCredentialCreationOptions,
     PublicKeyCredentialRequestOptions,
@@ -76,13 +76,13 @@ async def request_email_verification(
     """Send an email verification request."""
     await auth_service.send_email_verification_request(
         email=data.email,
-        user_agent=parse(user_agent),
+        user_agent=user_agents.parse(user_agent),
         request_ip=request_ip,
     )
 
 
 @auth_router.post(
-    "/register/options",
+    "/register/start",
     response_model=PublicKeyCredentialCreationOptions,
 )
 async def registration_options(
@@ -103,7 +103,7 @@ async def registration_options(
 
 
 @auth_router.post(
-    "/register/verification",
+    "/register/finish",
     response_model=RegisterUserResult,
 )
 async def registration_verification(
@@ -125,14 +125,15 @@ async def registration_verification(
     """Verify the authenticator's response for registration."""
     return await auth_service.verify_registration_response(
         email=data.email,
+        display_name=data.display_name,
         credential=data.credential,
         request_ip=request_ip,
-        user_agent=parse(user_agent),
+        user_agent=user_agents.parse(user_agent),
     )
 
 
 @auth_router.post(
-    "/login/options",
+    "/login/start",
     response_model=PublicKeyCredentialRequestOptions,
 )
 async def login_options(
@@ -151,7 +152,7 @@ async def login_options(
 
 
 @auth_router.post(
-    "/login/verification",
+    "/login/finish",
     response_model=AuthenticateUserResult,
 )
 async def login_verification(
@@ -174,7 +175,7 @@ async def login_verification(
     return await auth_service.verify_login_response(
         credential=data.credential,
         request_ip=request_ip,
-        user_agent=parse(user_agent),
+        user_agent=user_agents.parse(user_agent),
     )
 
 
