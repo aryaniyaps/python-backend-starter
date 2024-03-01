@@ -5,7 +5,7 @@
 groups = ["default", "dev", "test"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:82f621c28d434ff14a2ae2ffb6a96e1784bde0344f0dc7bbaee7b1bb9e5dfe26"
+content_hash = "sha256:3fa5cac53a565bdffbea24614c97719f42ee2ad3912e128b00a4751e720364cd"
 
 [[package]]
 name = "aiohttp"
@@ -1304,36 +1304,6 @@ dependencies = [
 files = [
     {file = "saq-0.12.2-py3-none-any.whl", hash = "sha256:2bbb4040fb1a1fb0b307aa317fbfa1d1bb74fa32807ab67e2b1e7b1787c110d7"},
     {file = "saq-0.12.2.tar.gz", hash = "sha256:8c20d605ca1b7f1aa9bb87f58097b74da9cdc39da6810e5ee738a4e04b64f7e0"},
-]
-
-[[package]]
-name = "sentry-sdk"
-version = "1.40.5"
-summary = "Python client for Sentry (https://sentry.io)"
-groups = ["default"]
-dependencies = [
-    "certifi",
-    "urllib3>=1.26.11; python_version >= \"3.6\"",
-]
-files = [
-    {file = "sentry-sdk-1.40.5.tar.gz", hash = "sha256:d2dca2392cc5c9a2cc9bb874dd7978ebb759682fe4fe889ee7e970ee8dd1c61e"},
-    {file = "sentry_sdk-1.40.5-py2.py3-none-any.whl", hash = "sha256:d188b407c9bacbe2a50a824e1f8fb99ee1aeb309133310488c570cb6d7056643"},
-]
-
-[[package]]
-name = "sentry-sdk"
-version = "1.40.5"
-extras = ["fastapi", "sqlalchemy"]
-summary = "Python client for Sentry (https://sentry.io)"
-groups = ["default"]
-dependencies = [
-    "fastapi>=0.79.0",
-    "sentry-sdk==1.40.5",
-    "sqlalchemy>=1.2",
-]
-files = [
-    {file = "sentry-sdk-1.40.5.tar.gz", hash = "sha256:d2dca2392cc5c9a2cc9bb874dd7978ebb759682fe4fe889ee7e970ee8dd1c61e"},
-    {file = "sentry_sdk-1.40.5-py2.py3-none-any.whl", hash = "sha256:d188b407c9bacbe2a50a824e1f8fb99ee1aeb309133310488c570cb6d7056643"},
 ]
 
 [[package]]

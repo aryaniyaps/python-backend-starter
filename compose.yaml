@@ -1,4 +1,62 @@
 services:
+  traefik:
+    image: traefik:v2.11
+    # Enables the web UI and tells Traefik to listen to docker
+    command:
+      - --api.insecure=true
+      - --providers.docker
+    ports:
+      # The HTTP port
+      - "80:80"
+      # The Web UI (enabled by --api.insecure=true)
+      - "8080:8080"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  server:
+    build:
+      context: ./server
+      target: development
+    working_dir: /app
+    ports:
+      - "8000:8000"
+    environment:
+      SERVER_DEBUG: "true"
+      SERVER_ENVIRONMENT: "development"
+      SERVER_HOST: "127.0.0.1"
+      SERVER_PORT: "8000"
+      SERVER_LOG_LEVEL: "INFO"
+      SERVER_CORS_ALLOW_ORIGINS: '["*"]'
+      SERVER_SERVER_URL: "http://localhost:8000"
+      SERVER_OPENAPI_URL: "/openapi.json"
+      SERVER_RP_ID: "localhost"
+      SERVER_RP_NAME: "Starter"
+      SERVER_RP_EXPECTED_ORIGIN: "http://localhost:8000"
+      SERVER_DATABASE_URL: "postgresql+asyncpg://user:pass@localhost:5432/starter"
+      SERVER_DATABASE_POOL_SIZE: "20"
+      SERVER_REDIS_URL: "redis://:pass@localhost:6379/1"
+      SERVER_SAQ_BROKER_URL: "redis://:pass@localhost:6379/2"
+      SERVER_SAQ_CONCURRENCY: "100"
+      SERVER_EMAIL_HOST: "localhost"
+      SERVER_EMAIL_PORT: "1025"
+      SERVER_EMAIL_USERNAME: ""
+      SERVER_EMAIL_PASSWORD: ""
+      SERVER_EMAIL_FROM: "noreply@example.com"
+      SERVER_GEOLITE2_DATABASE_PATH: "./data/geoipupdate/GeoLite2-City.mmdb"
+      SERVER_SENTRY_DSN: ""
+      SERVER_SENTRY_SAMPLE_RATE: "1.0"
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      - postgres
+      - redis
+      - geoipupdate
+
   postgres:
     image: "bitnami/postgresql:16"
     ports:
@@ -19,7 +77,6 @@ services:
     volumes:
       - "redis_data:/bitnami"
 
-
   mailhog:
     image: mailhog/mailhog:v1.0.1
     ports:
@@ -39,8 +96,6 @@ services:
     secrets:
       - GEOIPUPDATE_ACCOUNT_ID
       - GEOIPUPDATE_LICENSE_KEY
-
-
 
 secrets:
   GEOIPUPDATE_ACCOUNT_ID:

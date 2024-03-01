@@ -22,7 +22,6 @@
 - [x] Rate limiting (Moving window strategy)
    - [x] Primary rate limiting (API-wide)
    - [x] Secondary rate limiting (operation-specific)
-- [ ] Error reporting with Sentry
 
 ## Tech Stack
 

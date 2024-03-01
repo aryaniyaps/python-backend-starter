@@ -9,7 +9,6 @@ from saq.worker import Worker
 from app.config import settings
 from app.lib.database import get_database_session
 from app.logger import build_worker_log_config, setup_logging
-from app.sentry import setup_sentry
 from app.tasks import (
     delete_expired_email_verification_codes,
     send_email_verification_request_email,
@@ -85,9 +84,6 @@ if __name__ == "__main__":
             human_readable=settings.debug,
         ),
     )
-
-    # set up sentry
-    setup_sentry()
 
     worker = Worker(
         queue=task_queue,
