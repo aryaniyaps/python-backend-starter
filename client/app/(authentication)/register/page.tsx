@@ -9,6 +9,7 @@ import {
   Input,
   Link,
 } from '@nextui-org/react';
+import { startRegistration } from '@simplewebauthn/browser';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 type RegisterInput = {
@@ -19,7 +20,34 @@ type RegisterInput = {
 export default function RegisterPage() {
   const { register, handleSubmit } = useForm<RegisterInput>({});
 
-  const onSubmit: SubmitHandler<RegisterInput> = (data) => console.log(data);
+  const onSubmit: SubmitHandler<RegisterInput> = async (data) => {
+    const resp = await fetch('/api/v1/auth/register/start', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: data.email }),
+    });
+
+    // TODO: catch and display errors here
+    const attResp = await startRegistration(await resp.json());
+
+    const verificationResp = await fetch('/api/v1/auth/register/finish', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(attResp),
+    });
+
+    const verificationJSON = await verificationResp.json();
+
+    if (verificationJSON && verificationJSON.verified) {
+      console.log('user is verified!');
+    } else {
+      console.log('user is not verified!');
+    }
+  };
 
   return (
     <Card isFooterBlurred fullWidth className='px-unit-2'>
