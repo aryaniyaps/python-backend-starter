@@ -8,7 +8,6 @@ import {
   CardFooter,
   CardHeader,
   Divider,
-  Link,
 } from '@nextui-org/react';
 import { OTPInput } from 'input-otp';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
@@ -25,10 +24,15 @@ export default function RegisterOTPPage() {
   return (
     <Card isFooterBlurred fullWidth className='px-unit-2'>
       <CardHeader className='flex flex-col items-start gap-unit-2'>
-        <h1 className='text-md font-semibold'>Enter your {APP_NAME} OTP</h1>
-        <h3 className='text-xs font-extralight'>
-          We sent an OTP to ary*********06@gmail.com
-        </h3>
+        <h1 className='text-md font-semibold'>Enter {APP_NAME} OTP</h1>
+        <div className='flex w-full items-center justify-between'>
+          <h3 className='text-xs font-extralight'>
+            Enter the OTP we sent to ary*********06@gmail.com
+          </h3>
+          <Button variant='flat' size='sm'>
+            resend OTP
+          </Button>
+        </div>
       </CardHeader>
       <CardBody>
         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
@@ -87,13 +91,14 @@ export default function RegisterOTPPage() {
           />
 
           <Button color='primary' type='submit'>
-            Continue
+            Confirm
           </Button>
         </form>
       </CardBody>
-      <CardFooter className='flex justify-between text-sm'>
-        <Link href='/register'>go back</Link>
-        <p>resend OTP in 5s</p>
+      <CardFooter>
+        <Button variant='ghost' fullWidth>
+          Go back
+        </Button>
       </CardFooter>
     </Card>
   );
