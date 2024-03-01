@@ -1,9 +1,9 @@
 services:
-  caddy:
+  reverse-proxy:
     build:
-      context: ./caddy
+      context: ./reverse-proxy
     networks:
-      - caddy
+      - reverse-proxy
     ports:
       - "80:80"
     depends_on:
@@ -16,7 +16,7 @@ services:
       target: development
     networks:
       - server
-      - caddy
+      - reverse-proxy
     working_dir: /app/
     ports:
       - "8000:8000"
@@ -56,7 +56,7 @@ services:
       context: ./client
       target: development
     networks:
-      - caddy
+      - reverse-proxy
     working_dir: /app/
     ports:
       - "3000:3000"
@@ -122,4 +122,4 @@ volumes:
 
 networks:
   server:
-  caddy:
+  reverse-proxy:
