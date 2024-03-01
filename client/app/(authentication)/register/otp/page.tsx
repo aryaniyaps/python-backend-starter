@@ -26,7 +26,7 @@ export default function RegisterOTPPage() {
     <Card isFooterBlurred fullWidth className='px-unit-2'>
       <CardHeader className='flex flex-col items-start gap-unit-2'>
         <h1 className='text-md font-semibold'>Enter your {APP_NAME} OTP</h1>
-        <h3 className='text-xs text-content4'>
+        <h3 className='text-xs font-extralight'>
           We sent an OTP to ary*********06@gmail.com
         </h3>
       </CardHeader>
@@ -91,8 +91,9 @@ export default function RegisterOTPPage() {
           </Button>
         </form>
       </CardBody>
-      <CardFooter className='text-sm'>
-        Have an account?&nbsp;<Link href='/login'>sign in</Link>
+      <CardFooter className='flex justify-between text-sm'>
+        <Link href='/register'>go back</Link>
+        <p>resend OTP in 5s</p>
       </CardFooter>
     </Card>
   );
