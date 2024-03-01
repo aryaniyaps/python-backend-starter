@@ -1,52 +1,45 @@
-# Stage 1: Base
-FROM python:3.11.8-alpine AS base
+ARG BASE_IMAGE=python:3.11.8-slim-bookworm
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+# build stage
+FROM $BASE_IMAGE AS builder
 
-# Install system dependencies
-# RUN apt-get update \
-#     && apt-get install -y --no-install-recommends \
-#     build-essential \
-#     libpq-dev \
-#     && rm -rf /var/lib/apt/lists/*
-
-# Install PDM
+# install PDM
+RUN pip install -U pip setuptools wheel
 RUN pip install pdm
 
-# Set the working directory in the container
-WORKDIR /app
+# copy files
+COPY pyproject.toml pdm.lock /project/
 
-# Copy only the requirements file to optimize caching
+# install dependencies and project into the local packages directory
+WORKDIR /project
+RUN mkdir __pypackages__ && pdm sync --prod --no-editable
+
+# development stage
+FROM $BASE_IMAGE AS development
+
+# Set up development environment
+WORKDIR /project
+
+RUN pip install pdm
+
+# copy files
 COPY pyproject.toml pdm.lock ./
 
-# Stage 2: Development
-FROM base AS development
-
-# Install project dependencies
 RUN pdm install
 
-# Copy the rest of the application code
-COPY . .
+CMD ["pdm", "run", "server"]
 
-# Expose port for development (if applicable)
-EXPOSE 8000
 
-# Set up entry point
-ENTRYPOINT ["pdm", "run", "server"]
+# production stage
+FROM $BASE_IMAGE as production
 
-# Stage 3: Production
-FROM base AS production
+# retrieve packages from build stage
+ENV PYTHONPATH=/project/pkgs
 
-# Install project dependencies for production
-RUN pdm install --no-dev
+COPY --from=builder /project/__pypackages__/3.11/lib /project/pkgs
 
-# Copy the rest of the application code
-COPY . .
+# retrieve executables
+COPY --from=builder /project/__pypackages__/3.11/bin/* /bin/
 
-# Expose port for production (if applicable)
-EXPOSE 8000
-
-# Set up entry point
-ENTRYPOINT ["pdm", "run", "server"]
+# set command/entrypoint, adapt to fit your needs
+CMD ["python", "-m", "app/server.py"]

@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
 from asgi_correlation_id import CorrelationIdMiddleware
-from fastapi import APIRouter, FastAPI
+from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
@@ -41,11 +41,9 @@ from app.schemas.errors import (
 
 def add_routes(app: FastAPI) -> None:
     """Register routes for the app."""
-    app_router = APIRouter(prefix="/api/v1")
-    app_router.include_router(health_router)
-    app_router.include_router(users_router)
-    app_router.include_router(auth_router)
-    app.include_router(app_router)
+    app.include_router(health_router)
+    app.include_router(users_router)
+    app.include_router(auth_router)
 
 
 def add_middleware(app: FastAPI) -> None:
@@ -77,15 +75,11 @@ def create_app() -> FastAPI:
     """Initialize an app instance."""
     app = FastAPI(
         version="0.0.1",
+        root_path=settings.root_path,
         debug=settings.debug,
         default_response_class=ORJSONResponse,
         openapi_url=settings.openapi_url,
         title=f"{APP_NAME} HTTP API",
-        servers=[
-            {
-                "url": settings.server_url,
-            },
-        ],
         swagger_ui_parameters={
             "syntaxHighlight.theme": "monokai",
             "displayRequestDuration": True,

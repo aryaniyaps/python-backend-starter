@@ -57,9 +57,16 @@ class Settings(BaseSettings):
         ),
     ] = ("*",)
 
-    openapi_url: str | None = "/openapi.json"
+    root_path: Annotated[
+        str,
+        Field(
+            examples=[
+                "/api/v1",
+            ],
+        ),
+    ]
 
-    server_url: str = "http://localhost:8000"
+    openapi_url: str | None = "/openapi.json"
 
     # webauthn config
 
