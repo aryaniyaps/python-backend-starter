@@ -14,7 +14,6 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 
 type RegisterInput = {
   email: string;
-  displayName: string;
 };
 
 export default function RegisterPage() {
@@ -56,11 +55,12 @@ export default function RegisterPage() {
       </CardHeader>
       <CardBody>
         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
-          <Input type='email' label='Email address' {...register('email')} />
           <Input
-            type='text'
-            label='Display name'
-            {...register('displayName')}
+            {...register('email')}
+            type='email'
+            isRequired
+            label='Email address'
+            description="You'll need to verify that you own this email."
           />
           <Button color='primary' type='submit'>
             Continue
