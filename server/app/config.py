@@ -186,29 +186,6 @@ class Settings(BaseSettings):
         ),
     ]
 
-    # sentry config
-
-    sentry_dsn: Annotated[
-        str,
-        Field(
-            examples=[
-                "https://public@sentry.example.com/1",
-            ],
-        ),
-    ]
-
-    sentry_sample_rate: Annotated[
-        float,
-        Field(
-            gt=0.0,
-            le=1.0,
-            examples=[
-                0.1,
-                1.0,
-            ],
-        ),
-    ] = 1.0
-
     model_config = SettingsConfigDict(
         env_file=".env",
         env_prefix="server_",

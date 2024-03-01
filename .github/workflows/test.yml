@@ -18,11 +18,11 @@ jobs:
       SERVER_DATABASE_URL: "postgresql+asyncpg://user:pass@localhost:5432/starter"
       SERVER_DATABASE_POOL_SIZE: 20
       SERVER_CORS_ALLOW_ORIGINS: '["*"]'
-      SERVER_SERVER_URL: 'http://localhost:8000'
+      SERVER_SERVER_URL: "http://localhost:8000"
       SERVER_OPENAPI_URL:
-      SERVER_RP_ID: 'localhost'
-      SERVER_RP_NAME: 'Starter'
-      SERVER_RP_EXPECTED_ORIGIN: 'http://localhost:8000'
+      SERVER_RP_ID: "localhost"
+      SERVER_RP_NAME: "Starter"
+      SERVER_RP_EXPECTED_ORIGIN: "http://localhost:8000"
       SERVER_REDIS_URL: "redis://:pass@localhost:6379/1"
       SERVER_SAQ_BROKER_URL: "redis://:pass@localhost:6379/2"
       SERVER_SAQ_CONCURRENCY: 10
@@ -32,33 +32,29 @@ jobs:
       SERVER_SERVER_EMAIL_PASSWORD:
       SERVER_EMAIL_FROM: "noreply@example.com"
       SERVER_GEOLITE2_DATABASE_PATH: ""
-      SERVER_SENTRY_DSN: ""
-      SERVER_SENTRY_SAMPLE_RATE: 1.0
-
 
     services:
-        postgres:
-            image: "bitnami/postgresql:16"
-            ports:
-              - "5432:5432"
-            env:
-                POSTGRESQL_USERNAME: "user"
-                POSTGRESQL_PASSWORD: "pass"
-                POSTGRESQL_DATABASE: "starter"
+      postgres:
+        image: "bitnami/postgresql:16"
+        ports:
+          - "5432:5432"
+        env:
+          POSTGRESQL_USERNAME: "user"
+          POSTGRESQL_PASSWORD: "pass"
+          POSTGRESQL_DATABASE: "starter"
 
-        redis:
-            image: "bitnami/redis:6.2"
-            ports:
-                - "6379:6379"
-            env:
-                REDIS_PASSWORD: "pass"
+      redis:
+        image: "bitnami/redis:6.2"
+        ports:
+          - "6379:6379"
+        env:
+          REDIS_PASSWORD: "pass"
 
-
-        mailhog:
-            image: mailhog/mailhog:v1.0.1
-            ports:
-                - "1025:1025"
-                - "8025:8025"
+      mailhog:
+        image: mailhog/mailhog:v1.0.1
+        ports:
+          - "1025:1025"
+          - "8025:8025"
 
     steps:
       - uses: actions/checkout@v3
