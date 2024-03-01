@@ -63,9 +63,9 @@ services:
       - SERVER_EMAIL_USERNAME=""
       - SERVER_EMAIL_PASSWORD=""
       - SERVER_EMAIL_FROM="noreply@example.com"
-      - SERVER_GEOLITE2_DATABASE_PATH="/data/geoipupdate/GeoLite2-City.mmdb"
+      - SERVER_GEOLITE2_DATABASE_PATH="/usr/share/GeoIP/GeoLite2-City.mmdb"
     volumes:
-      - geoipupdate_data:/data/geoipupdate
+      - geoipupdate_data:/usr/share/GeoIP
     depends_on:
       - postgres
       - redis
