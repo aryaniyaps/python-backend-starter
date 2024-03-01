@@ -3,8 +3,20 @@ services:
     image: traefik:v2.11
     # Enables the web UI and tells Traefik to listen to docker
     command:
-      - --api.insecure=true
+      # Enable the Dashboard and API
+      - --api.insecure
+        # Enable Docker in Traefik, so that it reads labels from Docker services
       - --providers.docker
+      # Do not expose all Docker services, only the ones explicitly exposed
+      - --providers.docker.exposedbydefault=false
+      # Enable the access log, with HTTP requests
+      - --accesslog
+      # Enable the Traefik log, for configurations and errors
+      - --log
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.traefik.loadbalancer.server.port=80
+
     ports:
       # The HTTP port
       - "80:80"
@@ -14,56 +26,41 @@ services:
       # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock
 
-  client:
-    build:
-      context: ./client
-      target: development
-    working_dir: /client/
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.client.rule=Host(`localhost`) && PathPrefix(`/`)"
-      - "traefik.http.routers.server.middlewares=forwardedheaders@docker"
-      - "traefik.http.services.client.loadbalancer.server.port=3000"
-    ports:
-      - "3000:3000"
-    depends_on:
-      - server
-
   server:
     build:
       context: ./server
       target: development
-    working_dir: /project/
+    working_dir: /server/
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.server.rule=Host(`localhost`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.server.rule=PathPrefix(`/api`)"
       - "traefik.http.routers.server.middlewares=forwardedheaders@docker"
       - "traefik.http.services.server.loadbalancer.server.port=8000"
     ports:
       - "8000:8000"
     environment:
-      - SERVER_DEBUG="true"
-      - SERVER_ENVIRONMENT="development"
-      - SERVER_HOST="127.0.0.1"
-      - SERVER_PORT="8000"
-      - SERVER_LOG_LEVEL="INFO"
-      - SERVER_CORS_ALLOW_ORIGINS='["*"]'
-      - SERVER_ROOT_PATH="/api/v1"
-      - SERVER_OPENAPI_URL="/openapi.json"
-      - SERVER_RP_ID="localhost"
-      - SERVER_RP_NAME="Starter"
-      - SERVER_RP_EXPECTED_ORIGIN="http://localhost:8000"
-      - SERVER_DATABASE_URL="postgresql+asyncpg://user:pass@postgres:5432/starter"
-      - SERVER_DATABASE_POOL_SIZE="20"
-      - SERVER_REDIS_URL="redis://:pass@redis:6379/1"
-      - SERVER_SAQ_BROKER_URL="redis://:pass@redis:6379/2"
-      - SERVER_SAQ_CONCURRENCY="100"
-      - SERVER_EMAIL_HOST="mailhog"
-      - SERVER_EMAIL_PORT="1025"
-      - SERVER_EMAIL_USERNAME=""
-      - SERVER_EMAIL_PASSWORD=""
-      - SERVER_EMAIL_FROM="noreply@example.com"
-      - SERVER_GEOLITE2_DATABASE_PATH="/usr/share/GeoIP/GeoLite2-City.mmdb"
+      - SERVER_DEBUG=true
+      - SERVER_ENVIRONMENT=development
+      - SERVER_HOST=127.0.0.1
+      - SERVER_PORT=8000
+      - SERVER_LOG_LEVEL=INFO
+      - SERVER_CORS_ALLOW_ORIGINS=["*"]
+      - SERVER_ROOT_PATH=/api/v1
+      - SERVER_OPENAPI_URL=/openapi.json
+      - SERVER_RP_ID=localhost
+      - SERVER_RP_NAME=Starter
+      - SERVER_RP_EXPECTED_ORIGIN=http://localhost:8000
+      - SERVER_DATABASE_URL=postgresql+asyncpg://user:pass@postgres:5432/starter
+      - SERVER_DATABASE_POOL_SIZE=20
+      - SERVER_REDIS_URL=redis://:pass@redis:6379/1
+      - SERVER_SAQ_BROKER_URL=redis://:pass@redis:6379/2
+      - SERVER_SAQ_CONCURRENCY=100
+      - SERVER_EMAIL_HOST=mailhog
+      - SERVER_EMAIL_PORT=1025
+      - SERVER_EMAIL_USERNAME=
+      - SERVER_EMAIL_PASSWORD=
+      - SERVER_EMAIL_FROM=noreply@example.com
+      - SERVER_GEOLITE2_DATABASE_PATH=/usr/share/GeoIP/GeoLite2-City.mmdb
     volumes:
       - geoipupdate_data:/usr/share/GeoIP
     depends_on:
@@ -71,6 +68,20 @@ services:
       - redis
       - geoipupdate
       - mailhog
+
+  client:
+    build:
+      context: ./client
+      target: development
+    working_dir: /client/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.client.rule=PathPrefix(`/`)"
+      - "traefik.http.services.client.loadbalancer.server.port=3000"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server
 
   postgres:
     image: "bitnami/postgresql:16"

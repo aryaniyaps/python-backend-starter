@@ -1,24 +1,51 @@
-ARG BASE_IMAGE=python:3.11.8-slim-bookworm
+ARG BASE_IMAGE=python:3.11.8-slim
 
 # build stage
 FROM $BASE_IMAGE AS builder
+
+WORKDIR /server
 
 # install PDM
 RUN pip install -U pip setuptools wheel
 RUN pip install pdm
 
 # copy files
-COPY pyproject.toml pdm.lock /project/
+COPY pyproject.toml pdm.lock ./
 
 # install dependencies and project into the local packages directory
-WORKDIR /project
 RUN mkdir __pypackages__ && pdm sync --prod --no-editable
 
 # development stage
 FROM $BASE_IMAGE AS development
 
+ENV PYTHONPATH=/server
+
+ARG SERVER_DEBUG
+ARG SERVER_ENVIRONMENT
+ARG SERVER_HOST
+ARG SERVER_PORT
+ARG SERVER_LOG_LEVEL
+ARG SERVER_CORS_ALLOW_ORIGINS
+ARG SERVER_ROOT_PATH
+ARG SERVER_OPENAPI_URL
+ARG SERVER_RP_ID
+ARG SERVER_RP_NAME
+ARG SERVER_RP_EXPECTED_ORIGIN
+ARG SERVER_DATABASE_URL
+ARG SERVER_DATABASE_POOL_SIZE
+ARG SERVER_REDIS_URL
+ARG SERVER_SAQ_BROKER_URL
+ARG SERVER_SAQ_CONCURRENCY
+ARG SERVER_EMAIL_HOST
+ARG SERVER_EMAIL_PORT
+ARG SERVER_EMAIL_USERNAME
+ARG SERVER_EMAIL_PASSWORD
+ARG SERVER_EMAIL_FROM
+ARG SERVER_GEOLITE2_DATABASE_PATH
+
+
 # Set up development environment
-WORKDIR /project
+WORKDIR /server
 
 RUN pip install pdm
 
@@ -27,6 +54,8 @@ COPY pyproject.toml pdm.lock ./
 
 RUN pdm install
 
+COPY . .
+
 CMD ["pdm", "run", "server"]
 
 
@@ -34,12 +63,12 @@ CMD ["pdm", "run", "server"]
 FROM $BASE_IMAGE as production
 
 # retrieve packages from build stage
-ENV PYTHONPATH=/project/pkgs
+ENV PYTHONPATH=/server/pkgs
 
-COPY --from=builder /project/__pypackages__/3.11/lib /project/pkgs
+COPY --from=builder /server/__pypackages__/3.11/lib /server/pkgs
 
 # retrieve executables
-COPY --from=builder /project/__pypackages__/3.11/bin/* /bin/
+COPY --from=builder /server/__pypackages__/3.11/bin/* /bin/
 
 # set command/entrypoint, adapt to fit your needs
 CMD ["python", "-m", "app/server.py"]

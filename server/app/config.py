@@ -1,4 +1,3 @@
-from collections.abc import Sequence
 from enum import StrEnum
 from typing import Annotated
 
@@ -47,7 +46,7 @@ class Settings(BaseSettings):
     ] = "DEBUG"
 
     cors_allow_origins: Annotated[
-        Sequence[str],
+        set[str],
         Field(
             examples=[
                 {
@@ -55,7 +54,9 @@ class Settings(BaseSettings):
                 },
             ],
         ),
-    ] = ("*",)
+    ] = {
+        "*",
+    }
 
     root_path: Annotated[
         str,
@@ -215,4 +216,4 @@ class Settings(BaseSettings):
         return self._is_environment(Environment.production)
 
 
-settings = Settings()
+settings = Settings()  # type: ignore[call-arg]
