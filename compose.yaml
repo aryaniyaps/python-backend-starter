@@ -33,7 +33,7 @@ services:
     working_dir: /server/
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.server.rule=PathPrefix(`/api`)"
+      - "traefik.http.routers.server.rule=PathPrefix(`/api/v1`)"
       - "traefik.http.routers.server.middlewares=forwardedheaders@docker"
       - "traefik.http.services.server.loadbalancer.server.port=8000"
     ports:
