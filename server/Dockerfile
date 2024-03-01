@@ -3,7 +3,7 @@ ARG BASE_IMAGE=python:3.11.8-slim
 # build stage
 FROM $BASE_IMAGE AS builder
 
-WORKDIR /server
+WORKDIR /app
 
 # install PDM
 RUN pip install -U pip setuptools wheel
@@ -18,7 +18,7 @@ RUN mkdir __pypackages__ && pdm sync --prod --no-editable
 # development stage
 FROM $BASE_IMAGE AS development
 
-ENV PYTHONPATH=/server
+ENV PYTHONPATH=/app
 
 ARG SERVER_DEBUG
 ARG SERVER_ENVIRONMENT
@@ -45,7 +45,7 @@ ARG SERVER_GEOLITE2_DATABASE_PATH
 
 
 # Set up development environment
-WORKDIR /server
+WORKDIR /app
 
 RUN pip install pdm
 
@@ -63,12 +63,12 @@ CMD ["pdm", "run", "server"]
 FROM $BASE_IMAGE as production
 
 # retrieve packages from build stage
-ENV PYTHONPATH=/server/pkgs
+ENV PYTHONPATH=/app/pkgs
 
-COPY --from=builder /server/__pypackages__/3.11/lib /server/pkgs
+COPY --from=builder /app/__pypackages__/3.11/lib /app/pkgs
 
 # retrieve executables
-COPY --from=builder /server/__pypackages__/3.11/bin/* /bin/
+COPY --from=builder /app/__pypackages__/3.11/bin/* /bin/
 
 # set command/entrypoint, adapt to fit your needs
 CMD ["python", "-m", "app/server.py"]

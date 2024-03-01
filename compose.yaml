@@ -1,47 +1,29 @@
 services:
-  traefik:
-    image: traefik:v2.11
-    # Enables the web UI and tells Traefik to listen to docker
-    command:
-      # Enable the Dashboard and API
-      - --api.insecure
-        # Enable Docker in Traefik, so that it reads labels from Docker services
-      - --providers.docker
-      # Do not expose all Docker services, only the ones explicitly exposed
-      - --providers.docker.exposedbydefault=false
-      # Enable the access log, with HTTP requests
-      - --accesslog
-      # Enable the Traefik log, for configurations and errors
-      - --log
-    labels:
-      - traefik.enable=true
-      - traefik.http.services.traefik.loadbalancer.server.port=80
-
+  caddy:
+    build:
+      context: ./caddy
+    networks:
+      - caddy
     ports:
-      # The HTTP port
       - "80:80"
-      # The Web UI (enabled by --api.insecure=true)
-      - "8080:8080"
-    volumes:
-      # So that Traefik can listen to the Docker events
-      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - server
+      - client
 
   server:
     build:
       context: ./server
       target: development
-    working_dir: /server/
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.server.rule=PathPrefix(`/api/v1`)"
-      - "traefik.http.routers.server.middlewares=forwardedheaders@docker"
-      - "traefik.http.services.server.loadbalancer.server.port=8000"
+    networks:
+      - server
+      - caddy
+    working_dir: /app/
     ports:
       - "8000:8000"
     environment:
       - SERVER_DEBUG=true
       - SERVER_ENVIRONMENT=development
-      - SERVER_HOST=127.0.0.1
+      - SERVER_HOST=0.0.0.0
       - SERVER_PORT=8000
       - SERVER_LOG_LEVEL=INFO
       - SERVER_CORS_ALLOW_ORIGINS=["*"]
@@ -73,11 +55,9 @@ services:
     build:
       context: ./client
       target: development
-    working_dir: /client/
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.client.rule=PathPrefix(`/`)"
-      - "traefik.http.services.client.loadbalancer.server.port=3000"
+    networks:
+      - caddy
+    working_dir: /app/
     ports:
       - "3000:3000"
     depends_on:
@@ -85,6 +65,8 @@ services:
 
   postgres:
     image: "bitnami/postgresql:16"
+    networks:
+      - server
     ports:
       - "5432:5432"
     environment:
@@ -96,6 +78,8 @@ services:
 
   redis:
     image: "bitnami/redis:6.2"
+    networks:
+      - server
     ports:
       - "6379:6379"
     environment:
@@ -105,6 +89,8 @@ services:
 
   mailhog:
     image: mailhog/mailhog:v1.0.1
+    networks:
+      - server
     ports:
       - "1025:1025"
       - "8025:8025"
@@ -133,3 +119,7 @@ volumes:
   postgres_data:
   redis_data:
   geoipupdate_data:
+
+networks:
+  server:
+  caddy:

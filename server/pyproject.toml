@@ -91,7 +91,7 @@ show_column_numbers = true
 show_error_codes = true
 
 [[tool.mypy.overrides]]
-module = ["user_agents.*", "nanoid.*"]
+module = ["user_agents.*", "uvicorn.*"]
 ignore_missing_imports = true
 
 [tool.pydantic-mypy]

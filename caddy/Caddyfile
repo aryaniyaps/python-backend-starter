@@ -1,0 +1,10 @@
+# Local Configuration
+http://localhost {
+	handle /api/v1/* {
+		reverse_proxy server:8000
+	}
+
+	handle {
+		reverse_proxy client:3000
+	}
+}
