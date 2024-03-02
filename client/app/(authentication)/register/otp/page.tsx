@@ -8,6 +8,7 @@ import {
   CardFooter,
   CardHeader,
   Divider,
+  Spinner,
 } from '@nextui-org/react';
 import { OTPInput } from 'input-otp';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
@@ -17,7 +18,7 @@ type RegisterOTPInput = {
 };
 
 export default function RegisterOTPPage() {
-  const { control, handleSubmit } = useForm<RegisterOTPInput>({});
+  const { control, handleSubmit, formState } = useForm<RegisterOTPInput>({});
 
   const onSubmit: SubmitHandler<RegisterOTPInput> = async (data) => {};
 
@@ -25,14 +26,9 @@ export default function RegisterOTPPage() {
     <Card isFooterBlurred fullWidth className='px-unit-2'>
       <CardHeader className='flex flex-col items-start gap-unit-2'>
         <h1 className='text-md font-semibold'>Enter {APP_NAME} OTP</h1>
-        <div className='flex w-full items-center justify-between'>
-          <h3 className='text-xs font-extralight'>
-            Enter the OTP we sent to ary*********06@gmail.com
-          </h3>
-          <Button variant='flat' size='sm'>
-            resend OTP
-          </Button>
-        </div>
+        <h3 className='text-xs font-extralight'>
+          Enter the OTP we sent to ar*****06@gmail.com
+        </h3>
       </CardHeader>
       <CardBody>
         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
@@ -89,9 +85,20 @@ export default function RegisterOTPPage() {
             control={control}
             name='otp'
           />
-
-          <Button color='primary' type='submit'>
-            Confirm
+          <p className='text-xs'>
+            Didn&apos;t receive an OTP?&nbsp;
+            <strong className='text-primary'>resend</strong>
+          </p>
+          <Button
+            color='primary'
+            type='submit'
+            disabled={formState.isSubmitting}
+          >
+            {formState.isSubmitting ? (
+              <Spinner size='sm' color='white' />
+            ) : (
+              <>Continue</>
+            )}
           </Button>
         </form>
       </CardBody>

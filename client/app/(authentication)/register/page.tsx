@@ -1,5 +1,6 @@
 'use client';
 import { APP_NAME } from '@/lib/constants';
+import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Button,
   Card,
@@ -8,44 +9,32 @@ import {
   CardHeader,
   Input,
   Link,
+  Spinner,
 } from '@nextui-org/react';
-import { startRegistration } from '@simplewebauthn/browser';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
-type RegisterInput = {
-  email: string;
-};
+const registerSchema = yup
+  .object({
+    email: yup
+      .string()
+      .required('Please enter an email')
+      .email('Please enter a valid email')
+      .max(255),
+  })
+  .required();
 
 export default function RegisterPage() {
-  const { register, handleSubmit } = useForm<RegisterInput>({});
+  const { handleSubmit, control, formState } = useForm({
+    resolver: yupResolver(registerSchema),
+    defaultValues: { email: '' },
+    mode: 'onTouched',
+  });
 
-  const onSubmit: SubmitHandler<RegisterInput> = async (data) => {
-    const resp = await fetch('/api/v1/auth/register/start', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email: data.email }),
-    });
-
-    // TODO: catch and display errors here
-    const attResp = await startRegistration(await resp.json());
-
-    const verificationResp = await fetch('/api/v1/auth/register/finish', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(attResp),
-    });
-
-    const verificationJSON = await verificationResp.json();
-
-    if (verificationJSON && verificationJSON.verified) {
-      console.log('user is verified!');
-    } else {
-      console.log('user is not verified!');
-    }
+  const onSubmit: SubmitHandler<yup.InferType<typeof registerSchema>> = async (
+    data
+  ) => {
+    console.log(data);
   };
 
   return (
@@ -55,15 +44,33 @@ export default function RegisterPage() {
       </CardHeader>
       <CardBody>
         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
-          <Input
-            {...register('email')}
-            type='email'
-            isRequired
-            label='Email address'
-            description="You'll need to verify that you own this email."
+          <Controller
+            name='email'
+            control={control}
+            render={({ field, fieldState }) => {
+              return (
+                <Input
+                  {...field}
+                  variant='faded'
+                  type='email'
+                  label='Email address'
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={!!fieldState.error}
+                />
+              );
+            }}
           />
-          <Button color='primary' type='submit'>
-            Continue
+
+          <Button
+            color='primary'
+            type='submit'
+            disabled={formState.isSubmitting}
+          >
+            {formState.isSubmitting ? (
+              <Spinner size='sm' color='white' />
+            ) : (
+              <>Continue</>
+            )}
           </Button>
         </form>
       </CardBody>

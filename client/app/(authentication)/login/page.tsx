@@ -1,5 +1,6 @@
 'use client';
 import { APP_NAME } from '@/lib/constants';
+import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Button,
   Card,
@@ -8,17 +9,32 @@ import {
   CardHeader,
   Input,
   Link,
+  Spinner,
 } from '@nextui-org/react';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
-type LoginInput = {
-  email: string;
-};
+const loginSchema = yup
+  .object({
+    email: yup
+      .string()
+      .required('Please enter an email')
+      .email('Please enter a valid email')
+      .max(255),
+  })
+  .required();
 
 export default function LoginPage() {
-  const { register, handleSubmit } = useForm<LoginInput>({});
+  const { control, handleSubmit, formState } = useForm({
+    resolver: yupResolver(loginSchema),
+    defaultValues: { email: '' },
+    mode: 'onTouched',
+  });
 
-  const onSubmit: SubmitHandler<LoginInput> = (data) => console.log(data);
+  const onSubmit: SubmitHandler<yup.InferType<typeof loginSchema>> = (data) => {
+    console.log(data);
+  };
+
   return (
     <Card isFooterBlurred fullWidth className='px-unit-2'>
       <CardHeader>
@@ -26,9 +42,39 @@ export default function LoginPage() {
       </CardHeader>
       <CardBody>
         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
-          <Input type='email' label='Email address' {...register('email')} />
-          <Button color='primary' type='submit'>
-            login with passkeys
+          <Controller
+            name='email'
+            control={control}
+            rules={{
+              required: true,
+              maxLength: 255,
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: 'invalid email address',
+              },
+            }}
+            render={({ field, fieldState }) => (
+              <Input
+                {...field}
+                variant='faded'
+                type='email'
+                isRequired
+                label='Email address'
+                errorMessage={fieldState.error?.message}
+                isInvalid={!!fieldState.error}
+              />
+            )}
+          />
+          <Button
+            color='primary'
+            type='submit'
+            disabled={formState.isSubmitting}
+          >
+            {formState.isSubmitting ? (
+              <Spinner size='sm' color='white' />
+            ) : (
+              <>Login with passkeys</>
+            )}
           </Button>
         </form>
       </CardBody>
