@@ -52,7 +52,7 @@ server = "app/server.py"
 worker = "app/worker.py"
 test = "pytest -vv"
 lint = { composite = ["black .", "ruff --fix .", "black .", "mypy ."] }
-generate-openapi-schema = "scripts/generate_openapi_schema.py"
+generate-schema = "scripts/generate_schema.py"
 
 
 [tool.setuptools.packages.find]

@@ -9,103 +9,103 @@ export interface paths {
      * Check the health status of the application.
      * @description Provides information about the health status of the application.
      */
-    get: operations['Tag.HEALTH-check_health'];
+    get: operations['OpenAPITag.HEALTH-check_health'];
   };
   '/users/@me': {
     /**
      * Get the current user.
      * @description Get the current user.
      */
-    get: operations['ITag.USERS-get_current_user'];
+    get: operations['OpenAPITag.USERS-get_current_user'];
     /**
      * Update the current user.
      * @description Update the current user.
      */
-    patch: operations['ITag.USERS-update_current_user'];
+    patch: operations['OpenAPITag.USERS-update_current_user'];
   };
   '/users/@me/email-change-request': {
     /**
      * Send an email change request.
      * @description Send an email change request.
      */
-    post: operations['ITag.USERS-request_current_user_email_change'];
+    post: operations['OpenAPITag.USERS-request_current_user_email_change'];
   };
   '/users/@me/email': {
     /**
      * Change the current user's email.
      * @description Change the current user's email.
      */
-    patch: operations['ITag.USERS-change_current_user_email'];
+    patch: operations['OpenAPITag.USERS-change_current_user_email'];
   };
   '/users/{user_id}': {
     /**
      * Get the user with the given ID.
      * @description Get the user with the given ID.
      */
-    get: operations['ITag.USERS-get_user'];
+    get: operations['OpenAPITag.USERS-get_user'];
   };
   '/auth/register/flow/start': {
     /**
      * Start a register flow.
      * @description Start a register flow.
      */
-    post: operations['ENTICATION-start_register_flow'];
+    post: operations['OpenAPITag.AUTHENTICATION-start_register_flow'];
   };
   '/auth/register/flow/verify': {
     /**
      * Verify a register flow.
      * @description Verify a register flow.
      */
-    post: operations['ENTICATION-verify_register_flow'];
+    post: operations['OpenAPITag.AUTHENTICATION-verify_register_flow'];
   };
   '/auth/register/flow/webauthn-start': {
     /**
      * Start the webauthn registration in the register flow.
      * @description Start the webauthn registration in the register flow.
      */
-    post: operations['ENTICATION-start_webauthn_register_flow'];
+    post: operations['OpenAPITag.AUTHENTICATION-start_webauthn_register_flow'];
   };
   '/auth/register/flow/webauthn-finish': {
     /**
      * Finish the webauthn registration in the register flow.
      * @description Finish the webauthn registration in the register flow.
      */
-    post: operations['ENTICATION-finish_webauthn_register_flow'];
+    post: operations['OpenAPITag.AUTHENTICATION-finish_webauthn_register_flow'];
   };
   '/auth/login/start': {
     /**
      * Login Options
      * @description Generate options for retrieving a credential.
      */
-    post: operations['ENTICATION-login_options'];
+    post: operations['OpenAPITag.AUTHENTICATION-login_options'];
   };
   '/auth/login/finish': {
     /**
      * Login Verification
      * @description Verify the authenticator's response for login.
      */
-    post: operations['ENTICATION-login_verification'];
+    post: operations['OpenAPITag.AUTHENTICATION-login_verification'];
   };
   '/auth/webauthn-credentials': {
     /**
      * Create Webauthn Credential
      * @description Create a new webauthn credential.
      */
-    post: operations['ENTICATION-create_webauthn_credential'];
+    post: operations['OpenAPITag.AUTHENTICATION-create_webauthn_credential'];
   };
   '/auth/logout': {
     /**
      * Logout the current user.
      * @description Logout the current user.
      */
-    post: operations['ENTICATION-delete_current_user_session'];
+    post: operations['OpenAPITag.AUTHENTICATION-delete_current_user_session'];
   };
   '/auth/sessions': {
     /**
      * Get the current user's sessions.
      * @description Get the current user's user sessions.
      */
-    get: operations['ENTICATION-get_user_sessions'];
+    get: operations['OpenAPITag.AUTHENTICATION-get_user_sessions'];
   };
 }
 
@@ -727,7 +727,7 @@ export interface operations {
    * Check the health status of the application.
    * @description Provides information about the health status of the application.
    */
-  'Tag.HEALTH-check_health': {
+  'OpenAPITag.HEALTH-check_health': {
     responses: {
       /** @description Successful Response */
       200: {
@@ -759,7 +759,7 @@ export interface operations {
    * Get the current user.
    * @description Get the current user.
    */
-  'ITag.USERS-get_current_user': {
+  'OpenAPITag.USERS-get_current_user': {
     responses: {
       /** @description Successful Response */
       200: {
@@ -791,7 +791,7 @@ export interface operations {
    * Update the current user.
    * @description Update the current user.
    */
-  'ITag.USERS-update_current_user': {
+  'OpenAPITag.USERS-update_current_user': {
     requestBody: {
       content: {
         'application/json': components['schemas']['UpdateUserInput'];
@@ -834,7 +834,7 @@ export interface operations {
    * Send an email change request.
    * @description Send an email change request.
    */
-  'ITag.USERS-request_current_user_email_change': {
+  'OpenAPITag.USERS-request_current_user_email_change': {
     parameters: {
       header: {
         'user-agent': string;
@@ -882,7 +882,7 @@ export interface operations {
    * Change the current user's email.
    * @description Change the current user's email.
    */
-  'ITag.USERS-change_current_user_email': {
+  'OpenAPITag.USERS-change_current_user_email': {
     requestBody: {
       content: {
         'application/json': components['schemas']['ChangeUserEmailInput'];
@@ -925,7 +925,7 @@ export interface operations {
    * Get the user with the given ID.
    * @description Get the user with the given ID.
    */
-  'ITag.USERS-get_user': {
+  'OpenAPITag.USERS-get_user': {
     parameters: {
       path: {
         user_id: string;
@@ -968,7 +968,7 @@ export interface operations {
    * Start a register flow.
    * @description Start a register flow.
    */
-  'ENTICATION-start_register_flow': {
+  'OpenAPITag.AUTHENTICATION-start_register_flow': {
     parameters: {
       header: {
         'user-agent': string;
@@ -1016,7 +1016,7 @@ export interface operations {
    * Verify a register flow.
    * @description Verify a register flow.
    */
-  'ENTICATION-verify_register_flow': {
+  'OpenAPITag.AUTHENTICATION-verify_register_flow': {
     requestBody: {
       content: {
         'application/json': components['schemas']['RegisterFlowVerifyInput'];
@@ -1059,7 +1059,7 @@ export interface operations {
    * Start the webauthn registration in the register flow.
    * @description Start the webauthn registration in the register flow.
    */
-  'ENTICATION-start_webauthn_register_flow': {
+  'OpenAPITag.AUTHENTICATION-start_webauthn_register_flow': {
     requestBody: {
       content: {
         'application/json': components['schemas']['RegisterFlowWebAuthnStartInput'];
@@ -1102,7 +1102,7 @@ export interface operations {
    * Finish the webauthn registration in the register flow.
    * @description Finish the webauthn registration in the register flow.
    */
-  'ENTICATION-finish_webauthn_register_flow': {
+  'OpenAPITag.AUTHENTICATION-finish_webauthn_register_flow': {
     requestBody: {
       content: {
         'application/json': components['schemas']['RegisterFlowWebAuthnFinishInput'];
@@ -1145,7 +1145,7 @@ export interface operations {
    * Login Options
    * @description Generate options for retrieving a credential.
    */
-  'ENTICATION-login_options': {
+  'OpenAPITag.AUTHENTICATION-login_options': {
     requestBody: {
       content: {
         'application/json': components['schemas']['LoginOptionsInput'];
@@ -1182,7 +1182,7 @@ export interface operations {
    * Login Verification
    * @description Verify the authenticator's response for login.
    */
-  'ENTICATION-login_verification': {
+  'OpenAPITag.AUTHENTICATION-login_verification': {
     parameters: {
       header: {
         'user-agent': string;
@@ -1224,7 +1224,7 @@ export interface operations {
    * Create Webauthn Credential
    * @description Create a new webauthn credential.
    */
-  'ENTICATION-create_webauthn_credential': {
+  'OpenAPITag.AUTHENTICATION-create_webauthn_credential': {
     requestBody: {
       content: {
         'application/json': components['schemas']['CreateWebAuthnCredentialInput'];
@@ -1261,7 +1261,7 @@ export interface operations {
    * Logout the current user.
    * @description Logout the current user.
    */
-  'ENTICATION-delete_current_user_session': {
+  'OpenAPITag.AUTHENTICATION-delete_current_user_session': {
     requestBody: {
       content: {
         'application/json': components['schemas']['LogoutInput'];
@@ -1296,7 +1296,7 @@ export interface operations {
    * Get the current user's sessions.
    * @description Get the current user's user sessions.
    */
-  'ENTICATION-get_user_sessions': {
+  'OpenAPITag.AUTHENTICATION-get_user_sessions': {
     responses: {
       /** @description Successful Response */
       200: {
