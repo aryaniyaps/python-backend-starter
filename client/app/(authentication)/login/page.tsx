@@ -57,7 +57,6 @@ export default function LoginPage() {
                 {...field}
                 variant='faded'
                 type='email'
-                isRequired
                 label='Email address'
                 errorMessage={fieldState.error?.message}
                 isInvalid={!!fieldState.error}
