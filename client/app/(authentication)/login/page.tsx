@@ -1,5 +1,5 @@
 'use client';
-import { APP_NAME } from '@/lib/constants';
+import { APP_NAME, MAX_EMAIL_LENGTH } from '@/lib/constants';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Button,
@@ -19,7 +19,7 @@ const loginSchema = yup
       .string()
       .required('Please enter an email')
       .email('Please enter a valid email')
-      .max(255),
+      .max(MAX_EMAIL_LENGTH),
   })
   .required();
 
@@ -44,14 +44,6 @@ export default function LoginPage() {
           <Controller
             name='email'
             control={control}
-            rules={{
-              required: true,
-              maxLength: 255,
-              pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: 'invalid email address',
-              },
-            }}
             render={({ field, fieldState }) => (
               <Input
                 {...field}

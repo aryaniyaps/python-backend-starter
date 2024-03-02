@@ -1,5 +1,5 @@
 'use client';
-import { APP_NAME } from '@/lib/constants';
+import { APP_NAME, MAX_EMAIL_LENGTH } from '@/lib/constants';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Button,
@@ -19,7 +19,7 @@ const registerSchema = yup
       .string()
       .required('Please enter an email')
       .email('Please enter a valid email')
-      .max(255),
+      .max(MAX_EMAIL_LENGTH),
   })
   .required();
 

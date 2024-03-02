@@ -1,6 +1,6 @@
 'use client';
 import { OTPSlot } from '@/components/otp-input';
-import { APP_NAME } from '@/lib/constants';
+import { APP_NAME, EMAIL_VERIFICATION_CODE_LENGTH } from '@/lib/constants';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Button,
@@ -16,7 +16,7 @@ import * as yup from 'yup';
 
 const registerOTPSchema = yup
   .object({
-    otp: yup.string().required().length(8),
+    otp: yup.string().required().length(EMAIL_VERIFICATION_CODE_LENGTH),
   })
   .required();
 
@@ -45,7 +45,7 @@ export default function RegisterOTPPage() {
             render={({ field }) => (
               <OTPInput
                 {...field}
-                maxLength={8}
+                maxLength={EMAIL_VERIFICATION_CODE_LENGTH}
                 containerClassName='group flex items-center has-[:disabled]:opacity-30'
                 render={({ slots }) => (
                   <>
