@@ -10,6 +10,8 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    // recommended by openapi-typescript
+    "noUncheckedIndexedAccess": true,
     "jsx": "preserve",
     "incremental": true,
     "plugins": [
