@@ -9,7 +9,6 @@ import {
   CardHeader,
   Input,
   Link,
-  Spinner,
 } from '@nextui-org/react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -68,13 +67,9 @@ export default function LoginPage() {
           <Button
             color='primary'
             type='submit'
-            disabled={formState.isSubmitting}
+            isLoading={formState.isSubmitting}
           >
-            {formState.isSubmitting ? (
-              <Spinner size='sm' color='white' />
-            ) : (
-              <>Login with passkeys</>
-            )}
+            Login with passkeys
           </Button>
         </form>
       </CardBody>

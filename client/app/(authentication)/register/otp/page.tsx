@@ -8,7 +8,6 @@ import {
   CardFooter,
   CardHeader,
   Divider,
-  Spinner,
 } from '@nextui-org/react';
 import { OTPInput } from 'input-otp';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
@@ -92,13 +91,9 @@ export default function RegisterOTPPage() {
           <Button
             color='primary'
             type='submit'
-            disabled={formState.isSubmitting}
+            isLoading={formState.isSubmitting}
           >
-            {formState.isSubmitting ? (
-              <Spinner size='sm' color='white' />
-            ) : (
-              <>Continue</>
-            )}
+            Continue
           </Button>
         </form>
       </CardBody>
