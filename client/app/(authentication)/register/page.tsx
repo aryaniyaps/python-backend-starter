@@ -13,6 +13,8 @@ import {
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
+import { client } from '@/lib/client';
+
 const registerSchema = yup
   .object({
     email: yup
@@ -34,6 +36,13 @@ export default function RegisterPage() {
     data
   ) => {
     console.log(data);
+    // start register flow
+    await client.POST('/auth/register/flow/start', {
+      body: { email: data.email },
+      params: {
+        header: { 'user-agent': '' },
+      },
+    });
   };
 
   return (

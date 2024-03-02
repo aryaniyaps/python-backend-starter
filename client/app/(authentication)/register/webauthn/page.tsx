@@ -1,4 +1,5 @@
 'use client';
+import { client } from '@/lib/client';
 import {
   Button,
   Card,
@@ -8,14 +9,22 @@ import {
 } from '@nextui-org/react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-type RegisterInput = {
+// TODO: remove form and only keep button?
+type RegisterWebAuthnInput = {
   email: string;
 };
 
 export default function RegisterPage() {
-  const { register, handleSubmit, formState } = useForm<RegisterInput>({});
+  const { handleSubmit, formState } = useForm<RegisterWebAuthnInput>({});
 
-  const onSubmit: SubmitHandler<RegisterInput> = async (data) => {};
+  const onSubmit: SubmitHandler<RegisterWebAuthnInput> = async (data) => {
+    console.log(data);
+
+    // start webauthn registration
+    await client.POST('/auth/register/flow/webauthn-start', {
+      body: { flowId: '', displayName: '' },
+    });
+  };
 
   return (
     <Card isFooterBlurred fullWidth className='px-unit-2'>

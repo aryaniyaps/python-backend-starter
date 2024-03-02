@@ -1,6 +1,7 @@
 'use client';
 import { OTPSlot } from '@/components/otp-input';
-import { APP_NAME, EMAIL_VERIFICATION_CODE_LENGTH } from '@/lib/constants';
+import { client } from '@/lib/client';
+import { EMAIL_VERIFICATION_CODE_LENGTH } from '@/lib/constants';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Button,
@@ -14,33 +15,43 @@ import { OTPInput } from 'input-otp';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-const registerOTPSchema = yup
+const registerVerificationSchema = yup
   .object({
-    otp: yup.string().required().length(EMAIL_VERIFICATION_CODE_LENGTH),
+    verificationCode: yup
+      .string()
+      .required()
+      .length(EMAIL_VERIFICATION_CODE_LENGTH),
   })
   .required();
 
 export default function RegisterOTPPage() {
   const { control, handleSubmit, formState } = useForm({
-    resolver: yupResolver(registerOTPSchema),
+    resolver: yupResolver(registerVerificationSchema),
   });
 
   const onSubmit: SubmitHandler<
-    yup.InferType<typeof registerOTPSchema>
-  > = async (data) => {};
+    yup.InferType<typeof registerVerificationSchema>
+  > = async (data) => {
+    console.log(data);
+
+    // verify register flow
+    await client.POST('/auth/register/flow/verify', {
+      body: { flowId: '', verificationCode: data.verificationCode },
+    });
+  };
 
   return (
     <Card isFooterBlurred fullWidth className='px-unit-2'>
       <CardHeader className='flex flex-col items-start gap-unit-2'>
-        <h1 className='text-md font-semibold'>Enter {APP_NAME} OTP</h1>
+        <h1 className='text-md font-semibold'>Enter Verification Code</h1>
         <h3 className='text-xs font-extralight'>
-          Enter the OTP we sent to ar*****06@gmail.com
+          Enter the code we sent to ar*****06@gmail.com
         </h3>
       </CardHeader>
       <CardBody>
         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
           <Controller
-            name='otp'
+            name='verificationCode'
             control={control}
             render={({ field }) => (
               <OTPInput
@@ -93,7 +104,7 @@ export default function RegisterOTPPage() {
             )}
           />
           <p className='text-xs'>
-            Didn&apos;t receive an OTP?&nbsp;
+            Didn&apos;t receive code?&nbsp;
             <strong className='text-primary'>resend</strong>
           </p>
           <Button
