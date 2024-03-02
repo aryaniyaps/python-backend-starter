@@ -1,6 +1,7 @@
 'use client';
 import { OTPSlot } from '@/components/otp-input';
 import { APP_NAME } from '@/lib/constants';
+import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Button,
   Card,
@@ -11,15 +12,22 @@ import {
 } from '@nextui-org/react';
 import { OTPInput } from 'input-otp';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
-type RegisterOTPInput = {
-  otp: string;
-};
+const registerOTPSchema = yup
+  .object({
+    otp: yup.string().required().length(8),
+  })
+  .required();
 
 export default function RegisterOTPPage() {
-  const { control, handleSubmit, formState } = useForm<RegisterOTPInput>({});
+  const { control, handleSubmit, formState } = useForm({
+    resolver: yupResolver(registerOTPSchema),
+  });
 
-  const onSubmit: SubmitHandler<RegisterOTPInput> = async (data) => {};
+  const onSubmit: SubmitHandler<
+    yup.InferType<typeof registerOTPSchema>
+  > = async (data) => {};
 
   return (
     <Card isFooterBlurred fullWidth className='px-unit-2'>
@@ -32,6 +40,8 @@ export default function RegisterOTPPage() {
       <CardBody>
         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
           <Controller
+            name='otp'
+            control={control}
             render={({ field }) => (
               <OTPInput
                 {...field}
@@ -81,8 +91,6 @@ export default function RegisterOTPPage() {
                 )}
               />
             )}
-            control={control}
-            name='otp'
           />
           <p className='text-xs'>
             Didn&apos;t receive an OTP?&nbsp;
@@ -92,6 +100,7 @@ export default function RegisterOTPPage() {
             color='primary'
             type='submit'
             isLoading={formState.isSubmitting}
+            isDisabled={!formState.isValid}
           >
             Continue
           </Button>
