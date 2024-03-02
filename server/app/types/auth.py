@@ -1,5 +1,7 @@
-from typing import NamedTuple, TypedDict
+from typing import NamedTuple
 from uuid import UUID
+
+from typing_extensions import TypedDict
 
 from app.models.user import User
 

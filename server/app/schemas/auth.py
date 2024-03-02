@@ -66,6 +66,21 @@ class RegisterFlowWebAuthnFinishInput(BaseSchema):
     credential: Json[RegistrationCredential]
 
 
+class RegisterFlowWebAuthnFinishResult(BaseSchema):
+    user: UserSchema
+
+    authentication_token: Annotated[
+        str,
+        Field(
+            examples=[
+                "6fa74977e2a810ea95ef22f5f09d887337070ae0aacdf19d411bbe78fb98bdfa",
+            ],
+            title="Authentication Token",
+            description="The authentication token generated upon successful registration.",
+        ),
+    ]
+
+
 class RegisterFlowVerifyResult(BaseSchema):
     flow_id: UUID
 

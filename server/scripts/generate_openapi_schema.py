@@ -4,7 +4,7 @@ from pathlib import Path
 from app import create_app
 from fastapi.openapi.utils import get_openapi
 
-openapi_schema_path = Path("../openapi.json")
+openapi_schema_path = Path("../schema/openapi.json")
 
 app = create_app()
 

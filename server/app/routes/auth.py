@@ -28,6 +28,7 @@ from app.schemas.auth import (
     RegisterFlowVerifyInput,
     RegisterFlowVerifyResult,
     RegisterFlowWebAuthnFinishInput,
+    RegisterFlowWebAuthnFinishResult,
     RegisterFlowWebAuthnStartInput,
 )
 from app.schemas.errors import InvalidInputErrorResult
@@ -161,7 +162,7 @@ async def start_webauthn_register_flow(
 
 @auth_router.post(
     "/register/flow/webauthn-finish",
-    response_model=AuthenticationResult,
+    response_model=RegisterFlowWebAuthnFinishResult,
     responses={
         HTTPStatus.BAD_REQUEST: {
             "model": InvalidInputErrorResult,

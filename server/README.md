@@ -88,6 +88,16 @@ To setup the project for downloading and automatically updating the Maxmind GeoL
     ```
 
 
+## Generating the OpenAPI schema
+
+To (re)generate the OpenAPI schema, run the following command:
+
+```
+pdm run generate-openapi-schema
+```
+
+The schema would be (re)generated at `schema/openapi.json`
+
 
 ## Running the project
 
