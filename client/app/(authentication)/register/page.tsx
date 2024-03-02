@@ -41,7 +41,7 @@ export default function RegisterPage() {
     await client.POST('/auth/register/flow/start', {
       body: { email: data.email },
       params: {
-        header: { 'user-agent': '' },
+        header: { 'user-agent': window.navigator.userAgent },
       },
     });
   };

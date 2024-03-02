@@ -6,6 +6,7 @@ from sqlalchemy.dialects.postgresql import CITEXT
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.lib.database import Base
+from app.lib.enums import RegisterFlowStep
 
 
 class RegisterFlow(Base):
@@ -16,6 +17,10 @@ class RegisterFlow(Base):
         server_default=text(
             "gen_random_uuid()",
         ),
+    )
+
+    current_step: Mapped[RegisterFlowStep] = mapped_column(
+        default=RegisterFlowStep.INITIAL,
     )
 
     email: Mapped[str] = mapped_column(
@@ -29,8 +34,12 @@ class RegisterFlow(Base):
         index=True,
     )
 
-    is_verified: Mapped[bool] = mapped_column(
-        default=False,
+    verification_code_expires_at: Mapped[datetime]
+
+    ip_address: Mapped[str] = mapped_column(
+        String(40),
     )
+
+    user_agent: Mapped[str]
 
     expires_at: Mapped[datetime]

@@ -1,0 +1,129 @@
+services:
+  reverse-proxy:
+    build:
+      context: ./reverse-proxy
+    networks:
+      - reverse-proxy
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+      - client
+
+  server:
+    build:
+      context: ./server
+      target: development
+    networks:
+      - server
+      - reverse-proxy
+    working_dir: /app/
+    ports:
+      - "8000:8000"
+    environment:
+      - SERVER_DEBUG=true
+      - SERVER_ENVIRONMENT=development
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8000
+      - SERVER_LOG_LEVEL=INFO
+      - SERVER_CORS_ALLOW_ORIGINS=["*"]
+      - SERVER_ROOT_PATH=/api/v1
+      - SERVER_OPENAPI_URL=/openapi.json
+      - SERVER_RP_ID=localhost
+      - SERVER_RP_NAME=Starter
+      - SERVER_RP_EXPECTED_ORIGIN=http://localhost:8000
+      - SERVER_DATABASE_URL=postgresql+asyncpg://user:pass@postgres:5432/starter
+      - SERVER_DATABASE_POOL_SIZE=20
+      - SERVER_REDIS_URL=redis://:pass@redis:6379/1
+      - SERVER_SAQ_BROKER_URL=redis://:pass@redis:6379/2
+      - SERVER_SAQ_CONCURRENCY=100
+      - SERVER_EMAIL_HOST=mailhog
+      - SERVER_EMAIL_PORT=1025
+      - SERVER_EMAIL_USERNAME=
+      - SERVER_EMAIL_PASSWORD=
+      - SERVER_EMAIL_FROM=noreply@example.com
+      - SERVER_GEOLITE2_DATABASE_PATH=/usr/share/GeoIP/GeoLite2-City.mmdb
+    volumes:
+      - geoipupdate_data:/usr/share/GeoIP
+    depends_on:
+      - postgres
+      - redis
+      - geoipupdate
+      - mailhog
+
+  client:
+    build:
+      context: ./client
+      target: development
+    networks:
+      - reverse-proxy
+    working_dir: /app/
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client/:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - server
+
+  postgres:
+    image: "bitnami/postgresql:16"
+    networks:
+      - server
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRESQL_USERNAME=user
+      - POSTGRESQL_PASSWORD=pass
+      - POSTGRESQL_DATABASE=starter
+    volumes:
+      - "postgres_data:/bitnami/postgresql"
+
+  redis:
+    image: "bitnami/redis:6.2"
+    networks:
+      - server
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=pass
+    volumes:
+      - "redis_data:/bitnami"
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    networks:
+      - server
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  geoipupdate:
+    image: ghcr.io/maxmind/geoipupdate
+    restart: on-failure
+    environment:
+      - GEOIPUPDATE_ACCOUNT_ID_FILE=/run/secrets/GEOIPUPDATE_ACCOUNT_ID
+      - GEOIPUPDATE_LICENSE_KEY_FILE=/run/secrets/GEOIPUPDATE_LICENSE_KEY
+      - GEOIPUPDATE_EDITION_IDS=GeoLite2-City
+      - GEOIPUPDATE_FREQUENCY=168
+    volumes:
+      - "geoipupdate_data:/usr/share/GeoIP"
+    secrets:
+      - GEOIPUPDATE_ACCOUNT_ID
+      - GEOIPUPDATE_LICENSE_KEY
+
+secrets:
+  GEOIPUPDATE_ACCOUNT_ID:
+    file: ./secrets/GEOIPUPDATE_ACCOUNT_ID.txt
+  GEOIPUPDATE_LICENSE_KEY:
+    file: ./secrets/GEOIPUPDATE_LICENSE_KEY.txt
+
+volumes:
+  postgres_data:
+  redis_data:
+  geoipupdate_data:
+
+networks:
+  server:
+  reverse-proxy:

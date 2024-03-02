@@ -3,10 +3,14 @@ import string
 from hashlib import sha256
 from uuid import UUID
 
-from sqlalchemy import select, text
+from sqlalchemy import delete, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.lib.constants import REGISTER_FLOW_EXPIRES_IN
+from app.lib.constants import (
+    EMAIL_VERIFICATION_CODE_EXPIRES_IN,
+    REGISTER_FLOW_EXPIRES_IN,
+)
+from app.lib.enums import RegisterFlowStep
 from app.models.register_flow import RegisterFlow
 
 
@@ -24,19 +28,30 @@ class RegisterFlowRepo:
         """Hash the given email verification code."""
         return sha256(email_verification_code.encode()).hexdigest()
 
-    async def create(self, *, email: str) -> RegisterFlow:
+    async def create(
+        self,
+        *,
+        email: str,
+        ip_address: str,
+        user_agent: str,
+    ) -> tuple[str, RegisterFlow]:
         """Create a new register flow."""
         expires_at = text(
             f"NOW() + INTERVAL '{REGISTER_FLOW_EXPIRES_IN} SECOND'",
         )
 
-        verification_code = self.generate_verification_code()
+        verification_code_expires_at = text(
+            f"NOW() + INTERVAL '{EMAIL_VERIFICATION_CODE_EXPIRES_IN} SECOND'",
+        )
 
-        # TODO: what about email verification code expiration
+        verification_code = self.generate_verification_code()
 
         register_flow = RegisterFlow(
             email=email,
+            ip_address=ip_address,
+            user_agent=user_agent,
             expires_at=expires_at,
+            verification_code_expires_at=verification_code_expires_at,
             # hash code before storing
             verification_code_hash=self.hash_verification_code(
                 email_verification_code=verification_code,
@@ -45,23 +60,33 @@ class RegisterFlowRepo:
 
         self._session.add(register_flow)
         await self._session.commit()
-        return register_flow
+        return verification_code, register_flow
 
-    async def get(self, *, flow_id: UUID) -> RegisterFlow | None:
-        """Get a register flow by ID."""
+    async def get(
+        self, *, flow_id: UUID, step: RegisterFlowStep
+    ) -> RegisterFlow | None:
+        """Get a register flow by ID and step."""
         return await self._session.scalar(
-            select(RegisterFlow).where(RegisterFlow.id == flow_id),
+            select(RegisterFlow).where(
+                RegisterFlow.id == flow_id and RegisterFlow.current_step == step
+            ),
         )
 
     async def update(
         self,
         register_flow: RegisterFlow,
         *,
-        is_verified: bool | None = None,
+        current_step: RegisterFlowStep | None = None,
     ) -> None:
         """Update the given register flow."""
-        if is_verified is not None:
-            register_flow.is_verified = is_verified
+        if current_step is not None:
+            register_flow.current_step = current_step
 
         self._session.add(register_flow)
         await self._session.commit()
+
+    async def delete(self, *, flow_id: UUID) -> None:
+        """Delete a register flow by ID."""
+        await self._session.execute(
+            delete(RegisterFlow).where(RegisterFlow.id == flow_id),
+        )
