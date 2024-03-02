@@ -1,6 +1,6 @@
 import createClient, { Middleware } from 'openapi-fetch';
 import type { paths } from '../generated/api/v1';
-import { API_BASE_URL } from './constants';
+import { env } from './env';
 
 const errorMiddleware: Middleware = {
   async onResponse(res) {
@@ -18,7 +18,7 @@ const errorMiddleware: Middleware = {
 };
 
 export const client = createClient<paths>({
-  baseUrl: API_BASE_URL,
+  baseUrl: env.NEXT_PUBLIC_API_BASE_URL,
   headers: { 'Content-Type': 'application/json' },
 });
 

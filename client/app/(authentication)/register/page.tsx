@@ -15,6 +15,7 @@ import * as yup from 'yup';
 
 import { client } from '@/lib/client';
 
+// TODO: change resolver to zod as we are already using it for env management
 const registerSchema = yup
   .object({
     email: yup
