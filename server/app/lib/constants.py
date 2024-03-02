@@ -10,7 +10,11 @@ APP_URL = "https://example.com"  # frontend app URL
 
 # email verification codes
 
-EMAIL_VERIFICATION_CODE_EXPIRES_IN = 600  # 10 minutes
+EMAIL_VERIFICATION_CODE_EXPIRES_IN = 300  # 5 minutes
+
+# register flows
+
+REGISTER_FLOW_EXPIRES_IN = 1800 # 30 minutes
 
 # webauthn challenges
 

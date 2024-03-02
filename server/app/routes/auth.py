@@ -20,13 +20,15 @@ from app.models.user_session import UserSession
 from app.schemas.auth import (
     AuthenticateUserResult,
     CreateWebAuthnCredentialInput,
-    EmailVerificationRequestInput,
     LoginOptionsInput,
     LoginVerificationInput,
     LogoutInput,
-    RegisterOptionsInput,
-    RegisterUserResult,
-    RegisterVerificationInput,
+    RegisterFlowStartInput,
+    RegisterFlowStartResult,
+    RegisterFlowVerifyInput,
+    RegisterFlowVerifyResult,
+    RegisterFlowWebAuthnFinishInput,
+    RegisterFlowWebAuthnStartInput,
 )
 from app.schemas.errors import InvalidInputErrorResult
 from app.schemas.user_session import UserSessionSchema
@@ -40,16 +42,15 @@ auth_router = APIRouter(
 
 
 @auth_router.post(
-    "/email-verification-request",
-    response_model=None,
-    status_code=HTTPStatus.ACCEPTED,
+    "/register/flow/start",
+    response_model=RegisterFlowStartResult,
     responses={
         HTTPStatus.BAD_REQUEST: {
             "model": InvalidInputErrorResult,
             "description": "Invalid Input Error",
         },
     },
-    summary="Send an email verification request.",
+    summary="Start a register flow.",
     dependencies=[
         Depends(
             dependency=RateLimiter(
@@ -58,8 +59,8 @@ auth_router = APIRouter(
         ),
     ],
 )
-async def request_email_verification(
-    data: EmailVerificationRequestInput,
+async def start_register_flow(
+    data: RegisterFlowStartInput,
     user_agent: Annotated[str, Header()],
     request_ip: Annotated[
         str,
@@ -73,21 +74,77 @@ async def request_email_verification(
             dependency=get_auth_service,
         ),
     ],
-) -> None:
-    """Send an email verification request."""
-    await auth_service.send_email_verification_request(
+) -> RegisterFlowStartResult:
+    """Start a register flow."""
+    register_flow = await auth_service.start_register_flow(
         email=data.email,
         user_agent=user_agents.parse(user_agent),
         request_ip=request_ip,
     )
 
+    return RegisterFlowStartResult(
+        flow_id=register_flow.id,
+    )
+
 
 @auth_router.post(
-    "/register/start",
-    response_model=PublicKeyCredentialCreationOptions,
+    "/register/flow/verify",
+    response_model=RegisterFlowVerifyResult,
+    responses={
+        HTTPStatus.BAD_REQUEST: {
+            "model": InvalidInputErrorResult,
+            "description": "Invalid Input Error",
+        },
+    },
+    summary="Verify a register flow.",
+    dependencies=[
+        Depends(
+            dependency=RateLimiter(
+                limit="15/hour",
+            ),
+        ),
+    ],
 )
-async def registration_options(
-    data: RegisterOptionsInput,
+async def verify_register_flow(
+    data: RegisterFlowVerifyInput,
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=get_auth_service,
+        ),
+    ],
+) -> RegisterFlowVerifyResult:
+    """Verify a register flow."""
+    register_flow = await auth_service.verify_register_flow(
+        flow_id=data.flow_id,
+        verification_code=data.verification_code,
+    )
+
+    return RegisterFlowVerifyResult(
+        flow_id=register_flow.id,
+    )
+
+
+@auth_router.post(
+    "/register/flow/webauthn-start",
+    response_model=PublicKeyCredentialCreationOptions,
+    responses={
+        HTTPStatus.BAD_REQUEST: {
+            "model": InvalidInputErrorResult,
+            "description": "Invalid Input Error",
+        },
+    },
+    summary="Start the webauthn registration in the register flow.",
+    dependencies=[
+        Depends(
+            dependency=RateLimiter(
+                limit="15/hour",
+            ),
+        ),
+    ],
+)
+async def start_webauthn_register_flow(
+    data: RegisterFlowWebAuthnStartInput,
     auth_service: Annotated[
         AuthService,
         Depends(
@@ -95,27 +152,33 @@ async def registration_options(
         ),
     ],
 ) -> PublicKeyCredentialCreationOptions:
-    """Generate options for registering a credential."""
-    return await auth_service.generate_registration_options(
-        email=data.email,
-        verification_code=data.verification_code,
+    """Start the webauthn registration in the register flow."""
+    return await auth_service.webauthn_start_register_flow(
+        flow_id=data.flow_id,
         display_name=data.display_name,
     )
 
 
 @auth_router.post(
-    "/register/finish",
-    response_model=RegisterUserResult,
-)
-async def registration_verification(
-    data: RegisterVerificationInput,
-    user_agent: Annotated[str, Header()],
-    request_ip: Annotated[
-        str,
+    "/register/flow/webauthn-finish",
+    response_model=AuthenticationResult,
+    responses={
+        HTTPStatus.BAD_REQUEST: {
+            "model": InvalidInputErrorResult,
+            "description": "Invalid Input Error",
+        },
+    },
+    summary="Finish the webauthn registration in the register flow.",
+    dependencies=[
         Depends(
-            dependency=get_ip_address,
+            dependency=RateLimiter(
+                limit="15/hour",
+            ),
         ),
     ],
+)
+async def finish_webauthn_register_flow(
+    data: RegisterFlowWebAuthnFinishInput,
     auth_service: Annotated[
         AuthService,
         Depends(
@@ -123,13 +186,11 @@ async def registration_verification(
         ),
     ],
 ) -> AuthenticationResult:
-    """Verify the authenticator's response for registration."""
-    return await auth_service.verify_registration_response(
-        email=data.email,
+    """Finish the webauthn registration in the register flow."""
+    return await auth_service.webauthn_finish_register_flow(
+        flow_id=data.flow_id,
         display_name=data.display_name,
         credential=data.credential,
-        request_ip=request_ip,
-        user_agent=user_agents.parse(user_agent),
     )
 
 
@@ -181,7 +242,7 @@ async def login_verification(
 
 
 @auth_router.post("/webauthn-credentials")
-async def create_webauthn_credential(data: CreateWebAuthnCredentialInput) -> None:
+async def create_webauthn_credential(_data: CreateWebAuthnCredentialInput) -> None:
     """Create a new webauthn credential."""
 
 

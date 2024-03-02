@@ -1,4 +1,5 @@
 from typing import Annotated
+from uuid import UUID
 
 from pydantic import EmailStr, Field, Json
 from webauthn.helpers.structs import (
@@ -10,41 +11,47 @@ from app.schemas.base import BaseSchema
 from app.schemas.user import UserSchema
 
 
-class RegisterOptionsInput(BaseSchema):
+class RegisterFlowStartInput(BaseSchema):
     email: Annotated[
         EmailStr,
         Field(
             max_length=255,
         ),
     ]
+
+
+class RegisterFlowStartResult(BaseSchema):
+    flow_id: UUID
+
+
+class RegisterFlowVerifyInput(BaseSchema):
+    flow_id: UUID
 
     verification_code: Annotated[
         str,
         Field(
             examples=[
-                "88765432",
+                "87996502",
             ],
         ),
     ]
+
+
+class RegisterFlowWebAuthnStartInput(BaseSchema):
+    flow_id: UUID
 
     display_name: Annotated[
         str,
         Field(
-            max_length=70,
             examples=[
-                "Aryan Iyappan",
+                "My webauthn credential",
             ],
         ),
     ]
 
 
-class RegisterVerificationInput(BaseSchema):
-    email: Annotated[
-        EmailStr,
-        Field(
-            max_length=255,
-        ),
-    ]
+class RegisterFlowWebAuthnFinishInput(BaseSchema):
+    flow_id: UUID
 
     display_name: Annotated[
         str,
@@ -57,6 +64,10 @@ class RegisterVerificationInput(BaseSchema):
     ]
 
     credential: Json[RegistrationCredential]
+
+
+class RegisterFlowVerifyResult(BaseSchema):
+    flow_id: UUID
 
 
 class LoginOptionsInput(BaseSchema):
@@ -74,19 +85,6 @@ class LoginVerificationInput(BaseSchema):
 
 class CreateWebAuthnCredentialInput(BaseSchema):
     pass
-
-
-class EmailVerificationRequestInput(BaseSchema):
-    email: Annotated[
-        EmailStr,
-        Field(
-            max_length=250,
-            examples=[
-                "aryan@example.com",
-            ],
-            description="The email address to send the email verification request to.",
-        ),
-    ]
 
 
 class AuthenticateUserResult(BaseSchema):

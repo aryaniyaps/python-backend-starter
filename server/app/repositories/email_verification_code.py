@@ -1,6 +1,7 @@
 import secrets
 import string
 from hashlib import sha256
+from uuid import UUID
 
 import backoff
 from sqlalchemy import delete, select, text
@@ -31,7 +32,7 @@ class EmailVerificationCodeRepo:
         exception=IntegrityError,
         max_tries=2,
     )
-    async def create(self, email: str) -> str:
+    async def create(self, email: str) -> tuple[str, EmailVerificationCode]:
         """Create a new email verification code."""
         expires_at = text(
             f"NOW() + INTERVAL '{EMAIL_VERIFICATION_CODE_EXPIRES_IN} SECOND'",
@@ -49,19 +50,21 @@ class EmailVerificationCodeRepo:
         )
         self._session.add(email_verification_code)
         await self._session.commit()
-        return verification_code
+        return verification_code, email_verification_code
 
     async def get(
-        self, verification_code: str, email: str
+        self,
+        email_verification_code_id: UUID,
+        verification_code: str,
     ) -> EmailVerificationCode | None:
-        """Get an email verification code by code and email."""
+        """Get an email verification code by ID and verification code."""
         return await self._session.scalar(
             select(EmailVerificationCode).where(
-                EmailVerificationCode.code_hash
+                EmailVerificationCode.id == email_verification_code_id
+                and EmailVerificationCode.code_hash
                 == self.hash_code(
                     email_verification_code=verification_code,
                 )
-                and EmailVerificationCode.email == email,
             ),
         )
 

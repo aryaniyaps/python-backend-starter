@@ -26,11 +26,17 @@ from webauthn.helpers.structs import (
 )
 
 from app.config import settings
-from app.lib.errors import InvalidInputError, UnauthenticatedError
+from app.lib.errors import (
+    InvalidInputError,
+    ResourceNotFoundError,
+    UnauthenticatedError,
+)
 from app.lib.geo_ip import get_city_location, get_geoip_city
+from app.models.register_flow import RegisterFlow
 from app.models.user_session import UserSession
 from app.repositories.authentication_token import AuthenticationTokenRepo
 from app.repositories.email_verification_code import EmailVerificationCodeRepo
+from app.repositories.register_flow import RegisterFlowRepo
 from app.repositories.user import UserRepo
 from app.repositories.user_session import UserSessionRepo
 from app.repositories.webauthn_challenge import WebAuthnChallengeRepo
@@ -48,6 +54,7 @@ class AuthService:
         webauthn_credential_repo: WebAuthnCredentialRepo,
         webauthn_challenge_repo: WebAuthnChallengeRepo,
         authentication_token_repo: AuthenticationTokenRepo,
+        register_flow_repo: RegisterFlowRepo,
         user_repo: UserRepo,
         email_verification_code_repo: EmailVerificationCodeRepo,
         geoip_reader: Reader,
@@ -56,18 +63,19 @@ class AuthService:
         self._webauthn_credential_repo = webauthn_credential_repo
         self._webauthn_challenge_repo = webauthn_challenge_repo
         self._authentication_token_repo = authentication_token_repo
+        self._register_flow_repo = register_flow_repo
         self._user_repo = user_repo
         self._email_verification_code_repo = email_verification_code_repo
         self._geoip_reader = geoip_reader
 
-    async def send_email_verification_request(
+    async def start_register_flow(
         self,
         *,
         email: str,
         user_agent: UserAgent,
         request_ip: str,
-    ) -> None:
-        """Send an email verification request to the given email."""
+    ) -> RegisterFlow:
+        """Start a register flow."""
         if (
             await self._user_repo.get_by_email(
                 email=email,
@@ -78,15 +86,24 @@ class AuthService:
                 message="User with that email already exists.",
             )
 
-        verification_token = await self._email_verification_code_repo.create(
-            email=email,
+        verification_code, email_verification_code = (
+            await self._email_verification_code_repo.create(
+                email=email,
+            )
+        )
+
+        # create register flow
+        # TODO: probably store request IP and user agent in the register flow here.
+        # will be helpful to create the user session at last.
+        register_flow = await self._register_flow_repo.create(
+            email_verification_code_id=email_verification_code.id,
         )
 
         # send verification request email
         await task_queue.enqueue(
             "send_email_verification_request_email",
             receiver=email,
-            verification_token=verification_token,
+            verification_code=verification_code,
             device=user_agent.get_device(),
             browser_name=user_agent.get_browser(),
             location=get_city_location(
@@ -98,26 +115,58 @@ class AuthService:
             ip_address=request_ip,
         )
 
-    async def generate_registration_options(
+        return register_flow
+
+    async def verify_register_flow(
         self,
         *,
-        email: str,
+        flow_id: UUID,
         verification_code: str,
-        display_name: str,
-    ) -> PublicKeyCredentialCreationOptions:
-        """Generate options for registering a credential."""
+    ) -> RegisterFlow:
+        """Verify a register flow."""
+        register_flow = await self._register_flow_repo.get(flow_id=flow_id)
+
+        if register_flow is None:
+            raise ResourceNotFoundError(
+                message="Couldn't find register flow.",
+            )
+
         email_verification_code = await self._email_verification_code_repo.get(
+            email_verification_code_id=register_flow.email_verification_code_id,
             verification_code=verification_code,
-            email=email,
         )
 
-        if email_verification_code is None or email_verification_code.email != email:
+        if email_verification_code is None:
             raise InvalidInputError(
                 message="Invalid email verification code passed.",
             )
 
-        # delete existing email verification codes
-        await self._email_verification_code_repo.delete_all(email=email)
+        # mark register flow as verified
+        await self._register_flow_repo.update(
+            register_flow=register_flow,
+            is_verified=True,
+        )
+
+        # TODO: create options for registering a credential here and return them?
+        # so that registration can be completed in the next step??
+
+        return register_flow
+
+    async def webauthn_start_register_flow(
+        self,
+        *,
+        flow_id: UUID,
+        display_name: str,
+    ) -> PublicKeyCredentialCreationOptions:
+        """Start the webauthn registration in the register flow."""
+        register_flow = await self._register_flow_repo.get(flow_id=flow_id)
+
+        if register_flow is None:
+            raise ResourceNotFoundError(
+                message="Couldn't find register flow.",
+            )
+
+        # TODO: ensure that the register flow is verified here
 
         # generate user ID (UUID)
         user_id = uuid4()
@@ -144,16 +193,23 @@ class AuthService:
 
         return registration_options
 
-    async def verify_registration_response(
+    async def webauthn_finish_register_flow(
         self,
         *,
-        email: str,
-        display_name: str,
+        flow_id: UUID,
         credential: RegistrationCredential,
-        request_ip: str,
-        user_agent: UserAgent,
+        display_name: str,
     ) -> AuthenticationResult:
-        """Verify the authenticator's response for registration."""
+        """Finish the webauthn registration in the register flow."""
+        register_flow = await self._register_flow_repo.get(flow_id=flow_id)
+
+        if register_flow is None:
+            raise ResourceNotFoundError(
+                message="Couldn't find register flow.",
+            )
+
+        # TODO: ensure that the register flow has started webauthn registration here
+
         client_data = orjson.loads(
             base64.b64decode(credential.response.client_data_json)
         )
@@ -187,6 +243,8 @@ class AuthService:
             display_name=display_name,
         )
 
+        # TODO: delete email verification code here
+
         # delete challenge server-side
         await self._webauthn_challenge_repo.delete(challenge=challenge)
 
@@ -200,6 +258,7 @@ class AuthService:
             transports=credential.response.transports,
         )
 
+        # TODO: get request IP and user agent from the register flow
         user_session = await self._user_session_repo.create(
             user_id=user.id,
             ip_address=request_ip,

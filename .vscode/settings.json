@@ -4,11 +4,11 @@
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.organizeImports": "explicit"
-    },
+    }
   },
   "python.defaultInterpreterPath": "${workspaceFolder}/server/.venv",
   "python.testing.pytestEnabled": true,
   "python.testing.pytestArgs": [""],
   "python.terminal.activateEnvironment": false,
-  "python.analysis.ignore": ["*"],
+  "python.analysis.ignore": ["*"]
 }
