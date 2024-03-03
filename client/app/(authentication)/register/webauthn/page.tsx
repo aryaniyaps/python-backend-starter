@@ -53,13 +53,20 @@ export default function RegisterWebAuthnPage() {
         return;
       }
 
+      // FIXME ugly hack: we are renaming the `clientDataJSON` key to `clientDataJson`
       const { data: verificationData } = await client.POST(
         '/auth/register/flow/webauthn-finish',
         {
           body: {
             flowId: flowId,
             displayName: input.displayName,
-            credential: JSON.stringify(attResp),
+            credential: JSON.stringify({
+              ...attResp,
+              response: {
+                ...attResp.response,
+                clientDataJson: attResp.response.clientDataJSON,
+              },
+            }),
           },
         }
       );

@@ -282,8 +282,11 @@ class AuthService:
 
         challenge = client_data["challenge"]
 
+        # base64 decode challenge
+        # FIXME: the challenge is encoded in some way. we are not decoding it properly here, so we
+        # get challenge response doesn't match errors on the client.
         user_id = await self._webauthn_challenge_repo.get(
-            challenge=challenge,
+            challenge=base64.b64decode(challenge),
         )
 
         if user_id is None:

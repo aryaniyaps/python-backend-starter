@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
@@ -100,6 +99,8 @@ class RegisterFlowWebAuthnFinishInput(BaseSchema):
         ),
     ]
 
+    # FIXME: the client sends client data json under the key clientDataJSON, while we
+    # expect it to be clientDataJson. we need to fix this naming issue
     credential: Json[RegistrationCredential]
 
 
