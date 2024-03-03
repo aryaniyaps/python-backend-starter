@@ -57,13 +57,13 @@ def add_middleware(app: FastAPI) -> None:
         allow_methods=["*"],
         expose_headers=["*"],
     )
-    app.add_middleware(GZipMiddleware)
     app.add_middleware(
         RateLimitMiddleware,
         authenticate=client_ip,
         backend=rate_limit_backend,
         config=rate_limit_config,
     )
+    app.add_middleware(GZipMiddleware)
     app.add_middleware(
         CorrelationIdMiddleware,
         header_name="X-Request-ID",
