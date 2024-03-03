@@ -227,7 +227,6 @@ async def start_webauthn_register_flow(
     """Start the webauthn registration in the register flow."""
     register_flow, options = await auth_service.webauthn_start_register_flow(
         flow_id=data.flow_id,
-        display_name=data.display_name,
     )
 
     return {
@@ -259,7 +258,6 @@ async def finish_webauthn_register_flow(
     """Finish the webauthn registration in the register flow."""
     return await auth_service.webauthn_finish_register_flow(
         flow_id=data.flow_id,
-        display_name=data.display_name,
         credential=data.credential,
     )
 

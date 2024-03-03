@@ -69,16 +69,6 @@ class RegisterFlowVerifyResult(BaseSchema):
 class RegisterFlowWebAuthnStartInput(BaseSchema):
     flow_id: UUID
 
-    display_name: Annotated[
-        str,
-        Field(
-            max_length=75,
-            examples=[
-                "My webauthn credential",
-            ],
-        ),
-    ]
-
 
 class RegisterFlowWebAuthnStartResult(BaseSchema):
     register_flow: RegisterFlowSchema
@@ -88,16 +78,6 @@ class RegisterFlowWebAuthnStartResult(BaseSchema):
 
 class RegisterFlowWebAuthnFinishInput(BaseSchema):
     flow_id: UUID
-
-    display_name: Annotated[
-        str,
-        Field(
-            max_length=70,
-            examples=[
-                "Aryan Iyappan",
-            ],
-        ),
-    ]
 
     # FIXME: the client sends client data json under the key clientDataJSON, while we
     # expect it to be clientDataJson. we need to fix this naming issue

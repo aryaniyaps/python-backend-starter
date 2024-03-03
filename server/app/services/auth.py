@@ -220,7 +220,6 @@ class AuthService:
         self,
         *,
         flow_id: UUID,
-        display_name: str,
     ) -> tuple[RegisterFlow, PublicKeyCredentialCreationOptions]:
         """Start the webauthn registration in the register flow."""
         register_flow = await self._register_flow_repo.get(
@@ -241,7 +240,6 @@ class AuthService:
             rp_name=settings.rp_name,
             user_id=user_id.bytes,
             user_name=register_flow.email,
-            user_display_name=display_name,
             authenticator_selection=AuthenticatorSelectionCriteria(
                 authenticator_attachment=AuthenticatorAttachment.PLATFORM,
                 user_verification=UserVerificationRequirement.REQUIRED,
@@ -263,7 +261,6 @@ class AuthService:
         *,
         flow_id: UUID,
         credential: RegistrationCredential,
-        display_name: str,
     ) -> AuthenticationResult:
         """Finish the webauthn registration in the register flow."""
         register_flow = await self._register_flow_repo.get(
@@ -309,7 +306,6 @@ class AuthService:
         user = await self._user_repo.create(
             user_id=user_id,
             email=register_flow.email,
-            display_name=display_name,
         )
 
         # delete challenge server-side

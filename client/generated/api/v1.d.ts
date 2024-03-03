@@ -353,11 +353,6 @@ export interface components {
        */
       id: string;
       /**
-       * Username
-       * @description The username of the user.
-       */
-      username: string;
-      /**
        * Created At
        * Format: date-time
        * @description When the user was created.
@@ -526,8 +521,6 @@ export interface components {
        * Format: uuid
        */
       flowId: string;
-      /** Displayname */
-      displayName: string;
       /** Credential */
       credential: string;
     };
@@ -547,8 +540,6 @@ export interface components {
        * Format: uuid
        */
       flowId: string;
-      /** Displayname */
-      displayName: string;
     };
     /** RegisterFlowWebAuthnStartResult */
     RegisterFlowWebAuthnStartResult: {
@@ -618,11 +609,6 @@ export interface components {
        * @description The ID of the user.
        */
       id: string;
-      /**
-       * Username
-       * @description The username of the user.
-       */
-      username: string;
       /**
        * Created At
        * Format: date-time

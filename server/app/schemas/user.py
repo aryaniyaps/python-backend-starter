@@ -15,16 +15,6 @@ class PartialUserSchema(BaseSchema):
         ),
     ]
 
-    username: Annotated[
-        str,
-        Field(
-            examples=[
-                "aryaniyaps",
-            ],
-            description="The username of the user.",
-        ),
-    ]
-
     created_at: Annotated[
         datetime,
         Field(
