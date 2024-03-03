@@ -87,7 +87,7 @@ export default function RegisterWebAuthnPage() {
         {/* TODO: use a nested card for errors until we get an alert component */}
         {formState.errors.root ? (
           <Card isFooterBlurred fullWidth className='bg-danger-50 px-unit-2'>
-            <CardBody className='text-center text-danger'>
+            <CardBody className='text-center text-sm text-danger'>
               {formState.errors.root.message}
             </CardBody>
           </Card>
