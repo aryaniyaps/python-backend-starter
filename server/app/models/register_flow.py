@@ -20,7 +20,7 @@ class RegisterFlow(Base):
     )
 
     current_step: Mapped[RegisterFlowStep] = mapped_column(
-        default=RegisterFlowStep.INITIAL,
+        default=RegisterFlowStep.EMAIL_VERIFICATION,
     )
 
     email: Mapped[str] = mapped_column(

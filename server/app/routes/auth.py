@@ -1,10 +1,10 @@
 from http import HTTPStatus
-from typing import Annotated
+from typing import Annotated, Any
+from uuid import UUID
 
 import user_agents
-from fastapi import APIRouter, Depends, Header
+from fastapi import APIRouter, Depends, Header, Path
 from webauthn.helpers.structs import (
-    PublicKeyCredentialCreationOptions,
     PublicKeyCredentialRequestOptions,
 )
 
@@ -16,6 +16,7 @@ from app.dependencies.auth import (
 from app.dependencies.ip_address import get_ip_address
 from app.dependencies.rate_limiter import RateLimiter
 from app.lib.constants import OpenAPITag
+from app.models.register_flow import RegisterFlow
 from app.models.user_session import UserSession
 from app.schemas.auth import (
     AuthenticateUserResult,
@@ -23,6 +24,7 @@ from app.schemas.auth import (
     LoginOptionsInput,
     LoginVerificationInput,
     LogoutInput,
+    RegisterFlowSchema,
     RegisterFlowStartInput,
     RegisterFlowStartResult,
     RegisterFlowVerifyInput,
@@ -30,8 +32,9 @@ from app.schemas.auth import (
     RegisterFlowWebAuthnFinishInput,
     RegisterFlowWebAuthnFinishResult,
     RegisterFlowWebAuthnStartInput,
+    RegisterFlowWebAuthnStartResult,
 )
-from app.schemas.errors import InvalidInputErrorResult
+from app.schemas.errors import InvalidInputErrorResult, ResourceNotFoundErrorResult
 from app.schemas.user_session import UserSessionSchema
 from app.services.auth import AuthService
 from app.types.auth import AuthenticationResult, UserInfo
@@ -40,6 +43,35 @@ auth_router = APIRouter(
     prefix="/auth",
     tags=[OpenAPITag.AUTHENTICATION],
 )
+
+
+@auth_router.get(
+    "/register/flows/{flow_id}",
+    response_model=RegisterFlowSchema,
+    responses={
+        HTTPStatus.NOT_FOUND: {
+            "model": ResourceNotFoundErrorResult,
+            "description": "Resource Not Found Error",
+        },
+    },
+    summary="Get a register flow.",
+)
+async def get_register_flow(
+    flow_id: Annotated[
+        UUID,
+        Path(
+            title="The ID of the register flow to get.",
+        ),
+    ],
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=get_auth_service,
+        ),
+    ],
+) -> RegisterFlow:
+    """Get a register flow."""
+    return await auth_service.get_register_flow(flow_id=flow_id)
 
 
 @auth_router.post(
@@ -75,7 +107,7 @@ async def start_register_flow(
             dependency=get_auth_service,
         ),
     ],
-) -> RegisterFlowStartResult:
+) -> dict[str, Any]:
     """Start a register flow."""
     register_flow = await auth_service.start_register_flow(
         email=data.email,
@@ -83,9 +115,7 @@ async def start_register_flow(
         request_ip=request_ip,
     )
 
-    return RegisterFlowStartResult(
-        flow_id=register_flow.id,
-    )
+    return {"register_flow": register_flow}
 
 
 @auth_router.post(
@@ -114,21 +144,19 @@ async def verify_register_flow(
             dependency=get_auth_service,
         ),
     ],
-) -> RegisterFlowVerifyResult:
+) -> dict[str, Any]:
     """Verify a register flow."""
     register_flow = await auth_service.verify_register_flow(
         flow_id=data.flow_id,
         verification_code=data.verification_code,
     )
 
-    return RegisterFlowVerifyResult(
-        flow_id=register_flow.id,
-    )
+    return {"register_flow": register_flow}
 
 
 @auth_router.post(
     "/register/flow/webauthn-start",
-    response_model=PublicKeyCredentialCreationOptions,
+    response_model=RegisterFlowWebAuthnStartResult,
     responses={
         HTTPStatus.BAD_REQUEST: {
             "model": InvalidInputErrorResult,
@@ -152,12 +180,17 @@ async def start_webauthn_register_flow(
             dependency=get_auth_service,
         ),
     ],
-) -> PublicKeyCredentialCreationOptions:
+) -> dict[str, Any]:
     """Start the webauthn registration in the register flow."""
-    return await auth_service.webauthn_start_register_flow(
+    register_flow, options = await auth_service.webauthn_start_register_flow(
         flow_id=data.flow_id,
         display_name=data.display_name,
     )
+
+    return {
+        "register_flow": register_flow,
+        "options": options,
+    }
 
 
 @auth_router.post(

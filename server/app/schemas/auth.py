@@ -1,14 +1,32 @@
+from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
 from pydantic import EmailStr, Field, Json
 from webauthn.helpers.structs import (
     AuthenticationCredential,
+    PublicKeyCredentialCreationOptions,
     RegistrationCredential,
 )
 
+from app.lib.enums import RegisterFlowStep
 from app.schemas.base import BaseSchema
 from app.schemas.user import UserSchema
+
+
+class RegisterFlowSchema(BaseSchema):
+    id: UUID
+
+    current_step: RegisterFlowStep
+
+    email: Annotated[
+        str,
+        Field(
+            examples=[
+                "aryaniyaps@example.com",
+            ],
+        ),
+    ]
 
 
 class RegisterFlowStartInput(BaseSchema):
@@ -21,7 +39,7 @@ class RegisterFlowStartInput(BaseSchema):
 
 
 class RegisterFlowStartResult(BaseSchema):
-    flow_id: UUID
+    register_flow: RegisterFlowSchema
 
 
 class RegisterFlowVerifyInput(BaseSchema):
@@ -37,6 +55,10 @@ class RegisterFlowVerifyInput(BaseSchema):
     ]
 
 
+class RegisterFlowVerifyResult(BaseSchema):
+    register_flow: RegisterFlowSchema
+
+
 class RegisterFlowWebAuthnStartInput(BaseSchema):
     flow_id: UUID
 
@@ -48,6 +70,12 @@ class RegisterFlowWebAuthnStartInput(BaseSchema):
             ],
         ),
     ]
+
+
+class RegisterFlowWebAuthnStartResult(BaseSchema):
+    register_flow: RegisterFlowSchema
+
+    options: PublicKeyCredentialCreationOptions
 
 
 class RegisterFlowWebAuthnFinishInput(BaseSchema):
@@ -79,10 +107,6 @@ class RegisterFlowWebAuthnFinishResult(BaseSchema):
             description="The authentication token generated upon successful registration.",
         ),
     ]
-
-
-class RegisterFlowVerifyResult(BaseSchema):
-    flow_id: UUID
 
 
 class LoginOptionsInput(BaseSchema):

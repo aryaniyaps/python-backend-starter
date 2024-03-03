@@ -63,13 +63,17 @@ class RegisterFlowRepo:
         return verification_code, register_flow
 
     async def get(
-        self, *, flow_id: UUID, step: RegisterFlowStep
+        self, *, flow_id: UUID, step: RegisterFlowStep | None = None
     ) -> RegisterFlow | None:
-        """Get a register flow by ID and step."""
+        """Get a register flow by ID and/ or step."""
+        if step is not None:
+            return await self._session.scalar(
+                select(RegisterFlow).where(
+                    RegisterFlow.id == flow_id and RegisterFlow.current_step == step
+                ),
+            )
         return await self._session.scalar(
-            select(RegisterFlow).where(
-                RegisterFlow.id == flow_id and RegisterFlow.current_step == step
-            ),
+            select(RegisterFlow).where(RegisterFlow.id == flow_id),
         )
 
     async def update(

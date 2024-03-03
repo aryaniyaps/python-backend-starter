@@ -6,6 +6,7 @@ from geoip2.database import Reader
 
 from app.dependencies.authentication_token import get_authentication_token_repo
 from app.dependencies.email_verification_code import get_email_verification_code_repo
+from app.dependencies.register_flow import get_register_flow_repo
 from app.dependencies.user import get_user_repo
 from app.dependencies.user_session import get_user_session_repo
 from app.dependencies.webauthn_challenge import get_webauthn_challenge_repo
@@ -13,6 +14,7 @@ from app.dependencies.webauthn_credential import get_webauthn_credential_repo
 from app.lib.geo_ip import get_geoip_reader
 from app.repositories.authentication_token import AuthenticationTokenRepo
 from app.repositories.email_verification_code import EmailVerificationCodeRepo
+from app.repositories.register_flow import RegisterFlowRepo
 from app.repositories.user import UserRepo
 from app.repositories.user_session import UserSessionRepo
 from app.repositories.webauthn_challenge import WebAuthnChallengeRepo
@@ -48,6 +50,12 @@ def get_auth_service(
             dependency=get_authentication_token_repo,
         ),
     ],
+    register_flow_repo: Annotated[
+        RegisterFlowRepo,
+        Depends(
+            dependency=get_register_flow_repo,
+        ),
+    ],
     user_repo: Annotated[
         UserRepo,
         Depends(
@@ -73,6 +81,7 @@ def get_auth_service(
         webauthn_credential_repo=webauthn_credential_repo,
         webauthn_challenge_repo=webauthn_challenge_repo,
         authentication_token_repo=authentication_token_repo,
+        register_flow_repo=register_flow_repo,
         user_repo=user_repo,
         email_verification_code_repo=email_verification_token_repo,
         geoip_reader=geoip_reader,

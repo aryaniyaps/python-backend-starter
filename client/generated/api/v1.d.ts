@@ -3,109 +3,117 @@
  * Do not make direct changes to the file.
  */
 
+
 export interface paths {
-  '/health/': {
+  "/health/": {
     /**
      * Check the health status of the application.
      * @description Provides information about the health status of the application.
      */
-    get: operations['OpenAPITag.HEALTH-check_health'];
+    get: operations["OpenAPITag.HEALTH-check_health"];
   };
-  '/users/@me': {
+  "/users/@me": {
     /**
      * Get the current user.
      * @description Get the current user.
      */
-    get: operations['OpenAPITag.USERS-get_current_user'];
+    get: operations["OpenAPITag.USERS-get_current_user"];
     /**
      * Update the current user.
      * @description Update the current user.
      */
-    patch: operations['OpenAPITag.USERS-update_current_user'];
+    patch: operations["OpenAPITag.USERS-update_current_user"];
   };
-  '/users/@me/email-change-request': {
+  "/users/@me/email-change-request": {
     /**
      * Send an email change request.
      * @description Send an email change request.
      */
-    post: operations['OpenAPITag.USERS-request_current_user_email_change'];
+    post: operations["OpenAPITag.USERS-request_current_user_email_change"];
   };
-  '/users/@me/email': {
+  "/users/@me/email": {
     /**
      * Change the current user's email.
      * @description Change the current user's email.
      */
-    patch: operations['OpenAPITag.USERS-change_current_user_email'];
+    patch: operations["OpenAPITag.USERS-change_current_user_email"];
   };
-  '/users/{user_id}': {
+  "/users/{user_id}": {
     /**
      * Get the user with the given ID.
      * @description Get the user with the given ID.
      */
-    get: operations['OpenAPITag.USERS-get_user'];
+    get: operations["OpenAPITag.USERS-get_user"];
   };
-  '/auth/register/flow/start': {
+  "/auth/register/flows/{flow_id}": {
+    /**
+     * Get a register flow.
+     * @description Get a register flow.
+     */
+    get: operations["OpenAPITag.AUTHENTICATION-get_register_flow"];
+  };
+  "/auth/register/flow/start": {
     /**
      * Start a register flow.
      * @description Start a register flow.
      */
-    post: operations['OpenAPITag.AUTHENTICATION-start_register_flow'];
+    post: operations["OpenAPITag.AUTHENTICATION-start_register_flow"];
   };
-  '/auth/register/flow/verify': {
+  "/auth/register/flow/verify": {
     /**
      * Verify a register flow.
      * @description Verify a register flow.
      */
-    post: operations['OpenAPITag.AUTHENTICATION-verify_register_flow'];
+    post: operations["OpenAPITag.AUTHENTICATION-verify_register_flow"];
   };
-  '/auth/register/flow/webauthn-start': {
+  "/auth/register/flow/webauthn-start": {
     /**
      * Start the webauthn registration in the register flow.
      * @description Start the webauthn registration in the register flow.
      */
-    post: operations['OpenAPITag.AUTHENTICATION-start_webauthn_register_flow'];
+    post: operations["OpenAPITag.AUTHENTICATION-start_webauthn_register_flow"];
   };
-  '/auth/register/flow/webauthn-finish': {
+  "/auth/register/flow/webauthn-finish": {
     /**
      * Finish the webauthn registration in the register flow.
      * @description Finish the webauthn registration in the register flow.
      */
-    post: operations['OpenAPITag.AUTHENTICATION-finish_webauthn_register_flow'];
+    post: operations["OpenAPITag.AUTHENTICATION-finish_webauthn_register_flow"];
   };
-  '/auth/login/start': {
+  "/auth/login/start": {
     /**
      * Login Options
      * @description Generate options for retrieving a credential.
      */
-    post: operations['OpenAPITag.AUTHENTICATION-login_options'];
+    post: operations["OpenAPITag.AUTHENTICATION-login_options"];
   };
-  '/auth/login/finish': {
+  "/auth/login/finish": {
     /**
      * Login Verification
      * @description Verify the authenticator's response for login.
      */
-    post: operations['OpenAPITag.AUTHENTICATION-login_verification'];
+    post: operations["OpenAPITag.AUTHENTICATION-login_verification"];
   };
-  '/auth/webauthn-credentials': {
+  "/auth/webauthn-credentials": {
     /**
      * Create Webauthn Credential
      * @description Create a new webauthn credential.
      */
-    post: operations['OpenAPITag.AUTHENTICATION-create_webauthn_credential'];
+    post: operations["OpenAPITag.AUTHENTICATION-create_webauthn_credential"];
   };
-  '/auth/logout': {
+  "/auth/logout": {
     /**
      * Logout the current user.
      * @description Logout the current user.
      */
-    post: operations['OpenAPITag.AUTHENTICATION-delete_current_user_session'];
+    post: operations["OpenAPITag.AUTHENTICATION-delete_current_user_session"];
   };
-  '/auth/sessions': {
+  "/auth/sessions": {
     /**
      * Get the current user's sessions.
      * @description Get the current user's user sessions.
      */
-    get: operations['OpenAPITag.AUTHENTICATION-get_user_sessions'];
+    get: operations["OpenAPITag.AUTHENTICATION-get_user_sessions"];
   };
 }
 
@@ -126,11 +134,7 @@ export interface components {
      * https://www.w3.org/TR/webauthn-2/#enum-attestation-convey
      * @enum {string}
      */
-    AttestationConveyancePreference:
-      | 'none'
-      | 'indirect'
-      | 'direct'
-      | 'enterprise';
+    AttestationConveyancePreference: "none" | "indirect" | "direct" | "enterprise";
     /** AuthenticateUserResult */
     AuthenticateUserResult: {
       /**
@@ -139,7 +143,7 @@ export interface components {
        */
       authenticationToken: string;
       /** @description The logged in user. */
-      user: components['schemas']['UserSchema'];
+      user: components["schemas"]["UserSchema"];
     };
     /** AuthenticationCredential */
     AuthenticationCredential: {
@@ -150,16 +154,14 @@ export interface components {
        * Format: binary
        */
       rawId: string;
-      response: components['schemas']['AuthenticatorAssertionResponse'];
-      authenticatorAttachment?:
-        | components['schemas']['AuthenticatorAttachment']
-        | null;
+      response: components["schemas"]["AuthenticatorAssertionResponse"];
+      authenticatorAttachment?: components["schemas"]["AuthenticatorAttachment"] | null;
       /**
        * Type
        * @default public-key
        * @constant
        */
-      type?: 'public-key';
+      type?: "public-key";
     };
     /** AuthenticatorAssertionResponse */
     AuthenticatorAssertionResponse: {
@@ -192,7 +194,7 @@ export interface components {
      * https://www.w3.org/TR/webauthn-2/#enumdef-authenticatorattachment
      * @enum {string}
      */
-    AuthenticatorAttachment: 'platform' | 'cross-platform';
+    AuthenticatorAttachment: "platform" | "cross-platform";
     /** AuthenticatorAttestationResponse */
     AuthenticatorAttestationResponse: {
       /**
@@ -206,23 +208,19 @@ export interface components {
        */
       attestationObject: string;
       /** Transports */
-      transports?: components['schemas']['AuthenticatorTransport'][] | null;
+      transports?: components["schemas"]["AuthenticatorTransport"][] | null;
     };
     /** AuthenticatorSelectionCriteria */
     AuthenticatorSelectionCriteria: {
-      authenticator_attachment?:
-        | components['schemas']['AuthenticatorAttachment']
-        | null;
-      resident_key?: components['schemas']['ResidentKeyRequirement'] | null;
+      authenticatorAttachment?: components["schemas"]["AuthenticatorAttachment"] | null;
+      residentKey?: components["schemas"]["ResidentKeyRequirement"] | null;
       /**
-       * Require Resident Key
+       * Requireresidentkey
        * @default false
        */
-      require_resident_key?: boolean | null;
+      requireResidentKey?: boolean | null;
       /** @default preferred */
-      user_verification?:
-        | components['schemas']['UserVerificationRequirement']
-        | null;
+      userVerification?: components["schemas"]["UserVerificationRequirement"] | null;
     };
     /**
      * AuthenticatorTransport
@@ -239,13 +237,7 @@ export interface components {
      * https://www.w3.org/TR/webauthn-2/#enum-transport
      * @enum {string}
      */
-    AuthenticatorTransport:
-      | 'usb'
-      | 'nfc'
-      | 'ble'
-      | 'internal'
-      | 'cable'
-      | 'hybrid';
+    AuthenticatorTransport: "usb" | "nfc" | "ble" | "internal" | "cable" | "hybrid";
     /**
      * COSEAlgorithmIdentifier
      * @description Various registered values indicating cryptographic algorithms that may be used in credential responses
@@ -266,17 +258,7 @@ export interface components {
      * https://www.iana.org/assignments/cose/cose.xhtml#algorithms
      * @enum {integer}
      */
-    COSEAlgorithmIdentifier:
-      | -7
-      | -8
-      | -36
-      | -37
-      | -38
-      | -39
-      | -257
-      | -258
-      | -259
-      | -65535;
+    COSEAlgorithmIdentifier: -7 | -8 | -36 | -37 | -38 | -39 | -257 | -258 | -259 | -65535;
     /** ChangeUserEmailInput */
     ChangeUserEmailInput: {
       /**
@@ -316,7 +298,7 @@ export interface components {
        * @description The status of the application.
        * @constant
        */
-      status: 'OK';
+      status: "OK";
     };
     /** InvalidInputErrorResult */
     InvalidInputErrorResult: {
@@ -375,26 +357,22 @@ export interface components {
     };
     /** PublicKeyCredentialCreationOptions */
     PublicKeyCredentialCreationOptions: {
-      rp: components['schemas']['PublicKeyCredentialRpEntity'];
-      user: components['schemas']['PublicKeyCredentialUserEntity'];
+      rp: components["schemas"]["PublicKeyCredentialRpEntity"];
+      user: components["schemas"]["PublicKeyCredentialUserEntity"];
       /**
        * Challenge
        * Format: binary
        */
       challenge: string;
-      /** Pub Key Cred Params */
-      pub_key_cred_params: components['schemas']['PublicKeyCredentialParameters'][];
+      /** Pubkeycredparams */
+      pubKeyCredParams: components["schemas"]["PublicKeyCredentialParameters"][];
       /** Timeout */
       timeout?: number | null;
-      /** Exclude Credentials */
-      exclude_credentials?:
-        | components['schemas']['PublicKeyCredentialDescriptor'][]
-        | null;
-      authenticator_selection?:
-        | components['schemas']['AuthenticatorSelectionCriteria']
-        | null;
+      /** Excludecredentials */
+      excludeCredentials?: components["schemas"]["PublicKeyCredentialDescriptor"][] | null;
+      authenticatorSelection?: components["schemas"]["AuthenticatorSelectionCriteria"] | null;
       /** @default none */
-      attestation?: components['schemas']['AttestationConveyancePreference'];
+      attestation?: components["schemas"]["AttestationConveyancePreference"];
     };
     /** PublicKeyCredentialDescriptor */
     PublicKeyCredentialDescriptor: {
@@ -408,9 +386,9 @@ export interface components {
        * @default public-key
        * @constant
        */
-      type?: 'public-key';
+      type?: "public-key";
       /** Transports */
-      transports?: components['schemas']['AuthenticatorTransport'][] | null;
+      transports?: components["schemas"]["AuthenticatorTransport"][] | null;
     };
     /** PublicKeyCredentialParameters */
     PublicKeyCredentialParameters: {
@@ -418,8 +396,8 @@ export interface components {
        * Type
        * @constant
        */
-      type: 'public-key';
-      alg: components['schemas']['COSEAlgorithmIdentifier'];
+      type: "public-key";
+      alg: components["schemas"]["COSEAlgorithmIdentifier"];
     };
     /** PublicKeyCredentialRequestOptions */
     PublicKeyCredentialRequestOptions: {
@@ -433,13 +411,9 @@ export interface components {
       /** Rp Id */
       rp_id?: string | null;
       /** Allow Credentials */
-      allow_credentials?:
-        | components['schemas']['PublicKeyCredentialDescriptor'][]
-        | null;
+      allow_credentials?: components["schemas"]["PublicKeyCredentialDescriptor"][] | null;
       /** @default preferred */
-      user_verification?:
-        | components['schemas']['UserVerificationRequirement']
-        | null;
+      user_verification?: components["schemas"]["UserVerificationRequirement"] | null;
     };
     /** PublicKeyCredentialRpEntity */
     PublicKeyCredentialRpEntity: {
@@ -457,8 +431,8 @@ export interface components {
       id: string;
       /** Name */
       name: string;
-      /** Display Name */
-      display_name: string;
+      /** Displayname */
+      displayName: string;
     };
     /** RateLimitExceededErrorResult */
     RateLimitExceededErrorResult: {
@@ -473,6 +447,22 @@ export interface components {
        */
       isPrimary: boolean;
     };
+    /** RegisterFlowSchema */
+    RegisterFlowSchema: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      currentStep: components["schemas"]["RegisterFlowStep"];
+      /** Email */
+      email: string;
+      /**
+       * Expiresat
+       * Format: date-time
+       */
+      expiresAt: string;
+    };
     /** RegisterFlowStartInput */
     RegisterFlowStartInput: {
       /**
@@ -483,12 +473,13 @@ export interface components {
     };
     /** RegisterFlowStartResult */
     RegisterFlowStartResult: {
-      /**
-       * Flowid
-       * Format: uuid
-       */
-      flowId: string;
+      registerFlow: components["schemas"]["RegisterFlowSchema"];
     };
+    /**
+     * RegisterFlowStep
+     * @enum {string}
+     */
+    RegisterFlowStep: "email_verification" | "webauthn_start" | "webauthn_finish";
     /** RegisterFlowVerifyInput */
     RegisterFlowVerifyInput: {
       /**
@@ -501,11 +492,7 @@ export interface components {
     };
     /** RegisterFlowVerifyResult */
     RegisterFlowVerifyResult: {
-      /**
-       * Flowid
-       * Format: uuid
-       */
-      flowId: string;
+      registerFlow: components["schemas"]["RegisterFlowSchema"];
     };
     /** RegisterFlowWebAuthnFinishInput */
     RegisterFlowWebAuthnFinishInput: {
@@ -521,7 +508,7 @@ export interface components {
     };
     /** RegisterFlowWebAuthnFinishResult */
     RegisterFlowWebAuthnFinishResult: {
-      user: components['schemas']['UserSchema'];
+      user: components["schemas"]["UserSchema"];
       /**
        * Authentication Token
        * @description The authentication token generated upon successful registration.
@@ -538,6 +525,11 @@ export interface components {
       /** Displayname */
       displayName: string;
     };
+    /** RegisterFlowWebAuthnStartResult */
+    RegisterFlowWebAuthnStartResult: {
+      registerFlow: components["schemas"]["RegisterFlowSchema"];
+      options: components["schemas"]["PublicKeyCredentialCreationOptions"];
+    };
     /** RegistrationCredential */
     RegistrationCredential: {
       /** Id */
@@ -547,16 +539,14 @@ export interface components {
        * Format: binary
        */
       rawId: string;
-      response: components['schemas']['AuthenticatorAttestationResponse'];
-      authenticatorAttachment?:
-        | components['schemas']['AuthenticatorAttachment']
-        | null;
+      response: components["schemas"]["AuthenticatorAttestationResponse"];
+      authenticatorAttachment?: components["schemas"]["AuthenticatorAttachment"] | null;
       /**
        * Type
        * @default public-key
        * @constant
        */
-      type?: 'public-key';
+      type?: "public-key";
     };
     /**
      * ResidentKeyRequirement
@@ -570,7 +560,7 @@ export interface components {
      * https://www.w3.org/TR/webauthn-2/#enum-residentKeyRequirement
      * @enum {string}
      */
-    ResidentKeyRequirement: 'discouraged' | 'preferred' | 'required';
+    ResidentKeyRequirement: "discouraged" | "preferred" | "required";
     /** ResourceNotFoundErrorResult */
     ResourceNotFoundErrorResult: {
       /**
@@ -678,7 +668,7 @@ export interface components {
      * https://www.w3.org/TR/webauthn-2/#enumdef-userverificationrequirement
      * @enum {string}
      */
-    UserVerificationRequirement: 'required' | 'preferred' | 'discouraged';
+    UserVerificationRequirement: "required" | "preferred" | "discouraged";
     /** ValidationErrorResult */
     ValidationErrorResult: {
       /**
@@ -690,7 +680,7 @@ export interface components {
        * Errors
        * @description A list of validation errors.
        */
-      errors: components['schemas']['ValidationErrorSchema'][];
+      errors: components["schemas"]["ValidationErrorSchema"][];
     };
     /** ValidationErrorSchema */
     ValidationErrorSchema: {
@@ -723,34 +713,35 @@ export type $defs = Record<string, never>;
 export type external = Record<string, never>;
 
 export interface operations {
+
   /**
    * Check the health status of the application.
    * @description Provides information about the health status of the application.
    */
-  'OpenAPITag.HEALTH-check_health': {
+  "OpenAPITag.HEALTH-check_health": {
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['HealthCheckResult'];
+          "application/json": components["schemas"]["HealthCheckResult"];
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['ValidationErrorResult'];
+          "application/json": components["schemas"]["ValidationErrorResult"];
         };
       };
       /** @description Rate Limit Exceeded Error */
       429: {
         content: {
-          'application/json': components['schemas']['RateLimitExceededErrorResult'];
+          "application/json": components["schemas"]["RateLimitExceededErrorResult"];
         };
       };
       /** @description Internal Server Error */
       500: {
         content: {
-          'application/json': components['schemas']['UnexpectedErrorResult'];
+          "application/json": components["schemas"]["UnexpectedErrorResult"];
         };
       };
     };
@@ -759,30 +750,30 @@ export interface operations {
    * Get the current user.
    * @description Get the current user.
    */
-  'OpenAPITag.USERS-get_current_user': {
+  "OpenAPITag.USERS-get_current_user": {
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['UserSchema'];
+          "application/json": components["schemas"]["UserSchema"];
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['ValidationErrorResult'];
+          "application/json": components["schemas"]["ValidationErrorResult"];
         };
       };
       /** @description Rate Limit Exceeded Error */
       429: {
         content: {
-          'application/json': components['schemas']['RateLimitExceededErrorResult'];
+          "application/json": components["schemas"]["RateLimitExceededErrorResult"];
         };
       };
       /** @description Internal Server Error */
       500: {
         content: {
-          'application/json': components['schemas']['UnexpectedErrorResult'];
+          "application/json": components["schemas"]["UnexpectedErrorResult"];
         };
       };
     };
@@ -791,41 +782,41 @@ export interface operations {
    * Update the current user.
    * @description Update the current user.
    */
-  'OpenAPITag.USERS-update_current_user': {
+  "OpenAPITag.USERS-update_current_user": {
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateUserInput'];
+        "application/json": components["schemas"]["UpdateUserInput"];
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['UserSchema'];
+          "application/json": components["schemas"]["UserSchema"];
         };
       };
       /** @description Invalid Input Error */
       400: {
         content: {
-          'application/json': components['schemas']['InvalidInputErrorResult'];
+          "application/json": components["schemas"]["InvalidInputErrorResult"];
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['ValidationErrorResult'];
+          "application/json": components["schemas"]["ValidationErrorResult"];
         };
       };
       /** @description Rate Limit Exceeded Error */
       429: {
         content: {
-          'application/json': components['schemas']['RateLimitExceededErrorResult'];
+          "application/json": components["schemas"]["RateLimitExceededErrorResult"];
         };
       };
       /** @description Internal Server Error */
       500: {
         content: {
-          'application/json': components['schemas']['UnexpectedErrorResult'];
+          "application/json": components["schemas"]["UnexpectedErrorResult"];
         };
       };
     };
@@ -834,46 +825,46 @@ export interface operations {
    * Send an email change request.
    * @description Send an email change request.
    */
-  'OpenAPITag.USERS-request_current_user_email_change': {
+  "OpenAPITag.USERS-request_current_user_email_change": {
     parameters: {
       header: {
-        'user-agent': string;
+        "user-agent": string;
       };
     };
     requestBody: {
       content: {
-        'application/json': components['schemas']['ChangeUserEmailRequestInput'];
+        "application/json": components["schemas"]["ChangeUserEmailRequestInput"];
       };
     };
     responses: {
       /** @description Successful Response */
       202: {
         content: {
-          'application/json': unknown;
+          "application/json": unknown;
         };
       };
       /** @description Invalid Input Error */
       400: {
         content: {
-          'application/json': components['schemas']['InvalidInputErrorResult'];
+          "application/json": components["schemas"]["InvalidInputErrorResult"];
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['ValidationErrorResult'];
+          "application/json": components["schemas"]["ValidationErrorResult"];
         };
       };
       /** @description Rate Limit Exceeded Error */
       429: {
         content: {
-          'application/json': components['schemas']['RateLimitExceededErrorResult'];
+          "application/json": components["schemas"]["RateLimitExceededErrorResult"];
         };
       };
       /** @description Internal Server Error */
       500: {
         content: {
-          'application/json': components['schemas']['UnexpectedErrorResult'];
+          "application/json": components["schemas"]["UnexpectedErrorResult"];
         };
       };
     };
@@ -882,41 +873,41 @@ export interface operations {
    * Change the current user's email.
    * @description Change the current user's email.
    */
-  'OpenAPITag.USERS-change_current_user_email': {
+  "OpenAPITag.USERS-change_current_user_email": {
     requestBody: {
       content: {
-        'application/json': components['schemas']['ChangeUserEmailInput'];
+        "application/json": components["schemas"]["ChangeUserEmailInput"];
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['UserSchema'];
+          "application/json": components["schemas"]["UserSchema"];
         };
       };
       /** @description Invalid Input Error */
       400: {
         content: {
-          'application/json': components['schemas']['InvalidInputErrorResult'];
+          "application/json": components["schemas"]["InvalidInputErrorResult"];
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['ValidationErrorResult'];
+          "application/json": components["schemas"]["ValidationErrorResult"];
         };
       };
       /** @description Rate Limit Exceeded Error */
       429: {
         content: {
-          'application/json': components['schemas']['RateLimitExceededErrorResult'];
+          "application/json": components["schemas"]["RateLimitExceededErrorResult"];
         };
       };
       /** @description Internal Server Error */
       500: {
         content: {
-          'application/json': components['schemas']['UnexpectedErrorResult'];
+          "application/json": components["schemas"]["UnexpectedErrorResult"];
         };
       };
     };
@@ -925,7 +916,7 @@ export interface operations {
    * Get the user with the given ID.
    * @description Get the user with the given ID.
    */
-  'OpenAPITag.USERS-get_user': {
+  "OpenAPITag.USERS-get_user": {
     parameters: {
       path: {
         user_id: string;
@@ -935,31 +926,74 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['PartialUserSchema'];
+          "application/json": components["schemas"]["PartialUserSchema"];
         };
       };
       /** @description Resource Not Found Error */
       404: {
         content: {
-          'application/json': components['schemas']['ResourceNotFoundErrorResult'];
+          "application/json": components["schemas"]["ResourceNotFoundErrorResult"];
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['ValidationErrorResult'];
+          "application/json": components["schemas"]["ValidationErrorResult"];
         };
       };
       /** @description Rate Limit Exceeded Error */
       429: {
         content: {
-          'application/json': components['schemas']['RateLimitExceededErrorResult'];
+          "application/json": components["schemas"]["RateLimitExceededErrorResult"];
         };
       };
       /** @description Internal Server Error */
       500: {
         content: {
-          'application/json': components['schemas']['UnexpectedErrorResult'];
+          "application/json": components["schemas"]["UnexpectedErrorResult"];
+        };
+      };
+    };
+  };
+  /**
+   * Get a register flow.
+   * @description Get a register flow.
+   */
+  "OpenAPITag.AUTHENTICATION-get_register_flow": {
+    parameters: {
+      path: {
+        flow_id: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["RegisterFlowSchema"];
+        };
+      };
+      /** @description Resource Not Found Error */
+      404: {
+        content: {
+          "application/json": components["schemas"]["ResourceNotFoundErrorResult"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["ValidationErrorResult"];
+        };
+      };
+      /** @description Rate Limit Exceeded Error */
+      429: {
+        content: {
+          "application/json": components["schemas"]["RateLimitExceededErrorResult"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["UnexpectedErrorResult"];
         };
       };
     };
@@ -968,46 +1002,46 @@ export interface operations {
    * Start a register flow.
    * @description Start a register flow.
    */
-  'OpenAPITag.AUTHENTICATION-start_register_flow': {
+  "OpenAPITag.AUTHENTICATION-start_register_flow": {
     parameters: {
       header: {
-        'user-agent': string;
+        "user-agent": string;
       };
     };
     requestBody: {
       content: {
-        'application/json': components['schemas']['RegisterFlowStartInput'];
+        "application/json": components["schemas"]["RegisterFlowStartInput"];
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['RegisterFlowStartResult'];
+          "application/json": components["schemas"]["RegisterFlowStartResult"];
         };
       };
       /** @description Invalid Input Error */
       400: {
         content: {
-          'application/json': components['schemas']['InvalidInputErrorResult'];
+          "application/json": components["schemas"]["InvalidInputErrorResult"];
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['ValidationErrorResult'];
+          "application/json": components["schemas"]["ValidationErrorResult"];
         };
       };
       /** @description Rate Limit Exceeded Error */
       429: {
         content: {
-          'application/json': components['schemas']['RateLimitExceededErrorResult'];
+          "application/json": components["schemas"]["RateLimitExceededErrorResult"];
         };
       };
       /** @description Internal Server Error */
       500: {
         content: {
-          'application/json': components['schemas']['UnexpectedErrorResult'];
+          "application/json": components["schemas"]["UnexpectedErrorResult"];
         };
       };
     };
@@ -1016,41 +1050,41 @@ export interface operations {
    * Verify a register flow.
    * @description Verify a register flow.
    */
-  'OpenAPITag.AUTHENTICATION-verify_register_flow': {
+  "OpenAPITag.AUTHENTICATION-verify_register_flow": {
     requestBody: {
       content: {
-        'application/json': components['schemas']['RegisterFlowVerifyInput'];
+        "application/json": components["schemas"]["RegisterFlowVerifyInput"];
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['RegisterFlowVerifyResult'];
+          "application/json": components["schemas"]["RegisterFlowVerifyResult"];
         };
       };
       /** @description Invalid Input Error */
       400: {
         content: {
-          'application/json': components['schemas']['InvalidInputErrorResult'];
+          "application/json": components["schemas"]["InvalidInputErrorResult"];
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['ValidationErrorResult'];
+          "application/json": components["schemas"]["ValidationErrorResult"];
         };
       };
       /** @description Rate Limit Exceeded Error */
       429: {
         content: {
-          'application/json': components['schemas']['RateLimitExceededErrorResult'];
+          "application/json": components["schemas"]["RateLimitExceededErrorResult"];
         };
       };
       /** @description Internal Server Error */
       500: {
         content: {
-          'application/json': components['schemas']['UnexpectedErrorResult'];
+          "application/json": components["schemas"]["UnexpectedErrorResult"];
         };
       };
     };
@@ -1059,41 +1093,41 @@ export interface operations {
    * Start the webauthn registration in the register flow.
    * @description Start the webauthn registration in the register flow.
    */
-  'OpenAPITag.AUTHENTICATION-start_webauthn_register_flow': {
+  "OpenAPITag.AUTHENTICATION-start_webauthn_register_flow": {
     requestBody: {
       content: {
-        'application/json': components['schemas']['RegisterFlowWebAuthnStartInput'];
+        "application/json": components["schemas"]["RegisterFlowWebAuthnStartInput"];
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['PublicKeyCredentialCreationOptions'];
+          "application/json": components["schemas"]["RegisterFlowWebAuthnStartResult"];
         };
       };
       /** @description Invalid Input Error */
       400: {
         content: {
-          'application/json': components['schemas']['InvalidInputErrorResult'];
+          "application/json": components["schemas"]["InvalidInputErrorResult"];
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['ValidationErrorResult'];
+          "application/json": components["schemas"]["ValidationErrorResult"];
         };
       };
       /** @description Rate Limit Exceeded Error */
       429: {
         content: {
-          'application/json': components['schemas']['RateLimitExceededErrorResult'];
+          "application/json": components["schemas"]["RateLimitExceededErrorResult"];
         };
       };
       /** @description Internal Server Error */
       500: {
         content: {
-          'application/json': components['schemas']['UnexpectedErrorResult'];
+          "application/json": components["schemas"]["UnexpectedErrorResult"];
         };
       };
     };
@@ -1102,41 +1136,41 @@ export interface operations {
    * Finish the webauthn registration in the register flow.
    * @description Finish the webauthn registration in the register flow.
    */
-  'OpenAPITag.AUTHENTICATION-finish_webauthn_register_flow': {
+  "OpenAPITag.AUTHENTICATION-finish_webauthn_register_flow": {
     requestBody: {
       content: {
-        'application/json': components['schemas']['RegisterFlowWebAuthnFinishInput'];
+        "application/json": components["schemas"]["RegisterFlowWebAuthnFinishInput"];
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['RegisterFlowWebAuthnFinishResult'];
+          "application/json": components["schemas"]["RegisterFlowWebAuthnFinishResult"];
         };
       };
       /** @description Invalid Input Error */
       400: {
         content: {
-          'application/json': components['schemas']['InvalidInputErrorResult'];
+          "application/json": components["schemas"]["InvalidInputErrorResult"];
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['ValidationErrorResult'];
+          "application/json": components["schemas"]["ValidationErrorResult"];
         };
       };
       /** @description Rate Limit Exceeded Error */
       429: {
         content: {
-          'application/json': components['schemas']['RateLimitExceededErrorResult'];
+          "application/json": components["schemas"]["RateLimitExceededErrorResult"];
         };
       };
       /** @description Internal Server Error */
       500: {
         content: {
-          'application/json': components['schemas']['UnexpectedErrorResult'];
+          "application/json": components["schemas"]["UnexpectedErrorResult"];
         };
       };
     };
@@ -1145,35 +1179,35 @@ export interface operations {
    * Login Options
    * @description Generate options for retrieving a credential.
    */
-  'OpenAPITag.AUTHENTICATION-login_options': {
+  "OpenAPITag.AUTHENTICATION-login_options": {
     requestBody: {
       content: {
-        'application/json': components['schemas']['LoginOptionsInput'];
+        "application/json": components["schemas"]["LoginOptionsInput"];
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['PublicKeyCredentialRequestOptions'];
+          "application/json": components["schemas"]["PublicKeyCredentialRequestOptions"];
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['ValidationErrorResult'];
+          "application/json": components["schemas"]["ValidationErrorResult"];
         };
       };
       /** @description Rate Limit Exceeded Error */
       429: {
         content: {
-          'application/json': components['schemas']['RateLimitExceededErrorResult'];
+          "application/json": components["schemas"]["RateLimitExceededErrorResult"];
         };
       };
       /** @description Internal Server Error */
       500: {
         content: {
-          'application/json': components['schemas']['UnexpectedErrorResult'];
+          "application/json": components["schemas"]["UnexpectedErrorResult"];
         };
       };
     };
@@ -1182,40 +1216,40 @@ export interface operations {
    * Login Verification
    * @description Verify the authenticator's response for login.
    */
-  'OpenAPITag.AUTHENTICATION-login_verification': {
+  "OpenAPITag.AUTHENTICATION-login_verification": {
     parameters: {
       header: {
-        'user-agent': string;
+        "user-agent": string;
       };
     };
     requestBody: {
       content: {
-        'application/json': components['schemas']['LoginVerificationInput'];
+        "application/json": components["schemas"]["LoginVerificationInput"];
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['AuthenticateUserResult'];
+          "application/json": components["schemas"]["AuthenticateUserResult"];
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['ValidationErrorResult'];
+          "application/json": components["schemas"]["ValidationErrorResult"];
         };
       };
       /** @description Rate Limit Exceeded Error */
       429: {
         content: {
-          'application/json': components['schemas']['RateLimitExceededErrorResult'];
+          "application/json": components["schemas"]["RateLimitExceededErrorResult"];
         };
       };
       /** @description Internal Server Error */
       500: {
         content: {
-          'application/json': components['schemas']['UnexpectedErrorResult'];
+          "application/json": components["schemas"]["UnexpectedErrorResult"];
         };
       };
     };
@@ -1224,35 +1258,35 @@ export interface operations {
    * Create Webauthn Credential
    * @description Create a new webauthn credential.
    */
-  'OpenAPITag.AUTHENTICATION-create_webauthn_credential': {
+  "OpenAPITag.AUTHENTICATION-create_webauthn_credential": {
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateWebAuthnCredentialInput'];
+        "application/json": components["schemas"]["CreateWebAuthnCredentialInput"];
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': unknown;
+          "application/json": unknown;
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['ValidationErrorResult'];
+          "application/json": components["schemas"]["ValidationErrorResult"];
         };
       };
       /** @description Rate Limit Exceeded Error */
       429: {
         content: {
-          'application/json': components['schemas']['RateLimitExceededErrorResult'];
+          "application/json": components["schemas"]["RateLimitExceededErrorResult"];
         };
       };
       /** @description Internal Server Error */
       500: {
         content: {
-          'application/json': components['schemas']['UnexpectedErrorResult'];
+          "application/json": components["schemas"]["UnexpectedErrorResult"];
         };
       };
     };
@@ -1261,10 +1295,10 @@ export interface operations {
    * Logout the current user.
    * @description Logout the current user.
    */
-  'OpenAPITag.AUTHENTICATION-delete_current_user_session': {
+  "OpenAPITag.AUTHENTICATION-delete_current_user_session": {
     requestBody: {
       content: {
-        'application/json': components['schemas']['LogoutInput'];
+        "application/json": components["schemas"]["LogoutInput"];
       };
     };
     responses: {
@@ -1275,19 +1309,19 @@ export interface operations {
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['ValidationErrorResult'];
+          "application/json": components["schemas"]["ValidationErrorResult"];
         };
       };
       /** @description Rate Limit Exceeded Error */
       429: {
         content: {
-          'application/json': components['schemas']['RateLimitExceededErrorResult'];
+          "application/json": components["schemas"]["RateLimitExceededErrorResult"];
         };
       };
       /** @description Internal Server Error */
       500: {
         content: {
-          'application/json': components['schemas']['UnexpectedErrorResult'];
+          "application/json": components["schemas"]["UnexpectedErrorResult"];
         };
       };
     };
@@ -1296,30 +1330,30 @@ export interface operations {
    * Get the current user's sessions.
    * @description Get the current user's user sessions.
    */
-  'OpenAPITag.AUTHENTICATION-get_user_sessions': {
+  "OpenAPITag.AUTHENTICATION-get_user_sessions": {
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['UserSessionSchema'][];
+          "application/json": components["schemas"]["UserSessionSchema"][];
         };
       };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['ValidationErrorResult'];
+          "application/json": components["schemas"]["ValidationErrorResult"];
         };
       };
       /** @description Rate Limit Exceeded Error */
       429: {
         content: {
-          'application/json': components['schemas']['RateLimitExceededErrorResult'];
+          "application/json": components["schemas"]["RateLimitExceededErrorResult"];
         };
       };
       /** @description Internal Server Error */
       500: {
         content: {
-          'application/json': components['schemas']['UnexpectedErrorResult'];
+          "application/json": components["schemas"]["UnexpectedErrorResult"];
         };
       };
     };

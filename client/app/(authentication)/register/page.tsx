@@ -13,6 +13,7 @@ import {
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
+import { useRegisterFlow } from '@/components/register-flow-provider';
 import { client } from '@/lib/client';
 
 // TODO: change resolver to zod as we are already using it for env management
@@ -27,23 +28,38 @@ const registerSchema = yup
   .required();
 
 export default function RegisterPage() {
-  const { handleSubmit, control, formState } = useForm({
+  const { setCurrentStep, setFlowId } = useRegisterFlow();
+
+  const { handleSubmit, control, formState, setError } = useForm({
     resolver: yupResolver(registerSchema),
     defaultValues: { email: '' },
     mode: 'onTouched',
   });
 
   const onSubmit: SubmitHandler<yup.InferType<typeof registerSchema>> = async (
-    data
+    input
   ) => {
-    console.log(data);
-    // start register flow
-    await client.POST('/auth/register/flow/start', {
-      body: { email: data.email },
-      params: {
-        header: { 'user-agent': window.navigator.userAgent },
-      },
-    });
+    console.log(input);
+    try {
+      // start register flow
+      const { data } = await client.POST('/auth/register/flow/start', {
+        body: { email: input.email },
+        params: {
+          header: { 'user-agent': window.navigator.userAgent },
+        },
+      });
+
+      if (data) {
+        setFlowId(data.registerFlow.id);
+        setCurrentStep(data.registerFlow.currentStep);
+      }
+    } catch (err) {
+      // TODO: handle email already taken err
+      setError('email', {
+        message: 'That email is already in use',
+        type: 'server',
+      });
+    }
   };
 
   return (

@@ -98,6 +98,14 @@ pdm run generate-schema
 
 The schema would be (re)generated at `schema/openapi.json`
 
+## Running migrations
+
+To run migrations on the database, run the following command:
+
+```
+pdm run alembic upgrade head
+```
+
 
 ## Running the project
 

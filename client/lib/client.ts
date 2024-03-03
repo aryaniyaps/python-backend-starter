@@ -20,6 +20,8 @@ const errorMiddleware: Middleware = {
 export const client = createClient<paths>({
   baseUrl: env.NEXT_PUBLIC_API_BASE_URL,
   headers: { 'Content-Type': 'application/json' },
+  mode: 'cors',
+  credentials: 'include',
 });
 
 client.use(errorMiddleware);

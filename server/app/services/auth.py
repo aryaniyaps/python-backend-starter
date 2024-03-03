@@ -4,6 +4,7 @@ from uuid import UUID, uuid4
 
 import humanize
 import orjson
+import user_agents
 from geoip2.database import Reader
 from user_agents.parsers import UserAgent
 from webauthn import (
@@ -67,6 +68,18 @@ class AuthService:
         self._email_verification_code_repo = email_verification_code_repo
         self._geoip_reader = geoip_reader
 
+    async def get_register_flow(self, *, flow_id: UUID) -> RegisterFlow:
+        """Get a register flow."""
+        register_flow = await self._register_flow_repo.get(flow_id=flow_id)
+
+        # TODO: check if register flow has expired
+        if register_flow is None:
+            raise ResourceNotFoundError(
+                message="Couldn't find register flow with the given ID.",
+            )
+
+        return register_flow
+
     async def start_register_flow(
         self,
         *,
@@ -89,7 +102,7 @@ class AuthService:
         verification_code, register_flow = await self._register_flow_repo.create(
             email=email,
             ip_address=request_ip,
-            user_agent=user_agent,
+            user_agent=user_agent.ua_string,
         )
 
         # send verification request email
@@ -138,10 +151,10 @@ class AuthService:
                 message="Invalid email verification code passed.",
             )
 
-        # mark register flow as verified
+        # update current step
         await self._register_flow_repo.update(
             register_flow=register_flow,
-            is_verified=True,
+            current_step=RegisterFlowStep.WEBAUTHN_START,
         )
 
         return register_flow
@@ -151,7 +164,7 @@ class AuthService:
         *,
         flow_id: UUID,
         display_name: str,
-    ) -> PublicKeyCredentialCreationOptions:
+    ) -> tuple[RegisterFlow, PublicKeyCredentialCreationOptions]:
         """Start the webauthn registration in the register flow."""
         register_flow = await self._register_flow_repo.get(
             flow_id=flow_id,
@@ -186,7 +199,13 @@ class AuthService:
             user_id=user_id,
         )
 
-        return registration_options
+        # update current step
+        await self._register_flow_repo.update(
+            register_flow=register_flow,
+            current_step=RegisterFlowStep.WEBAUTHN_FINISH,
+        )
+
+        return register_flow, registration_options
 
     async def webauthn_finish_register_flow(
         self,
@@ -255,7 +274,7 @@ class AuthService:
         user_session = await self._user_session_repo.create(
             user_id=user.id,
             ip_address=register_flow.ip_address,
-            user_agent=register_flow.user_agent,
+            user_agent=user_agents.parse(register_flow.user_agent),
         )
 
         # delete register flow

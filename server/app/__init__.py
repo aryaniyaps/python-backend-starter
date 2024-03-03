@@ -48,18 +48,6 @@ def add_routes(app: FastAPI) -> None:
 
 def add_middleware(app: FastAPI) -> None:
     """Register middleware for the app."""
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=settings.cors_allow_origins,
-        allow_credentials=True,
-        allow_headers=[
-            "X-Requested-With",
-            "X-Request-ID",
-        ],
-        expose_headers=[
-            "*",
-        ],
-    )
     app.add_middleware(GZipMiddleware)
     app.add_middleware(
         BaseHTTPMiddleware,
@@ -68,6 +56,14 @@ def add_middleware(app: FastAPI) -> None:
     app.add_middleware(
         CorrelationIdMiddleware,
         header_name="X-Request-ID",
+    )
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_allow_origins,
+        allow_credentials=True,
+        allow_headers=["*"],
+        allow_methods=["*"],
+        expose_headers=["*"],
     )
 
 
@@ -115,6 +111,6 @@ def create_app() -> FastAPI:
             "email": SUPPORT_EMAIL,
         },
     )
-    add_middleware(app)
     add_routes(app)
+    add_middleware(app)
     return app

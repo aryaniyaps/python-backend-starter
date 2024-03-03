@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     ] = "DEBUG"
 
     cors_allow_origins: Annotated[
-        set[str],
+        list[str],
         Field(
             examples=[
                 {
@@ -54,9 +54,7 @@ class Settings(BaseSettings):
                 },
             ],
         ),
-    ] = {
-        "*",
-    }
+    ] = ["*"]
 
     root_path: Annotated[
         str,
