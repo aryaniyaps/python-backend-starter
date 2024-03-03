@@ -46,19 +46,28 @@ export default function RegisterWebAuthnPage() {
       let attResp;
       try {
         attResp = await startRegistration(data.options);
+        console.log('ATTESTATION RESPONSE: ', attResp);
       } catch (err) {
+        console.error(err);
         alert("Couldn't register credential!");
         return;
       }
 
       const { data: verificationData } = await client.POST(
         '/auth/register/flow/webauthn-finish',
-        { body: attResp }
+        {
+          body: {
+            flowId: flowId,
+            displayName: input.displayName,
+            credential: JSON.stringify(attResp),
+          },
+        }
       );
 
       if (verificationData) {
         const authToken = verificationData.authenticationToken;
         // TODO: store authentication token
+        console.log('AUTHENTICATED!! auth token:', authToken);
       }
     }
   };

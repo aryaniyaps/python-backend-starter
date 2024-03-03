@@ -76,10 +76,7 @@ export const RegisterFlowProvider: React.FC<React.PropsWithChildren> = ({
         case 'email_verification':
           router.push('/register/verification');
           break;
-        case 'webauthn_start':
-          router.push('/register/webauthn');
-          break;
-        case 'webauthn_finish':
+        case 'webauthn_registration':
           router.push('/register/webauthn');
           break;
         default:

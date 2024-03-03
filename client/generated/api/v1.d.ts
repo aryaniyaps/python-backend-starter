@@ -504,7 +504,7 @@ export interface components {
      * RegisterFlowStep
      * @enum {string}
      */
-    RegisterFlowStep: "email_verification" | "webauthn_start" | "webauthn_finish";
+    RegisterFlowStep: "email_verification" | "webauthn_registration";
     /** RegisterFlowVerifyInput */
     RegisterFlowVerifyInput: {
       /**

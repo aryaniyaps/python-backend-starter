@@ -1,9 +1,9 @@
 """
 initial migration
 
-Revision ID: e94badd89cec
+Revision ID: 8d370a31c5aa
 Revises: 7a23de63905c
-Create Date: 2024-03-03 07:02:57.585013
+Create Date: 2024-03-03 14:07:36.516315
 
 """
 
@@ -14,7 +14,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = "e94badd89cec"
+revision: str = "8d370a31c5aa"
 down_revision: str | None = "7a23de63905c"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -57,10 +57,7 @@ def upgrade() -> None:
         sa.Column(
             "current_step",
             sa.Enum(
-                "EMAIL_VERIFICATION",
-                "WEBAUTHN_START",
-                "WEBAUTHN_FINISH",
-                name="registerflowstep",
+                "EMAIL_VERIFICATION", "WEBAUTHN_REGISTRATION", name="registerflowstep"
             ),
             nullable=False,
         ),

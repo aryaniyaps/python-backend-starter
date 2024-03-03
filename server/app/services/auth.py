@@ -211,7 +211,7 @@ class AuthService:
         # update current step
         await self._register_flow_repo.update(
             register_flow=register_flow,
-            current_step=RegisterFlowStep.WEBAUTHN_START,
+            current_step=RegisterFlowStep.WEBAUTHN_REGISTRATION,
         )
 
         return register_flow
@@ -225,7 +225,7 @@ class AuthService:
         """Start the webauthn registration in the register flow."""
         register_flow = await self._register_flow_repo.get(
             flow_id=flow_id,
-            step=RegisterFlowStep.WEBAUTHN_START,
+            step=RegisterFlowStep.WEBAUTHN_REGISTRATION,
         )
 
         if register_flow is None:
@@ -256,12 +256,6 @@ class AuthService:
             user_id=user_id,
         )
 
-        # update current step
-        await self._register_flow_repo.update(
-            register_flow=register_flow,
-            current_step=RegisterFlowStep.WEBAUTHN_FINISH,
-        )
-
         return register_flow, registration_options
 
     async def webauthn_finish_register_flow(
@@ -274,7 +268,7 @@ class AuthService:
         """Finish the webauthn registration in the register flow."""
         register_flow = await self._register_flow_repo.get(
             flow_id=flow_id,
-            step=RegisterFlowStep.WEBAUTHN_FINISH,
+            step=RegisterFlowStep.WEBAUTHN_REGISTRATION,
         )
 
         if register_flow is None:

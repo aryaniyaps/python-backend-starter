@@ -1,3 +1,4 @@
+import base64
 from uuid import UUID
 
 from redis.asyncio import Redis
@@ -12,7 +13,8 @@ class WebAuthnChallengeRepo:
     @staticmethod
     def generate_challenge_key(challenge: bytes) -> str:
         """Generate a challenge key for the challenge."""
-        return f"webauthn-challenges:{challenge.decode(errors='replace')}"
+        challenge_base64 = base64.urlsafe_b64encode(challenge).decode("utf-8")
+        return f"webauthn-challenges:{challenge_base64}"
 
     async def create(self, *, user_id: UUID, challenge: bytes) -> None:
         """Create a new WebAuthn challenge."""
