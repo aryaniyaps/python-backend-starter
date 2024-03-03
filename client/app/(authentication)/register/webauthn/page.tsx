@@ -96,8 +96,15 @@ export default function RegisterWebAuthnPage() {
           onSubmit={handleSubmit(onSubmit)}
           className='flex flex-col gap-unit-4'
         >
-          <Button color='primary' type='submit'>
-            <KeyIcon className='h-unit-6 w-unit-6' /> Create passkey
+          <Button
+            color='primary'
+            type='submit'
+            isLoading={formState.isSubmitting}
+          >
+            {!formState.isSubmitting ? (
+              <KeyIcon className='h-unit-6 w-unit-6' />
+            ) : null}{' '}
+            Create passkey
           </Button>
         </form>
       </CardBody>
