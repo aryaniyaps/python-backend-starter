@@ -1,6 +1,7 @@
 'use client';
 import { useRegisterFlow } from '@/components/register-flow-provider';
 import { client } from '@/lib/client';
+import { KeyIcon } from '@heroicons/react/24/outline';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Button,
@@ -94,7 +95,7 @@ export default function RegisterWebAuthnPage() {
       <CardBody>
         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
           <Button color='primary' type='submit' isDisabled={!formState.isValid}>
-            Create passkey
+            <KeyIcon className='h-unit-6 w-unit-6' /> Create passkey
           </Button>
         </form>
       </CardBody>
