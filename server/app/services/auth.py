@@ -72,7 +72,6 @@ class AuthService:
         """Get a register flow."""
         register_flow = await self._register_flow_repo.get(flow_id=flow_id)
 
-        # TODO: check if register flow has expired
         if register_flow is None:
             raise ResourceNotFoundError(
                 message="Couldn't find register flow with the given ID.",
@@ -181,13 +180,19 @@ class AuthService:
                 message="Couldn't find register flow.",
             )
 
-        if not (
-            self._register_flow_repo.hash_verification_code(
-                email_verification_code=verification_code
-            )
-            == register_flow.verification_code_hash
-            and datetime.now(UTC) >= register_flow.verification_code_expires_at
-        ):
+        # if not (
+        #     self._register_flow_repo.hash_verification_code(
+        #         email_verification_code=verification_code
+        #     )
+        #     == register_flow.verification_code_hash
+        #     and datetime.now(UTC) >= register_flow.verification_code_expires_at
+        # ):
+        #     raise InvalidInputError(
+        #         message="Invalid email verification code passed.",
+        #     )
+
+        # FIXME: rewrite logic after local testing and enabling email sending via workers
+        if not (verification_code == "00000000"):
             raise InvalidInputError(
                 message="Invalid email verification code passed.",
             )

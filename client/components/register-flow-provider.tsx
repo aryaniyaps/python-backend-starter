@@ -9,6 +9,7 @@ type RegisterFlowStep = components['schemas']['RegisterFlowStep'];
 interface RegisterFlowContextType {
   currentStep: RegisterFlowStep | null;
   setCurrentStep: (step: RegisterFlowStep | null) => void;
+  email: string | null;
   flowId: string | null;
   setFlowId: (flowId: string | null) => void;
 }
@@ -17,6 +18,7 @@ interface RegisterFlowContextType {
 const RegisterFlowContext = createContext<RegisterFlowContextType>({
   currentStep: null,
   setCurrentStep(step) {},
+  email: null,
   flowId: null,
   setFlowId(flowId) {},
 });
@@ -27,6 +29,7 @@ export const RegisterFlowProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
   const [currentStep, setCurrentStep] = useState<RegisterFlowStep | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
   const [flowId, setLocalFlowId] = useState<string | null>(null);
   const router = useRouter();
 
@@ -49,7 +52,7 @@ export const RegisterFlowProvider: React.FC<React.PropsWithChildren> = ({
 
   useEffect(() => {
     if (flowId) {
-      if (!currentStep) {
+      if (!currentStep || !email) {
         client
           .GET('/auth/register/flows/{flow_id}', {
             params: { path: { flow_id: flowId } },
@@ -57,6 +60,7 @@ export const RegisterFlowProvider: React.FC<React.PropsWithChildren> = ({
           .then(({ data }) => {
             if (data) {
               setCurrentStep(data.currentStep);
+              setEmail(data.email);
             }
           })
           .catch((error) => {
@@ -87,7 +91,7 @@ export const RegisterFlowProvider: React.FC<React.PropsWithChildren> = ({
 
   return (
     <RegisterFlowContext.Provider
-      value={{ currentStep, setCurrentStep, flowId, setFlowId }}
+      value={{ currentStep, setCurrentStep, email, flowId, setFlowId }}
     >
       {children}
     </RegisterFlowContext.Provider>

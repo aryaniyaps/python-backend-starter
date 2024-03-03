@@ -1,5 +1,6 @@
 'use client';
 import { OTPSlot } from '@/components/otp-input';
+import { useRegisterFlow } from '@/components/register-flow-provider';
 import { client } from '@/lib/client';
 import { EMAIL_VERIFICATION_CODE_LENGTH } from '@/lib/constants';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -12,6 +13,7 @@ import {
   Divider,
 } from '@nextui-org/react';
 import { OTPInput } from 'input-otp';
+import { useRouter } from 'next/navigation';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -25,7 +27,14 @@ const registerVerificationSchema = yup
   .required();
 
 export default function RegisterOTPPage() {
-  const { control, handleSubmit, formState } = useForm({
+  const router = useRouter();
+  const { flowId, email } = useRegisterFlow();
+  if (!flowId || !email) {
+    // redirect to register page
+    return router.push('/register');
+  }
+
+  const { control, handleSubmit, formState, setError } = useForm({
     resolver: yupResolver(registerVerificationSchema),
   });
 
@@ -33,11 +42,18 @@ export default function RegisterOTPPage() {
     yup.InferType<typeof registerVerificationSchema>
   > = async (data) => {
     console.log(data);
-
-    // verify register flow
-    await client.POST('/auth/register/flow/verify', {
-      body: { flowId: '', verificationCode: data.verificationCode },
-    });
+    try {
+      // verify register flow
+      await client.POST('/auth/register/flow/verify', {
+        body: { flowId: flowId, verificationCode: data.verificationCode },
+      });
+    } catch (err) {
+      // TODO: handle error properly
+      setError('verificationCode', {
+        message: `That code isn't valid. You can request a new one.`,
+        type: 'server',
+      });
+    }
   };
 
   return (
@@ -45,7 +61,7 @@ export default function RegisterOTPPage() {
       <CardHeader className='flex flex-col items-start gap-unit-2'>
         <h1 className='text-md font-semibold'>Enter Verification Code</h1>
         <h3 className='text-xs font-extralight'>
-          Enter the code we sent to ar*****06@gmail.com
+          Enter the code we sent to {email}
         </h3>
       </CardHeader>
       <CardBody>
@@ -103,6 +119,11 @@ export default function RegisterOTPPage() {
               />
             )}
           />
+          {formState.errors.verificationCode ? (
+            <p className='text-xs text-danger'>
+              {formState.errors.verificationCode.message}
+            </p>
+          ) : null}
           <p className='text-xs'>
             Didn&apos;t receive code?&nbsp;
             <strong className='text-primary'>resend</strong>

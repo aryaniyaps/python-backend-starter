@@ -5,6 +5,7 @@ from uuid import UUID
 
 from sqlalchemy import delete, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.functions import now
 
 from app.lib.constants import (
     EMAIL_VERIFICATION_CODE_EXPIRES_IN,
@@ -90,15 +91,23 @@ class RegisterFlowRepo:
     async def get(
         self, *, flow_id: UUID, step: RegisterFlowStep | None = None
     ) -> RegisterFlow | None:
-        """Get a register flow by ID and/ or step."""
+        """
+        Get a register flow by ID and/ or step.
+
+        Filters expired register flows.
+        """
         if step is not None:
             return await self._session.scalar(
                 select(RegisterFlow).where(
-                    RegisterFlow.id == flow_id and RegisterFlow.current_step == step
+                    RegisterFlow.id == flow_id
+                    and RegisterFlow.current_step == step
+                    and RegisterFlow.expires_at >= now()
                 ),
             )
         return await self._session.scalar(
-            select(RegisterFlow).where(RegisterFlow.id == flow_id),
+            select(RegisterFlow).where(
+                RegisterFlow.id == flow_id and RegisterFlow.expires_at >= now()
+            ),
         )
 
     async def update(

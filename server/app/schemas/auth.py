@@ -69,6 +69,7 @@ class RegisterFlowWebAuthnStartInput(BaseSchema):
     display_name: Annotated[
         str,
         Field(
+            max_length=75,
             examples=[
                 "My webauthn credential",
             ],
