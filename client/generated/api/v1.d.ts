@@ -59,6 +59,20 @@ export interface paths {
      */
     post: operations["OpenAPITag.AUTHENTICATION-start_register_flow"];
   };
+  "/auth/register/flow/cancel": {
+    /**
+     * Cancel a register flow.
+     * @description Cancel a register flow.
+     */
+    post: operations["OpenAPITag.AUTHENTICATION-cancel_register_flow"];
+  };
+  "/auth/register/flow/resend-verification": {
+    /**
+     * Resend email verification in the register flow.
+     * @description Resend email verification in the register flow.
+     */
+    post: operations["OpenAPITag.AUTHENTICATION-resend_verification_register_flow"];
+  };
   "/auth/register/flow/verify": {
     /**
      * Verify a register flow.
@@ -447,6 +461,22 @@ export interface components {
        */
       isPrimary: boolean;
     };
+    /** RegisterFlowCancelInput */
+    RegisterFlowCancelInput: {
+      /**
+       * Flowid
+       * Format: uuid
+       */
+      flowId: string;
+    };
+    /** RegisterFlowResendVerificationInput */
+    RegisterFlowResendVerificationInput: {
+      /**
+       * Flowid
+       * Format: uuid
+       */
+      flowId: string;
+    };
     /** RegisterFlowSchema */
     RegisterFlowSchema: {
       /**
@@ -457,11 +487,6 @@ export interface components {
       currentStep: components["schemas"]["RegisterFlowStep"];
       /** Email */
       email: string;
-      /**
-       * Expiresat
-       * Format: date-time
-       */
-      expiresAt: string;
     };
     /** RegisterFlowStartInput */
     RegisterFlowStartInput: {
@@ -1018,6 +1043,95 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["RegisterFlowStartResult"];
+        };
+      };
+      /** @description Invalid Input Error */
+      400: {
+        content: {
+          "application/json": components["schemas"]["InvalidInputErrorResult"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["ValidationErrorResult"];
+        };
+      };
+      /** @description Rate Limit Exceeded Error */
+      429: {
+        content: {
+          "application/json": components["schemas"]["RateLimitExceededErrorResult"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["UnexpectedErrorResult"];
+        };
+      };
+    };
+  };
+  /**
+   * Cancel a register flow.
+   * @description Cancel a register flow.
+   */
+  "OpenAPITag.AUTHENTICATION-cancel_register_flow": {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RegisterFlowCancelInput"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      204: {
+        content: never;
+      };
+      /** @description Invalid Input Error */
+      400: {
+        content: {
+          "application/json": components["schemas"]["InvalidInputErrorResult"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["ValidationErrorResult"];
+        };
+      };
+      /** @description Rate Limit Exceeded Error */
+      429: {
+        content: {
+          "application/json": components["schemas"]["RateLimitExceededErrorResult"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["UnexpectedErrorResult"];
+        };
+      };
+    };
+  };
+  /**
+   * Resend email verification in the register flow.
+   * @description Resend email verification in the register flow.
+   */
+  "OpenAPITag.AUTHENTICATION-resend_verification_register_flow": {
+    parameters: {
+      header: {
+        "user-agent": string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RegisterFlowResendVerificationInput"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      202: {
+        content: {
+          "application/json": unknown;
         };
       };
       /** @description Invalid Input Error */

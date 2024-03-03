@@ -21,12 +21,12 @@ const createPasskeySchema = yup
   })
   .required();
 
-export default function RegisterPage() {
+export default function RegisterWebAuthnPage() {
   const { handleSubmit, formState, control } = useForm({
     resolver: yupResolver(createPasskeySchema),
   });
   const router = useRouter();
-  const { flowId } = useRegisterFlow();
+  const { flowId, setFlowId, setCurrentStep, setEmail } = useRegisterFlow();
   if (!flowId) {
     // redirect to register page
     return router.push('/register');
@@ -80,8 +80,7 @@ export default function RegisterPage() {
                   variant='faded'
                   type='text'
                   label='Display name'
-                  placeholder='example passkey'
-                  description='Enter the name of your passkey'
+                  description='This name will be displayed upon login'
                   errorMessage={fieldState.error?.message}
                   isInvalid={!!fieldState.error}
                 />
@@ -94,8 +93,19 @@ export default function RegisterPage() {
         </form>
       </CardBody>
       <CardFooter>
-        <Button variant='ghost' fullWidth>
-          Go back
+        <Button
+          variant='ghost'
+          fullWidth
+          onClick={async () => {
+            await client.POST('/auth/register/flow/cancel', {
+              body: { flowId: flowId },
+            });
+            setFlowId(null);
+            setCurrentStep(null);
+            setEmail(null);
+          }}
+        >
+          Cancel
         </Button>
       </CardFooter>
     </Card>

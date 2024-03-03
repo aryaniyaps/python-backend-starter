@@ -128,3 +128,4 @@ class RegisterFlowRepo:
         await self._session.execute(
             delete(RegisterFlow).where(RegisterFlow.id == flow_id),
         )
+        await self._session.commit()

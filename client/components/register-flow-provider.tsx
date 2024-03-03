@@ -10,6 +10,7 @@ interface RegisterFlowContextType {
   currentStep: RegisterFlowStep | null;
   setCurrentStep: (step: RegisterFlowStep | null) => void;
   email: string | null;
+  setEmail: (email: string | null) => void;
   flowId: string | null;
   setFlowId: (flowId: string | null) => void;
 }
@@ -19,6 +20,7 @@ const RegisterFlowContext = createContext<RegisterFlowContextType>({
   currentStep: null,
   setCurrentStep(step) {},
   email: null,
+  setEmail(email) {},
   flowId: null,
   setFlowId(flowId) {},
 });
@@ -91,7 +93,14 @@ export const RegisterFlowProvider: React.FC<React.PropsWithChildren> = ({
 
   return (
     <RegisterFlowContext.Provider
-      value={{ currentStep, setCurrentStep, email, flowId, setFlowId }}
+      value={{
+        currentStep,
+        setCurrentStep,
+        email,
+        flowId,
+        setFlowId,
+        setEmail,
+      }}
     >
       {children}
     </RegisterFlowContext.Provider>

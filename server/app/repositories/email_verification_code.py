@@ -75,6 +75,7 @@ class EmailVerificationCodeRepo:
                 EmailVerificationCode.email == email,
             ),
         )
+        await self._session.commit()
 
     async def delete_expired(self) -> None:
         """Delete all email verification codes which have expired."""
@@ -83,3 +84,4 @@ class EmailVerificationCodeRepo:
                 EmailVerificationCode.expires_at <= now(),
             ),
         )
+        await self._session.commit()

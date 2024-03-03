@@ -23,7 +23,7 @@ class RegisterFlowSchema(BaseSchema):
         str,
         Field(
             examples=[
-                "aryaniyaps@example.com",
+                "a********s@example.com",
             ],
         ),
     ]
@@ -43,6 +43,10 @@ class RegisterFlowStartResult(BaseSchema):
 
 
 class RegisterFlowResendVerificationInput(BaseSchema):
+    flow_id: UUID
+
+
+class RegisterFlowCancelInput(BaseSchema):
     flow_id: UUID
 
 

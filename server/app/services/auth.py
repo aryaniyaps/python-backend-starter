@@ -122,6 +122,17 @@ class AuthService:
 
         return register_flow
 
+    async def cancel_register_flow(self, *, flow_id: UUID) -> None:
+        """Cancel a register flow."""
+        register_flow = await self._register_flow_repo.get(flow_id=flow_id)
+
+        if register_flow is None:
+            raise ResourceNotFoundError(
+                message="Couldn't find register flow.",
+            )
+
+        await self._register_flow_repo.delete(flow_id=flow_id)
+
     async def resend_verification_register_flow(
         self,
         *,
@@ -241,7 +252,7 @@ class AuthService:
 
         # store challenge server-side
         await self._webauthn_challenge_repo.create(
-            challenge=registration_options.challenge.decode(),
+            challenge=registration_options.challenge,
             user_id=user_id,
         )
 
@@ -376,7 +387,7 @@ class AuthService:
 
         # store challenge server-side
         await self._webauthn_challenge_repo.create(
-            challenge=authentication_options.challenge.decode(),
+            challenge=authentication_options.challenge,
             user_id=existing_user.id,
         )
 

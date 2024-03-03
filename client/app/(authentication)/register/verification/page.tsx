@@ -28,7 +28,7 @@ const registerVerificationSchema = yup
 
 export default function RegisterOTPPage() {
   const router = useRouter();
-  const { flowId, email } = useRegisterFlow();
+  const { flowId, email, setCurrentStep } = useRegisterFlow();
   if (!flowId || !email) {
     // redirect to register page
     return router.push('/register');
@@ -40,13 +40,17 @@ export default function RegisterOTPPage() {
 
   const onSubmit: SubmitHandler<
     yup.InferType<typeof registerVerificationSchema>
-  > = async (data) => {
-    console.log(data);
+  > = async (input) => {
+    console.log(input);
     try {
       // verify register flow
-      await client.POST('/auth/register/flow/verify', {
-        body: { flowId: flowId, verificationCode: data.verificationCode },
+      const { data } = await client.POST('/auth/register/flow/verify', {
+        body: { flowId: flowId, verificationCode: input.verificationCode },
       });
+
+      if (data) {
+        setCurrentStep(data.registerFlow.currentStep);
+      }
     } catch (err) {
       // TODO: handle error properly
       setError('verificationCode', {

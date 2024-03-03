@@ -23,6 +23,7 @@ from app.schemas.auth import (
     LoginOptionsInput,
     LoginVerificationInput,
     LogoutInput,
+    RegisterFlowCancelInput,
     RegisterFlowResendVerificationInput,
     RegisterFlowSchema,
     RegisterFlowStartInput,
@@ -109,6 +110,33 @@ async def start_register_flow(
     )
 
     return {"register_flow": register_flow}
+
+
+@auth_router.post(
+    "/register/flow/cancel",
+    response_model=None,
+    status_code=HTTPStatus.NO_CONTENT,
+    responses={
+        HTTPStatus.BAD_REQUEST: {
+            "model": InvalidInputErrorResult,
+            "description": "Invalid Input Error",
+        },
+    },
+    summary="Cancel a register flow.",
+)
+async def cancel_register_flow(
+    data: RegisterFlowCancelInput,
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=get_auth_service,
+        ),
+    ],
+) -> None:
+    """Cancel a register flow."""
+    await auth_service.cancel_register_flow(
+        flow_id=data.flow_id,
+    )
 
 
 @auth_router.post(
