@@ -7,7 +7,6 @@ from fastapi import APIRouter, Depends, Header, Path
 
 from app.dependencies.auth import get_viewer_info
 from app.dependencies.ip_address import get_ip_address
-from app.dependencies.rate_limiter import RateLimiter
 from app.dependencies.user import get_user_service
 from app.lib.constants import OpenAPITag
 from app.models.user import User
@@ -32,13 +31,6 @@ users_router = APIRouter(
     "/@me",
     response_model=UserSchema,
     summary="Get the current user.",
-    dependencies=[
-        Depends(
-            dependency=RateLimiter(
-                limit="1000/hour",
-            ),
-        ),
-    ],
 )
 async def get_current_user(
     viewer_info: Annotated[
@@ -70,13 +62,6 @@ async def get_current_user(
         },
     },
     summary="Update the current user.",
-    dependencies=[
-        Depends(
-            dependency=RateLimiter(
-                limit="100/hour",
-            ),
-        ),
-    ],
 )
 async def update_current_user(
     data: UpdateUserInput,
@@ -111,13 +96,6 @@ async def update_current_user(
         },
     },
     summary="Send an email change request.",
-    dependencies=[
-        Depends(
-            dependency=RateLimiter(
-                limit="15/hour",
-            ),
-        ),
-    ],
 )
 async def request_current_user_email_change(
     data: ChangeUserEmailRequestInput,
@@ -161,13 +139,6 @@ async def request_current_user_email_change(
         },
     },
     summary="Change the current user's email.",
-    dependencies=[
-        Depends(
-            dependency=RateLimiter(
-                limit="15/hour",
-            ),
-        ),
-    ],
 )
 async def change_current_user_email(
     data: ChangeUserEmailInput,
@@ -202,13 +173,6 @@ async def change_current_user_email(
             "description": "Resource Not Found Error",
         },
     },
-    dependencies=[
-        Depends(
-            dependency=RateLimiter(
-                limit="2500/hour",
-            ),
-        ),
-    ],
 )
 async def get_user(
     user_id: Annotated[

@@ -14,7 +14,6 @@ from app.dependencies.auth import (
     get_viewer_info,
 )
 from app.dependencies.ip_address import get_ip_address
-from app.dependencies.rate_limiter import RateLimiter
 from app.lib.constants import OpenAPITag
 from app.models.register_flow import RegisterFlow
 from app.models.user_session import UserSession
@@ -84,13 +83,6 @@ async def get_register_flow(
         },
     },
     summary="Start a register flow.",
-    dependencies=[
-        Depends(
-            dependency=RateLimiter(
-                limit="15/hour",
-            ),
-        ),
-    ],
 )
 async def start_register_flow(
     data: RegisterFlowStartInput,
@@ -128,13 +120,6 @@ async def start_register_flow(
         },
     },
     summary="Verify a register flow.",
-    dependencies=[
-        Depends(
-            dependency=RateLimiter(
-                limit="15/hour",
-            ),
-        ),
-    ],
 )
 async def verify_register_flow(
     data: RegisterFlowVerifyInput,
@@ -164,13 +149,6 @@ async def verify_register_flow(
         },
     },
     summary="Start the webauthn registration in the register flow.",
-    dependencies=[
-        Depends(
-            dependency=RateLimiter(
-                limit="15/hour",
-            ),
-        ),
-    ],
 )
 async def start_webauthn_register_flow(
     data: RegisterFlowWebAuthnStartInput,
@@ -203,13 +181,6 @@ async def start_webauthn_register_flow(
         },
     },
     summary="Finish the webauthn registration in the register flow.",
-    dependencies=[
-        Depends(
-            dependency=RateLimiter(
-                limit="15/hour",
-            ),
-        ),
-    ],
 )
 async def finish_webauthn_register_flow(
     data: RegisterFlowWebAuthnFinishInput,
@@ -284,13 +255,6 @@ async def create_webauthn_credential(_data: CreateWebAuthnCredentialInput) -> No
     "/logout",
     status_code=HTTPStatus.NO_CONTENT,
     summary="Logout the current user.",
-    dependencies=[
-        Depends(
-            dependency=RateLimiter(
-                limit="50/hour",
-            ),
-        ),
-    ],
 )
 async def delete_current_user_session(
     data: LogoutInput,

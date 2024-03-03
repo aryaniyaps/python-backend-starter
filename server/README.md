@@ -19,9 +19,7 @@
    - Requester device (based on the user agent)
    - Geolocation data (based on IP)
 - [x] Structured logging support
-- [x] Rate limiting (Moving window strategy)
-   - [x] Primary rate limiting (API-wide)
-   - [x] Secondary rate limiting (operation-specific)
+- [x] Rate limiting (operation-specific)
 
 ## Tech Stack
 

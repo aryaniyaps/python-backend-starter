@@ -6,8 +6,9 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import ORJSONResponse
+from ratelimit import RateLimitMiddleware
+from ratelimit.auths.ip import client_ip
 from starlette.exceptions import HTTPException
-from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.config import settings
 from app.lib.constants import APP_NAME, SUPPORT_EMAIL
@@ -28,7 +29,7 @@ from app.lib.errors import (
     UnexpectedError,
 )
 from app.lib.openapi import generate_operation_id
-from app.middleware.rate_limiter import rate_limiter_middleware
+from app.lib.rate_limit import rate_limit_backend, rate_limit_config
 from app.routes.auth import auth_router
 from app.routes.health import health_router
 from app.routes.user import users_router
@@ -48,15 +49,6 @@ def add_routes(app: FastAPI) -> None:
 
 def add_middleware(app: FastAPI) -> None:
     """Register middleware for the app."""
-    app.add_middleware(GZipMiddleware)
-    app.add_middleware(
-        BaseHTTPMiddleware,
-        dispatch=rate_limiter_middleware,
-    )
-    app.add_middleware(
-        CorrelationIdMiddleware,
-        header_name="X-Request-ID",
-    )
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_allow_origins,
@@ -64,6 +56,17 @@ def add_middleware(app: FastAPI) -> None:
         allow_headers=["*"],
         allow_methods=["*"],
         expose_headers=["*"],
+    )
+    app.add_middleware(GZipMiddleware)
+    app.add_middleware(
+        RateLimitMiddleware,
+        authenticate=client_ip,
+        backend=rate_limit_backend,
+        config=rate_limit_config,
+    )
+    app.add_middleware(
+        CorrelationIdMiddleware,
+        header_name="X-Request-ID",
     )
 
 
