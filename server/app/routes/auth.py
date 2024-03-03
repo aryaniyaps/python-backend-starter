@@ -23,6 +23,7 @@ from app.schemas.auth import (
     LoginOptionsInput,
     LoginVerificationInput,
     LogoutInput,
+    RegisterFlowResendVerificationInput,
     RegisterFlowSchema,
     RegisterFlowStartInput,
     RegisterFlowStartResult,
@@ -108,6 +109,42 @@ async def start_register_flow(
     )
 
     return {"register_flow": register_flow}
+
+
+@auth_router.post(
+    "/register/flow/resend-verification",
+    response_model=None,
+    status_code=HTTPStatus.ACCEPTED,
+    responses={
+        HTTPStatus.BAD_REQUEST: {
+            "model": InvalidInputErrorResult,
+            "description": "Invalid Input Error",
+        },
+    },
+    summary="Resend email verification in the register flow.",
+)
+async def resend_verification_register_flow(
+    data: RegisterFlowResendVerificationInput,
+    user_agent: Annotated[str, Header()],
+    request_ip: Annotated[
+        str,
+        Depends(
+            dependency=get_ip_address,
+        ),
+    ],
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=get_auth_service,
+        ),
+    ],
+) -> None:
+    """Resend email verification in the register flow."""
+    await auth_service.resend_verification_register_flow(
+        flow_id=data.flow_id,
+        user_agent=user_agents.parse(user_agent),
+        request_ip=request_ip,
+    )
 
 
 @auth_router.post(

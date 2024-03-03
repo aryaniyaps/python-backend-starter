@@ -3,7 +3,7 @@ import string
 from hashlib import sha256
 from uuid import UUID
 
-from sqlalchemy import delete, select, text
+from sqlalchemy import delete, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.lib.constants import (
@@ -61,6 +61,31 @@ class RegisterFlowRepo:
         self._session.add(register_flow)
         await self._session.commit()
         return verification_code, register_flow
+
+    async def recreate_verification_code(
+        self,
+        *,
+        flow_id: UUID,
+    ) -> str:
+        """Recreate the verification code for the register flow."""
+        verification_code_expires_at = text(
+            f"NOW() + INTERVAL '{EMAIL_VERIFICATION_CODE_EXPIRES_IN} SECOND'",
+        )
+
+        verification_code = self.generate_verification_code()
+
+        await self._session.scalar(
+            update(RegisterFlow)
+            .where(RegisterFlow.id == flow_id)
+            .values(
+                verification_code_expires_at=verification_code_expires_at,
+                verification_code_hash=self.hash_verification_code(
+                    email_verification_code=verification_code,
+                ),
+            ),
+        )
+
+        return verification_code
 
     async def get(
         self, *, flow_id: UUID, step: RegisterFlowStep | None = None

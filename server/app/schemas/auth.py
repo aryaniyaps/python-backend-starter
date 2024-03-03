@@ -42,6 +42,10 @@ class RegisterFlowStartResult(BaseSchema):
     register_flow: RegisterFlowSchema
 
 
+class RegisterFlowResendVerificationInput(BaseSchema):
+    flow_id: UUID
+
+
 class RegisterFlowVerifyInput(BaseSchema):
     flow_id: UUID
 

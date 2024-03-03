@@ -123,6 +123,47 @@ class AuthService:
 
         return register_flow
 
+    async def resend_verification_register_flow(
+        self,
+        *,
+        flow_id: UUID,
+        user_agent: UserAgent,
+        request_ip: str,
+    ) -> RegisterFlow:
+        """Resend email verification in the register flow."""
+        register_flow = await self._register_flow_repo.get(
+            flow_id=flow_id,
+            step=RegisterFlowStep.EMAIL_VERIFICATION,
+        )
+
+        if register_flow is None:
+            raise ResourceNotFoundError(
+                message="Couldn't find register flow.",
+            )
+
+        # recreate verification code for register flow
+        verification_code = await self._register_flow_repo.recreate_verification_code(
+            flow_id=register_flow.id,
+        )
+
+        # send verification request email
+        await task_queue.enqueue(
+            "send_email_verification_request_email",
+            receiver=register_flow.email,
+            verification_code=verification_code,
+            device=user_agent.get_device(),
+            browser_name=user_agent.get_browser(),
+            location=get_city_location(
+                city=get_geoip_city(
+                    ip_address=request_ip,
+                    geoip_reader=self._geoip_reader,
+                ),
+            ),
+            ip_address=request_ip,
+        )
+
+        return register_flow
+
     async def verify_register_flow(
         self,
         *,
