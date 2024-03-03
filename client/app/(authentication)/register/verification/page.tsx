@@ -28,7 +28,8 @@ const registerVerificationSchema = yup
 
 export default function RegisterOTPPage() {
   const router = useRouter();
-  const { flowId, email, setCurrentStep } = useRegisterFlow();
+  const { flowId, email, setCurrentStep, setFlowId, setEmail } =
+    useRegisterFlow();
   if (!flowId || !email) {
     // redirect to register page
     return router.push('/register');
@@ -36,6 +37,7 @@ export default function RegisterOTPPage() {
 
   const { control, handleSubmit, formState, setError } = useForm({
     resolver: yupResolver(registerVerificationSchema),
+    reValidateMode: 'onSubmit',
   });
 
   const onSubmit: SubmitHandler<
@@ -123,7 +125,8 @@ export default function RegisterOTPPage() {
               />
             )}
           />
-          {formState.errors.verificationCode ? (
+          {formState.errors.verificationCode &&
+          formState.errors.verificationCode.type == 'server' ? (
             <p className='text-xs text-danger'>
               {formState.errors.verificationCode.message}
             </p>
@@ -143,8 +146,19 @@ export default function RegisterOTPPage() {
         </form>
       </CardBody>
       <CardFooter>
-        <Button variant='ghost' fullWidth>
-          Go back
+        <Button
+          variant='ghost'
+          fullWidth
+          onClick={async () => {
+            await client.POST('/auth/register/flow/cancel', {
+              body: { flowId: flowId },
+            });
+            setFlowId(null);
+            setCurrentStep(null);
+            setEmail(null);
+          }}
+        >
+          Cancel
         </Button>
       </CardFooter>
     </Card>
