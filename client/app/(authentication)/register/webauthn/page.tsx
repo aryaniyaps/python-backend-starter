@@ -2,7 +2,6 @@
 import { useRegisterFlow } from '@/components/register-flow-provider';
 import { client } from '@/lib/client';
 import { KeyIcon } from '@heroicons/react/24/outline';
-import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Button,
   Card,
@@ -14,14 +13,9 @@ import {
 import { startRegistration } from '@simplewebauthn/browser';
 import { useRouter } from 'next/navigation';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import * as yup from 'yup';
-
-const webAuthnRegisterSchema = yup.object({}).required();
 
 export default function RegisterWebAuthnPage() {
-  const { handleSubmit, formState } = useForm({
-    resolver: yupResolver(webAuthnRegisterSchema),
-  });
+  const { handleSubmit, formState, setError } = useForm({});
 
   const router = useRouter();
   const { flowId, setFlowId, setCurrentStep, setEmail } = useRegisterFlow();
@@ -30,11 +24,7 @@ export default function RegisterWebAuthnPage() {
     return router.push('/register');
   }
 
-  const onSubmit: SubmitHandler<
-    yup.InferType<typeof webAuthnRegisterSchema>
-  > = async (input) => {
-    console.log(input);
-
+  const onSubmit: SubmitHandler<{}> = async () => {
     // start webauthn registration
     const { data } = await client.POST('/auth/register/flow/webauthn-start', {
       body: { flowId: flowId },
@@ -46,8 +36,9 @@ export default function RegisterWebAuthnPage() {
         attResp = await startRegistration(data.options);
         console.log('ATTESTATION RESPONSE: ', attResp);
       } catch (err) {
-        console.error(err);
-        alert("Couldn't register credential!");
+        setError('root', {
+          message: `Couldn't create passkey. Please try again`,
+        });
         return;
       }
 
@@ -92,9 +83,20 @@ export default function RegisterWebAuthnPage() {
           </Link>
         </h3>
       </CardHeader>
-      <CardBody>
-        <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
-          <Button color='primary' type='submit' isDisabled={!formState.isValid}>
+      <CardBody className='flex flex-col gap-unit-6'>
+        {/* TODO: use a nested card for errors until we get an alert component */}
+        {formState.errors.root ? (
+          <Card isFooterBlurred fullWidth className='bg-danger-50 px-unit-2'>
+            <CardBody className='text-center text-danger'>
+              {formState.errors.root.message}
+            </CardBody>
+          </Card>
+        ) : null}
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className='flex flex-col gap-unit-4'
+        >
+          <Button color='primary' type='submit'>
             <KeyIcon className='h-unit-6 w-unit-6' /> Create passkey
           </Button>
         </form>
