@@ -75,7 +75,7 @@ class RegisterFlowRepo:
 
         verification_code = self.generate_verification_code()
 
-        await self._session.scalar(
+        await self._session.execute(
             update(RegisterFlow)
             .where(RegisterFlow.id == flow_id)
             .values(
