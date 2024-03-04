@@ -30,21 +30,35 @@ rate_limit_config = {
             group="default",
         ),
     ],
-    r"^/auth/register/flow/verify": [
+    rf"/auth/register/flows/{UUID_REGEX.pattern}/cancel": [
         Rule(
             method=HTTPMethod.POST,
             hour=75,
             group="default",
         ),
     ],
-    r"/auth/register/flow/webauthn-start": [
+    rf"/auth/register/flows/{UUID_REGEX.pattern}/resend-verification": [
         Rule(
             method=HTTPMethod.POST,
             hour=75,
             group="default",
         ),
     ],
-    r"/auth/register/flow/webauthn-finish": [
+    rf"/auth/register/flows/{UUID_REGEX.pattern}/verify": [
+        Rule(
+            method=HTTPMethod.POST,
+            hour=75,
+            group="default",
+        ),
+    ],
+    rf"/auth/register/flows/{UUID_REGEX.pattern}/webauthn-start": [
+        Rule(
+            method=HTTPMethod.POST,
+            hour=75,
+            group="default",
+        ),
+    ],
+    rf"/auth/register/flows/{UUID_REGEX.pattern}/webauthn-finish": [
         Rule(
             method=HTTPMethod.POST,
             hour=75,
