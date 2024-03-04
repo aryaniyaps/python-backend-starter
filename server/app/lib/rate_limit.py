@@ -23,7 +23,7 @@ rate_limit_config = {
             group="default",
         ),
     ],
-    r"^/auth/register/flow/start": [
+    r"^/auth/register/flows/start": [
         Rule(
             method=HTTPMethod.POST,
             hour=75,
