@@ -90,6 +90,7 @@ export default function RegisterPage() {
             color='primary'
             type='submit'
             isLoading={formState.isSubmitting}
+            fullWidth
           >
             Continue
           </Button>

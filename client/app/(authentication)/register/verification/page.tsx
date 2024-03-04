@@ -43,7 +43,6 @@ export default function RegisterOTPPage() {
   const onSubmit: SubmitHandler<
     yup.InferType<typeof registerVerificationSchema>
   > = async (input) => {
-    console.log(input);
     try {
       // verify register flow
       const { data } = await client.POST(
@@ -66,22 +65,40 @@ export default function RegisterOTPPage() {
     }
   };
 
+  const resendVerificationCode = async () => {
+    await client.POST('/auth/register/flows/{flow_id}/resend-verification', {
+      params: {
+        path: { flow_id: flowId },
+        header: { 'user-agent': navigator.userAgent },
+      },
+    });
+  };
+
   return (
     <Card isFooterBlurred fullWidth className='px-unit-2'>
-      <CardHeader className='flex flex-col items-start gap-unit-2'>
-        <h1 className='text-md font-semibold'>Enter Verification Code</h1>
-        <h3 className='text-xs font-extralight'>
-          Enter the code we sent to {email}
-        </h3>
+      <CardHeader className='flex w-full items-center justify-between gap-unit-2'>
+        <div className='flex flex-col gap-unit-2'>
+          <h1 className='text-md font-semibold'>Enter Verification Code</h1>
+          <h3 className='text-xs font-extralight'>
+            Enter the code we sent to {email}
+          </h3>
+        </div>
+        <Button size='sm' variant='ghost' onClick={resendVerificationCode}>
+          resend code
+        </Button>
       </CardHeader>
       <CardBody>
-        <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className='flex flex-col items-start gap-4'
+        >
           <Controller
             name='verificationCode'
             control={control}
             render={({ field }) => (
               <OTPInput
                 {...field}
+                inputMode='numeric'
                 maxLength={EMAIL_VERIFICATION_CODE_LENGTH}
                 containerClassName='group flex items-center has-[:disabled]:opacity-30'
                 render={({ slots }) => (
@@ -135,15 +152,13 @@ export default function RegisterOTPPage() {
               {formState.errors.verificationCode.message}
             </p>
           ) : null}
-          <p className='text-xs'>
-            Didn&apos;t receive code?&nbsp;
-            <strong className='text-primary'>resend</strong>
-          </p>
+
           <Button
             color='primary'
             type='submit'
             isLoading={formState.isSubmitting}
             isDisabled={!formState.isValid}
+            fullWidth
           >
             Continue
           </Button>
