@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import Depends, Security
-from fastapi.security import APIKeyHeader
+from fastapi.security import APIKeyCookie, APIKeyHeader
 from geoip2.database import Reader
 
 from app.dependencies.authentication_token import get_authentication_token_repo
@@ -11,6 +11,7 @@ from app.dependencies.user import get_user_repo
 from app.dependencies.user_session import get_user_session_repo
 from app.dependencies.webauthn_challenge import get_webauthn_challenge_repo
 from app.dependencies.webauthn_credential import get_webauthn_credential_repo
+from app.lib.constants import AUTHENTICATION_TOKEN_COOKIE
 from app.lib.geo_ip import get_geoip_reader
 from app.repositories.authentication_token import AuthenticationTokenRepo
 from app.repositories.email_verification_code import EmailVerificationCodeRepo
@@ -22,7 +23,7 @@ from app.repositories.webauthn_credential import WebAuthnCredentialRepo
 from app.services.auth import AuthService
 from app.types.auth import UserInfo
 
-authentication_token_header = APIKeyHeader(name="X-Authentication-Token")
+authentication_token_cookie = APIKeyCookie(name=AUTHENTICATION_TOKEN_COOKIE)
 
 
 def get_auth_service(
@@ -98,7 +99,7 @@ async def get_viewer_info(
     authentication_token: Annotated[
         str,
         Security(
-            authentication_token_header,
+            authentication_token_cookie,
         ),
     ],
 ) -> UserInfo:

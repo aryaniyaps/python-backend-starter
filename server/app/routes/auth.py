@@ -11,7 +11,7 @@ from webauthn.helpers.structs import (
 
 from app.config import settings
 from app.dependencies.auth import (
-    authentication_token_header,
+    authentication_token_cookie,
     get_auth_service,
     get_viewer_info,
 )
@@ -376,7 +376,7 @@ async def delete_current_user_session(
     authentication_token: Annotated[
         str,
         Depends(
-            authentication_token_header,
+            authentication_token_cookie,
         ),
     ],
     viewer_info: Annotated[
