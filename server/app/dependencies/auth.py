@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import Depends, Security
-from fastapi.security import APIKeyCookie, APIKeyHeader
+from fastapi.security import APIKeyCookie
 from geoip2.database import Reader
 
 from app.dependencies.authentication_token import get_authentication_token_repo
