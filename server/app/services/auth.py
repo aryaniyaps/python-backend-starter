@@ -73,7 +73,7 @@ class AuthService:
 
         if register_flow is None:
             raise ResourceNotFoundError(
-                message="Couldn't find register flow with the given ID.",
+                message="Couldn't find register flow.",
             )
 
         return register_flow
