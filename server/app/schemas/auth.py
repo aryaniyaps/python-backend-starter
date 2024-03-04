@@ -3,7 +3,6 @@ from uuid import UUID
 
 from pydantic import EmailStr, Field, Json, RootModel
 from webauthn.helpers.structs import (
-    AuthenticationCredential,
     PublicKeyCredentialCreationOptions,
 )
 
@@ -62,8 +61,6 @@ class RegisterFlowWebAuthnStartResult(BaseSchema):
 
 
 class RegisterFlowWebAuthnFinishInput(BaseSchema):
-    # FIXME: the client sends client data json under the key clientDataJSON, while we
-    # expect it to be clientDataJson. we need to fix this naming issue
     credential: Json
 
 
@@ -82,7 +79,7 @@ class LoginOptionsInput(BaseSchema):
 
 
 class LoginVerificationInput(BaseSchema):
-    credential: Json[AuthenticationCredential]
+    credential: Json
 
 
 class CreateWebAuthnCredentialInput(BaseSchema):

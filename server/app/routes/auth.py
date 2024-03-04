@@ -4,7 +4,10 @@ from uuid import UUID
 
 import user_agents
 from fastapi import APIRouter, Depends, Header, Path, Response
-from webauthn.helpers import parse_registration_credential_json
+from webauthn.helpers import (
+    parse_authentication_credential_json,
+    parse_registration_credential_json,
+)
 from webauthn.helpers.structs import (
     PublicKeyCredentialRequestOptions,
 )
@@ -341,7 +344,7 @@ async def login_verification(
 ) -> User:
     """Verify the authenticator's response for login."""
     authentication_token, user = await auth_service.verify_login_response(
-        credential=data.credential,
+        credential=parse_authentication_credential_json(data.credential),
         request_ip=request_ip,
         user_agent=user_agents.parse(user_agent),
     )
@@ -368,6 +371,7 @@ async def create_webauthn_credential(_data: CreateWebAuthnCredentialInput) -> No
 )
 async def delete_current_user_session(
     data: LogoutInput,
+    response: Response,
     auth_service: Annotated[
         AuthService,
         Depends(
@@ -394,6 +398,9 @@ async def delete_current_user_session(
         user_id=viewer_info.user_id,
         remember_session=data.remember_session,
     )
+
+    # remove authentication token from cookie
+    response.delete_cookie(AUTHENTICATION_TOKEN_COOKIE)
 
 
 @auth_router.get(

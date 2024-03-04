@@ -38,34 +38,27 @@ export default function RegisterWebAuthnPage() {
       try {
         attResp = await startRegistration(data.options);
       } catch (err) {
-        setError('root', {
+        return setError('root', {
           message: `Couldn't create passkey. Please try again`,
         });
-        return;
       }
 
-      // FIXME ugly hack: we are renaming the `clientDataJSON` key to `clientDataJson`
-      const { data: verificationData } = await client.POST(
-        '/auth/register/flows/{flow_id}/webauthn-finish',
-        {
+      try {
+        await client.POST('/auth/register/flows/{flow_id}/webauthn-finish', {
           params: { path: { flow_id: flowId } },
           body: {
-            credential: JSON.stringify({
-              ...attResp,
-              response: {
-                ...attResp.response,
-                clientDataJson: attResp.response.clientDataJSON,
-              },
-            }),
+            credential: JSON.stringify(attResp),
           },
-        }
-      );
-
-      if (verificationData) {
-        const authToken = verificationData.authenticationToken;
-        // TODO: store authentication token
-        console.log('AUTHENTICATED!! auth token:', authToken);
+        });
+      } catch (err) {
+        // TODO: perform better error handling
+        return setError('root', {
+          message: `Couldn't verify user. Please try again`,
+        });
       }
+
+      // TODO: redirect here using redirect URL
+      router.push('/');
     }
   };
 

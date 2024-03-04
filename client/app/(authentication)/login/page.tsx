@@ -1,4 +1,5 @@
 'use client';
+import { client } from '@/lib/client';
 import { APP_NAME, MAX_EMAIL_LENGTH } from '@/lib/constants';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
@@ -10,6 +11,8 @@ import {
   Input,
   Link,
 } from '@nextui-org/react';
+import { startAuthentication } from '@simplewebauthn/browser';
+import { useRouter } from 'next/navigation';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -24,14 +27,42 @@ const loginSchema = yup
   .required();
 
 export default function LoginPage() {
-  const { control, handleSubmit, formState } = useForm({
+  const { control, handleSubmit, formState, setError } = useForm({
     resolver: yupResolver(loginSchema),
     defaultValues: { email: '' },
     mode: 'onTouched',
   });
 
-  const onSubmit: SubmitHandler<yup.InferType<typeof loginSchema>> = (data) => {
-    console.log(data);
+  const router = useRouter();
+
+  const onSubmit: SubmitHandler<yup.InferType<typeof loginSchema>> = async (
+    input
+  ) => {
+    console.log(input);
+    // start webauthn authentication
+    const { data } = await client.POST('/auth/login/start', {
+      body: { email: input.email },
+    });
+
+    let asseResp;
+    try {
+      // Pass the options to the authenticator and wait for a response
+      asseResp = await startAuthentication(data);
+    } catch (error) {
+      return setError('root', {
+        message: `Couldn't login with passkey. Please try again`,
+      });
+    }
+
+    await client.POST('/auth/login/finish', {
+      params: { header: { 'user-agent': navigator.userAgent } },
+      body: {
+        credential: JSON.stringify(asseResp),
+      },
+    });
+
+    // TODO: redirect using redirect URL here
+    router.push('/');
   };
 
   return (

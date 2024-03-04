@@ -74,10 +74,10 @@ class AuthenticationTokenRepo:
         if user_info is not None:
             return UserInfo(
                 user_id=UUID(
-                    bytes=user_info.get("user_id"),
+                    bytes=user_info.get(b"user_id"),
                 ),
                 user_session_id=UUID(
-                    bytes=user_info.get("user_session_id"),
+                    bytes=user_info.get(b"user_session_id"),
                 ),
             )
         return None
