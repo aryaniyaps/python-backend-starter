@@ -12,7 +12,6 @@ from app.logger import build_worker_log_config, setup_logging
 from app.tasks import (
     delete_expired_email_verification_codes,
     send_email_verification_request_email,
-    send_new_login_device_detected_email,
     send_onboarding_email,
 )
 
@@ -88,7 +87,6 @@ if __name__ == "__main__":
     worker = Worker(
         queue=task_queue,
         functions=[
-            send_new_login_device_detected_email,
             send_onboarding_email,
             send_email_verification_request_email,
         ],

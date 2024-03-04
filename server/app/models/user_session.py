@@ -35,9 +35,7 @@ class UserSession(Base):
         String(256),
     )
 
-    device: Mapped[str] = mapped_column(
-        String(256),
-    )
+    user_agent: Mapped[str]
 
     logged_out_at: Mapped[datetime | None]
 

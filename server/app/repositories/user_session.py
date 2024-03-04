@@ -29,9 +29,6 @@ class UserSessionRepo:
         user_agent: UserAgent,
     ) -> UserSession:
         """Create a new user session."""
-        # FIXME: review device strings, we get pretty much common strings
-        # like iPhone, so we can't possibly differentiate between device versions
-        # maybe pass device IDs instead?
         user_session = UserSession(
             user_id=user_id,
             ip_address=ip_address,
@@ -41,24 +38,11 @@ class UserSessionRepo:
                     geoip_reader=self._geoip_reader,
                 ),
             ),
-            device=user_agent.device,
+            user_agent=str(user_agent),
         )
         self._session.add(user_session)
         await self._session.commit()
         return user_session
-
-    async def check_if_device_exists(
-        self,
-        user_id: UUID,
-        device: str,
-    ) -> bool:
-        """Check whether user sessions for the user exist with the given device."""
-        results = await self._session.scalars(
-            select(UserSession).where(
-                UserSession.user_id == user_id and UserSession.device == device
-            ),
-        )
-        return results.first() is not None
 
     async def get_all(self, user_id: UUID) -> list[UserSession]:
         """Get user sessions for the given user ID."""

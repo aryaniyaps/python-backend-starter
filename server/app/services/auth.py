@@ -297,14 +297,14 @@ class AuthService:
                 message="Couldn't verify user.",
             )
 
-        user = await self._user_repo.create(
-            user_id=user_id,
-            email=register_flow.email,
-        )
-
         # delete challenge server-side
         await self._webauthn_challenge_repo.delete(
             challenge=client_data.challenge,
+        )
+
+        user = await self._user_repo.create(
+            user_id=user_id,
+            email=register_flow.email,
         )
 
         await self._webauthn_credential_repo.create(
@@ -442,26 +442,6 @@ class AuthService:
             webauthn_credential=existing_credential,
             sign_count=verified_authentication.new_sign_count,
         )
-
-        if not await self._user_session_repo.check_if_device_exists(
-            user_id=existing_user.id,
-            device=user_agent.device,
-        ):
-            await task_queue.enqueue(
-                "send_new_login_device_detected_email",
-                receiver=existing_user.email,
-                email=existing_user.email,
-                login_timestamp=humanize.naturaldate(datetime.now(UTC)),
-                device=user_agent.get_device(),
-                browser_name=user_agent.get_browser(),
-                location=get_city_location(
-                    city=get_geoip_city(
-                        ip_address=request_ip,
-                        geoip_reader=self._geoip_reader,
-                    ),
-                ),
-                ip_address=request_ip,
-            )
 
         user_session = await self._user_session_repo.create(
             user_id=existing_user.id,

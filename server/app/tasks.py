@@ -61,30 +61,3 @@ async def send_email_verification_request_email(
             "location": location,
         },
     )
-
-
-async def send_new_login_device_detected_email(
-    _ctx: Context,
-    *,
-    receiver: str,
-    email: str,
-    login_timestamp: str,
-    device: str,
-    browser_name: str,
-    ip_address: str,
-    location: str,
-) -> None:
-    """Send a new login device detected email to the given user."""
-    await send_template_email(
-        sender=settings.email_from,
-        receiver=receiver,
-        template="new-login-device",
-        context={
-            "email": email,
-            "login_timestamp": login_timestamp,
-            "device": device,
-            "browser_name": browser_name,
-            "ip_address": ip_address,
-            "location": location,
-        },
-    )
