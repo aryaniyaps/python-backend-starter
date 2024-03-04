@@ -46,9 +46,13 @@ export default function RegisterOTPPage() {
     console.log(input);
     try {
       // verify register flow
-      const { data } = await client.POST('/auth/register/flow/verify', {
-        body: { flowId: flowId, verificationCode: input.verificationCode },
-      });
+      const { data } = await client.POST(
+        '/auth/register/flows/{flow_id}/verify',
+        {
+          body: { verificationCode: input.verificationCode },
+          params: { path: { flow_id: flowId } },
+        }
+      );
 
       if (data) {
         setCurrentStep(data.registerFlow.currentStep);
@@ -150,8 +154,8 @@ export default function RegisterOTPPage() {
           variant='ghost'
           fullWidth
           onClick={async () => {
-            await client.POST('/auth/register/flow/cancel', {
-              body: { flowId: flowId },
+            await client.POST('/auth/register/flows/{flow_id}/cancel', {
+              params: { path: { flow_id: flowId } },
             });
             setFlowId(null);
             setCurrentStep(null);

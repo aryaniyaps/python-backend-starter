@@ -24,8 +24,6 @@ from app.schemas.auth import (
     LoginOptionsInput,
     LoginVerificationInput,
     LogoutInput,
-    RegisterFlowCancelInput,
-    RegisterFlowResendVerificationInput,
     RegisterFlowSchema,
     RegisterFlowStartInput,
     RegisterFlowStartResult,
@@ -33,7 +31,6 @@ from app.schemas.auth import (
     RegisterFlowVerifyResult,
     RegisterFlowWebAuthnFinishInput,
     RegisterFlowWebAuthnFinishResult,
-    RegisterFlowWebAuthnStartInput,
     RegisterFlowWebAuthnStartResult,
 )
 from app.schemas.errors import InvalidInputErrorResult, ResourceNotFoundErrorResult
@@ -62,7 +59,7 @@ async def get_register_flow(
     flow_id: Annotated[
         UUID,
         Path(
-            title="The ID of the register flow to get.",
+            title="The ID of the register flow.",
         ),
     ],
     auth_service: Annotated[
@@ -77,7 +74,7 @@ async def get_register_flow(
 
 
 @auth_router.post(
-    "/register/flow/start",
+    "/register/flows/start",
     response_model=RegisterFlowStartResult,
     responses={
         HTTPStatus.BAD_REQUEST: {
@@ -114,7 +111,7 @@ async def start_register_flow(
 
 
 @auth_router.post(
-    "/register/flow/cancel",
+    "/register/flows/{flow_id}/cancel",
     response_model=None,
     status_code=HTTPStatus.NO_CONTENT,
     responses={
@@ -126,7 +123,12 @@ async def start_register_flow(
     summary="Cancel a register flow.",
 )
 async def cancel_register_flow(
-    data: RegisterFlowCancelInput,
+    flow_id: Annotated[
+        UUID,
+        Path(
+            title="The ID of the register flow.",
+        ),
+    ],
     auth_service: Annotated[
         AuthService,
         Depends(
@@ -136,12 +138,12 @@ async def cancel_register_flow(
 ) -> None:
     """Cancel a register flow."""
     await auth_service.cancel_register_flow(
-        flow_id=data.flow_id,
+        flow_id=flow_id,
     )
 
 
 @auth_router.post(
-    "/register/flow/resend-verification",
+    "/register/flows/{flow_id}/resend-verification",
     response_model=None,
     status_code=HTTPStatus.ACCEPTED,
     responses={
@@ -153,7 +155,12 @@ async def cancel_register_flow(
     summary="Resend email verification in the register flow.",
 )
 async def resend_verification_register_flow(
-    data: RegisterFlowResendVerificationInput,
+    flow_id: Annotated[
+        UUID,
+        Path(
+            title="The ID of the register flow.",
+        ),
+    ],
     user_agent: Annotated[str, Header()],
     request_ip: Annotated[
         str,
@@ -170,14 +177,14 @@ async def resend_verification_register_flow(
 ) -> None:
     """Resend email verification in the register flow."""
     await auth_service.resend_verification_register_flow(
-        flow_id=data.flow_id,
+        flow_id=flow_id,
         user_agent=user_agents.parse(user_agent),
         request_ip=request_ip,
     )
 
 
 @auth_router.post(
-    "/register/flow/verify",
+    "/register/flows/{flow_id}/verify",
     response_model=RegisterFlowVerifyResult,
     responses={
         HTTPStatus.BAD_REQUEST: {
@@ -188,6 +195,12 @@ async def resend_verification_register_flow(
     summary="Verify a register flow.",
 )
 async def verify_register_flow(
+    flow_id: Annotated[
+        UUID,
+        Path(
+            title="The ID of the register flow.",
+        ),
+    ],
     data: RegisterFlowVerifyInput,
     auth_service: Annotated[
         AuthService,
@@ -198,7 +211,7 @@ async def verify_register_flow(
 ) -> dict[str, Any]:
     """Verify a register flow."""
     register_flow = await auth_service.verify_register_flow(
-        flow_id=data.flow_id,
+        flow_id=flow_id,
         verification_code=data.verification_code,
     )
 
@@ -206,7 +219,7 @@ async def verify_register_flow(
 
 
 @auth_router.post(
-    "/register/flow/webauthn-start",
+    "/register/flows/{flow_id}/webauthn-start",
     response_model=RegisterFlowWebAuthnStartResult,
     responses={
         HTTPStatus.BAD_REQUEST: {
@@ -217,7 +230,12 @@ async def verify_register_flow(
     summary="Start the webauthn registration in the register flow.",
 )
 async def start_webauthn_register_flow(
-    data: RegisterFlowWebAuthnStartInput,
+    flow_id: Annotated[
+        UUID,
+        Path(
+            title="The ID of the register flow.",
+        ),
+    ],
     auth_service: Annotated[
         AuthService,
         Depends(
@@ -227,7 +245,7 @@ async def start_webauthn_register_flow(
 ) -> dict[str, Any]:
     """Start the webauthn registration in the register flow."""
     register_flow, options = await auth_service.webauthn_start_register_flow(
-        flow_id=data.flow_id,
+        flow_id=flow_id,
     )
 
     return {
@@ -237,7 +255,7 @@ async def start_webauthn_register_flow(
 
 
 @auth_router.post(
-    "/register/flow/webauthn-finish",
+    "/register/flows/{flow_id}/webauthn-finish",
     response_model=RegisterFlowWebAuthnFinishResult,
     responses={
         HTTPStatus.BAD_REQUEST: {
@@ -248,6 +266,12 @@ async def start_webauthn_register_flow(
     summary="Finish the webauthn registration in the register flow.",
 )
 async def finish_webauthn_register_flow(
+    flow_id: Annotated[
+        UUID,
+        Path(
+            title="The ID of the register flow.",
+        ),
+    ],
     data: RegisterFlowWebAuthnFinishInput,
     auth_service: Annotated[
         AuthService,
@@ -258,7 +282,7 @@ async def finish_webauthn_register_flow(
 ) -> AuthenticationResult:
     """Finish the webauthn registration in the register flow."""
     return await auth_service.webauthn_finish_register_flow(
-        flow_id=data.flow_id,
+        flow_id=flow_id,
         credential=parse_registration_credential_json(data.credential),
     )
 

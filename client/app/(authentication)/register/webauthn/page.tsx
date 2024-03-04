@@ -26,15 +26,17 @@ export default function RegisterWebAuthnPage() {
 
   const onSubmit: SubmitHandler<{}> = async () => {
     // start webauthn registration
-    const { data } = await client.POST('/auth/register/flow/webauthn-start', {
-      body: { flowId: flowId },
-    });
+    const { data } = await client.POST(
+      '/auth/register/flows/{flow_id}/webauthn-start',
+      {
+        params: { path: { flow_id: flowId } },
+      }
+    );
 
     if (data) {
       let attResp;
       try {
         attResp = await startRegistration(data.options);
-        console.log('ATTESTATION RESPONSE: ', attResp);
       } catch (err) {
         setError('root', {
           message: `Couldn't create passkey. Please try again`,
@@ -44,10 +46,10 @@ export default function RegisterWebAuthnPage() {
 
       // FIXME ugly hack: we are renaming the `clientDataJSON` key to `clientDataJson`
       const { data: verificationData } = await client.POST(
-        '/auth/register/flow/webauthn-finish',
+        '/auth/register/flows/{flow_id}/webauthn-finish',
         {
+          params: { path: { flow_id: flowId } },
           body: {
-            flowId: flowId,
             credential: JSON.stringify({
               ...attResp,
               response: {
@@ -113,8 +115,8 @@ export default function RegisterWebAuthnPage() {
           variant='ghost'
           fullWidth
           onClick={async () => {
-            await client.POST('/auth/register/flow/cancel', {
-              body: { flowId: flowId },
+            await client.POST('/auth/register/flows/{flow_id}/cancel', {
+              params: { path: { flow_id: flowId } },
             });
             setFlowId(null);
             setCurrentStep(null);

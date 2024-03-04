@@ -52,42 +52,42 @@ export interface paths {
      */
     get: operations["OpenAPITag.AUTHENTICATION-get_register_flow"];
   };
-  "/auth/register/flow/start": {
+  "/auth/register/flows/start": {
     /**
      * Start a register flow.
      * @description Start a register flow.
      */
     post: operations["OpenAPITag.AUTHENTICATION-start_register_flow"];
   };
-  "/auth/register/flow/cancel": {
+  "/auth/register/flows/{flow_id}/cancel": {
     /**
      * Cancel a register flow.
      * @description Cancel a register flow.
      */
     post: operations["OpenAPITag.AUTHENTICATION-cancel_register_flow"];
   };
-  "/auth/register/flow/resend-verification": {
+  "/auth/register/flows/{flow_id}/resend-verification": {
     /**
      * Resend email verification in the register flow.
      * @description Resend email verification in the register flow.
      */
     post: operations["OpenAPITag.AUTHENTICATION-resend_verification_register_flow"];
   };
-  "/auth/register/flow/verify": {
+  "/auth/register/flows/{flow_id}/verify": {
     /**
      * Verify a register flow.
      * @description Verify a register flow.
      */
     post: operations["OpenAPITag.AUTHENTICATION-verify_register_flow"];
   };
-  "/auth/register/flow/webauthn-start": {
+  "/auth/register/flows/{flow_id}/webauthn-start": {
     /**
      * Start the webauthn registration in the register flow.
      * @description Start the webauthn registration in the register flow.
      */
     post: operations["OpenAPITag.AUTHENTICATION-start_webauthn_register_flow"];
   };
-  "/auth/register/flow/webauthn-finish": {
+  "/auth/register/flows/{flow_id}/webauthn-finish": {
     /**
      * Finish the webauthn registration in the register flow.
      * @description Finish the webauthn registration in the register flow.
@@ -209,21 +209,6 @@ export interface components {
      * @enum {string}
      */
     AuthenticatorAttachment: "platform" | "cross-platform";
-    /** AuthenticatorAttestationResponse */
-    AuthenticatorAttestationResponse: {
-      /**
-       * Clientdatajson
-       * Format: binary
-       */
-      clientDataJson: string;
-      /**
-       * Attestationobject
-       * Format: binary
-       */
-      attestationObject: string;
-      /** Transports */
-      transports?: components["schemas"]["AuthenticatorTransport"][] | null;
-    };
     /** AuthenticatorSelectionCriteria */
     AuthenticatorSelectionCriteria: {
       authenticatorAttachment?: components["schemas"]["AuthenticatorAttachment"] | null;
@@ -456,22 +441,6 @@ export interface components {
        */
       isPrimary: boolean;
     };
-    /** RegisterFlowCancelInput */
-    RegisterFlowCancelInput: {
-      /**
-       * Flowid
-       * Format: uuid
-       */
-      flowId: string;
-    };
-    /** RegisterFlowResendVerificationInput */
-    RegisterFlowResendVerificationInput: {
-      /**
-       * Flowid
-       * Format: uuid
-       */
-      flowId: string;
-    };
     /** RegisterFlowSchema */
     RegisterFlowSchema: {
       /**
@@ -502,11 +471,6 @@ export interface components {
     RegisterFlowStep: "email_verification" | "webauthn_registration";
     /** RegisterFlowVerifyInput */
     RegisterFlowVerifyInput: {
-      /**
-       * Flowid
-       * Format: uuid
-       */
-      flowId: string;
       /** Verificationcode */
       verificationCode: string;
     };
@@ -516,11 +480,6 @@ export interface components {
     };
     /** RegisterFlowWebAuthnFinishInput */
     RegisterFlowWebAuthnFinishInput: {
-      /**
-       * Flowid
-       * Format: uuid
-       */
-      flowId: string;
       /** Credential */
       credential: string;
     };
@@ -533,36 +492,10 @@ export interface components {
        */
       authenticationToken: string;
     };
-    /** RegisterFlowWebAuthnStartInput */
-    RegisterFlowWebAuthnStartInput: {
-      /**
-       * Flowid
-       * Format: uuid
-       */
-      flowId: string;
-    };
     /** RegisterFlowWebAuthnStartResult */
     RegisterFlowWebAuthnStartResult: {
       registerFlow: components["schemas"]["RegisterFlowSchema"];
       options: components["schemas"]["PublicKeyCredentialCreationOptions"];
-    };
-    /** RegistrationCredential */
-    RegistrationCredential: {
-      /** Id */
-      id: string;
-      /**
-       * Rawid
-       * Format: binary
-       */
-      rawId: string;
-      response: components["schemas"]["AuthenticatorAttestationResponse"];
-      authenticatorAttachment?: components["schemas"]["AuthenticatorAttachment"] | null;
-      /**
-       * Type
-       * @default public-key
-       * @constant
-       */
-      type?: "public-key";
     };
     /**
      * ResidentKeyRequirement
@@ -625,11 +558,6 @@ export interface components {
        * @description The email of the user.
        */
       email: string;
-      /**
-       * Haspassword
-       * @description Whether the user has their password set.
-       */
-      hasPassword: boolean;
     };
     /** UserSessionSchema */
     UserSessionSchema: {
@@ -652,9 +580,9 @@ export interface components {
       location: string;
       /**
        * User Agent
-       * @description The device of the user session.
+       * @description The user agent of the user session.
        */
-      device: string;
+      userAgent: string;
       /**
        * Logged Out At
        * @description When the user logged out of the session.
@@ -1062,9 +990,9 @@ export interface operations {
    * @description Cancel a register flow.
    */
   "OpenAPITag.AUTHENTICATION-cancel_register_flow": {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RegisterFlowCancelInput"];
+    parameters: {
+      path: {
+        flow_id: string;
       };
     };
     responses: {
@@ -1107,10 +1035,8 @@ export interface operations {
       header: {
         "user-agent": string;
       };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RegisterFlowResendVerificationInput"];
+      path: {
+        flow_id: string;
       };
     };
     responses: {
@@ -1151,6 +1077,11 @@ export interface operations {
    * @description Verify a register flow.
    */
   "OpenAPITag.AUTHENTICATION-verify_register_flow": {
+    parameters: {
+      path: {
+        flow_id: string;
+      };
+    };
     requestBody: {
       content: {
         "application/json": components["schemas"]["RegisterFlowVerifyInput"];
@@ -1194,9 +1125,9 @@ export interface operations {
    * @description Start the webauthn registration in the register flow.
    */
   "OpenAPITag.AUTHENTICATION-start_webauthn_register_flow": {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RegisterFlowWebAuthnStartInput"];
+    parameters: {
+      path: {
+        flow_id: string;
       };
     };
     responses: {
@@ -1237,6 +1168,11 @@ export interface operations {
    * @description Finish the webauthn registration in the register flow.
    */
   "OpenAPITag.AUTHENTICATION-finish_webauthn_register_flow": {
+    parameters: {
+      path: {
+        flow_id: string;
+      };
+    };
     requestBody: {
       content: {
         "application/json": components["schemas"]["RegisterFlowWebAuthnFinishInput"];

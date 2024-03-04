@@ -42,7 +42,7 @@ export default function RegisterPage() {
     console.log(input);
     try {
       // start register flow
-      const { data } = await client.POST('/auth/register/flow/start', {
+      const { data } = await client.POST('/auth/register/flows/start', {
         body: { email: input.email },
         params: {
           header: { 'user-agent': window.navigator.userAgent },

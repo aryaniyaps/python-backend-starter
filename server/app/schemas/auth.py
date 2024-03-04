@@ -40,17 +40,7 @@ class RegisterFlowStartResult(BaseSchema):
     register_flow: RegisterFlowSchema
 
 
-class RegisterFlowResendVerificationInput(BaseSchema):
-    flow_id: UUID
-
-
-class RegisterFlowCancelInput(BaseSchema):
-    flow_id: UUID
-
-
 class RegisterFlowVerifyInput(BaseSchema):
-    flow_id: UUID
-
     verification_code: Annotated[
         str,
         Field(
@@ -65,10 +55,6 @@ class RegisterFlowVerifyResult(BaseSchema):
     register_flow: RegisterFlowSchema
 
 
-class RegisterFlowWebAuthnStartInput(BaseSchema):
-    flow_id: UUID
-
-
 class RegisterFlowWebAuthnStartResult(BaseSchema):
     register_flow: RegisterFlowSchema
 
@@ -76,8 +62,6 @@ class RegisterFlowWebAuthnStartResult(BaseSchema):
 
 
 class RegisterFlowWebAuthnFinishInput(BaseSchema):
-    flow_id: UUID
-
     # FIXME: the client sends client data json under the key clientDataJSON, while we
     # expect it to be clientDataJson. we need to fix this naming issue
     credential: Json
