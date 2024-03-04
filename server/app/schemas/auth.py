@@ -1,7 +1,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from pydantic import EmailStr, Field, Json
+from pydantic import EmailStr, Field, Json, RootModel
 from webauthn.helpers.structs import (
     AuthenticationCredential,
     PublicKeyCredentialCreationOptions,
@@ -67,19 +67,9 @@ class RegisterFlowWebAuthnFinishInput(BaseSchema):
     credential: Json
 
 
-class RegisterFlowWebAuthnFinishResult(BaseSchema):
-    user: UserSchema
+RegisterFlowWebAuthnFinishResult = RootModel[UserSchema]
 
-    authentication_token: Annotated[
-        str,
-        Field(
-            examples=[
-                "6fa74977e2a810ea95ef22f5f09d887337070ae0aacdf19d411bbe78fb98bdfa",
-            ],
-            title="Authentication Token",
-            description="The authentication token generated upon successful registration.",
-        ),
-    ]
+AuthenticateUserResult = RootModel[UserSchema]
 
 
 class LoginOptionsInput(BaseSchema):
@@ -97,46 +87,6 @@ class LoginVerificationInput(BaseSchema):
 
 class CreateWebAuthnCredentialInput(BaseSchema):
     pass
-
-
-class AuthenticateUserResult(BaseSchema):
-    authentication_token: Annotated[
-        str,
-        Field(
-            examples=[
-                "6fa74977e2a810ea95ef22f5f09d887337070ae0aacdf19d411bbe78fb98bdfa",
-            ],
-            title="Authentication Token",
-            description="The authentication token generated upon successful login.",
-        ),
-    ]
-
-    user: Annotated[
-        UserSchema,
-        Field(
-            description="The logged in user.",
-        ),
-    ]
-
-
-class RegisterUserResult(BaseSchema):
-    authentication_token: Annotated[
-        str,
-        Field(
-            title="Authentication Token",
-            description="The authentication token obtained after registration.",
-            examples=[
-                "6fa74977e2a810ea95ef22f5f09d887337070ae0aacdf19d411bbe78fb98bdfa",
-            ],
-        ),
-    ]
-
-    user: Annotated[
-        UserSchema,
-        Field(
-            description="The registered user.",
-        ),
-    ]
 
 
 class LogoutInput(BaseSchema):

@@ -81,7 +81,7 @@ async def update_current_user(
     """Update the current user."""
     return await user_service.update_user(
         user_id=viewer_info.user_id,
-        username=data.username,
+        display_name=data.display_name,
     )
 
 

@@ -149,16 +149,6 @@ export interface components {
      * @enum {string}
      */
     AttestationConveyancePreference: "none" | "indirect" | "direct" | "enterprise";
-    /** AuthenticateUserResult */
-    AuthenticateUserResult: {
-      /**
-       * Authentication Token
-       * @description The authentication token generated upon successful login.
-       */
-      authenticationToken: string;
-      /** @description The logged in user. */
-      user: components["schemas"]["UserSchema"];
-    };
     /** AuthenticationCredential */
     AuthenticationCredential: {
       /** Id */
@@ -483,15 +473,6 @@ export interface components {
       /** Credential */
       credential: string;
     };
-    /** RegisterFlowWebAuthnFinishResult */
-    RegisterFlowWebAuthnFinishResult: {
-      user: components["schemas"]["UserSchema"];
-      /**
-       * Authentication Token
-       * @description The authentication token generated upon successful registration.
-       */
-      authenticationToken: string;
-    };
     /** RegisterFlowWebAuthnStartResult */
     RegisterFlowWebAuthnStartResult: {
       registerFlow: components["schemas"]["RegisterFlowSchema"];
@@ -518,6 +499,8 @@ export interface components {
        */
       message: string;
     };
+    /** RootModel[UserSchema] */
+    RootModel_UserSchema_: components["schemas"]["UserSchema"];
     /** UnexpectedErrorResult */
     UnexpectedErrorResult: {
       /**
@@ -1182,7 +1165,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["RegisterFlowWebAuthnFinishResult"];
+          "application/json": components["schemas"]["RootModel_UserSchema_"];
         };
       };
       /** @description Invalid Input Error */
@@ -1267,7 +1250,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["AuthenticateUserResult"];
+          "application/json": components["schemas"]["RootModel_UserSchema_"];
         };
       };
       /** @description Validation Error */

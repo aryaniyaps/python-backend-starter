@@ -33,6 +33,7 @@ from app.lib.errors import (
 )
 from app.lib.geo_ip import get_city_location, get_geoip_city
 from app.models.register_flow import RegisterFlow
+from app.models.user import User
 from app.models.user_session import UserSession
 from app.repositories.authentication_token import AuthenticationTokenRepo
 from app.repositories.email_verification_code import EmailVerificationCodeRepo
@@ -41,7 +42,7 @@ from app.repositories.user import UserRepo
 from app.repositories.user_session import UserSessionRepo
 from app.repositories.webauthn_challenge import WebAuthnChallengeRepo
 from app.repositories.webauthn_credential import WebAuthnCredentialRepo
-from app.types.auth import AuthenticationResult, UserInfo
+from app.types.auth import UserInfo
 from app.worker import task_queue
 
 
@@ -258,7 +259,7 @@ class AuthService:
         *,
         flow_id: UUID,
         credential: RegistrationCredential,
-    ) -> AuthenticationResult:
+    ) -> tuple[str, User]:
         """Finish the webauthn registration in the register flow."""
         register_flow = await self._register_flow_repo.get(
             flow_id=flow_id,
@@ -338,10 +339,7 @@ class AuthService:
             email=user.email,
         )
 
-        return {
-            "authentication_token": authentication_token,
-            "user": user,
-        }
+        return authentication_token, user
 
     async def generate_login_options(
         self, *, email: str
@@ -387,7 +385,7 @@ class AuthService:
         credential: AuthenticationCredential,
         request_ip: str,
         user_agent: UserAgent,
-    ) -> AuthenticationResult:
+    ) -> tuple[str, User]:
         """Verify the authenticator's response for authentication."""
         # TODO: check if its okay if we don't use the user_handle here
         # user_id = credential.response.user_handle
@@ -453,10 +451,7 @@ class AuthService:
             user_session_id=user_session.id,
         )
 
-        return {
-            "authentication_token": authentication_token,
-            "user": existing_user,
-        }
+        return authentication_token, existing_user
 
     async def get_user_sessions(self, *, user_id: UUID) -> list[UserSession]:
         """Get user sessions for the given user ID."""

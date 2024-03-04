@@ -18,6 +18,7 @@ from app.dependencies.auth import (
 from app.dependencies.ip_address import get_ip_address
 from app.lib.constants import AUTHENTICATION_TOKEN_COOKIE, OpenAPITag
 from app.models.register_flow import RegisterFlow
+from app.models.user import User
 from app.models.user_session import UserSession
 from app.schemas.auth import (
     AuthenticateUserResult,
@@ -37,7 +38,7 @@ from app.schemas.auth import (
 from app.schemas.errors import InvalidInputErrorResult, ResourceNotFoundErrorResult
 from app.schemas.user_session import UserSessionSchema
 from app.services.auth import AuthService
-from app.types.auth import AuthenticationResult, UserInfo
+from app.types.auth import UserInfo
 
 auth_router = APIRouter(
     prefix="/auth",
@@ -281,9 +282,9 @@ async def finish_webauthn_register_flow(
             dependency=get_auth_service,
         ),
     ],
-) -> AuthenticationResult:
+) -> User:
     """Finish the webauthn registration in the register flow."""
-    result = await auth_service.webauthn_finish_register_flow(
+    authentication_token, user = await auth_service.webauthn_finish_register_flow(
         flow_id=flow_id,
         credential=parse_registration_credential_json(data.credential),
     )
@@ -291,11 +292,11 @@ async def finish_webauthn_register_flow(
     # set authentication token in a cookie
     response.set_cookie(
         key=AUTHENTICATION_TOKEN_COOKIE,
-        value=result["authentication_token"],
+        value=authentication_token,
         secure=settings.is_production(),
     )
 
-    return result
+    return user
 
 
 @auth_router.post(
@@ -337,9 +338,9 @@ async def login_verification(
             dependency=get_auth_service,
         ),
     ],
-) -> AuthenticationResult:
+) -> User:
     """Verify the authenticator's response for login."""
-    result = await auth_service.verify_login_response(
+    authentication_token, user = await auth_service.verify_login_response(
         credential=data.credential,
         request_ip=request_ip,
         user_agent=user_agents.parse(user_agent),
@@ -348,11 +349,11 @@ async def login_verification(
     # set authentication token in a cookie
     response.set_cookie(
         key=AUTHENTICATION_TOKEN_COOKIE,
-        value=result["authentication_token"],
+        value=authentication_token,
         secure=settings.is_production(),
     )
 
-    return result
+    return user
 
 
 @auth_router.post("/webauthn-credentials")
