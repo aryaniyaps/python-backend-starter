@@ -102,6 +102,7 @@ export default function RegisterWebAuthnPage() {
             color='primary'
             type='submit'
             isLoading={formState.isSubmitting}
+            fullWidth
           >
             {!formState.isSubmitting ? (
               <KeyIcon className='h-unit-6 w-unit-6' />

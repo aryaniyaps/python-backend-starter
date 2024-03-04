@@ -3,19 +3,20 @@ from typing import Annotated, Any
 from uuid import UUID
 
 import user_agents
-from fastapi import APIRouter, Depends, Header, Path
+from fastapi import APIRouter, Depends, Header, Path, Response
 from webauthn.helpers import parse_registration_credential_json
 from webauthn.helpers.structs import (
     PublicKeyCredentialRequestOptions,
 )
 
+from app.config import settings
 from app.dependencies.auth import (
     authentication_token_header,
     get_auth_service,
     get_viewer_info,
 )
 from app.dependencies.ip_address import get_ip_address
-from app.lib.constants import OpenAPITag
+from app.lib.constants import AUTHENTICATION_TOKEN_COOKIE, OpenAPITag
 from app.models.register_flow import RegisterFlow
 from app.models.user_session import UserSession
 from app.schemas.auth import (
@@ -273,6 +274,7 @@ async def finish_webauthn_register_flow(
         ),
     ],
     data: RegisterFlowWebAuthnFinishInput,
+    response: Response,
     auth_service: Annotated[
         AuthService,
         Depends(
@@ -281,10 +283,19 @@ async def finish_webauthn_register_flow(
     ],
 ) -> AuthenticationResult:
     """Finish the webauthn registration in the register flow."""
-    return await auth_service.webauthn_finish_register_flow(
+    result = await auth_service.webauthn_finish_register_flow(
         flow_id=flow_id,
         credential=parse_registration_credential_json(data.credential),
     )
+
+    # set authentication token in a cookie
+    response.set_cookie(
+        key=AUTHENTICATION_TOKEN_COOKIE,
+        value=result["authentication_token"],
+        secure=settings.is_production(),
+    )
+
+    return result
 
 
 @auth_router.post(
@@ -319,6 +330,7 @@ async def login_verification(
             dependency=get_ip_address,
         ),
     ],
+    response: Response,
     auth_service: Annotated[
         AuthService,
         Depends(
@@ -327,11 +339,20 @@ async def login_verification(
     ],
 ) -> AuthenticationResult:
     """Verify the authenticator's response for login."""
-    return await auth_service.verify_login_response(
+    result = await auth_service.verify_login_response(
         credential=data.credential,
         request_ip=request_ip,
         user_agent=user_agents.parse(user_agent),
     )
+
+    # set authentication token in a cookie
+    response.set_cookie(
+        key=AUTHENTICATION_TOKEN_COOKIE,
+        value=result["authentication_token"],
+        secure=settings.is_production(),
+    )
+
+    return result
 
 
 @auth_router.post("/webauthn-credentials")
