@@ -1,7 +1,6 @@
 from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
-import humanize
 import user_agents
 from geoip2.database import Reader
 from user_agents.parsers import UserAgent
