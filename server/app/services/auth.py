@@ -341,7 +341,7 @@ class AuthService:
 
         return authentication_token, user
 
-    async def generate_login_options(
+    async def generate_authentication_options(
         self, *, email: str
     ) -> PublicKeyCredentialRequestOptions:
         """Generate options for retrieving a credential."""
@@ -379,7 +379,7 @@ class AuthService:
 
         return authentication_options
 
-    async def verify_login_response(
+    async def verify_authentication_response(
         self,
         *,
         credential: AuthenticationCredential,

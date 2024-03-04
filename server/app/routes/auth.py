@@ -306,7 +306,7 @@ async def finish_webauthn_register_flow(
     "/login/start",
     response_model=PublicKeyCredentialRequestOptions,
 )
-async def login_options(
+async def generate_authentication_options(
     data: LoginOptionsInput,
     auth_service: Annotated[
         AuthService,
@@ -316,7 +316,7 @@ async def login_options(
     ],
 ) -> PublicKeyCredentialRequestOptions:
     """Generate options for retrieving a credential."""
-    return await auth_service.generate_login_options(
+    return await auth_service.generate_authentication_options(
         email=data.email,
     )
 
@@ -325,7 +325,7 @@ async def login_options(
     "/login/finish",
     response_model=AuthenticateUserResult,
 )
-async def login_verification(
+async def verify_authentication_response(
     data: LoginVerificationInput,
     user_agent: Annotated[str, Header()],
     request_ip: Annotated[
@@ -343,7 +343,7 @@ async def login_verification(
     ],
 ) -> User:
     """Verify the authenticator's response for login."""
-    authentication_token, user = await auth_service.verify_login_response(
+    authentication_token, user = await auth_service.verify_authentication_response(
         credential=parse_authentication_credential_json(data.credential),
         request_ip=request_ip,
         user_agent=user_agents.parse(user_agent),
