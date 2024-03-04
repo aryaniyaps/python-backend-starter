@@ -1,9 +1,9 @@
 """
 initial migration
 
-Revision ID: 8d370a31c5aa
+Revision ID: 82125bc2970a
 Revises: 7a23de63905c
-Create Date: 2024-03-03 14:07:36.516315
+Create Date: 2024-03-04 17:52:32.566113
 
 """
 
@@ -14,7 +14,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = "8d370a31c5aa"
+revision: str = "82125bc2970a"
 down_revision: str | None = "7a23de63905c"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -86,7 +86,6 @@ def upgrade() -> None:
             "id", sa.Uuid(), server_default=sa.text("gen_random_uuid()"), nullable=False
         ),
         sa.Column("email", postgresql.CITEXT(length=255), nullable=False),
-        sa.Column("display_name", postgresql.CITEXT(length=70), nullable=False),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),

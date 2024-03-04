@@ -1,9 +1,7 @@
-import base64
 from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 import humanize
-import orjson
 import user_agents
 from geoip2.database import Reader
 from user_agents.parsers import UserAgent
@@ -13,6 +11,7 @@ from webauthn import (
     verify_authentication_response,
     verify_registration_response,
 )
+from webauthn.helpers import parse_client_data_json
 from webauthn.helpers.structs import (
     AuthenticationCredential,
     AuthenticatorAttachment,
@@ -242,9 +241,8 @@ class AuthService:
             user_name=register_flow.email,
             authenticator_selection=AuthenticatorSelectionCriteria(
                 authenticator_attachment=AuthenticatorAttachment.PLATFORM,
-                user_verification=UserVerificationRequirement.REQUIRED,
-                resident_key=ResidentKeyRequirement.PREFERRED,
-                require_resident_key=False,
+                user_verification=UserVerificationRequirement.PREFERRED,
+                resident_key=ResidentKeyRequirement.REQUIRED,
             ),
         )
 
@@ -273,17 +271,12 @@ class AuthService:
                 message="Couldn't find register flow.",
             )
 
-        client_data = orjson.loads(
-            base64.b64decode(credential.response.client_data_json)
+        client_data = parse_client_data_json(
+            credential.response.client_data_json,
         )
 
-        challenge = client_data["challenge"]
-
-        # base64 decode challenge
-        # FIXME: the challenge is encoded in some way. we are not decoding it properly here, so we
-        # get challenge response doesn't match errors on the client.
         user_id = await self._webauthn_challenge_repo.get(
-            challenge=base64.b64decode(challenge),
+            challenge=client_data.challenge,
         )
 
         if user_id is None:
@@ -293,9 +286,10 @@ class AuthService:
 
         verified_registration = verify_registration_response(
             credential=credential,
-            expected_challenge=challenge,
+            expected_challenge=client_data.challenge,
             expected_rp_id=settings.rp_id,
             expected_origin=settings.rp_expected_origin,
+            require_user_verification=True,
         )
 
         if not verified_registration.user_verified:
@@ -309,7 +303,9 @@ class AuthService:
         )
 
         # delete challenge server-side
-        await self._webauthn_challenge_repo.delete(challenge=challenge)
+        await self._webauthn_challenge_repo.delete(
+            challenge=client_data.challenge,
+        )
 
         await self._webauthn_credential_repo.create(
             user_id=user.id,
@@ -367,7 +363,7 @@ class AuthService:
 
         authentication_options = generate_authentication_options(
             rp_id=settings.rp_id,
-            user_verification=UserVerificationRequirement.DISCOURAGED,
+            user_verification=UserVerificationRequirement.PREFERRED,
             allow_credentials=[
                 PublicKeyCredentialDescriptor(
                     id=credential.id.encode(),
@@ -397,13 +393,13 @@ class AuthService:
         # TODO: check if its okay if we don't use the user_handle here
         # user_id = credential.response.user_handle
 
-        client_data = orjson.loads(
-            base64.b64decode(credential.response.client_data_json)
+        client_data = parse_client_data_json(
+            credential.response.client_data_json,
         )
 
-        challenge = client_data["challenge"]
-
-        user_id = await self._webauthn_challenge_repo.get(challenge=challenge)
+        user_id = await self._webauthn_challenge_repo.get(
+            challenge=client_data.challenge,
+        )
 
         if user_id is None:
             raise InvalidInputError(
@@ -428,15 +424,18 @@ class AuthService:
 
         verified_authentication = verify_authentication_response(
             credential=credential,
-            expected_challenge=challenge.encode(),
+            expected_challenge=client_data.challenge,
             expected_rp_id=settings.rp_id,
             expected_origin=settings.rp_expected_origin,
             credential_current_sign_count=existing_credential.sign_count,
             credential_public_key=existing_credential.public_key.encode(),
+            require_user_verification=True,
         )
 
         # delete challenge server-side
-        await self._webauthn_challenge_repo.delete(challenge=challenge)
+        await self._webauthn_challenge_repo.delete(
+            challenge=client_data.challenge,
+        )
 
         # update credential sign count
         await self._webauthn_credential_repo.update(

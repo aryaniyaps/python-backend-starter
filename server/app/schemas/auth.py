@@ -5,7 +5,6 @@ from pydantic import EmailStr, Field, Json
 from webauthn.helpers.structs import (
     AuthenticationCredential,
     PublicKeyCredentialCreationOptions,
-    RegistrationCredential,
 )
 
 from app.lib.enums import RegisterFlowStep
@@ -81,7 +80,7 @@ class RegisterFlowWebAuthnFinishInput(BaseSchema):
 
     # FIXME: the client sends client data json under the key clientDataJSON, while we
     # expect it to be clientDataJson. we need to fix this naming issue
-    credential: Json[RegistrationCredential]
+    credential: Json
 
 
 class RegisterFlowWebAuthnFinishResult(BaseSchema):

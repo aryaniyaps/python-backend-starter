@@ -4,6 +4,7 @@ from uuid import UUID
 
 import user_agents
 from fastapi import APIRouter, Depends, Header, Path
+from webauthn.helpers import parse_registration_credential_json
 from webauthn.helpers.structs import (
     PublicKeyCredentialRequestOptions,
 )
@@ -258,7 +259,7 @@ async def finish_webauthn_register_flow(
     """Finish the webauthn registration in the register flow."""
     return await auth_service.webauthn_finish_register_flow(
         flow_id=data.flow_id,
-        credential=data.credential,
+        credential=parse_registration_credential_json(data.credential),
     )
 
 
