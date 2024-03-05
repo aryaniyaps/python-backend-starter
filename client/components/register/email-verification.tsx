@@ -1,6 +1,6 @@
 'use client';
 import { OTPSlot } from '@/components/otp-input';
-import { useRegisterFlow } from '@/components/register-flow-provider';
+import { useRegisterFlow } from '@/components/register/flow-provider';
 import { client } from '@/lib/client';
 import { EMAIL_VERIFICATION_CODE_LENGTH } from '@/lib/constants';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -26,14 +26,10 @@ const registerVerificationSchema = yup
   })
   .required();
 
-export default function RegisterOTPPage() {
+export default function RegisterEmailVerification() {
+  const { setCurrentStep, flowData } = useRegisterFlow();
+
   const router = useRouter();
-  const { flowId, email, setCurrentStep, setFlowId, setEmail } =
-    useRegisterFlow();
-  if (!flowId || !email) {
-    // redirect to register page
-    return router.push('/register');
-  }
 
   const { control, handleSubmit, formState, setError } = useForm({
     resolver: yupResolver(registerVerificationSchema),
@@ -45,13 +41,10 @@ export default function RegisterOTPPage() {
   > = async (input) => {
     try {
       // verify register flow
-      const { data } = await client.POST(
-        '/auth/register/flows/{flow_id}/verify',
-        {
-          body: { verificationCode: input.verificationCode },
-          params: { path: { flow_id: flowId } },
-        }
-      );
+      const { data } = await client.POST('/auth/register/flows/verify', {
+        body: { verificationCode: input.verificationCode },
+        params: { cookie: { register_flow_id: flowData!.id } },
+      });
 
       if (data) {
         setCurrentStep(data.registerFlow.currentStep);
@@ -66,9 +59,9 @@ export default function RegisterOTPPage() {
   };
 
   const resendVerificationCode = async () => {
-    await client.POST('/auth/register/flows/{flow_id}/resend-verification', {
+    await client.POST('/auth/register/flows/resend-verification', {
       params: {
-        path: { flow_id: flowId },
+        cookie: { register_flow_id: flowData!.id },
         header: { 'user-agent': navigator.userAgent },
       },
     });
@@ -80,7 +73,7 @@ export default function RegisterOTPPage() {
         <div className='flex flex-col gap-unit-2'>
           <h1 className='text-md font-semibold'>Enter Verification Code</h1>
           <h3 className='text-xs font-extralight'>
-            Enter the code we sent to {email}
+            Enter the code we sent to {flowData?.email}
           </h3>
         </div>
         <Button size='sm' variant='ghost' onClick={resendVerificationCode}>
@@ -169,12 +162,10 @@ export default function RegisterOTPPage() {
           variant='ghost'
           fullWidth
           onClick={async () => {
-            await client.POST('/auth/register/flows/{flow_id}/cancel', {
-              params: { path: { flow_id: flowId } },
+            await client.POST('/auth/register/flows/cancel', {
+              params: { cookie: { register_flow_id: flowData!.id } },
             });
-            setFlowId(null);
-            setCurrentStep(null);
-            setEmail(null);
+            router.refresh();
           }}
         >
           Cancel

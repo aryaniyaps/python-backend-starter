@@ -1,5 +1,5 @@
 'use client';
-import { useRegisterFlow } from '@/components/register-flow-provider';
+import { useRegisterFlow } from '@/components/register/flow-provider';
 import { client } from '@/lib/client';
 import { KeyIcon } from '@heroicons/react/24/outline';
 import {
@@ -14,24 +14,17 @@ import { startRegistration } from '@simplewebauthn/browser';
 import { useRouter } from 'next/navigation';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-export default function RegisterWebAuthnPage() {
+export default function RegisterWebAuthnRegistration() {
   const { handleSubmit, formState, setError } = useForm({});
 
   const router = useRouter();
-  const { flowId, setFlowId, setCurrentStep, setEmail } = useRegisterFlow();
-  if (!flowId) {
-    // redirect to register page
-    return router.push('/register');
-  }
+  const { flowData } = useRegisterFlow();
 
   const onSubmit: SubmitHandler<{}> = async () => {
     // start webauthn registration
-    const { data } = await client.POST(
-      '/auth/register/flows/{flow_id}/webauthn-start',
-      {
-        params: { path: { flow_id: flowId } },
-      }
-    );
+    const { data } = await client.POST('/auth/register/flows/webauthn-start', {
+      params: { cookie: { register_flow_id: flowData!.id } },
+    });
 
     if (data) {
       let attResp;
@@ -44,8 +37,8 @@ export default function RegisterWebAuthnPage() {
       }
 
       try {
-        await client.POST('/auth/register/flows/{flow_id}/webauthn-finish', {
-          params: { path: { flow_id: flowId } },
+        await client.POST('/auth/register/flows/webauthn-finish', {
+          params: { cookie: { register_flow_id: flowData!.id } },
           body: {
             credential: JSON.stringify(attResp),
           },
@@ -109,12 +102,10 @@ export default function RegisterWebAuthnPage() {
           variant='ghost'
           fullWidth
           onClick={async () => {
-            await client.POST('/auth/register/flows/{flow_id}/cancel', {
-              params: { path: { flow_id: flowId } },
+            await client.POST('/auth/register/flows/cancel', {
+              params: { cookie: { register_flow_id: flowData!.id } },
             });
-            setFlowId(null);
-            setCurrentStep(null);
-            setEmail(null);
+            router.refresh();
           }}
         >
           Cancel

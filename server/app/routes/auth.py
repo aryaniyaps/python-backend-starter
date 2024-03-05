@@ -3,13 +3,10 @@ from typing import Annotated, Any
 from uuid import UUID
 
 import user_agents
-from fastapi import APIRouter, Depends, Header, Path, Response
+from fastapi import APIRouter, Cookie, Depends, Header, Response
 from webauthn.helpers import (
     parse_authentication_credential_json,
     parse_registration_credential_json,
-)
-from webauthn.helpers.structs import (
-    PublicKeyCredentialRequestOptions,
 )
 
 from app.config import settings
@@ -19,7 +16,11 @@ from app.dependencies.auth import (
     get_viewer_info,
 )
 from app.dependencies.ip_address import get_ip_address
-from app.lib.constants import AUTHENTICATION_TOKEN_COOKIE, OpenAPITag
+from app.lib.constants import (
+    AUTHENTICATION_TOKEN_COOKIE,
+    REGISTER_FLOW_ID_COOKIE,
+    OpenAPITag,
+)
 from app.models.register_flow import RegisterFlow
 from app.models.user import User
 from app.models.user_session import UserSession
@@ -51,7 +52,7 @@ auth_router = APIRouter(
 
 
 @auth_router.get(
-    "/register/flows/{flow_id}",
+    "/register/flows",
     response_model=RegisterFlowSchema,
     responses={
         HTTPStatus.NOT_FOUND: {
@@ -62,9 +63,9 @@ auth_router = APIRouter(
     summary="Get a register flow.",
 )
 async def get_register_flow(
-    flow_id: Annotated[
-        UUID,
-        Path(
+    register_flow_id: Annotated[
+        str,
+        Cookie(
             title="The ID of the register flow.",
         ),
     ],
@@ -76,7 +77,7 @@ async def get_register_flow(
     ],
 ) -> RegisterFlow:
     """Get a register flow."""
-    return await auth_service.get_register_flow(flow_id=flow_id)
+    return await auth_service.get_register_flow(flow_id=UUID(register_flow_id))
 
 
 @auth_router.post(
@@ -99,6 +100,7 @@ async def start_register_flow(
             dependency=get_ip_address,
         ),
     ],
+    response: Response,
     auth_service: Annotated[
         AuthService,
         Depends(
@@ -113,11 +115,18 @@ async def start_register_flow(
         request_ip=request_ip,
     )
 
+    # set the register flow ID in a cookie
+    response.set_cookie(
+        key=REGISTER_FLOW_ID_COOKIE,
+        value=str(register_flow.id),
+        secure=settings.is_production(),
+    )
+
     return {"register_flow": register_flow}
 
 
 @auth_router.post(
-    "/register/flows/{flow_id}/cancel",
+    "/register/flows/cancel",
     response_model=None,
     status_code=HTTPStatus.NO_CONTENT,
     responses={
@@ -129,12 +138,13 @@ async def start_register_flow(
     summary="Cancel a register flow.",
 )
 async def cancel_register_flow(
-    flow_id: Annotated[
-        UUID,
-        Path(
+    register_flow_id: Annotated[
+        str,
+        Cookie(
             title="The ID of the register flow.",
         ),
     ],
+    response: Response,
     auth_service: Annotated[
         AuthService,
         Depends(
@@ -144,12 +154,18 @@ async def cancel_register_flow(
 ) -> None:
     """Cancel a register flow."""
     await auth_service.cancel_register_flow(
-        flow_id=flow_id,
+        flow_id=UUID(register_flow_id),
+    )
+
+    # remove register flow ID from cookie
+    response.delete_cookie(
+        key=REGISTER_FLOW_ID_COOKIE,
+        secure=settings.is_production(),
     )
 
 
 @auth_router.post(
-    "/register/flows/{flow_id}/resend-verification",
+    "/register/flows/resend-verification",
     response_model=None,
     status_code=HTTPStatus.ACCEPTED,
     responses={
@@ -161,9 +177,9 @@ async def cancel_register_flow(
     summary="Resend email verification in the register flow.",
 )
 async def resend_verification_register_flow(
-    flow_id: Annotated[
-        UUID,
-        Path(
+    register_flow_id: Annotated[
+        str,
+        Cookie(
             title="The ID of the register flow.",
         ),
     ],
@@ -183,14 +199,14 @@ async def resend_verification_register_flow(
 ) -> None:
     """Resend email verification in the register flow."""
     await auth_service.resend_verification_register_flow(
-        flow_id=flow_id,
+        flow_id=UUID(register_flow_id),
         user_agent=user_agents.parse(user_agent),
         request_ip=request_ip,
     )
 
 
 @auth_router.post(
-    "/register/flows/{flow_id}/verify",
+    "/register/flows/verify",
     response_model=RegisterFlowVerifyResult,
     responses={
         HTTPStatus.BAD_REQUEST: {
@@ -201,9 +217,9 @@ async def resend_verification_register_flow(
     summary="Verify a register flow.",
 )
 async def verify_register_flow(
-    flow_id: Annotated[
-        UUID,
-        Path(
+    register_flow_id: Annotated[
+        str,
+        Cookie(
             title="The ID of the register flow.",
         ),
     ],
@@ -217,7 +233,7 @@ async def verify_register_flow(
 ) -> dict[str, Any]:
     """Verify a register flow."""
     register_flow = await auth_service.verify_register_flow(
-        flow_id=flow_id,
+        flow_id=UUID(register_flow_id),
         verification_code=data.verification_code,
     )
 
@@ -225,7 +241,7 @@ async def verify_register_flow(
 
 
 @auth_router.post(
-    "/register/flows/{flow_id}/webauthn-start",
+    "/register/flows/webauthn-start",
     response_model=RegisterFlowWebAuthnStartResult,
     responses={
         HTTPStatus.BAD_REQUEST: {
@@ -236,9 +252,9 @@ async def verify_register_flow(
     summary="Start the webauthn registration in the register flow.",
 )
 async def start_webauthn_register_flow(
-    flow_id: Annotated[
-        UUID,
-        Path(
+    register_flow_id: Annotated[
+        str,
+        Cookie(
             title="The ID of the register flow.",
         ),
     ],
@@ -251,7 +267,7 @@ async def start_webauthn_register_flow(
 ) -> dict[str, Any]:
     """Start the webauthn registration in the register flow."""
     register_flow, options = await auth_service.webauthn_start_register_flow(
-        flow_id=flow_id,
+        flow_id=UUID(register_flow_id),
     )
 
     return {
@@ -261,7 +277,7 @@ async def start_webauthn_register_flow(
 
 
 @auth_router.post(
-    "/register/flows/{flow_id}/webauthn-finish",
+    "/register/flows/webauthn-finish",
     response_model=RegisterFlowWebAuthnFinishResult,
     responses={
         HTTPStatus.BAD_REQUEST: {
@@ -272,9 +288,9 @@ async def start_webauthn_register_flow(
     summary="Finish the webauthn registration in the register flow.",
 )
 async def finish_webauthn_register_flow(
-    flow_id: Annotated[
-        UUID,
-        Path(
+    register_flow_id: Annotated[
+        str,
+        Cookie(
             title="The ID of the register flow.",
         ),
     ],
@@ -289,7 +305,7 @@ async def finish_webauthn_register_flow(
 ) -> User:
     """Finish the webauthn registration in the register flow."""
     authentication_token, user = await auth_service.webauthn_finish_register_flow(
-        flow_id=flow_id,
+        flow_id=UUID(register_flow_id),
         credential=parse_registration_credential_json(data.credential),
     )
 
@@ -403,7 +419,10 @@ async def delete_current_user_session(
     )
 
     # remove authentication token from cookie
-    response.delete_cookie(AUTHENTICATION_TOKEN_COOKIE)
+    response.delete_cookie(
+        key=AUTHENTICATION_TOKEN_COOKIE,
+        secure=settings.is_production(),
+    )
 
 
 @auth_router.get(

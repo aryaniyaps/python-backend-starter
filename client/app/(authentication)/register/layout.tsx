@@ -1,4 +1,4 @@
-import { RegisterFlowProvider } from '@/components/register-flow-provider';
+import { RegisterFlowProvider } from '@/components/register/flow-provider';
 
 export default function RegisterLayout({
   children,

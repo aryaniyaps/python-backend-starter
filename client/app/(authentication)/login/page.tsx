@@ -18,11 +18,7 @@ import * as yup from 'yup';
 
 const loginSchema = yup
   .object({
-    email: yup
-      .string()
-      .required('Please enter an email')
-      .email('Please enter a valid email')
-      .max(MAX_EMAIL_LENGTH),
+    email: yup.string().required().email().max(MAX_EMAIL_LENGTH),
   })
   .required();
 

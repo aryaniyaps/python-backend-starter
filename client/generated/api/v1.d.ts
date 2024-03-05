@@ -45,7 +45,7 @@ export interface paths {
      */
     get: operations["OpenAPITag.USERS-get_user"];
   };
-  "/auth/register/flows/{flow_id}": {
+  "/auth/register/flows": {
     /**
      * Get a register flow.
      * @description Get a register flow.
@@ -59,35 +59,35 @@ export interface paths {
      */
     post: operations["OpenAPITag.AUTHENTICATION-start_register_flow"];
   };
-  "/auth/register/flows/{flow_id}/cancel": {
+  "/auth/register/flows/cancel": {
     /**
      * Cancel a register flow.
      * @description Cancel a register flow.
      */
     post: operations["OpenAPITag.AUTHENTICATION-cancel_register_flow"];
   };
-  "/auth/register/flows/{flow_id}/resend-verification": {
+  "/auth/register/flows/resend-verification": {
     /**
      * Resend email verification in the register flow.
      * @description Resend email verification in the register flow.
      */
     post: operations["OpenAPITag.AUTHENTICATION-resend_verification_register_flow"];
   };
-  "/auth/register/flows/{flow_id}/verify": {
+  "/auth/register/flows/verify": {
     /**
      * Verify a register flow.
      * @description Verify a register flow.
      */
     post: operations["OpenAPITag.AUTHENTICATION-verify_register_flow"];
   };
-  "/auth/register/flows/{flow_id}/webauthn-start": {
+  "/auth/register/flows/webauthn-start": {
     /**
      * Start the webauthn registration in the register flow.
      * @description Start the webauthn registration in the register flow.
      */
     post: operations["OpenAPITag.AUTHENTICATION-start_webauthn_register_flow"];
   };
-  "/auth/register/flows/{flow_id}/webauthn-finish": {
+  "/auth/register/flows/webauthn-finish": {
     /**
      * Finish the webauthn registration in the register flow.
      * @description Finish the webauthn registration in the register flow.
@@ -849,8 +849,8 @@ export interface operations {
    */
   "OpenAPITag.AUTHENTICATION-get_register_flow": {
     parameters: {
-      path: {
-        flow_id: string;
+      cookie: {
+        register_flow_id: string;
       };
     };
     responses: {
@@ -940,8 +940,8 @@ export interface operations {
    */
   "OpenAPITag.AUTHENTICATION-cancel_register_flow": {
     parameters: {
-      path: {
-        flow_id: string;
+      cookie: {
+        register_flow_id: string;
       };
     };
     responses: {
@@ -984,8 +984,8 @@ export interface operations {
       header: {
         "user-agent": string;
       };
-      path: {
-        flow_id: string;
+      cookie: {
+        register_flow_id: string;
       };
     };
     responses: {
@@ -1027,8 +1027,8 @@ export interface operations {
    */
   "OpenAPITag.AUTHENTICATION-verify_register_flow": {
     parameters: {
-      path: {
-        flow_id: string;
+      cookie: {
+        register_flow_id: string;
       };
     };
     requestBody: {
@@ -1075,8 +1075,8 @@ export interface operations {
    */
   "OpenAPITag.AUTHENTICATION-start_webauthn_register_flow": {
     parameters: {
-      path: {
-        flow_id: string;
+      cookie: {
+        register_flow_id: string;
       };
     };
     responses: {
@@ -1118,8 +1118,8 @@ export interface operations {
    */
   "OpenAPITag.AUTHENTICATION-finish_webauthn_register_flow": {
     parameters: {
-      path: {
-        flow_id: string;
+      cookie: {
+        register_flow_id: string;
       };
     };
     requestBody: {

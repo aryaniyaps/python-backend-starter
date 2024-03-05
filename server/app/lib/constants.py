@@ -10,6 +10,8 @@ APP_URL = "https://example.com"  # frontend app URL
 
 # cookies
 
+REGISTER_FLOW_ID_COOKIE = "register_flow_id"
+
 AUTHENTICATION_TOKEN_COOKIE = "authentication_token"  # noqa: S105
 
 # email verification codes

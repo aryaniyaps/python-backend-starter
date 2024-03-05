@@ -1,104 +1,34 @@
-'use client';
-import { APP_NAME, MAX_EMAIL_LENGTH } from '@/lib/constants';
-import { yupResolver } from '@hookform/resolvers/yup';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Input,
-  Link,
-} from '@nextui-org/react';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import * as yup from 'yup';
+import { REGISTER_FLOW_ID_COOKIE } from '@/lib/constants';
+import { cookies } from 'next/headers';
 
-import { useRegisterFlow } from '@/components/register-flow-provider';
+import { RegisterFlowProvider } from '@/components/register/flow-provider';
+import RegisterForm from '@/components/register/register-form';
 import { client } from '@/lib/client';
 
-// TODO: change resolver to zod as we are already using it for env management
-const registerSchema = yup
-  .object({
-    email: yup
-      .string()
-      .required('Please enter an email')
-      .email('Please enter a valid email')
-      .max(MAX_EMAIL_LENGTH),
-  })
-  .required();
+export default async function RegisterPage() {
+  const cookieStore = cookies();
+  const flowId = cookieStore.get(REGISTER_FLOW_ID_COOKIE);
 
-export default function RegisterPage() {
-  const { setCurrentStep, setFlowId } = useRegisterFlow();
+  let flowData;
 
-  const { handleSubmit, control, formState, setError } = useForm({
-    resolver: yupResolver(registerSchema),
-    defaultValues: { email: '' },
-    mode: 'onTouched',
-  });
-
-  const onSubmit: SubmitHandler<yup.InferType<typeof registerSchema>> = async (
-    input
-  ) => {
-    console.log(input);
+  if (flowId) {
     try {
-      // start register flow
-      const { data } = await client.POST('/auth/register/flows/start', {
-        body: { email: input.email },
-        params: {
-          header: { 'user-agent': window.navigator.userAgent },
-        },
+      const { data } = await client.GET('/auth/register/flows', {
+        params: { cookie: { register_flow_id: flowId.value } },
       });
-
       if (data) {
-        setFlowId(data.registerFlow.id);
-        setCurrentStep(data.registerFlow.currentStep);
+        flowData = data;
       }
     } catch (err) {
-      // TODO: handle email already taken err
-      setError('email', {
-        message: 'That email is already in use',
-        type: 'server',
-      });
+      // TODO: handle errs better
+      // TODO: delete register flow ID cookie if it is invalid
+      // cookieStore.delete(REGISTER_FLOW_ID_COOKIE);
     }
-  };
+  }
 
   return (
-    <Card isFooterBlurred fullWidth className='px-unit-2'>
-      <CardHeader>
-        <h1 className='text-md font-semibold'>Create a {APP_NAME} account</h1>
-      </CardHeader>
-      <CardBody>
-        <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
-          <Controller
-            name='email'
-            control={control}
-            render={({ field, fieldState }) => {
-              return (
-                <Input
-                  {...field}
-                  variant='faded'
-                  type='email'
-                  label='Email address'
-                  errorMessage={fieldState.error?.message}
-                  isInvalid={!!fieldState.error}
-                />
-              );
-            }}
-          />
-
-          <Button
-            color='primary'
-            type='submit'
-            isLoading={formState.isSubmitting}
-            fullWidth
-          >
-            Continue
-          </Button>
-        </form>
-      </CardBody>
-      <CardFooter className='text-sm'>
-        Have an account?&nbsp;<Link href='/login'>sign in</Link>
-      </CardFooter>
-    </Card>
+    <RegisterFlowProvider flowData={flowData}>
+      <RegisterForm />
+    </RegisterFlowProvider>
   );
 }
