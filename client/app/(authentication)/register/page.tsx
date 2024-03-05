@@ -13,7 +13,7 @@ export default async function RegisterPage() {
 
   if (flowId) {
     try {
-      console.log('GETTING FLOW DATA');
+      console.log('GETTING FLOW DATA: ', flowId.value);
       const { data } = await client.GET('/auth/register/flows', {
         params: { cookie: { register_flow_id: flowId.value } },
       });

@@ -69,7 +69,7 @@ export default function LoginPage() {
       },
     });
 
-    router.push(returnTo);
+    router.replace(returnTo);
   };
 
   return (

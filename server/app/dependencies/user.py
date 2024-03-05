@@ -47,7 +47,7 @@ def get_user_service(
             dependency=get_user_repo,
         ),
     ],
-    email_verification_token_repo: Annotated[
+    email_verification_code_repo: Annotated[
         EmailVerificationCodeRepo,
         Depends(
             dependency=get_email_verification_code_repo,
@@ -63,7 +63,7 @@ def get_user_service(
     """Get the user service."""
     return UserService(
         user_repo=user_repo,
-        email_verification_token_repo=email_verification_token_repo,
+        email_verification_code_repo=email_verification_code_repo,
         user_session_repo=user_session_repo,
         authentication_token_repo=authentication_token_repo,
         geoip_reader=geoip_reader,

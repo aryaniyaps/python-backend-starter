@@ -13,7 +13,7 @@ const errorMiddleware: Middleware = {
       }
       throw new Error(body);
     }
-    return res;
+    return undefined;
   },
 };
 

@@ -54,7 +54,7 @@ export default function RegisterWebAuthnRegistration() {
         });
       }
 
-      router.push(returnTo);
+      router.replace(returnTo);
     }
   };
 
