@@ -77,7 +77,9 @@ async def get_register_flow(
     ],
 ) -> RegisterFlow:
     """Get a register flow."""
-    return await auth_service.get_register_flow(flow_id=UUID(register_flow_id))
+    return await auth_service.get_register_flow(
+        flow_id=UUID(register_flow_id),
+    )
 
 
 @auth_router.post(

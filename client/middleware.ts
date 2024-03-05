@@ -1,7 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { AUTHENTICATION_TOKEN_COOKIE } from './lib/constants';
 
-// TODO: append redirect to URL here
 export function middleware(request: NextRequest) {
   const authenticationToken = request.cookies.get(
     AUTHENTICATION_TOKEN_COOKIE
@@ -24,7 +23,9 @@ export function middleware(request: NextRequest) {
       request.nextUrl.pathname.startsWith('/register')
     )
   ) {
-    return Response.redirect(new URL('/login', request.url));
+    const redirectURL = new URL('/login', request.url);
+    redirectURL.searchParams.append('returnTo', request.nextUrl.pathname);
+    return Response.redirect(redirectURL);
   }
 }
 

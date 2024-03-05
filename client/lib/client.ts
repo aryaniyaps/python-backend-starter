@@ -17,8 +17,15 @@ const errorMiddleware: Middleware = {
   },
 };
 
+function getBaseUrl(): string {
+  if (typeof window !== 'undefined') {
+    return env.NEXT_PUBLIC_API_BASE_URL; // browser should use relative url
+  }
+  return env.API_BASE_URL; // SSR should use localhost
+}
+
 export const client = createClient<paths>({
-  baseUrl: env.NEXT_PUBLIC_API_BASE_URL,
+  baseUrl: getBaseUrl(),
   headers: { 'Content-Type': 'application/json' },
   mode: 'cors',
   credentials: 'include',

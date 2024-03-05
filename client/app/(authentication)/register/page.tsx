@@ -13,13 +13,16 @@ export default async function RegisterPage() {
 
   if (flowId) {
     try {
+      console.log('GETTING FLOW DATA');
       const { data } = await client.GET('/auth/register/flows', {
         params: { cookie: { register_flow_id: flowId.value } },
       });
       if (data) {
+        console.log('GOT FLOW DATA');
         flowData = data;
       }
     } catch (err) {
+      console.log('ERR: ', err);
       // TODO: handle errs better
       // TODO: delete register flow ID cookie if it is invalid
       // cookieStore.delete(REGISTER_FLOW_ID_COOKIE);

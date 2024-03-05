@@ -12,7 +12,7 @@ import {
   Link,
 } from '@nextui-org/react';
 import { startAuthentication } from '@simplewebauthn/browser';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -28,6 +28,10 @@ export default function LoginPage() {
     defaultValues: { email: '' },
     mode: 'onTouched',
   });
+
+  const searchParams = useSearchParams();
+
+  const returnTo = searchParams.get('returnTo') || '/';
 
   const router = useRouter();
 
@@ -61,8 +65,7 @@ export default function LoginPage() {
       },
     });
 
-    // TODO: redirect using redirect URL here
-    router.push('/');
+    router.push(returnTo);
   };
 
   return (

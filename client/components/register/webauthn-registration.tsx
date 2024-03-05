@@ -11,7 +11,7 @@ import {
   Link,
 } from '@nextui-org/react';
 import { startRegistration } from '@simplewebauthn/browser';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 export default function RegisterWebAuthnRegistration() {
@@ -19,6 +19,9 @@ export default function RegisterWebAuthnRegistration() {
 
   const router = useRouter();
   const { flowData } = useRegisterFlow();
+  const searchParams = useSearchParams();
+
+  const returnTo = searchParams.get('returnTo') || '/';
 
   const onSubmit: SubmitHandler<{}> = async () => {
     // start webauthn registration
@@ -50,8 +53,7 @@ export default function RegisterWebAuthnRegistration() {
         });
       }
 
-      // TODO: redirect here using redirect URL
-      router.push('/');
+      router.push(returnTo);
     }
   };
 
