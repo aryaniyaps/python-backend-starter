@@ -27,7 +27,7 @@ const registerVerificationSchema = yup
   .required();
 
 export default function RegisterEmailVerification() {
-  const { setCurrentStep, flowData } = useRegisterFlow();
+  const { setCurrentStep, flow: flowData } = useRegisterFlow();
 
   const router = useRouter();
 

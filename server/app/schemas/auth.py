@@ -1,7 +1,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from pydantic import EmailStr, Field, Json, RootModel
+from pydantic import EmailStr, Field, Json, RootModel, field_serializer
 from webauthn.helpers.structs import (
     PublicKeyCredentialCreationOptions,
     PublicKeyCredentialRequestOptions,
@@ -10,6 +10,7 @@ from webauthn.helpers.structs import (
 from app.lib.enums import RegisterFlowStep
 from app.schemas.base import BaseSchema
 from app.schemas.user import UserSchema
+from app.utils.formatting import redact_email
 
 
 class RegisterFlowSchema(BaseSchema):
@@ -25,6 +26,12 @@ class RegisterFlowSchema(BaseSchema):
             ],
         ),
     ]
+
+    @field_serializer("email")
+    @classmethod
+    def serialize_email(cls, email: str) -> str:
+        """Redact the given email (for security purposes)."""
+        return redact_email(email=email)
 
 
 class RegisterFlowStartInput(BaseSchema):

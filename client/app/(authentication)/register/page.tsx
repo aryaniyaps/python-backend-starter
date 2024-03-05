@@ -9,7 +9,7 @@ export default async function RegisterPage() {
   const cookieStore = cookies();
   const flowId = cookieStore.get(REGISTER_FLOW_ID_COOKIE);
 
-  let flowData;
+  let flow;
 
   if (flowId) {
     try {
@@ -19,7 +19,7 @@ export default async function RegisterPage() {
       });
       if (data) {
         console.log('GOT FLOW DATA');
-        flowData = data;
+        flow = data;
       }
     } catch (err) {
       console.log(typeof err);
@@ -31,7 +31,7 @@ export default async function RegisterPage() {
   }
 
   return (
-    <RegisterFlowProvider flowData={flowData}>
+    <RegisterFlowProvider flow={flow}>
       <RegisterForm />
     </RegisterFlowProvider>
   );

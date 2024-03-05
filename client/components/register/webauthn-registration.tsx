@@ -19,7 +19,7 @@ export default function RegisterWebAuthnRegistration() {
   const { handleSubmit, formState, setError } = useForm({});
 
   const router = useRouter();
-  const { flowData } = useRegisterFlow();
+  const { flow: flowData } = useRegisterFlow();
   const searchParams = useSearchParams();
 
   const returnTo = searchParams.get('returnTo') || DEFAULT_REDIRECT_TO;
