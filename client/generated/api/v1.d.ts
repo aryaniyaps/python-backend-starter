@@ -45,7 +45,7 @@ export interface paths {
      */
     get: operations["OpenAPITag.USERS-get_user"];
   };
-  "/auth/register/flows": {
+  "/auth/register/flows/{flow_id}": {
     /**
      * Get a register flow.
      * @description Get a register flow.
@@ -849,8 +849,8 @@ export interface operations {
    */
   "OpenAPITag.AUTHENTICATION-get_register_flow": {
     parameters: {
-      cookie: {
-        register_flow_id: string;
+      path: {
+        flow_id: string;
       };
     };
     responses: {

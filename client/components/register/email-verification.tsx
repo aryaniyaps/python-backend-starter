@@ -27,7 +27,7 @@ const registerVerificationSchema = yup
   .required();
 
 export default function RegisterEmailVerification() {
-  const { setCurrentStep, flow: flowData } = useRegisterFlow();
+  const { setCurrentStep, flow } = useRegisterFlow();
 
   const router = useRouter();
 
@@ -43,7 +43,7 @@ export default function RegisterEmailVerification() {
       // verify register flow
       const { data } = await client.POST('/auth/register/flows/verify', {
         body: { verificationCode: input.verificationCode },
-        params: { cookie: { register_flow_id: flowData!.id } },
+        params: { cookie: { register_flow_id: flow!.id } },
       });
 
       if (data) {
@@ -61,7 +61,7 @@ export default function RegisterEmailVerification() {
   const resendVerificationCode = async () => {
     await client.POST('/auth/register/flows/resend-verification', {
       params: {
-        cookie: { register_flow_id: flowData!.id },
+        cookie: { register_flow_id: flow!.id },
         header: { 'user-agent': navigator.userAgent },
       },
     });
@@ -73,7 +73,7 @@ export default function RegisterEmailVerification() {
         <div className='flex flex-col gap-unit-2'>
           <h1 className='text-md font-semibold'>Enter Verification Code</h1>
           <h3 className='text-xs font-extralight'>
-            Enter the code we sent to {flowData?.email}
+            Enter the code we sent to {flow?.email}
           </h3>
         </div>
         <Button size='sm' variant='ghost' onClick={resendVerificationCode}>
@@ -163,7 +163,7 @@ export default function RegisterEmailVerification() {
           fullWidth
           onClick={async () => {
             await client.POST('/auth/register/flows/cancel', {
-              params: { cookie: { register_flow_id: flowData!.id } },
+              params: { cookie: { register_flow_id: flow!.id } },
             });
             router.refresh();
           }}

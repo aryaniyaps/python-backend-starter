@@ -24,7 +24,7 @@ const registerSchema = yup
   .required();
 
 export default function RegisterFlowStart() {
-  const { setCurrentStep } = useRegisterFlow();
+  const { setCurrentStep, setFlow } = useRegisterFlow();
 
   const { handleSubmit, control, formState, setError } = useForm({
     resolver: yupResolver(registerSchema),
@@ -46,6 +46,7 @@ export default function RegisterFlowStart() {
       });
 
       if (data) {
+        setFlow(data.registerFlow);
         setCurrentStep(data.registerFlow.currentStep);
       }
     } catch (err) {

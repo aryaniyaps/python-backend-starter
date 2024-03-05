@@ -3,7 +3,7 @@ from typing import Annotated, Any
 from uuid import UUID
 
 import user_agents
-from fastapi import APIRouter, Cookie, Depends, Header, Response
+from fastapi import APIRouter, Cookie, Depends, Header, Path, Response
 from webauthn.helpers import (
     parse_authentication_credential_json,
     parse_registration_credential_json,
@@ -52,7 +52,7 @@ auth_router = APIRouter(
 
 
 @auth_router.get(
-    "/register/flows",
+    "/register/flows/{flow_id}",
     response_model=RegisterFlowSchema,
     responses={
         HTTPStatus.NOT_FOUND: {
@@ -63,9 +63,9 @@ auth_router = APIRouter(
     summary="Get a register flow.",
 )
 async def get_register_flow(
-    register_flow_id: Annotated[
-        str,
-        Cookie(
+    flow_id: Annotated[
+        UUID,
+        Path(
             title="The ID of the register flow.",
         ),
     ],
@@ -77,9 +77,7 @@ async def get_register_flow(
     ],
 ) -> RegisterFlow:
     """Get a register flow."""
-    return await auth_service.get_register_flow(
-        flow_id=UUID(register_flow_id),
-    )
+    return await auth_service.get_register_flow(flow_id=flow_id)
 
 
 @auth_router.post(
@@ -309,6 +307,12 @@ async def finish_webauthn_register_flow(
     authentication_token, user = await auth_service.webauthn_finish_register_flow(
         flow_id=UUID(register_flow_id),
         credential=parse_registration_credential_json(data.credential),
+    )
+
+    # remove register flow ID from cookie
+    response.delete_cookie(
+        key=REGISTER_FLOW_ID_COOKIE,
+        secure=settings.is_production(),
     )
 
     # set authentication token in a cookie
