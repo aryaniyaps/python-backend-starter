@@ -1,6 +1,7 @@
 'use client';
 import { useRegisterFlow } from '@/components/register/flow-provider';
 import { client } from '@/lib/client';
+import { DEFAULT_REDIRECT_TO } from '@/lib/constants';
 import { KeyIcon } from '@heroicons/react/24/outline';
 import {
   Button,
@@ -21,7 +22,7 @@ export default function RegisterWebAuthnRegistration() {
   const { flowData } = useRegisterFlow();
   const searchParams = useSearchParams();
 
-  const returnTo = searchParams.get('returnTo') || '/';
+  const returnTo = searchParams.get('returnTo') || DEFAULT_REDIRECT_TO;
 
   const onSubmit: SubmitHandler<{}> = async () => {
     // start webauthn registration

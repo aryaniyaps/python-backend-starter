@@ -1,6 +1,10 @@
 'use client';
 import { client } from '@/lib/client';
-import { APP_NAME, MAX_EMAIL_LENGTH } from '@/lib/constants';
+import {
+  APP_NAME,
+  DEFAULT_REDIRECT_TO,
+  MAX_EMAIL_LENGTH,
+} from '@/lib/constants';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Button,
@@ -31,7 +35,7 @@ export default function LoginPage() {
 
   const searchParams = useSearchParams();
 
-  const returnTo = searchParams.get('returnTo') || '/';
+  const returnTo = searchParams.get('returnTo') || DEFAULT_REDIRECT_TO;
 
   const router = useRouter();
 
