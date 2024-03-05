@@ -22,7 +22,8 @@ export default async function RegisterPage() {
         flowData = data;
       }
     } catch (err) {
-      console.log('ERR: ', err);
+      console.log(typeof err);
+      console.log(JSON.stringify(err, null, 4));
       // TODO: handle errs better
       // TODO: delete register flow ID cookie if it is invalid
       // cookieStore.delete(REGISTER_FLOW_ID_COOKIE);

@@ -40,6 +40,7 @@ async def handle_validation_error(
     exception: RequestValidationError,
 ) -> Response:
     """Handle ValidationError exceptions."""
+    print("ERROR: ", exception)
     return _create_error_response(
         error_result=ValidationErrorResult(
             message="Invalid input detected.",

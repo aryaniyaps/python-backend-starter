@@ -316,6 +316,7 @@ async def finish_webauthn_register_flow(
         key=AUTHENTICATION_TOKEN_COOKIE,
         value=authentication_token,
         secure=settings.is_production(),
+        httponly=True,
     )
 
     return user
@@ -375,6 +376,7 @@ async def verify_authentication_response(
         key=AUTHENTICATION_TOKEN_COOKIE,
         value=authentication_token,
         secure=settings.is_production(),
+        httponly=True,
     )
 
     return user
@@ -424,6 +426,7 @@ async def delete_current_user_session(
     response.delete_cookie(
         key=AUTHENTICATION_TOKEN_COOKIE,
         secure=settings.is_production(),
+        httponly=True,
     )
 
 
