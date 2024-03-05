@@ -1,5 +1,8 @@
 import type { NextRequest } from 'next/server';
-import { AUTHENTICATION_TOKEN_COOKIE } from './lib/constants';
+import {
+  AUTHENTICATION_TOKEN_COOKIE,
+  DEFAULT_REDIRECT_TO,
+} from './lib/constants';
 
 export function middleware(request: NextRequest) {
   const authenticationToken = request.cookies.get(
@@ -13,7 +16,7 @@ export function middleware(request: NextRequest) {
   ) {
     // redirect to dashboard if an authenticated user
     // tries to access the register/ login page
-    return Response.redirect(new URL('/', request.url));
+    return Response.redirect(new URL(DEFAULT_REDIRECT_TO, request.url));
   }
 
   if (
