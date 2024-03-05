@@ -4,6 +4,7 @@ from uuid import UUID
 from pydantic import EmailStr, Field, Json, RootModel
 from webauthn.helpers.structs import (
     PublicKeyCredentialCreationOptions,
+    PublicKeyCredentialRequestOptions,
 )
 
 from app.lib.enums import RegisterFlowStep
@@ -69,7 +70,7 @@ RegisterFlowWebAuthnFinishResult = RootModel[UserSchema]
 AuthenticateUserResult = RootModel[UserSchema]
 
 
-class LoginOptionsInput(BaseSchema):
+class AuthenticateOptionsInput(BaseSchema):
     email: Annotated[
         EmailStr,
         Field(
@@ -78,7 +79,11 @@ class LoginOptionsInput(BaseSchema):
     ]
 
 
-class LoginVerificationInput(BaseSchema):
+class AuthenticateOptionsResult(BaseSchema):
+    options: PublicKeyCredentialRequestOptions
+
+
+class AuthenticateVerificationInput(BaseSchema):
     credential: Json
 
 

@@ -309,8 +309,8 @@ class AuthService:
 
         await self._webauthn_credential_repo.create(
             user_id=user.id,
-            credential_id=str(verified_registration.credential_id),
-            public_key=str(verified_registration.credential_public_key),
+            credential_id=verified_registration.credential_id,
+            public_key=verified_registration.credential_public_key,
             sign_count=verified_registration.sign_count,
             backed_up=verified_registration.credential_backed_up,
             device_type=verified_registration.credential_device_type,
@@ -363,7 +363,7 @@ class AuthService:
             user_verification=UserVerificationRequirement.PREFERRED,
             allow_credentials=[
                 PublicKeyCredentialDescriptor(
-                    id=credential.id.encode(),
+                    id=credential.id,
                     type=PublicKeyCredentialType.PUBLIC_KEY,
                     transports=credential.transports,
                 )
@@ -410,7 +410,7 @@ class AuthService:
             raise Exception
 
         existing_credential = await self._webauthn_credential_repo.get(
-            credential_id=credential.id,
+            credential_id=credential.raw_id,
             user_id=existing_user.id,
         )
 
@@ -425,7 +425,7 @@ class AuthService:
             expected_rp_id=settings.rp_id,
             expected_origin=settings.rp_expected_origin,
             credential_current_sign_count=existing_credential.sign_count,
-            credential_public_key=existing_credential.public_key.encode(),
+            credential_public_key=existing_credential.public_key,
             require_user_verification=True,
         )
 

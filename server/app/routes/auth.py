@@ -24,10 +24,11 @@ from app.models.register_flow import RegisterFlow
 from app.models.user import User
 from app.models.user_session import UserSession
 from app.schemas.auth import (
+    AuthenticateOptionsInput,
+    AuthenticateOptionsResult,
     AuthenticateUserResult,
+    AuthenticateVerificationInput,
     CreateWebAuthnCredentialInput,
-    LoginOptionsInput,
-    LoginVerificationInput,
     LogoutInput,
     RegisterFlowSchema,
     RegisterFlowStartInput,
@@ -304,21 +305,23 @@ async def finish_webauthn_register_flow(
 
 @auth_router.post(
     "/login/start",
-    response_model=PublicKeyCredentialRequestOptions,
+    response_model=AuthenticateOptionsResult,
 )
 async def generate_authentication_options(
-    data: LoginOptionsInput,
+    data: AuthenticateOptionsInput,
     auth_service: Annotated[
         AuthService,
         Depends(
             dependency=get_auth_service,
         ),
     ],
-) -> PublicKeyCredentialRequestOptions:
+) -> AuthenticateOptionsResult:
     """Generate options for retrieving a credential."""
-    return await auth_service.generate_authentication_options(
+    options = await auth_service.generate_authentication_options(
         email=data.email,
     )
+
+    return AuthenticateOptionsResult(options=options)
 
 
 @auth_router.post(
@@ -326,7 +329,7 @@ async def generate_authentication_options(
     response_model=AuthenticateUserResult,
 )
 async def verify_authentication_response(
-    data: LoginVerificationInput,
+    data: AuthenticateVerificationInput,
     user_agent: Annotated[str, Header()],
     request_ip: Annotated[
         str,

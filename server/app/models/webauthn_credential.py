@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 class WebAuthnCredential(Base):
     __tablename__ = "webauthn_credentials"
 
-    id: Mapped[str] = mapped_column(
+    id: Mapped[bytes] = mapped_column(
         primary_key=True,
     )
 
@@ -26,7 +26,7 @@ class WebAuthnCredential(Base):
         primary_key=True,
     )
 
-    public_key: Mapped[str]
+    public_key: Mapped[bytes]
 
     sign_count: Mapped[int]
 

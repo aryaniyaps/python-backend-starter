@@ -1,9 +1,9 @@
 """
 initial migration
 
-Revision ID: 867747625abd
+Revision ID: fd20fb42ede5
 Revises: 7a23de63905c
-Create Date: 2024-03-04 18:03:36.153410
+Create Date: 2024-03-05 12:43:29.009884
 
 """
 
@@ -14,7 +14,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = "867747625abd"
+revision: str = "fd20fb42ede5"
 down_revision: str | None = "7a23de63905c"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -122,9 +122,9 @@ def upgrade() -> None:
     )
     op.create_table(
         "webauthn_credentials",
-        sa.Column("id", sa.String(), nullable=False),
+        sa.Column("id", sa.LargeBinary(), nullable=False),
         sa.Column("user_id", sa.Uuid(), nullable=False),
-        sa.Column("public_key", sa.String(), nullable=False),
+        sa.Column("public_key", sa.LargeBinary(), nullable=False),
         sa.Column("sign_count", sa.Integer(), nullable=False),
         sa.Column("device_type", sa.String(), nullable=False),
         sa.Column("backed_up", sa.Boolean(), nullable=False),

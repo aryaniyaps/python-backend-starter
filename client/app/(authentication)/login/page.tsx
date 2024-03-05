@@ -39,18 +39,22 @@ export default function LoginPage() {
     input
   ) => {
     console.log(input);
-    // start webauthn authentication
-    const { data } = await client.POST('/auth/login/start', {
-      body: { email: input.email },
-    });
 
     let asseResp;
     try {
+      // start webauthn authentication
+      const { data } = await client.POST('/auth/login/start', {
+        body: { email: input.email },
+      });
+
       // Pass the options to the authenticator and wait for a response
-      asseResp = await startAuthentication(data);
-    } catch (error) {
-      return setError('root', {
-        message: `Couldn't login with passkey. Please try again`,
+      asseResp = await startAuthentication(data.options);
+    } catch (err) {
+      // TODO: handle errors better
+      return setError('email', {
+        message:
+          "User with that email doesn't exist or couldn't login with passkey.",
+        type: 'server',
       });
     }
 

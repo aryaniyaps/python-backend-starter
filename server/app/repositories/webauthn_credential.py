@@ -14,9 +14,9 @@ class WebAuthnCredentialRepo:
     async def create(
         self,
         *,
-        credential_id: str,
+        credential_id: bytes,
         user_id: UUID,
-        public_key: str,
+        public_key: bytes,
         sign_count: int,
         device_type: str,
         backed_up: bool,
@@ -47,7 +47,9 @@ class WebAuthnCredentialRepo:
         self._session.add(webauthn_credential)
         await self._session.commit()
 
-    async def get(self, credential_id: str, user_id: UUID) -> WebAuthnCredential | None:
+    async def get(
+        self, credential_id: bytes, user_id: UUID
+    ) -> WebAuthnCredential | None:
         """Get WebAuthn credential by ID and user ID."""
         return await self._session.scalar(
             select(WebAuthnCredential).where(

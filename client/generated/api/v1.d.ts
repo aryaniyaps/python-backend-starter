@@ -96,17 +96,17 @@ export interface paths {
   };
   "/auth/login/start": {
     /**
-     * Login Options
+     * Generate Authentication Options
      * @description Generate options for retrieving a credential.
      */
-    post: operations["OpenAPITag.AUTHENTICATION-login_options"];
+    post: operations["OpenAPITag.AUTHENTICATION-generate_authentication_options"];
   };
   "/auth/login/finish": {
     /**
-     * Login Verification
+     * Verify Authentication Response
      * @description Verify the authenticator's response for login.
      */
-    post: operations["OpenAPITag.AUTHENTICATION-login_verification"];
+    post: operations["OpenAPITag.AUTHENTICATION-verify_authentication_response"];
   };
   "/auth/webauthn-credentials": {
     /**
@@ -149,43 +149,22 @@ export interface components {
      * @enum {string}
      */
     AttestationConveyancePreference: "none" | "indirect" | "direct" | "enterprise";
-    /** AuthenticationCredential */
-    AuthenticationCredential: {
-      /** Id */
-      id: string;
+    /** AuthenticateOptionsInput */
+    AuthenticateOptionsInput: {
       /**
-       * Rawid
-       * Format: binary
+       * Email
+       * Format: email
        */
-      rawId: string;
-      response: components["schemas"]["AuthenticatorAssertionResponse"];
-      authenticatorAttachment?: components["schemas"]["AuthenticatorAttachment"] | null;
-      /**
-       * Type
-       * @default public-key
-       * @constant
-       */
-      type?: "public-key";
+      email: string;
     };
-    /** AuthenticatorAssertionResponse */
-    AuthenticatorAssertionResponse: {
-      /**
-       * Clientdatajson
-       * Format: binary
-       */
-      clientDataJson: string;
-      /**
-       * Authenticatordata
-       * Format: binary
-       */
-      authenticatorData: string;
-      /**
-       * Signature
-       * Format: binary
-       */
-      signature: string;
-      /** Userhandle */
-      userHandle?: string | null;
+    /** AuthenticateOptionsResult */
+    AuthenticateOptionsResult: {
+      options: components["schemas"]["PublicKeyCredentialRequestOptions"];
+    };
+    /** AuthenticateVerificationInput */
+    AuthenticateVerificationInput: {
+      /** Credential */
+      credential: string;
     };
     /**
      * AuthenticatorAttachment
@@ -297,19 +276,6 @@ export interface components {
        */
       message: string;
     };
-    /** LoginOptionsInput */
-    LoginOptionsInput: {
-      /**
-       * Email
-       * Format: email
-       */
-      email: string;
-    };
-    /** LoginVerificationInput */
-    LoginVerificationInput: {
-      /** Credential */
-      credential: string;
-    };
     /** LogoutInput */
     LogoutInput: {
       /**
@@ -392,12 +358,12 @@ export interface components {
       challenge: string;
       /** Timeout */
       timeout?: number | null;
-      /** Rp Id */
-      rp_id?: string | null;
-      /** Allow Credentials */
-      allow_credentials?: components["schemas"]["PublicKeyCredentialDescriptor"][] | null;
+      /** Rpid */
+      rpId?: string | null;
+      /** Allowcredentials */
+      allowCredentials?: components["schemas"]["PublicKeyCredentialDescriptor"][] | null;
       /** @default preferred */
-      user_verification?: components["schemas"]["UserVerificationRequirement"] | null;
+      userVerification?: components["schemas"]["UserVerificationRequirement"] | null;
     };
     /** PublicKeyCredentialRpEntity */
     PublicKeyCredentialRpEntity: {
@@ -1195,20 +1161,20 @@ export interface operations {
     };
   };
   /**
-   * Login Options
+   * Generate Authentication Options
    * @description Generate options for retrieving a credential.
    */
-  "OpenAPITag.AUTHENTICATION-login_options": {
+  "OpenAPITag.AUTHENTICATION-generate_authentication_options": {
     requestBody: {
       content: {
-        "application/json": components["schemas"]["LoginOptionsInput"];
+        "application/json": components["schemas"]["AuthenticateOptionsInput"];
       };
     };
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["PublicKeyCredentialRequestOptions"];
+          "application/json": components["schemas"]["AuthenticateOptionsResult"];
         };
       };
       /** @description Validation Error */
@@ -1232,10 +1198,10 @@ export interface operations {
     };
   };
   /**
-   * Login Verification
+   * Verify Authentication Response
    * @description Verify the authenticator's response for login.
    */
-  "OpenAPITag.AUTHENTICATION-login_verification": {
+  "OpenAPITag.AUTHENTICATION-verify_authentication_response": {
     parameters: {
       header: {
         "user-agent": string;
@@ -1243,7 +1209,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["LoginVerificationInput"];
+        "application/json": components["schemas"]["AuthenticateVerificationInput"];
       };
     };
     responses: {
