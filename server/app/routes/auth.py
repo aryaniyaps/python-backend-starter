@@ -304,7 +304,7 @@ async def finish_webauthn_register_flow(
 
 
 @auth_router.post(
-    "/login/start",
+    "/authenticate/start",
     response_model=AuthenticateOptionsResult,
 )
 async def generate_authentication_options(
@@ -325,7 +325,7 @@ async def generate_authentication_options(
 
 
 @auth_router.post(
-    "/login/finish",
+    "/authenticate/finish",
     response_model=AuthenticateUserResult,
 )
 async def verify_authentication_response(

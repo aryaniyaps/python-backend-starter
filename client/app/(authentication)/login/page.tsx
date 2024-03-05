@@ -43,7 +43,7 @@ export default function LoginPage() {
     let asseResp;
     try {
       // start webauthn authentication
-      const { data } = await client.POST('/auth/login/start', {
+      const { data } = await client.POST('/auth/authenticate/start', {
         body: { email: input.email },
       });
 
@@ -58,7 +58,7 @@ export default function LoginPage() {
       });
     }
 
-    await client.POST('/auth/login/finish', {
+    await client.POST('/auth/authenticate/finish', {
       params: { header: { 'user-agent': navigator.userAgent } },
       body: {
         credential: JSON.stringify(asseResp),

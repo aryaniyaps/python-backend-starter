@@ -94,14 +94,14 @@ export interface paths {
      */
     post: operations["OpenAPITag.AUTHENTICATION-finish_webauthn_register_flow"];
   };
-  "/auth/login/start": {
+  "/auth/authenticate/start": {
     /**
      * Generate Authentication Options
      * @description Generate options for retrieving a credential.
      */
     post: operations["OpenAPITag.AUTHENTICATION-generate_authentication_options"];
   };
-  "/auth/login/finish": {
+  "/auth/authenticate/finish": {
     /**
      * Verify Authentication Response
      * @description Verify the authenticator's response for login.
