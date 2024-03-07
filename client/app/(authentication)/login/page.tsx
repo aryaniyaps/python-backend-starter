@@ -5,7 +5,7 @@ import {
   DEFAULT_REDIRECT_TO,
   MAX_EMAIL_LENGTH,
 } from '@/lib/constants';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
   Card,
@@ -18,17 +18,19 @@ import {
 import { startAuthentication } from '@simplewebauthn/browser';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import * as yup from 'yup';
+import * as z from 'zod';
 
-const loginSchema = yup
-  .object({
-    email: yup.string().required().email().max(MAX_EMAIL_LENGTH),
-  })
-  .required();
+const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, { message: 'Email address is required' })
+    .email({ message: 'Email address is invalid' })
+    .max(MAX_EMAIL_LENGTH, { message: 'Email address is too long' }),
+});
 
 export default function LoginPage() {
   const { control, handleSubmit, formState, setError } = useForm({
-    resolver: yupResolver(loginSchema),
+    resolver: zodResolver(loginSchema),
     defaultValues: { email: '' },
     mode: 'onTouched',
   });
@@ -39,7 +41,7 @@ export default function LoginPage() {
 
   const router = useRouter();
 
-  const onSubmit: SubmitHandler<yup.InferType<typeof loginSchema>> = async (
+  const onSubmit: SubmitHandler<z.infer<typeof loginSchema>> = async (
     input
   ) => {
     console.log(input);

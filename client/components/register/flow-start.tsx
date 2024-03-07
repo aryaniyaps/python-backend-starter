@@ -1,6 +1,6 @@
 'use client';
 import { APP_NAME, MAX_EMAIL_LENGTH } from '@/lib/constants';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
   Card,
@@ -11,28 +11,30 @@ import {
   Link,
 } from '@nextui-org/react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import * as yup from 'yup';
+import * as z from 'zod';
 
 import { useRegisterFlow } from '@/components/register/flow-provider';
 import { client } from '@/lib/client';
 
 // TODO: change resolver to zod as we are already using it for env management
-const registerSchema = yup
-  .object({
-    email: yup.string().required().email().max(MAX_EMAIL_LENGTH),
-  })
-  .required();
+const registerSchema = z.object({
+  email: z
+    .string()
+    .min(1, { message: 'Email address is required' })
+    .email({ message: 'Email address is invalid' })
+    .max(MAX_EMAIL_LENGTH, { message: 'Email address is too long' }),
+});
 
 export default function RegisterFlowStart() {
   const { setCurrentStep, setFlow } = useRegisterFlow();
 
   const { handleSubmit, control, formState, setError } = useForm({
-    resolver: yupResolver(registerSchema),
+    resolver: zodResolver(registerSchema),
     defaultValues: { email: '' },
     mode: 'onTouched',
   });
 
-  const onSubmit: SubmitHandler<yup.InferType<typeof registerSchema>> = async (
+  const onSubmit: SubmitHandler<z.infer<typeof registerSchema>> = async (
     input
   ) => {
     console.log(input);

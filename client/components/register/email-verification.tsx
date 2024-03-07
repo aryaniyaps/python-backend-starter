@@ -3,7 +3,7 @@ import { OTPSlot } from '@/components/otp-input';
 import { useRegisterFlow } from '@/components/register/flow-provider';
 import { client } from '@/lib/client';
 import { EMAIL_VERIFICATION_CODE_LENGTH } from '@/lib/constants';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
   Card,
@@ -15,16 +15,11 @@ import {
 import { OTPInput } from 'input-otp';
 import { useRouter } from 'next/navigation';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import * as yup from 'yup';
+import * as z from 'zod';
 
-const registerVerificationSchema = yup
-  .object({
-    verificationCode: yup
-      .string()
-      .required()
-      .length(EMAIL_VERIFICATION_CODE_LENGTH),
-  })
-  .required();
+const registerVerificationSchema = z.object({
+  verificationCode: z.string().length(EMAIL_VERIFICATION_CODE_LENGTH),
+});
 
 export default function RegisterEmailVerification() {
   const { setCurrentStep, flow } = useRegisterFlow();
@@ -32,12 +27,12 @@ export default function RegisterEmailVerification() {
   const router = useRouter();
 
   const { control, handleSubmit, formState, setError } = useForm({
-    resolver: yupResolver(registerVerificationSchema),
+    resolver: zodResolver(registerVerificationSchema),
     reValidateMode: 'onSubmit',
   });
 
   const onSubmit: SubmitHandler<
-    yup.InferType<typeof registerVerificationSchema>
+    z.infer<typeof registerVerificationSchema>
   > = async (input) => {
     try {
       // verify register flow
