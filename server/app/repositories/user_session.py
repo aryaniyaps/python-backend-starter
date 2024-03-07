@@ -65,6 +65,7 @@ class UserSessionRepo:
                 UserSession.id == user_session_id and UserSession.user_id == user_id,
             ),
         )
+        await self._session.commit()
 
     async def update(
         self,
@@ -79,6 +80,7 @@ class UserSessionRepo:
                 logged_out_at=logged_out_at,
             )
         )
+        await self._session.commit()
 
     async def logout_all(
         self,
@@ -92,3 +94,4 @@ class UserSessionRepo:
                 logged_out_at=text("NOW()"),
             ),
         )
+        await self._session.commit()
