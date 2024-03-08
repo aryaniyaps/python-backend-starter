@@ -5,6 +5,7 @@ import {
   DEFAULT_REDIRECT_TO,
   MAX_EMAIL_LENGTH,
 } from '@/lib/constants';
+import { KeyIcon } from '@heroicons/react/24/outline';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
@@ -100,6 +101,9 @@ export default function LoginPage() {
             type='submit'
             isLoading={formState.isSubmitting}
           >
+            {!formState.isSubmitting ? (
+              <KeyIcon className='h-unit-6 w-unit-6' />
+            ) : null}{' '}
             Login with passkeys
           </Button>
         </form>

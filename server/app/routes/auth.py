@@ -368,7 +368,7 @@ async def verify_authentication_response(
         ),
     ],
 ) -> User:
-    """Verify the authenticator's response for login."""
+    """Verify the authenticator's response for authentication."""
     authentication_token, user = await auth_service.verify_authentication_response(
         credential=parse_authentication_credential_json(data.credential),
         request_ip=request_ip,

@@ -1,6 +1,6 @@
 'use client';
-import { OTPSlot } from '@/components/otp-input';
 import { useRegisterFlow } from '@/components/register/flow-provider';
+import { OTPSlot } from '@/components/ui/otp-input';
 import { client } from '@/lib/client';
 import { EMAIL_VERIFICATION_CODE_LENGTH } from '@/lib/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
