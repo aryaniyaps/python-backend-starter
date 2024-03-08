@@ -5,12 +5,12 @@ import {
 } from './lib/constants';
 
 export function middleware(request: NextRequest) {
-  const authenticationToken = request.cookies.get(
+  const hasAuthenticationToken = request.cookies.has(
     AUTHENTICATION_TOKEN_COOKIE
-  )?.value;
+  );
 
   if (
-    authenticationToken &&
+    hasAuthenticationToken &&
     (request.nextUrl.pathname.startsWith('/login') ||
       request.nextUrl.pathname.startsWith('/register'))
   ) {
@@ -20,7 +20,7 @@ export function middleware(request: NextRequest) {
   }
 
   if (
-    !authenticationToken &&
+    !hasAuthenticationToken &&
     !(
       request.nextUrl.pathname.startsWith('/login') ||
       request.nextUrl.pathname.startsWith('/register')
@@ -33,5 +33,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/settings/:path*'],
+  matcher: ['/', '/settings/:path*', '/login', '/register'],
 };
