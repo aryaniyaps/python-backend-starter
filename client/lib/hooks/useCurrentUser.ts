@@ -1,8 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { client } from '../client';
 
 export default function useCurrentUser() {
-  return useQuery({
+  return useSuspenseQuery({
     queryKey: ['/users/@me'],
     queryFn: async () => {
       const { data } = await client.GET('/users/@me');

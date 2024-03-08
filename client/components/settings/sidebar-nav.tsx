@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { client } from '@/lib/client';
 import { cn } from '@/utils/style';
 import { Button } from '@nextui-org/react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   items: {
@@ -20,6 +20,8 @@ export default function SidebarNav({
   ...props
 }: SidebarNavProps) {
   const router = useRouter();
+
+  const pathname = usePathname();
 
   async function logout() {
     await client.POST('/auth/logout', { body: { rememberSession: false } });
@@ -36,7 +38,16 @@ export default function SidebarNav({
     >
       <div className='flex h-full w-full space-x-unit-4 lg:flex-col lg:space-x-unit-0 lg:space-y-unit-2'>
         {items.map((item) => (
-          <Link key={item.href} href={item.href}>
+          <Link
+            key={item.href}
+            href={item.href}
+            className={cn(
+              pathname === item.href
+                ? 'bg-default-50 hover:bg-default-50'
+                : 'hover:bg-transparent hover:underline',
+              'justify-start px-unit-4 py-unit-2'
+            )}
+          >
             {item.title}
           </Link>
         ))}

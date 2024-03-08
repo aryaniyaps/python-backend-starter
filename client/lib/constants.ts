@@ -7,7 +7,7 @@ export const AUTHENTICATION_TOKEN_COOKIE = 'authentication_token';
 
 // redirects
 
-export const DEFAULT_REDIRECT_TO = '/';
+export const DEFAULT_REDIRECT_TO = '/dashboard';
 
 export const EMAIL_VERIFICATION_CODE_LENGTH = 8;
 

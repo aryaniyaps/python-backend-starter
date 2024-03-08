@@ -8,6 +8,12 @@ APP_NAME = "Starter"
 
 APP_URL = "https://example.com"  # frontend app URL
 
+# gravatar
+
+GRAVATAR_DEFAULT_IMAGE = "retro"
+
+GRAVATAR_SIZE = 50
+
 # cookies
 
 REGISTER_FLOW_ID_COOKIE = "register_flow_id"

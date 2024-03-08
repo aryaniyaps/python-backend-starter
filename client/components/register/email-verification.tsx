@@ -48,7 +48,7 @@ export default function RegisterEmailVerification() {
     } catch (err) {
       // TODO: handle error properly
       setError('verificationCode', {
-        message: `That code isn't valid. You can request a new one.`,
+        message: `That code isn't valid. You can request a new one`,
         type: 'server',
       });
     }

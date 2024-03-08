@@ -104,7 +104,7 @@ export interface paths {
   "/auth/authenticate/finish": {
     /**
      * Verify Authentication Response
-     * @description Verify the authenticator's response for login.
+     * @description Verify the authenticator's response for authentication.
      */
     post: operations["OpenAPITag.AUTHENTICATION-verify_authentication_response"];
   };
@@ -293,6 +293,8 @@ export interface components {
        * @description The ID of the user.
        */
       id: string;
+      /** Email */
+      email: string;
       /**
        * Created At
        * Format: date-time
@@ -304,6 +306,11 @@ export interface components {
        * @description When the user was last updated.
        */
       updatedAt: string | null;
+      /**
+       * Avatar URL
+       * @description The Gravatar URL of the user.
+       */
+      avatarUrl: string;
     };
     /** PublicKeyCredentialCreationOptions */
     PublicKeyCredentialCreationOptions: {
@@ -492,6 +499,11 @@ export interface components {
        */
       id: string;
       /**
+       * Email
+       * @description The email of the user.
+       */
+      email: string;
+      /**
        * Created At
        * Format: date-time
        * @description When the user was created.
@@ -503,10 +515,10 @@ export interface components {
        */
       updatedAt: string | null;
       /**
-       * Email
-       * @description The email of the user.
+       * Avatar URL
+       * @description The Gravatar URL of the user.
        */
-      email: string;
+      avatarUrl: string;
     };
     /** UserSessionSchema */
     UserSessionSchema: {
@@ -1199,7 +1211,7 @@ export interface operations {
   };
   /**
    * Verify Authentication Response
-   * @description Verify the authenticator's response for login.
+   * @description Verify the authenticator's response for authentication.
    */
   "OpenAPITag.AUTHENTICATION-verify_authentication_response": {
     parameters: {

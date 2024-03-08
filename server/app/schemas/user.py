@@ -2,9 +2,10 @@ from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from pydantic import EmailStr, Field, SecretStr
+from pydantic import EmailStr, Field, PrivateAttr, SecretStr, computed_field
 
 from app.schemas.base import BaseSchema
+from app.utils.avatars import generate_avatar_url
 
 
 class PartialUserSchema(BaseSchema):
@@ -13,6 +14,14 @@ class PartialUserSchema(BaseSchema):
         Field(
             description="The ID of the user.",
         ),
+    ]
+
+    # email is a private attribute and is not
+    # exposed on the partial user schema. We need this field
+    # to generate the gravatar URL.
+    email: Annotated[
+        str,
+        PrivateAttr(),
     ]
 
     created_at: Annotated[
@@ -30,6 +39,15 @@ class PartialUserSchema(BaseSchema):
             description="When the user was last updated.",
         ),
     ]
+
+    @computed_field(  # type: ignore[misc]
+        title="Avatar URL",
+        description="The Gravatar URL of the user.",
+    )
+    @property
+    def avatar_url(self) -> str:
+        """Generate a Gravatar URL for the user."""
+        return generate_avatar_url(email=self.email)
 
 
 class UserSchema(PartialUserSchema):
