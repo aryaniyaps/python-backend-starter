@@ -1,7 +1,7 @@
 import { REGISTER_FLOW_ID_COOKIE } from '@/lib/constants';
 import { cookies } from 'next/headers';
 
-import { RegisterFlowProvider } from '@/components/register/flow-provider';
+import { LocalRegisterFlowProvider } from '@/components/register/flow-provider';
 import RegisterForm from '@/components/register/register-form';
 import { client } from '@/lib/client';
 
@@ -27,8 +27,8 @@ export default async function RegisterPage() {
   }
 
   return (
-    <RegisterFlowProvider flow={flow}>
+    <LocalRegisterFlowProvider flow={flow}>
       <RegisterForm />
-    </RegisterFlowProvider>
+    </LocalRegisterFlowProvider>
   );
 }

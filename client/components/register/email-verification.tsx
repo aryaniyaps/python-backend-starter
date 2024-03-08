@@ -1,8 +1,10 @@
 'use client';
-import { useRegisterFlow } from '@/components/register/flow-provider';
+import { useLocalRegisterFlow } from '@/components/register/flow-provider';
 import { OTPSlot } from '@/components/ui/otp-input';
-import { client } from '@/lib/client';
 import { EMAIL_VERIFICATION_CODE_LENGTH } from '@/lib/constants';
+import useCancelRegisterFlow from '@/lib/hooks/useCancelRegisterFlow';
+import useResendVerificationRegisterFlow from '@/lib/hooks/useResendVerificationRegisterFlow';
+import useVerifyRegisterFlow from '@/lib/hooks/useVerifyRegisterFlow';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
@@ -17,33 +19,32 @@ import { useRouter } from 'next/navigation';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import * as z from 'zod';
 
-const registerVerificationSchema = z.object({
+const verifyRegisterFlowSchema = z.object({
   verificationCode: z.string().length(EMAIL_VERIFICATION_CODE_LENGTH),
 });
 
 export default function RegisterEmailVerification() {
-  const { setCurrentStep, flow } = useRegisterFlow();
+  const verifyRegisterFlow = useVerifyRegisterFlow();
+  const resendVerificationRegisterFlow = useResendVerificationRegisterFlow();
+  const cancelRegisterFlow = useCancelRegisterFlow();
+  const { flow } = useLocalRegisterFlow();
 
   const router = useRouter();
 
   const { control, handleSubmit, formState, setError } = useForm({
-    resolver: zodResolver(registerVerificationSchema),
+    resolver: zodResolver(verifyRegisterFlowSchema),
     reValidateMode: 'onSubmit',
   });
 
   const onSubmit: SubmitHandler<
-    z.infer<typeof registerVerificationSchema>
+    z.infer<typeof verifyRegisterFlowSchema>
   > = async (input) => {
     try {
       // verify register flow
-      const { data } = await client.POST('/auth/register/flows/verify', {
-        body: { verificationCode: input.verificationCode },
-        params: { cookie: { register_flow_id: flow!.id } },
+      await verifyRegisterFlow.mutateAsync({
+        verificationCode: input.verificationCode,
+        flowId: flow!.id,
       });
-
-      if (data) {
-        setCurrentStep(data.registerFlow.currentStep);
-      }
     } catch (err) {
       // TODO: handle error properly
       setError('verificationCode', {
@@ -54,12 +55,7 @@ export default function RegisterEmailVerification() {
   };
 
   const resendVerificationCode = async () => {
-    await client.POST('/auth/register/flows/resend-verification', {
-      params: {
-        cookie: { register_flow_id: flow!.id },
-        header: { 'user-agent': navigator.userAgent },
-      },
-    });
+    await resendVerificationRegisterFlow.mutateAsync({ flowId: flow!.id });
   };
 
   return (
@@ -157,9 +153,7 @@ export default function RegisterEmailVerification() {
           variant='ghost'
           fullWidth
           onClick={async () => {
-            await client.POST('/auth/register/flows/cancel', {
-              params: { cookie: { register_flow_id: flow!.id } },
-            });
+            await cancelRegisterFlow.mutateAsync({ flowId: flow!.id });
             router.refresh();
           }}
         >

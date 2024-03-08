@@ -19,8 +19,5 @@ export default function useWebAuthnFinishRegisterFlow() {
       );
       return data;
     },
-    onSuccess(data, variables, context) {
-      // update query data here
-    },
   });
 }

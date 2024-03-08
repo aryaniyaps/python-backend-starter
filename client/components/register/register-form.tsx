@@ -2,15 +2,16 @@
 import RegisterEmailVerification from '@/components/register/email-verification';
 import RegisterFlowStart from '@/components/register/flow-start';
 import RegisterWebAuthnRegistration from '@/components/register/webauthn-registration';
-import { useRegisterFlow } from './flow-provider';
+import { useLocalRegisterFlow } from './flow-provider';
 
 export default function RegisterForm() {
-  const { currentStep } = useRegisterFlow();
+  const { flow } = useLocalRegisterFlow();
 
-  if (!currentStep) {
+  if (!flow) {
     return <RegisterFlowStart />;
   }
-  switch (currentStep) {
+
+  switch (flow.currentStep) {
     case 'email_verification':
       return <RegisterEmailVerification />;
     case 'webauthn_registration':

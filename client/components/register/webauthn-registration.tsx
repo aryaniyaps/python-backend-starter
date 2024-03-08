@@ -1,7 +1,9 @@
 'use client';
-import { useRegisterFlow } from '@/components/register/flow-provider';
-import { client } from '@/lib/client';
+import { useLocalRegisterFlow } from '@/components/register/flow-provider';
 import { DEFAULT_REDIRECT_TO } from '@/lib/constants';
+import useCancelRegisterFlow from '@/lib/hooks/useCancelRegisterFlow';
+import useWebAuthnFinishRegisterFlow from '@/lib/hooks/useWebAuthnFinishRegisterFlow';
+import useWebAuthnStartRegisterFlow from '@/lib/hooks/useWebAuthnStartRegisterFlow';
 import { KeyIcon } from '@heroicons/react/24/outline';
 import {
   Button,
@@ -16,24 +18,29 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 export default function RegisterWebAuthnRegistration() {
+  const startWebAuthnRegisterFlow = useWebAuthnStartRegisterFlow();
+  const finishWebAuthnRegisterFlow = useWebAuthnFinishRegisterFlow();
+  const cancelRegisterFlow = useCancelRegisterFlow();
+
   const { handleSubmit, formState, setError } = useForm({});
 
   const router = useRouter();
-  const { flow: flowData } = useRegisterFlow();
   const searchParams = useSearchParams();
+
+  const { flow } = useLocalRegisterFlow();
 
   const returnTo = searchParams.get('returnTo') || DEFAULT_REDIRECT_TO;
 
   const onSubmit: SubmitHandler<{}> = async () => {
     // start webauthn registration
-    const { data } = await client.POST('/auth/register/flows/webauthn-start', {
-      params: { cookie: { register_flow_id: flowData!.id } },
+    const data = await startWebAuthnRegisterFlow.mutateAsync({
+      flowId: flow!.id,
     });
 
     if (data) {
-      let attResp;
+      let authenticatorResponse;
       try {
-        attResp = await startRegistration(data.options);
+        authenticatorResponse = await startRegistration(data.options);
       } catch (err) {
         return setError('root', {
           message: `Couldn't create passkey. Please try again`,
@@ -41,11 +48,9 @@ export default function RegisterWebAuthnRegistration() {
       }
 
       try {
-        await client.POST('/auth/register/flows/webauthn-finish', {
-          params: { cookie: { register_flow_id: flowData!.id } },
-          body: {
-            credential: JSON.stringify(attResp),
-          },
+        await finishWebAuthnRegisterFlow.mutateAsync({
+          flowId: flow!.id,
+          credential: JSON.stringify(authenticatorResponse),
         });
       } catch (err) {
         // TODO: perform better error handling
@@ -105,9 +110,7 @@ export default function RegisterWebAuthnRegistration() {
           variant='ghost'
           fullWidth
           onClick={async () => {
-            await client.POST('/auth/register/flows/cancel', {
-              params: { cookie: { register_flow_id: flowData!.id } },
-            });
+            await cancelRegisterFlow.mutateAsync({ flowId: flow!.id });
             router.refresh();
           }}
         >

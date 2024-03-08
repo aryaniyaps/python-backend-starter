@@ -1,13 +1,16 @@
 import { useMutation } from '@tanstack/react-query';
 import { client } from '../client';
 
-export default function useWebAuthnStartRegisterFlow() {
+export default function useResendVerificationRegisterFlow() {
   return useMutation({
     mutationFn: async ({ flowId }: { flowId: string }) => {
       const { data } = await client.POST(
-        '/auth/register/flows/webauthn-start',
+        '/auth/register/flows/resend-verification',
         {
-          params: { cookie: { register_flow_id: flowId } },
+          params: {
+            header: { 'user-agent': navigator.userAgent },
+            cookie: { register_flow_id: flowId },
+          },
         }
       );
       return data;

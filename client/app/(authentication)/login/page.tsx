@@ -1,10 +1,11 @@
 'use client';
-import { client } from '@/lib/client';
 import {
   APP_NAME,
   DEFAULT_REDIRECT_TO,
   MAX_EMAIL_LENGTH,
 } from '@/lib/constants';
+import useAuthenticateFinish from '@/lib/hooks/useAuthenticateFinish';
+import useAuthenticateStart from '@/lib/hooks/useAuthenticateStart';
 import { KeyIcon } from '@heroicons/react/24/outline';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -30,6 +31,9 @@ const loginSchema = z.object({
 });
 
 export default function LoginPage() {
+  const authenticateFinish = useAuthenticateFinish();
+  const authenticateStart = useAuthenticateStart();
+
   const { control, handleSubmit, formState, setError } = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: '' },
@@ -45,34 +49,36 @@ export default function LoginPage() {
   const onSubmit: SubmitHandler<z.infer<typeof loginSchema>> = async (
     input
   ) => {
-    console.log(input);
+    let data;
 
-    let asseResp;
     try {
       // start webauthn authentication
-      const { data } = await client.POST('/auth/authenticate/start', {
-        body: { email: input.email },
-      });
-
-      // Pass the options to the authenticator and wait for a response
-      asseResp = await startAuthentication(data.options);
+      data = await authenticateStart.mutateAsync({ email: input.email });
     } catch (err) {
       // TODO: handle errors better
       return setError('email', {
-        message:
-          "User with that email doesn't exist or couldn't login with passkey.",
+        message: "User with that email doesn't exist",
         type: 'server',
       });
     }
 
-    await client.POST('/auth/authenticate/finish', {
-      params: { header: { 'user-agent': navigator.userAgent } },
-      body: {
-        credential: JSON.stringify(asseResp),
-      },
-    });
+    if (data) {
+      try {
+        // Pass the options to the authenticator and wait for a response
+        const authenticatorResponse = await startAuthentication(data.options);
+        await authenticateFinish.mutateAsync({
+          credential: JSON.stringify(authenticatorResponse),
+        });
+      } catch (err) {
+        // TODO: handle errors better
+        return setError('root', {
+          message: "Couldn't login with passkey. Please try again",
+          type: 'server',
+        });
+      }
 
-    router.replace(returnTo);
+      router.replace(returnTo);
+    }
   };
 
   return (
@@ -96,6 +102,14 @@ export default function LoginPage() {
               />
             )}
           />
+          {/* TODO: use a nested card for errors until we get an alert component */}
+          {formState.errors.root ? (
+            <Card isFooterBlurred fullWidth className='bg-danger-50 px-unit-2'>
+              <CardBody className='text-center text-sm text-danger'>
+                {formState.errors.root.message}
+              </CardBody>
+            </Card>
+          ) : null}
           <Button
             color='primary'
             type='submit'

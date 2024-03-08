@@ -13,8 +13,7 @@ import {
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import * as z from 'zod';
 
-import { useRegisterFlow } from '@/components/register/flow-provider';
-import { client } from '@/lib/client';
+import useStartRegisterFlow from '@/lib/hooks/useStartRegisterFlow';
 
 // TODO: change resolver to zod as we are already using it for env management
 const registerSchema = z.object({
@@ -26,7 +25,7 @@ const registerSchema = z.object({
 });
 
 export default function RegisterFlowStart() {
-  const { setCurrentStep, setFlow } = useRegisterFlow();
+  const startRegisterFlow = useStartRegisterFlow();
 
   const { handleSubmit, control, formState, setError } = useForm({
     resolver: zodResolver(registerSchema),
@@ -37,20 +36,9 @@ export default function RegisterFlowStart() {
   const onSubmit: SubmitHandler<z.infer<typeof registerSchema>> = async (
     input
   ) => {
-    console.log(input);
     try {
       // start register flow
-      const { data } = await client.POST('/auth/register/flows/start', {
-        body: { email: input.email },
-        params: {
-          header: { 'user-agent': window.navigator.userAgent },
-        },
-      });
-
-      if (data) {
-        setFlow(data.registerFlow);
-        setCurrentStep(data.registerFlow.currentStep);
-      }
+      await startRegisterFlow.mutateAsync({ email: input.email });
     } catch (err) {
       // TODO: handle email already taken err
       setError('email', {

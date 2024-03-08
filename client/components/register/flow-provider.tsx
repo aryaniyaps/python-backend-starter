@@ -1,45 +1,40 @@
 'use client';
-import { createContext, useContext, useState } from 'react';
+import useRegisterFlow from '@/lib/hooks/useRegisterFlow';
+import { createContext, useContext } from 'react';
 
 interface RegisterFlowContextType {
-  setCurrentStep: (step: string | null) => void;
-  currentStep: string | null;
   flow: { email: string; currentStep: string; id: string } | null;
-  setFlow: (flow: { email: string; currentStep: string; id: string }) => void;
 }
 
 const RegisterFlowContext = createContext<RegisterFlowContextType>({
-  setCurrentStep(step) {},
-  currentStep: null,
-  setFlow(flow) {},
   flow: null,
 });
 
-export const useRegisterFlow = () => useContext(RegisterFlowContext);
+export const useLocalRegisterFlow = () => useContext(RegisterFlowContext);
 
 interface RegisterFlowProviderProps {
   flow: { email: string; currentStep: string; id: string } | null;
 }
 
-export const RegisterFlowProvider: React.FC<
+export const LocalRegisterFlowProvider: React.FC<
   React.PropsWithChildren<RegisterFlowProviderProps>
 > = ({ children, flow }) => {
-  const [localFlow, setFlow] = useState<{
-    email: string;
-    currentStep: string;
-    id: string;
-  } | null>(flow ? flow : null);
-  const [localCurrentStep, setCurrentStep] = useState<string | null>(
-    flow ? flow.currentStep : null
-  );
+  let localFlow = null;
 
+  if (flow) {
+    // FIXME we are conditionally calling this hook, thats the issue!
+    // we won't be encountering these issues if we use a cookie that doesn't need to be
+    // explicitly passed over every request (like a session cookie), and we can omit the
+    // path parameters!!
+    const { data } = useRegisterFlow({ flowId: flow.id }, flow);
+    if (data) {
+      localFlow = data;
+    }
+  }
   return (
     <RegisterFlowContext.Provider
       value={{
-        setCurrentStep,
-        currentStep: localCurrentStep,
         flow: localFlow,
-        setFlow,
       }}
     >
       {children}

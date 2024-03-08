@@ -1,7 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import { client } from '../client';
 
-export default function useRegisterFlow({ flowId }: { flowId: string }) {
+export default function useRegisterFlow(
+  {
+    flowId,
+  }: {
+    flowId: string;
+  },
+  initialData:
+    | { id: string; email: string; currentStep: string }
+    | undefined = undefined
+) {
   return useQuery({
     queryKey: ['/auth/register/flows', flowId],
     queryFn: async () => {
@@ -10,5 +19,7 @@ export default function useRegisterFlow({ flowId }: { flowId: string }) {
       });
       return data;
     },
+    initialData,
+    refetchOnMount: false,
   });
 }

@@ -1,7 +1,8 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { client } from '../client';
 
 export default function useVerifyRegisterFlow() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({
       verificationCode,
@@ -19,8 +20,12 @@ export default function useVerifyRegisterFlow() {
       });
       return data;
     },
-    onSuccess(data, variables, context) {
-      // update query data here
+    onSuccess(data, variables) {
+      // update query data
+      queryClient.setQueryData(
+        ['/auth/register/flows', variables.flowId],
+        data?.registerFlow
+      );
     },
   });
 }
