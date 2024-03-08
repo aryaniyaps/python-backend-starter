@@ -1,3 +1,5 @@
+TODO: REPLACE openapi-fetch with some other client library, as the data being undefined causes an undesirable DX with TS
+
 TODO:
 
 generate a flow ID during registration and save it server side.

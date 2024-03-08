@@ -8,9 +8,9 @@ export default function UserNav() {
 
   return (
     <Link href='/settings' className='flex items-center gap-unit-4'>
-      <Avatar src='' name={user.email} />
+      <Avatar src={user?.avatarUrl} name={user?.email} />
       <p className='hidden text-sm font-semibold leading-none sm:block'>
-        {user.email}
+        {user?.email}
       </p>
     </Link>
   );
