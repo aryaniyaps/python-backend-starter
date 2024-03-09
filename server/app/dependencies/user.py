@@ -5,9 +5,9 @@ from geoip2.database import Reader
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies.authentication_token import get_authentication_token_repo
+from app.dependencies.database_session import get_database_session
 from app.dependencies.email_verification_code import get_email_verification_code_repo
 from app.dependencies.user_session import get_user_session_repo
-from app.lib.database import get_database_session
 from app.lib.geo_ip import get_geoip_reader
 from app.repositories.authentication_token import AuthenticationTokenRepo
 from app.repositories.email_verification_code import EmailVerificationCodeRepo

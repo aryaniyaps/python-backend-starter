@@ -7,7 +7,7 @@ from saq.types import Context
 from saq.worker import Worker
 
 from app.config import settings
-from app.lib.database import get_database_session
+from app.dependencies.database_session import get_database_session
 from app.logger import build_worker_log_config, setup_logging
 from app.tasks import (
     delete_expired_email_verification_codes,
