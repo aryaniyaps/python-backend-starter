@@ -90,7 +90,7 @@ export default function LoginPage() {
   };
 
   return (
-    <Card className='w-full px-2'>
+    <Card className='w-full'>
       <CardHeader>
         <h1 className='text-md font-semibold'>Sign in with {APP_NAME}</h1>
       </CardHeader>
