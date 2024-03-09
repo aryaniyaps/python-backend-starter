@@ -1,19 +1,22 @@
 'use client';
 import { APP_NAME, MAX_EMAIL_LENGTH } from '@/lib/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Input,
-  Link,
-} from '@nextui-org/react';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 import useStartRegisterFlow from '@/lib/hooks/useStartRegisterFlow';
+import Link from 'next/link';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardFooter, CardHeader } from '../ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../ui/form';
+import { Input } from '../ui/input';
 
 // TODO: change resolver to zod as we are already using it for env management
 const registerSchema = z.object({
@@ -27,7 +30,7 @@ const registerSchema = z.object({
 export default function RegisterFlowStart() {
   const startRegisterFlow = useStartRegisterFlow();
 
-  const { handleSubmit, control, formState, setError } = useForm({
+  const form = useForm({
     resolver: zodResolver(registerSchema),
     defaultValues: { email: '' },
     mode: 'onTouched',
@@ -41,7 +44,7 @@ export default function RegisterFlowStart() {
       await startRegisterFlow.mutateAsync({ email: input.email });
     } catch (err) {
       // TODO: handle email already taken err
-      setError('email', {
+      form.setError('email', {
         message: 'That email is already in use',
         type: 'server',
       });
@@ -49,39 +52,40 @@ export default function RegisterFlowStart() {
   };
 
   return (
-    <Card isFooterBlurred fullWidth className='px-unit-2'>
+    <Card className='w-full'>
       <CardHeader>
         <h1 className='text-md font-semibold'>Create a {APP_NAME} account</h1>
       </CardHeader>
-      <CardBody>
-        <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
-          <Controller
-            name='email'
-            control={control}
-            render={({ field, fieldState }) => {
-              return (
-                <Input
-                  {...field}
-                  variant='faded'
-                  type='email'
-                  label='Email address'
-                  errorMessage={fieldState.error?.message}
-                  isInvalid={!!fieldState.error}
-                />
-              );
-            }}
-          />
-
-          <Button
-            color='primary'
-            type='submit'
-            isLoading={formState.isSubmitting}
-            fullWidth
+      <CardContent>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className='flex flex-col gap-4'
           >
-            Continue
-          </Button>
-        </form>
-      </CardBody>
+            <FormField
+              name='email'
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email address</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button
+              className='w-full'
+              type='submit'
+              disabled={form.formState.isSubmitting}
+            >
+              Continue
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
       <CardFooter className='text-sm'>
         Have an account?&nbsp;<Link href='/login'>sign in</Link>
       </CardFooter>

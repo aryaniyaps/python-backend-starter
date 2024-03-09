@@ -1,5 +1,5 @@
 import SidebarNav from '@/components/settings/sidebar-nav';
-import { APP_NAME } from '@/lib/constants';
+import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 const sidebarNavItems = [
@@ -19,16 +19,19 @@ export default function SettingsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <main className=' flex min-h-screen w-full flex-col'>
-      <div className='bg-content1 p-unit-4'>
-        <div className='mx-auto flex max-w-7xl items-center'>
+    <main className='flex min-h-screen w-full flex-col'>
+      <div className='border-b p-4'>
+        <div className='mx-auto flex max-w-7xl items-center justify-between'>
+          <h1 className='font-semibold'>Settings</h1>
           <Link href='/'>
-            <h1 className='font-semibold'>{APP_NAME} Settings</h1>
+            <Button variant='link' size='sm'>
+              Back to dashboard
+            </Button>
           </Link>
         </div>
       </div>
-      <div className='mb-unit-12 flex min-h-full flex-1'>
-        <div className='mx-auto flex min-h-full max-w-7xl flex-1 flex-col space-y-unit-12 p-unit-4 lg:flex-row lg:space-x-unit-16 lg:space-y-unit-0'>
+      <div className='mb-8 flex min-h-full flex-1'>
+        <div className='mx-auto flex min-h-full max-w-7xl flex-1 flex-col space-y-8 p-4 lg:flex-row lg:space-x-12 lg:space-y-0'>
           <aside className='lg:w-1/6'>
             <SidebarNav items={sidebarNavItems} />
           </aside>

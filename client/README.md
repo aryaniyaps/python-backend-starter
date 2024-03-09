@@ -3,12 +3,13 @@
 ## Tech Stack
 
 - [NextJS](https://nextjs.org/)
-- [NextUI](https://nextui.org/)
+- [TailwindCSS](https://tailwindcss.com/)
+- [Radix UI](https://www.radix-ui.com/)
+- [shadcn/ui](https://ui.shadcn.com/)
 - [React Hook Form](https://react-hook-form.com/)
 - [React Query](https://tanstack.com/query/latest/)
 - [Zod](https://zod.dev/)
 - [OpenAPI Fetch](https://openapi-ts.pages.dev/openapi-fetch/)
-- [Framer Motion](https://www.framer.com/motion/)
 
 ## Generating the client schema
 

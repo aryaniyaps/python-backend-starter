@@ -1,4 +1,20 @@
 'use client';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import {
   APP_NAME,
   DEFAULT_REDIRECT_TO,
@@ -8,18 +24,10 @@ import useAuthenticateFinish from '@/lib/hooks/useAuthenticateFinish';
 import useAuthenticateStart from '@/lib/hooks/useAuthenticateStart';
 import { KeyIcon } from '@heroicons/react/24/outline';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Input,
-  Link,
-} from '@nextui-org/react';
 import { startAuthentication } from '@simplewebauthn/browser';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 const loginSchema = z.object({
@@ -34,7 +42,7 @@ export default function LoginPage() {
   const authenticateFinish = useAuthenticateFinish();
   const authenticateStart = useAuthenticateStart();
 
-  const { control, handleSubmit, formState, setError } = useForm({
+  const form = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: '' },
     mode: 'onTouched',
@@ -56,7 +64,7 @@ export default function LoginPage() {
       data = await authenticateStart.mutateAsync({ email: input.email });
     } catch (err) {
       // TODO: handle errors better
-      return setError('email', {
+      return form.setError('email', {
         message: "User with that email doesn't exist",
         type: 'server',
       });
@@ -71,7 +79,7 @@ export default function LoginPage() {
         });
       } catch (err) {
         // TODO: handle errors better
-        return setError('root', {
+        return form.setError('root', {
           message: "Couldn't login with passkey. Please try again",
           type: 'server',
         });
@@ -82,46 +90,48 @@ export default function LoginPage() {
   };
 
   return (
-    <Card isFooterBlurred fullWidth className='px-unit-2'>
+    <Card className='w-full px-2'>
       <CardHeader>
         <h1 className='text-md font-semibold'>Sign in with {APP_NAME}</h1>
       </CardHeader>
-      <CardBody>
-        <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
-          <Controller
-            name='email'
-            control={control}
-            render={({ field, fieldState }) => (
-              <Input
-                {...field}
-                variant='faded'
-                type='email'
-                label='Email address'
-                errorMessage={fieldState.error?.message}
-                isInvalid={!!fieldState.error}
-              />
-            )}
-          />
-          {/* TODO: use a nested card for errors until we get an alert component */}
-          {formState.errors.root ? (
-            <Card isFooterBlurred fullWidth className='bg-danger-50 px-unit-2'>
-              <CardBody className='text-center text-sm text-danger'>
-                {formState.errors.root.message}
-              </CardBody>
-            </Card>
-          ) : null}
-          <Button
-            color='primary'
-            type='submit'
-            isLoading={formState.isSubmitting}
+      <CardContent>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className='flex flex-col gap-4'
           >
-            {!formState.isSubmitting ? (
-              <KeyIcon className='h-unit-6 w-unit-6' />
-            ) : null}{' '}
-            Login with passkeys
-          </Button>
-        </form>
-      </CardBody>
+            <FormField
+              name='email'
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email address</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* TODO: use a nested card for errors until we get an alert component */}
+            {form.formState.errors.root ? (
+              <Card className='w-full bg-danger-50 px-2'>
+                <CardContent className='text-center text-sm text-danger'>
+                  {form.formState.errors.root.message}
+                </CardContent>
+              </Card>
+            ) : null}
+            <Button
+              type='submit'
+              className='flex w-full gap-2'
+              disabled={form.formState.isSubmitting}
+            >
+              <KeyIcon className='h-6 w-6' />
+              Login with passkeys
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
       <CardFooter className='text-sm'>
         Don&apos;t have an account?&nbsp;<Link href='/register'>sign up</Link>
       </CardFooter>

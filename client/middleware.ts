@@ -11,11 +11,12 @@ export function middleware(request: NextRequest) {
 
   if (
     hasAuthenticationToken &&
-    (request.nextUrl.pathname.startsWith('/login') ||
+    (request.nextUrl.pathname == '/' ||
+      request.nextUrl.pathname.startsWith('/login') ||
       request.nextUrl.pathname.startsWith('/register'))
   ) {
     // redirect to dashboard if an authenticated user
-    // tries to access the register/ login page
+    // tries to access the register/ login/ landing page
     return Response.redirect(new URL(DEFAULT_REDIRECT_TO, request.url));
   }
 
