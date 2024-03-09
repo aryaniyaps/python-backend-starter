@@ -1,4 +1,5 @@
 'use client';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -100,6 +101,13 @@ export default function LoginPage() {
             onSubmit={form.handleSubmit(onSubmit)}
             className='flex flex-col gap-4'
           >
+            {form.formState.errors.root ? (
+              <Alert variant='destructive'>
+                <AlertDescription>
+                  {form.formState.errors.root.message}
+                </AlertDescription>
+              </Alert>
+            ) : null}
             <FormField
               name='email'
               control={form.control}
@@ -113,14 +121,7 @@ export default function LoginPage() {
                 </FormItem>
               )}
             />
-            {/* TODO: use a nested card for errors until we get an alert component */}
-            {form.formState.errors.root ? (
-              <Card className='w-full bg-danger-50 px-2'>
-                <CardContent className='text-center text-sm text-danger'>
-                  {form.formState.errors.root.message}
-                </CardContent>
-              </Card>
-            ) : null}
+
             <Button
               type='submit'
               className='flex w-full gap-2'

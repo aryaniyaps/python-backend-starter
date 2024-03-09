@@ -9,6 +9,7 @@ import { startRegistration } from '@simplewebauthn/browser';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { Alert, AlertDescription } from '../ui/alert';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '../ui/card';
 import { Form } from '../ui/form';
@@ -77,13 +78,12 @@ export default function RegisterWebAuthnRegistration() {
         </div>
       </CardHeader>
       <CardContent className='flex flex-col gap-6'>
-        {/* TODO: use a nested card for errors until we get an alert component */}
         {form.formState.errors.root ? (
-          <Card className='w-full bg-danger-50 px-2'>
-            <CardContent className='text-center text-sm text-danger'>
+          <Alert variant='destructive'>
+            <AlertDescription>
               {form.formState.errors.root.message}
-            </CardContent>
-          </Card>
+            </AlertDescription>
+          </Alert>
         ) : null}
         <Form {...form}>
           <form
