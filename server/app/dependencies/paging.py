@@ -20,6 +20,6 @@ def get_paging_info(
             description="The cursor after which items should be fetched.",
         ),
     ],
-) -> None:
+) -> PageInfo:
     """Get paging info from query parameters."""
     return PageInfo(limit=limit, after=after)
