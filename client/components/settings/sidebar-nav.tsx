@@ -2,9 +2,8 @@
 
 import Link from 'next/link';
 
-import { client } from '@/lib/client';
 import { cn } from '@/utils/style';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { buttonVariants } from '../ui/button';
 import LogoutDialog from './logout-dialog';
 
@@ -23,16 +22,7 @@ export default function SidebarNav({
   items,
   ...props
 }: SidebarNavProps) {
-  const router = useRouter();
-
   const pathname = usePathname();
-
-  async function logout() {
-    // TODO: open modal here and ask user if session should be remembered
-    // also have a checkbox to remember user's choice
-    await client.POST('/auth/logout', { body: { rememberSession: false } });
-    router.replace('/login');
-  }
 
   return (
     <nav
