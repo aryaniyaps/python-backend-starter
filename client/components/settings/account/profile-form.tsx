@@ -54,7 +54,7 @@ export default function ProfileForm() {
         onSubmit={form.handleSubmit(onSubmit)}
         className='flex w-full items-start gap-4'
       >
-        <div className='flex w-2/3 flex-col gap-4'>
+        <div className='flex w-96 flex-col gap-4'>
           <FormField
             control={form.control}
             name='name'
@@ -72,6 +72,7 @@ export default function ProfileForm() {
 
           <Button
             type='submit'
+            className='w-full'
             disabled={!form.formState.isDirty || form.formState.isSubmitting}
           >
             Update profile

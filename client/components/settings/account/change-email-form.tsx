@@ -34,7 +34,7 @@ export default function ChangeEmailForm() {
         onSubmit={form.handleSubmit(onSubmit)}
         className='flex w-full items-start gap-4'
       >
-        <div className='flex w-2/3 flex-col gap-4'>
+        <div className='flex w-96 flex-col gap-4'>
           <FormField
             control={form.control}
             name='email'

@@ -386,6 +386,14 @@ async def verify_authentication_response(
     return user
 
 
+@auth_router.get(
+    "/webauthn-credentials",
+    summary="Get the current user's webauthn credentials.",
+)
+async def get_webauthn_credential(_data: CreateWebAuthnCredentialInput) -> None:
+    """Get the current user's webauthn credentials."""
+
+
 @auth_router.post("/webauthn-credentials")
 async def create_webauthn_credential(_data: CreateWebAuthnCredentialInput) -> None:
     """Create a new webauthn credential."""

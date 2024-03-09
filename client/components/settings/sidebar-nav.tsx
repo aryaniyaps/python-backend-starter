@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { client } from '@/lib/client';
 import { cn } from '@/utils/style';
 import { usePathname, useRouter } from 'next/navigation';
-import { Button, buttonVariants } from '../ui/button';
+import { buttonVariants } from '../ui/button';
+import LogoutDialog from './logout-dialog';
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   items: Record<
@@ -27,6 +28,8 @@ export default function SidebarNav({
   const pathname = usePathname();
 
   async function logout() {
+    // TODO: open modal here and ask user if session should be remembered
+    // also have a checkbox to remember user's choice
     await client.POST('/auth/logout', { body: { rememberSession: false } });
     router.replace('/login');
   }
@@ -65,13 +68,7 @@ export default function SidebarNav({
           </div>
         ))}
       </div>
-      <Button
-        variant='destructive'
-        className='block w-full bg-transparent text-left'
-        onClick={logout}
-      >
-        Logout
-      </Button>
+      <LogoutDialog />
     </nav>
   );
 }
