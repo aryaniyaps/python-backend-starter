@@ -24,6 +24,7 @@ import {
   PenBox,
   Pizza,
   Plus,
+  Search,
   SendIcon,
   Settings,
   SunMedium,
@@ -54,6 +55,7 @@ export const Icons = {
       <circle cx='12' cy='12' r='10'></circle>
     </svg>
   ),
+  search: Search,
   key: Key,
   arrowUp: ArrowUp,
   users: Users,

@@ -25,7 +25,7 @@ export default function UserNav() {
           <AvatarFallback>{user?.email.slice(0, 2)}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align='end'>
+      <DropdownMenuContent align='end' sideOffset={15}>
         <DropdownMenuLabel>{user?.email}</DropdownMenuLabel>
         <Link href='/settings'>
           <DropdownMenuItem>Settings</DropdownMenuItem>

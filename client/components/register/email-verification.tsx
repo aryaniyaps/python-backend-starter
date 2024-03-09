@@ -25,6 +25,7 @@ import {
   FormLabel,
   FormMessage,
 } from '../ui/form';
+import { useToast } from '../ui/use-toast';
 
 const verifyRegisterFlowSchema = z.object({
   verificationCode: z.string().length(EMAIL_VERIFICATION_CODE_LENGTH),
@@ -37,6 +38,8 @@ export default function RegisterEmailVerification() {
   const { flow } = useLocalRegisterFlow();
 
   const router = useRouter();
+
+  const { toast } = useToast();
 
   const form = useForm({
     resolver: zodResolver(verifyRegisterFlowSchema),
@@ -64,6 +67,10 @@ export default function RegisterEmailVerification() {
 
   const resendVerificationCode = async () => {
     await resendVerificationRegisterFlow.mutateAsync({ flowId: flow!.id });
+    toast({
+      title: 'Resent verification code',
+      description: 'We sent the verification code to your inbox.',
+    });
   };
 
   return (

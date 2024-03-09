@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 const sidebarNavItems = [
   {
-    title: 'Profile',
+    title: 'Account',
     href: '/settings',
   },
   {

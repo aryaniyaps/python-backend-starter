@@ -12,7 +12,7 @@ APP_URL = "https://example.com"  # frontend app URL
 
 GRAVATAR_DEFAULT_IMAGE = "retro"
 
-GRAVATAR_SIZE = 50
+GRAVATAR_SIZE = 100
 
 # cookies
 

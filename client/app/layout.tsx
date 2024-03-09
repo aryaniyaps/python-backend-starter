@@ -1,3 +1,4 @@
+import { Toaster } from '@/components/ui/toaster';
 import { APP_NAME } from '@/lib/constants';
 import '@/styles/globals.css';
 import type { Metadata } from 'next';
@@ -23,7 +24,10 @@ export default function RootLayout({
   return (
     <html lang='en' suppressHydrationWarning>
       <body className={fontSans.variable}>
-        <Providers>{children}</Providers>
+        <main>
+          <Providers>{children}</Providers>
+        </main>
+        <Toaster />
       </body>
     </html>
   );

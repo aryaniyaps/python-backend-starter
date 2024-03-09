@@ -1,3 +1,4 @@
+import SearchBar from '@/components/dashboard/search-bar';
 import UserNav from '@/components/dashboard/user-nav';
 import { APP_NAME } from '@/lib/constants';
 import Link from 'next/link';
@@ -14,7 +15,10 @@ export default function DashBoardLayout({
           <Link href='/dashboard'>
             <h1 className='font-semibold'>{APP_NAME}</h1>
           </Link>
-          <UserNav />
+          <div className='flex items-center gap-4'>
+            <SearchBar />
+            <UserNav />
+          </div>
         </div>
       </div>
       <div className='flex flex-grow overflow-hidden py-6'>

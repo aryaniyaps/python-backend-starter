@@ -134,7 +134,8 @@ export default function LoginPage() {
         </Form>
       </CardContent>
       <CardFooter className='text-sm'>
-        Don&apos;t have an account?&nbsp;<Link href='/register'>sign up</Link>
+        Don&apos;t have an account?&nbsp;
+        <Link href='/register'>sign up</Link>
       </CardFooter>
     </Card>
   );

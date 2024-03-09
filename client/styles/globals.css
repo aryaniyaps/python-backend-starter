@@ -58,6 +58,7 @@
     @apply text-primary;
 
   }
+
   body {
     @apply bg-background text-foreground;
     @apply font-sans antialiased;
@@ -65,6 +66,7 @@
 
   html,
   body,
+  body > main,
   #__next {
     @apply h-full w-full;
     @apply whitespace-normal;
@@ -81,7 +83,7 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-accent;
+    @apply bg-primary;
     @apply rounded-xl;
     @apply border-x-4 border-solid border-transparent;
     @apply bg-clip-padding;
