@@ -66,8 +66,8 @@ export default function SidebarNav({
         ))}
       </div>
       <Button
-        variant='ghost'
-        className='text-destructive font-bold'
+        variant='destructive'
+        className='block w-full bg-transparent text-left'
         onClick={logout}
       >
         Logout
