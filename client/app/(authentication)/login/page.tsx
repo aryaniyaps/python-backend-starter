@@ -1,4 +1,5 @@
 'use client';
+import { Icons } from '@/components/icons';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,7 +24,6 @@ import {
 } from '@/lib/constants';
 import useAuthenticateFinish from '@/lib/hooks/useAuthenticateFinish';
 import useAuthenticateStart from '@/lib/hooks/useAuthenticateStart';
-import { KeyIcon } from '@heroicons/react/24/outline';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { startAuthentication } from '@simplewebauthn/browser';
 import Link from 'next/link';
@@ -127,7 +127,7 @@ export default function LoginPage() {
               className='flex w-full gap-2'
               disabled={form.formState.isSubmitting}
             >
-              <KeyIcon className='h-6 w-6' />
+              <Icons.key className='h-5 w-5' />
               Login with passkeys
             </Button>
           </form>

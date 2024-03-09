@@ -4,11 +4,11 @@ import { DEFAULT_REDIRECT_TO } from '@/lib/constants';
 import useCancelRegisterFlow from '@/lib/hooks/useCancelRegisterFlow';
 import useWebAuthnFinishRegisterFlow from '@/lib/hooks/useWebAuthnFinishRegisterFlow';
 import useWebAuthnStartRegisterFlow from '@/lib/hooks/useWebAuthnStartRegisterFlow';
-import { KeyIcon } from '@heroicons/react/24/outline';
 import { startRegistration } from '@simplewebauthn/browser';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { Icons } from '../icons';
 import { Alert, AlertDescription } from '../ui/alert';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '../ui/card';
@@ -95,7 +95,7 @@ export default function RegisterWebAuthnRegistration() {
               disabled={form.formState.isSubmitting}
               className='flex w-full gap-2'
             >
-              <KeyIcon className='h-6 w-6' />
+              <Icons.key className='h-5 w-5' />
               Create passkey
             </Button>
           </form>
