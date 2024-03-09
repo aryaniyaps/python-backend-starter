@@ -35,6 +35,7 @@ from app.lib.geo_ip import get_city_location, get_geoip_city
 from app.models.register_flow import RegisterFlow
 from app.models.user import User
 from app.models.user_session import UserSession
+from app.models.webauthn_credential import WebAuthnCredential
 from app.repositories.authentication_token import AuthenticationTokenRepo
 from app.repositories.email_verification_code import EmailVerificationCodeRepo
 from app.repositories.register_flow import RegisterFlowRepo
@@ -496,3 +497,7 @@ class AuthService:
                 message="Invalid authentication token provided.",
             )
         return user_info
+
+    async def get_webauthn_credentials(self, user_id: UUID) -> list[WebAuthnCredential]:
+        """Get WebAuthn credentials for the given user ID."""
+        return await self._webauthn_credential_repo.get_all(user_id=user_id)

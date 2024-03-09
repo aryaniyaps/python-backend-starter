@@ -25,6 +25,7 @@ dependencies = [
     "saq>=0.12.2",
     "backoff>=2.2.1",
     "webauthn>=2.0.0",
+    "sqlakeyset>=2.0.1708907391",
 ]
 requires-python = ">=3.11"
 readme = "README.md"

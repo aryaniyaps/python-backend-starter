@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from sqlakeyset.asyncio import select_page
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from webauthn.helpers.structs import AuthenticatorTransport
@@ -60,9 +61,7 @@ class WebAuthnCredentialRepo:
 
     async def get_all(self, user_id: UUID) -> list[WebAuthnCredential]:
         """Get all WebAuthn credentials by user ID."""
-        credentials = await self._session.scalars(
-            select(WebAuthnCredential).where(
-                WebAuthnCredential.user_id == user_id,
-            ),
+        query = select(WebAuthnCredential).where(
+            WebAuthnCredential.user_id == user_id,
         )
-        return list(credentials)
+        return await select_page(self._session, query, per_page=20, page="")

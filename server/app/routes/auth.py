@@ -24,6 +24,7 @@ from app.lib.constants import (
 from app.models.register_flow import RegisterFlow
 from app.models.user import User
 from app.models.user_session import UserSession
+from app.models.webauthn_credential import WebAuthnCredential
 from app.schemas.auth import (
     AuthenticateOptionsInput,
     AuthenticateOptionsResult,
@@ -42,6 +43,7 @@ from app.schemas.auth import (
 )
 from app.schemas.errors import InvalidInputErrorResult, ResourceNotFoundErrorResult
 from app.schemas.user_session import UserSessionSchema
+from app.schemas.webauthn_credential import WebAuthnCredentialSchema
 from app.services.auth import AuthService
 from app.types.auth import UserInfo
 
@@ -389,9 +391,27 @@ async def verify_authentication_response(
 @auth_router.get(
     "/webauthn-credentials",
     summary="Get the current user's webauthn credentials.",
+    response_model=list[WebAuthnCredentialSchema],
 )
-async def get_webauthn_credential(_data: CreateWebAuthnCredentialInput) -> None:
+async def get_webauthn_credentials(
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=get_auth_service,
+        ),
+    ],
+    viewer_info: Annotated[
+        UserInfo,
+        Depends(
+            dependency=get_viewer_info,
+        ),
+    ],
+) -> list[WebAuthnCredential]:
     """Get the current user's webauthn credentials."""
+    # TODO: paginate response
+    return await auth_service.get_webauthn_credentials(
+        user_id=viewer_info.user_id,
+    )
 
 
 @auth_router.post("/webauthn-credentials")
