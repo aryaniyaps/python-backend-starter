@@ -1,4 +1,5 @@
 'use client';
+import ChangeEmailForm from '@/components/settings/account/change-email-form';
 import ProfileForm from '@/components/settings/account/profile-form';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
@@ -54,9 +55,10 @@ export default function AccountSettingsPage() {
       <div>
         <h3 className='text-lg font-medium'>User email</h3>
         <p className='text-muted-foreground text-sm'>
-          Your email address is private.
+          Manage your email address here.
         </p>
       </div>
+      <ChangeEmailForm />
     </div>
   );
 }
