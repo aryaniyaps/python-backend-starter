@@ -49,38 +49,22 @@ export default function ProfileForm() {
   }
 
   return (
-    <Form {...form} data-testid='profile-form'>
+    <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className='flex items-start gap-4'
+        className='flex w-full items-start gap-4'
       >
-        <div className='flex w-6/12 flex-col gap-4'>
+        <div className='flex w-2/3 flex-col gap-4'>
           <FormField
             control={form.control}
             name='name'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Full Name</FormLabel>
+                <FormLabel>Full name</FormLabel>
                 <FormControl>
                   <Input placeholder='first last' {...field} />
                 </FormControl>
                 <FormDescription>This is your full name.</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name='username'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Username</FormLabel>
-                <FormControl>
-                  <Input placeholder='username' {...field} />
-                </FormControl>
-                <FormDescription>
-                  This is your public display name.
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}

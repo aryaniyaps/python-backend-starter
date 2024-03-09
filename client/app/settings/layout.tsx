@@ -2,16 +2,30 @@ import SidebarNav from '@/components/settings/sidebar-nav';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
-const sidebarNavItems = [
-  {
-    title: 'Account',
-    href: '/settings',
-  },
-  {
-    title: 'Appearance',
-    href: '/settings/appearance',
-  },
-];
+const sidebarNavItems = {
+  'User settings': [
+    {
+      title: 'Account',
+      href: '/settings',
+    },
+  ],
+  'Security settings': [
+    {
+      title: 'Passkeys',
+      href: '/settings/passkeys',
+    },
+    {
+      title: 'Devices',
+      href: '/settings/devices',
+    },
+  ],
+  'App settings': [
+    {
+      title: 'Appearance',
+      href: '/settings/appearance',
+    },
+  ],
+};
 
 export default function SettingsLayout({
   children,
