@@ -13,7 +13,7 @@
 
 ## Generating the client schema
 
-To generate the client types based on the OpenAPI schema, run the following command:
+To generate the client from the OpenAPI schema, run the following command:
 
 ```
 npm run generate-schema
