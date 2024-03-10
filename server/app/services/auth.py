@@ -509,7 +509,7 @@ class AuthService:
         self,
         *,
         user_id: UUID,
-    ) -> Page[WebAuthnCredential, UUID]:
+    ) -> list[WebAuthnCredential]:
         """Get WebAuthn credentials for the given user ID."""
         return await self._webauthn_credential_repo.get_all(
             user_id=user_id,
