@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import Query
 
-from app.lib.constants import DEFAULT_PAGINATION_LIMIT
+from app.lib.constants import DEFAULT_PAGINATION_LIMIT, MAX_PAGINATION_LIMIT
 from app.types.paging import PagingInfo
 
 
@@ -11,6 +11,7 @@ def get_paging_info(
         int,
         Query(
             description="The amount of entities to fetch.",
+            le=MAX_PAGINATION_LIMIT,
         ),
     ] = DEFAULT_PAGINATION_LIMIT,
     after: Annotated[
