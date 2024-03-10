@@ -67,10 +67,9 @@ class WebAuthnCredentialRepo:
         self,
         *,
         user_id: UUID,
-        paging_info: PagingInfo,
-    ) -> Page[WebAuthnCredential, UUID]:
+    ) -> list[WebAuthnCredential]:
         """Get all WebAuthn credentials by user ID."""
-        statement = (
+        credentials = await self._session.scalars(
             select(WebAuthnCredential)
             .where(
                 WebAuthnCredential.user_id == user_id,
@@ -78,9 +77,4 @@ class WebAuthnCredentialRepo:
             .order_by(desc(WebAuthnCredential.created_at))
         )
 
-        return await paginate(
-            session=self._session,
-            statement=statement,
-            paginate_by=WebAuthnCredential.id,
-            paging_info=paging_info,
-        )
+        return list(credentials)

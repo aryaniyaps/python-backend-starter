@@ -394,7 +394,7 @@ async def verify_authentication_response(
 @auth_router.get(
     "/webauthn-credentials",
     summary="Get the current user's webauthn credentials.",
-    response_model=PaginatedResult[WebAuthnCredentialSchema, UUID],
+    response_model=list[WebAuthnCredentialSchema],
 )
 async def get_webauthn_credentials(
     auth_service: Annotated[
@@ -409,17 +409,10 @@ async def get_webauthn_credentials(
             dependency=get_viewer_info,
         ),
     ],
-    paging_info: Annotated[
-        PagingInfo,
-        Depends(
-            dependency=get_paging_info,
-        ),
-    ],
-) -> Page[WebAuthnCredential, UUID]:
+) -> list[WebAuthnCredential]:
     """Get the current user's webauthn credentials."""
     return await auth_service.get_webauthn_credentials(
         user_id=viewer_info.user_id,
-        paging_info=paging_info,
     )
 
 

@@ -509,10 +509,8 @@ class AuthService:
         self,
         *,
         user_id: UUID,
-        paging_info: PagingInfo,
     ) -> Page[WebAuthnCredential, UUID]:
         """Get WebAuthn credentials for the given user ID."""
         return await self._webauthn_credential_repo.get_all(
             user_id=user_id,
-            paging_info=paging_info,
         )
