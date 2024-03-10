@@ -1,11 +1,16 @@
+import { Button } from '@/components/ui/button';
+
 export default function PasskeysSettingsPage() {
   return (
     <div className='space-y-6'>
-      <div>
-        <h3 className='text-lg font-medium'>Passkeys</h3>
-        <p className='text-muted-foreground text-sm'>
-          Manage your passkeys here.
-        </p>
+      <div className='flex w-full justify-between gap-4'>
+        <div className='flex flex-col'>
+          <h3 className='text-lg font-medium'>Passkeys</h3>
+          <p className='text-sm text-muted-foreground'>
+            Manage your passkeys here.
+          </p>
+        </div>
+        <Button>Add passkey</Button>
       </div>
     </div>
   );

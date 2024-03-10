@@ -59,6 +59,10 @@
     @apply font-sans antialiased;
   }
 
+  html {
+    position: fixed;
+  }
+
   html,
   body,
   body > main,
@@ -66,21 +70,6 @@
     @apply h-full w-full;
     @apply whitespace-normal;
     @apply box-border;
-  }
-
-  /* Custom Scrollbar Styles */
-  ::-webkit-scrollbar {
-    @apply w-4;
-  }
-
-  ::-webkit-scrollbar-track {
-    @apply bg-secondary;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    @apply bg-primary;
-    @apply rounded-xl;
-    @apply border-x-4 border-solid border-transparent;
-    @apply bg-clip-padding;
+    @apply overflow-y-auto;
   }
 }

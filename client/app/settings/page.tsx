@@ -17,9 +17,9 @@ export default function AccountSettingsPage() {
 
   return (
     <div className='space-y-6'>
-      <div>
+      <div className='flex flex-col'>
         <h3 className='text-lg font-medium'>User profile</h3>
-        <p className='text-muted-foreground text-sm'>
+        <p className='text-sm text-muted-foreground'>
           This is how others will see you on {APP_NAME}.
         </p>
       </div>
@@ -48,13 +48,13 @@ export default function AccountSettingsPage() {
               </Link>
             </TooltipContent>
           </Tooltip>
-          <p className='text-muted-foreground text-sm'>User avatar</p>
+          <p className='text-sm text-muted-foreground'>User avatar</p>
         </div>
       </div>
       <Separator />
       <div>
         <h3 className='text-lg font-medium'>User email</h3>
-        <p className='text-muted-foreground text-sm'>
+        <p className='text-sm text-muted-foreground'>
           Manage your email address here.
         </p>
       </div>

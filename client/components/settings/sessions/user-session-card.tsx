@@ -1,3 +1,4 @@
+'use client';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -8,7 +9,7 @@ import {
 import { UserSessionSchema } from '@/generated/openapi/v1.0';
 import useDeleteUserSession from '@/lib/hooks/useDeleteUserSession';
 
-const createdAtFormat = new Intl.DateTimeFormat('en', {
+const dateTimeFormat = new Intl.DateTimeFormat('en', {
   day: '2-digit',
   month: 'long',
   year: 'numeric',
@@ -24,6 +25,9 @@ export default function UserSessionCard({
   async function revokeSession() {
     await deleteUserSession.mutateAsync({ sessionId: userSession.id });
   }
+
+  console.log(userSession.loggedOutAt);
+  console.log(userSession.createdAt);
 
   return (
     <Card>
@@ -48,9 +52,15 @@ export default function UserSessionCard({
         </div>
       </CardContent>
       <CardFooter>
-        <p className='text-xs text-muted-foreground'>
-          created on {createdAtFormat.format(userSession.createdAt)}
-        </p>
+        {userSession.loggedOutAt !== null ? (
+          <p className='text-xs text-muted-foreground'>
+            logged out on {dateTimeFormat.format(userSession.createdAt)}
+          </p>
+        ) : (
+          <p className='text-xs text-muted-foreground'>
+            created on {dateTimeFormat.format(userSession.createdAt)}
+          </p>
+        )}
       </CardFooter>
     </Card>
   );
