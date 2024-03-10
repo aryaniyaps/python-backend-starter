@@ -9,7 +9,7 @@
 - [React Hook Form](https://react-hook-form.com/)
 - [React Query](https://tanstack.com/query/latest/)
 - [Zod](https://zod.dev/)
-- [OpenAPI Fetch](https://openapi-ts.pages.dev/openapi-fetch/)
+- [OpenAPI Generator](https://openapi-generator.tech/)
 
 ## Generating the client schema
 

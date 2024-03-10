@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/@openapitools/openapi-generator-cli/config.schema.json",
+  "spaces": 2,
+  "generator-cli": {
+    "version": "7.3.0",
+    "useDocker": true,
+    "generators": {
+      "v1.0": {
+        "generatorName": "typescript-fetch",
+        "output": "#{cwd}/generated/openapi/v1.0",
+        "glob": "../schema/openapi.json",
+        "additionalProperties": {
+          "supportsES6": "true",
+          "withInterfaces": true
+        }
+      }
+    }
+  }
+}

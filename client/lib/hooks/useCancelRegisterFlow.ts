@@ -1,14 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { client } from '../client';
+import { authenticationApi } from '../api';
 
 export default function useCancelRegisterFlow() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ flowId }: { flowId: string }) => {
-      const { data } = await client.POST('/auth/register/flows/cancel', {
-        params: { cookie: { register_flow_id: flowId } },
-      });
-      return data;
+      return await authenticationApi.openAPITagAUTHENTICATIONCancelRegisterFlow(
+        { registerFlowId: flowId }
+      );
     },
     onSuccess(_data, variables) {
       // update query data here

@@ -1,13 +1,12 @@
 import { useMutation } from '@tanstack/react-query';
-import { client } from '../client';
+import { authenticationApi } from '../api';
 
 export default function useAuthenticateStart() {
   return useMutation({
     mutationFn: async ({ email }: { email: string }) => {
-      const { data } = await client.POST('/auth/authenticate/start', {
-        body: { email },
-      });
-      return data;
+      return await authenticationApi.openAPITagAUTHENTICATIONGenerateAuthenticationOptions(
+        { authenticateOptionsInput: { email } }
+      );
     },
   });
 }

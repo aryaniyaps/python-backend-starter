@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 
 import { LocalRegisterFlowProvider } from '@/components/register/flow-provider';
 import RegisterForm from '@/components/register/register-form';
-import { client } from '@/lib/client';
+import { client } from '@/lib/api';
 
 export default async function RegisterPage() {
   const cookieStore = cookies();

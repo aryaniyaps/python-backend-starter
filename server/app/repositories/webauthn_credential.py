@@ -4,9 +4,7 @@ from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from webauthn.helpers.structs import AuthenticatorTransport
 
-from app.lib.database.paging import paginate
 from app.models.webauthn_credential import WebAuthnCredential
-from app.types.paging import Page, PagingInfo
 
 
 class WebAuthnCredentialRepo:

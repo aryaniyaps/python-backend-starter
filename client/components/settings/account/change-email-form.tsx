@@ -19,10 +19,11 @@ const changeEmailSchema = z.object({
 
 export default function ChangeEmailForm() {
   const { data: user } = useCurrentUser();
+
   const form = useForm<z.infer<typeof changeEmailSchema>>({
     resolver: zodResolver(changeEmailSchema),
     defaultValues: {
-      email: user?.email,
+      email: user.email,
     },
   });
 

@@ -39,14 +39,7 @@ export default function ProfileForm() {
     },
   });
 
-  async function updateProfile(values: z.infer<typeof profileSchema>) {}
-
-  async function onSubmit(values: z.infer<typeof profileSchema>) {
-    try {
-      await updateProfile(values);
-      form.reset({ username: values.username, name: values.name });
-    } catch (err) {}
-  }
+  async function onSubmit(values: z.infer<typeof profileSchema>) {}
 
   return (
     <Form {...form}>

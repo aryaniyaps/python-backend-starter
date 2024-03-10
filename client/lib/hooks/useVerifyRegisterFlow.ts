@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { client } from '../client';
+import { authenticationApi } from '../api';
 
 export default function useVerifyRegisterFlow() {
   const queryClient = useQueryClient();
@@ -11,20 +11,18 @@ export default function useVerifyRegisterFlow() {
       verificationCode: string;
       flowId: string;
     }) => {
-      const { data } = await client.POST('/auth/register/flows/verify', {
-        body: { verificationCode },
-        params: {
-          header: { 'user-agent': navigator.userAgent },
-          cookie: { register_flow_id: flowId },
-        },
-      });
-      return data;
+      return await authenticationApi.openAPITagAUTHENTICATIONVerifyRegisterFlow(
+        {
+          registerFlowId: flowId,
+          registerFlowVerifyInput: { verificationCode },
+        }
+      );
     },
     onSuccess(data, variables) {
       // update query data
       queryClient.setQueryData(
         ['/auth/register/flows', variables.flowId],
-        data?.registerFlow
+        data.registerFlow
       );
     },
   });

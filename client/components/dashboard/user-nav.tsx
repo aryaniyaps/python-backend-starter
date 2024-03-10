@@ -17,16 +17,12 @@ export default function UserNav() {
     <DropdownMenu>
       <DropdownMenuTrigger>
         <Avatar className='h-8 w-8'>
-          <AvatarImage
-            src={user?.avatarUrl}
-            loading='eager'
-            alt={user?.email}
-          />
-          <AvatarFallback>{user?.email.slice(0, 2)}</AvatarFallback>
+          <AvatarImage src={user.avatarUrl} loading='eager' alt={user.email} />
+          <AvatarFallback>{user.email.slice(0, 2)}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end' sideOffset={15}>
-        <DropdownMenuLabel>{user?.email}</DropdownMenuLabel>
+        <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
         <Link href='/settings'>
           <DropdownMenuItem>Settings</DropdownMenuItem>
         </Link>

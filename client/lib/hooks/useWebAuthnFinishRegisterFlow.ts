@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { client } from '../client';
+import { authenticationApi } from '../api';
 
 export default function useWebAuthnFinishRegisterFlow() {
   return useMutation({
@@ -10,14 +10,12 @@ export default function useWebAuthnFinishRegisterFlow() {
       credential: string;
       flowId: string;
     }) => {
-      const { data } = await client.POST(
-        '/auth/register/flows/webauthn-finish',
+      return await authenticationApi.openAPITagAUTHENTICATIONFinishWebauthnRegisterFlow(
         {
-          body: { credential },
-          params: { cookie: { register_flow_id: flowId } },
+          registerFlowId: flowId,
+          registerFlowWebAuthnFinishInput: { credential },
         }
       );
-      return data;
     },
   });
 }
