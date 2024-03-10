@@ -365,7 +365,7 @@ class AuthService:
             user_verification=UserVerificationRequirement.PREFERRED,
             allow_credentials=[
                 PublicKeyCredentialDescriptor(
-                    id=credential.id,
+                    id=credential.credential_id,
                     type=PublicKeyCredentialType.PUBLIC_KEY,
                     transports=credential.transports,
                 )

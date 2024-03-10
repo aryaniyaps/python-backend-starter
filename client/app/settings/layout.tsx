@@ -15,8 +15,8 @@ const sidebarNavItems = {
       href: '/settings/passkeys',
     },
     {
-      title: 'Devices',
-      href: '/settings/devices',
+      title: 'Sessions',
+      href: '/settings/sessions',
     },
   ],
   'App settings': [

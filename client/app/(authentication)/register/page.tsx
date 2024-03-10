@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 
 import { LocalRegisterFlowProvider } from '@/components/register/flow-provider';
 import RegisterForm from '@/components/register/register-form';
-import { client } from '@/lib/api';
+import { authenticationApi } from '@/lib/api';
 
 export default async function RegisterPage() {
   const cookieStore = cookies();
@@ -13,12 +13,7 @@ export default async function RegisterPage() {
 
   if (flowId) {
     try {
-      const { data } = await client.GET('/auth/register/flows/{flow_id}', {
-        params: { path: { flow_id: flowId.value } },
-      });
-      if (data) {
-        flow = data;
-      }
+      flow = await authenticationApi.getRegisterFlow({ flowId: flowId.value });
     } catch (err) {
       // TODO: handle errs better
       // TODO: delete register flow ID cookie if it is invalid
