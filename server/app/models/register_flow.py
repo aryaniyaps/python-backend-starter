@@ -5,7 +5,7 @@ from sqlalchemy import String, text
 from sqlalchemy.dialects.postgresql import CITEXT
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.lib.database import Base
+from app.lib.database.base import Base
 from app.lib.enums import RegisterFlowStep
 
 

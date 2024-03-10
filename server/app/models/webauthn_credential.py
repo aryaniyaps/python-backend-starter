@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql.functions import now
 from webauthn.helpers.structs import AuthenticatorTransport
 
-from app.lib.database import Base
+from app.lib.database.base import Base
 
 if TYPE_CHECKING:
     from app.models.user import User
@@ -17,6 +17,18 @@ if TYPE_CHECKING:
 class WebAuthnCredential(Base):
     __tablename__ = "webauthn_credentials"
 
+    # TODO: rename this ID to credential_id and use UUIDs as primary keys.
+    # this will help in pagination and is what is done by sites like locker.io
+    # [
+    # {
+    #    "id": "3ef13c24-41e1-42cd-b1d5-e0fc2c3e313c",
+    #    "created_time": 1710044530.0,
+    #    "webauthn_credential_id": "UDHFMGLY5DibnQ0ZjuQhIFD4H8picoZkSUgpzbSnupw",
+    #    "webauthn_public_key": "pQECAyYgASFYIOx0ZG9JvqL6XjMWbrbdrxK84i2eKSRSE-umk1H-Nl9fIlggmair70G8ri-t-tuhnqmO0Qa0eOOshoSV5VGeNzRgp18",
+    #    "name": "Other_Windows_Chrome",
+    #    "last_used_time": 1710044580.0
+    # }
+    # ]
     id: Mapped[bytes] = mapped_column(
         primary_key=True,
     )

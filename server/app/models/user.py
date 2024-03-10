@@ -7,7 +7,7 @@ from sqlalchemy.dialects.postgresql import CITEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql.functions import now
 
-from app.lib.database import Base
+from app.lib.database.base import Base
 
 if TYPE_CHECKING:
     from app.models.user_session import UserSession

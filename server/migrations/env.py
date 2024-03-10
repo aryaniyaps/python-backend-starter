@@ -3,7 +3,7 @@ from logging.config import fileConfig
 
 from alembic import context
 from app.config import settings
-from app.lib.database import database_metadata
+from app.lib.database.base import database_metadata
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config

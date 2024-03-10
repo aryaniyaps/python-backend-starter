@@ -15,7 +15,6 @@ from app.lib.constants import APP_NAME, SUPPORT_EMAIL
 from app.lib.error_handlers import (
     handle_http_exception,
     handle_invalid_input_error,
-    handle_rate_limit_exceeded_error,
     handle_resource_not_found_error,
     handle_unauthenticated_error,
     handle_unexpected_error,
@@ -23,7 +22,6 @@ from app.lib.error_handlers import (
 )
 from app.lib.errors import (
     InvalidInputError,
-    RateLimitExceededError,
     ResourceNotFoundError,
     UnauthenticatedError,
     UnexpectedError,
@@ -34,7 +32,6 @@ from app.routes.auth import auth_router
 from app.routes.health import health_router
 from app.routes.user import users_router
 from app.schemas.errors import (
-    RateLimitExceededErrorResult,
     UnexpectedErrorResult,
     ValidationErrorResult,
 )
@@ -84,10 +81,6 @@ def create_app() -> FastAPI:
             "displayRequestDuration": True,
         },
         responses={
-            HTTPStatus.TOO_MANY_REQUESTS: {
-                "model": RateLimitExceededErrorResult,
-                "description": "Rate Limit Exceeded Error",
-            },
             HTTPStatus.INTERNAL_SERVER_ERROR: {
                 "model": UnexpectedErrorResult,
                 "description": "Internal Server Error",
@@ -108,7 +101,6 @@ def create_app() -> FastAPI:
             ResourceNotFoundError: handle_resource_not_found_error,
             UnauthenticatedError: handle_unauthenticated_error,
             UnexpectedError: handle_unexpected_error,
-            RateLimitExceededError: handle_rate_limit_exceeded_error,
         },
         contact={
             "email": SUPPORT_EMAIL,

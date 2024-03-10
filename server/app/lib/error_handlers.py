@@ -7,7 +7,6 @@ from starlette.exceptions import HTTPException
 
 from app.lib.errors import (
     InvalidInputError,
-    RateLimitExceededError,
     ResourceNotFoundError,
     UnauthenticatedError,
     UnexpectedError,
@@ -16,7 +15,6 @@ from app.schemas.base import BaseSchema
 from app.schemas.errors import (
     HTTPExceptionResult,
     InvalidInputErrorResult,
-    RateLimitExceededErrorResult,
     ResourceNotFoundErrorResult,
     UnauthenticatedErrorResult,
     UnexpectedErrorResult,
@@ -40,27 +38,12 @@ async def handle_validation_error(
     exception: RequestValidationError,
 ) -> Response:
     """Handle ValidationError exceptions."""
-    print("ERROR: ", exception)
     return _create_error_response(
         error_result=ValidationErrorResult(
             message="Invalid input detected.",
             errors=exception.errors(),
         ),
         status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-    )
-
-
-async def handle_rate_limit_exceeded_error(
-    _request: Request,
-    exception: RateLimitExceededError,
-) -> Response:
-    """Handle RateLimitExceededError exceptions."""
-    return _create_error_response(
-        error_result=RateLimitExceededErrorResult(
-            message=str(exception),
-            is_primary=exception.is_primary,
-        ),
-        status_code=HTTPStatus.TOO_MANY_REQUESTS,
     )
 
 

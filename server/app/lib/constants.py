@@ -14,6 +14,10 @@ GRAVATAR_DEFAULT_IMAGE = "retro"
 
 GRAVATAR_SIZE = 100
 
+# pagination
+
+DEFAULT_PAGINATION_LIMIT = 10
+
 # cookies
 
 REGISTER_FLOW_ID_COOKIE = "register_flow_id"

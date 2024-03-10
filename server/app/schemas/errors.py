@@ -106,23 +106,3 @@ class UnauthenticatedErrorResult(BaseSchema):
             description="A human readable message describing the error.",
         ),
     ]
-
-
-class RateLimitExceededErrorResult(BaseSchema):
-    message: Annotated[
-        str,
-        Field(
-            examples=[
-                "You are being rate limited.",
-            ],
-            description="A human readable message describing the error.",
-        ),
-    ]
-
-    is_primary: Annotated[
-        bool,
-        Field(
-            title="Is Primary",
-            description="Whether the primary rate limiter was exceeded.",
-        ),
-    ]
