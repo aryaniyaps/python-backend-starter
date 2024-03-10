@@ -87,7 +87,10 @@ export default function RegisterFlowStart() {
         </Form>
       </CardContent>
       <CardFooter className='text-sm'>
-        Have an account?&nbsp;<Link href='/login'>sign in</Link>
+        Have an account?&nbsp;
+        <Link href='/login' className='text-primary'>
+          sign in
+        </Link>
       </CardFooter>
     </Card>
   );
