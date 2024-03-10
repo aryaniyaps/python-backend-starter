@@ -6,11 +6,13 @@ from sqlalchemy import delete, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from user_agents.parsers import UserAgent
 
+from app.lib.database.paging import paginate
 from app.lib.geo_ip import (
     get_city_location,
     get_geoip_city,
 )
 from app.models.user_session import UserSession
+from app.types.paging import Page, PagingInfo
 
 
 class UserSessionRepo:
@@ -24,6 +26,7 @@ class UserSessionRepo:
 
     async def create(
         self,
+        *,
         user_id: UUID,
         ip_address: str,
         user_agent: UserAgent,
@@ -44,18 +47,27 @@ class UserSessionRepo:
         await self._session.commit()
         return user_session
 
-    async def get_all(self, user_id: UUID) -> list[UserSession]:
+    async def get_all(
+        self,
+        *,
+        user_id: UUID,
+        paging_info: PagingInfo,
+    ) -> Page[UserSession, UUID]:
         """Get user sessions for the given user ID."""
-        sessions = await self._session.scalars(
-            select(UserSession).where(
-                UserSession.user_id == user_id,
-            ),
+        statement = select(UserSession).where(
+            UserSession.user_id == user_id,
         )
 
-        return list(sessions)
+        return await paginate(
+            session=self._session,
+            statement=statement,
+            paginate_by=UserSession.id,
+            paging_info=paging_info,
+        )
 
     async def delete(
         self,
+        *,
         user_session_id: UUID,
         user_id: UUID,
     ) -> None:
@@ -69,6 +81,7 @@ class UserSessionRepo:
 
     async def update(
         self,
+        *,
         user_session_id: UUID,
         logged_out_at: datetime | None,
     ) -> None:
@@ -84,6 +97,7 @@ class UserSessionRepo:
 
     async def logout_all(
         self,
+        *,
         user_id: UUID,
     ) -> None:
         """Mark all user sessions with the given user ID as logged out."""

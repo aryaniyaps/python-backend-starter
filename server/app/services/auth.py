@@ -44,6 +44,7 @@ from app.repositories.user_session import UserSessionRepo
 from app.repositories.webauthn_challenge import WebAuthnChallengeRepo
 from app.repositories.webauthn_credential import WebAuthnCredentialRepo
 from app.types.auth import UserInfo
+from app.types.paging import Page, PagingInfo
 from app.worker import task_queue
 
 
@@ -454,10 +455,16 @@ class AuthService:
 
         return authentication_token, existing_user
 
-    async def get_user_sessions(self, *, user_id: UUID) -> list[UserSession]:
+    async def get_user_sessions(
+        self,
+        *,
+        user_id: UUID,
+        paging_info: PagingInfo,
+    ) -> Page[UserSession, UUID]:
         """Get user sessions for the given user ID."""
         return await self._user_session_repo.get_all(
             user_id=user_id,
+            paging_info=paging_info,
         )
 
     async def logout_user(
@@ -485,7 +492,7 @@ class AuthService:
             )
 
     async def get_user_info_for_authentication_token(
-        self, authentication_token: str
+        self, *, authentication_token: str
     ) -> UserInfo:
         """Verify the given authentication token and return the corresponding user info."""
         user_info = await self._authentication_token_repo.get_user_info(
@@ -498,6 +505,14 @@ class AuthService:
             )
         return user_info
 
-    async def get_webauthn_credentials(self, user_id: UUID) -> list[WebAuthnCredential]:
+    async def get_webauthn_credentials(
+        self,
+        *,
+        user_id: UUID,
+        paging_info: PagingInfo,
+    ) -> Page[WebAuthnCredential, bytes]:
         """Get WebAuthn credentials for the given user ID."""
-        return await self._webauthn_credential_repo.get_all(user_id=user_id)
+        return await self._webauthn_credential_repo.get_all(
+            user_id=user_id,
+            paging_info=paging_info,
+        )

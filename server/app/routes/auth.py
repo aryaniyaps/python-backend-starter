@@ -16,6 +16,7 @@ from app.dependencies.auth import (
     get_viewer_info,
 )
 from app.dependencies.ip_address import get_ip_address
+from app.dependencies.paging import get_paging_info
 from app.lib.constants import (
     AUTHENTICATION_TOKEN_COOKIE,
     REGISTER_FLOW_ID_COOKIE,
@@ -42,10 +43,12 @@ from app.schemas.auth import (
     RegisterFlowWebAuthnStartResult,
 )
 from app.schemas.errors import InvalidInputErrorResult, ResourceNotFoundErrorResult
+from app.schemas.paging import PaginatedResult
 from app.schemas.user_session import UserSessionSchema
 from app.schemas.webauthn_credential import WebAuthnCredentialSchema
 from app.services.auth import AuthService
 from app.types.auth import UserInfo
+from app.types.paging import Page, PagingInfo
 
 auth_router = APIRouter(
     prefix="/auth",
@@ -391,7 +394,7 @@ async def verify_authentication_response(
 @auth_router.get(
     "/webauthn-credentials",
     summary="Get the current user's webauthn credentials.",
-    response_model=list[WebAuthnCredentialSchema],
+    response_model=PaginatedResult[WebAuthnCredentialSchema, bytes],
 )
 async def get_webauthn_credentials(
     auth_service: Annotated[
@@ -406,11 +409,17 @@ async def get_webauthn_credentials(
             dependency=get_viewer_info,
         ),
     ],
-) -> list[WebAuthnCredential]:
+    paging_info: Annotated[
+        PagingInfo,
+        Depends(
+            dependency=get_paging_info,
+        ),
+    ],
+) -> Page[WebAuthnCredential, bytes]:
     """Get the current user's webauthn credentials."""
-    # TODO: paginate response
     return await auth_service.get_webauthn_credentials(
         user_id=viewer_info.user_id,
+        paging_info=paging_info,
     )
 
 
@@ -465,7 +474,7 @@ async def delete_current_user_session(
 @auth_router.get(
     "/sessions",
     summary="Get the current user's sessions.",
-    response_model=list[UserSessionSchema],
+    response_model=PaginatedResult[UserSessionSchema, UUID],
 )
 async def get_user_sessions(
     auth_service: Annotated[
@@ -480,8 +489,15 @@ async def get_user_sessions(
             dependency=get_viewer_info,
         ),
     ],
-) -> list[UserSession]:
+    paging_info: Annotated[
+        PagingInfo,
+        Depends(
+            dependency=get_paging_info,
+        ),
+    ],
+) -> Page[UserSession, UUID]:
     """Get the current user's user sessions."""
     return await auth_service.get_user_sessions(
         user_id=viewer_info.user_id,
+        paging_info=paging_info,
     )

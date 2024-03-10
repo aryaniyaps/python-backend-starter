@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import Query
 
-from app.types.paging import PageInfo
+from app.types.paging import PagingInfo
 
 
 def get_paging_info(
@@ -20,6 +20,6 @@ def get_paging_info(
             description="The cursor after which items should be fetched.",
         ),
     ],
-) -> PageInfo:
+) -> PagingInfo:
     """Get paging info from query parameters."""
-    return PageInfo(limit=limit, after=after)
+    return PagingInfo(limit=limit, after=after)

@@ -113,8 +113,8 @@ class RegisterFlowRepo:
 
     async def update(
         self,
-        register_flow: RegisterFlow,
         *,
+        register_flow: RegisterFlow,
         current_step: RegisterFlowStep | None = None,
     ) -> None:
         """Update the given register flow."""

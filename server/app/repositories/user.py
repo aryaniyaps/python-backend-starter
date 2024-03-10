@@ -27,8 +27,8 @@ class UserRepo:
 
     async def update(
         self,
-        user: User,
         *,
+        user: User,
         email: str | None = None,
     ) -> User:
         """Update the given user."""
@@ -41,6 +41,7 @@ class UserRepo:
 
     async def get(
         self,
+        *,
         user_id: UUID,
     ) -> User | None:
         """Get an user by ID."""
@@ -52,6 +53,7 @@ class UserRepo:
 
     async def get_by_email(
         self,
+        *,
         email: str,
     ) -> User | None:
         """Get an user by email."""

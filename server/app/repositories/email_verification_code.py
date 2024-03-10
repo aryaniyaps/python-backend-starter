@@ -32,7 +32,7 @@ class EmailVerificationCodeRepo:
         exception=IntegrityError,
         max_tries=2,
     )
-    async def create(self, email: str) -> tuple[str, EmailVerificationCode]:
+    async def create(self, *, email: str) -> tuple[str, EmailVerificationCode]:
         """Create a new email verification code."""
         expires_at = text(
             f"NOW() + INTERVAL '{EMAIL_VERIFICATION_CODE_EXPIRES_IN} SECOND'",
@@ -54,6 +54,7 @@ class EmailVerificationCodeRepo:
 
     async def get(
         self,
+        *,
         email_verification_code_id: UUID,
         verification_code: str,
     ) -> EmailVerificationCode | None:
@@ -68,7 +69,7 @@ class EmailVerificationCodeRepo:
             ),
         )
 
-    async def delete_all(self, email: str) -> None:
+    async def delete_all(self, *, email: str) -> None:
         """Delete all email verification codes for the given email."""
         await self._session.execute(
             delete(EmailVerificationCode).where(

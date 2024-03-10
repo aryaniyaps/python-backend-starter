@@ -1,11 +1,12 @@
 from uuid import UUID
 
-from sqlakeyset.asyncio import select_page
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from webauthn.helpers.structs import AuthenticatorTransport
 
+from app.lib.database.paging import paginate
 from app.models.webauthn_credential import WebAuthnCredential
+from app.types.paging import Page, PagingInfo
 
 
 class WebAuthnCredentialRepo:
@@ -39,8 +40,8 @@ class WebAuthnCredentialRepo:
 
     async def update(
         self,
-        webauthn_credential: WebAuthnCredential,
         *,
+        webauthn_credential: WebAuthnCredential,
         sign_count: int,
     ) -> None:
         """Update the given WebAuthn credential."""
@@ -49,7 +50,10 @@ class WebAuthnCredentialRepo:
         await self._session.commit()
 
     async def get(
-        self, credential_id: bytes, user_id: UUID
+        self,
+        *,
+        credential_id: bytes,
+        user_id: UUID,
     ) -> WebAuthnCredential | None:
         """Get WebAuthn credential by ID and user ID."""
         return await self._session.scalar(
@@ -59,9 +63,20 @@ class WebAuthnCredentialRepo:
             ),
         )
 
-    async def get_all(self, user_id: UUID) -> list[WebAuthnCredential]:
+    async def get_all(
+        self,
+        *,
+        user_id: UUID,
+        paging_info: PagingInfo,
+    ) -> Page[WebAuthnCredential, bytes]:
         """Get all WebAuthn credentials by user ID."""
-        query = select(WebAuthnCredential).where(
+        statement = select(WebAuthnCredential).where(
             WebAuthnCredential.user_id == user_id,
         )
-        return await select_page(self._session, query, per_page=20, page="")
+
+        return await paginate(
+            session=self._session,
+            statement=statement,
+            paginate_by=WebAuthnCredential.id,
+            paging_info=paging_info,
+        )

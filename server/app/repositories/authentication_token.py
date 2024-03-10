@@ -13,6 +13,7 @@ class AuthenticationTokenRepo:
 
     async def create(
         self,
+        *,
         user_id: UUID,
         user_session_id: UUID,
     ) -> str:
@@ -61,6 +62,7 @@ class AuthenticationTokenRepo:
 
     async def get_user_info(
         self,
+        *,
         authentication_token: str,
     ) -> UserInfo | None:
         """Get the user ID and user session ID for the authentication token."""
@@ -84,6 +86,7 @@ class AuthenticationTokenRepo:
 
     async def delete(
         self,
+        *,
         authentication_token: str,
         user_id: UUID,
     ) -> None:
@@ -101,6 +104,7 @@ class AuthenticationTokenRepo:
 
     async def delete_all(
         self,
+        *,
         user_id: UUID,
     ) -> None:
         """Delete all authentication tokens for the given user ID."""
