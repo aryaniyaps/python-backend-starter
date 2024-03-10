@@ -2,7 +2,7 @@ from datetime import datetime
 from uuid import UUID
 
 from geoip2.database import Reader
-from sqlalchemy import delete, select, text, update
+from sqlalchemy import delete, desc, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from user_agents.parsers import UserAgent
 
@@ -54,8 +54,12 @@ class UserSessionRepo:
         paging_info: PagingInfo,
     ) -> Page[UserSession, UUID]:
         """Get user sessions for the given user ID."""
-        statement = select(UserSession).where(
-            UserSession.user_id == user_id,
+        statement = (
+            select(UserSession)
+            .where(
+                UserSession.user_id == user_id,
+            )
+            .order_by(desc(UserSession.created_at))
         )
 
         return await paginate(

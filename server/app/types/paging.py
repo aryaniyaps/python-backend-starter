@@ -1,26 +1,29 @@
 from dataclasses import dataclass
 from typing import Generic, TypeVar
-from uuid import UUID
 
 from app.lib.database.base import Base
 
-CursorT = TypeVar("CursorT", UUID, bytes)
+# TODO: use UUID as default for CursorT TypeVar after we upgrade to Python 3.13
+# https://peps.python.org/pep-0696/
+
+CursorT = TypeVar("CursorT")
 
 EntityT = TypeVar("EntityT", bound=Base)
 
 
 @dataclass
 class PagingInfo(Generic[CursorT]):
+    """Information required for pagination."""
+
     after: CursorT | None
     limit: int
 
 
 @dataclass
 class PageInfo(Generic[CursorT]):
-    """Additional metadata that aids in pagination."""
+    """Additional information that aids in pagination."""
 
-    has_next: bool
-    start_cursor: CursorT | None
+    next_cursor: CursorT | None
 
 
 @dataclass

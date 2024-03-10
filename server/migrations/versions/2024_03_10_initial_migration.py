@@ -1,9 +1,9 @@
 """
 initial migration
 
-Revision ID: fd20fb42ede5
+Revision ID: fecfcdb58705
 Revises: 7a23de63905c
-Create Date: 2024-03-05 12:43:29.009884
+Create Date: 2024-03-10 10:47:15.124374
 
 """
 
@@ -14,7 +14,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = "fd20fb42ede5"
+revision: str = "fecfcdb58705"
 down_revision: str | None = "7a23de63905c"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -122,7 +122,10 @@ def upgrade() -> None:
     )
     op.create_table(
         "webauthn_credentials",
-        sa.Column("id", sa.LargeBinary(), nullable=False),
+        sa.Column(
+            "id", sa.Uuid(), server_default=sa.text("gen_random_uuid()"), nullable=False
+        ),
+        sa.Column("credential_id", sa.LargeBinary(), nullable=False),
         sa.Column("user_id", sa.Uuid(), nullable=False),
         sa.Column("public_key", sa.LargeBinary(), nullable=False),
         sa.Column("sign_count", sa.Integer(), nullable=False),
@@ -156,9 +159,19 @@ def upgrade() -> None:
             "id", "user_id", name=op.f("webauthn_credentials_pkey")
         ),
     )
+    op.create_index(
+        op.f("webauthn_credentials_credential_id_idx"),
+        "webauthn_credentials",
+        ["credential_id"],
+        unique=False,
+    )
 
 
 def downgrade() -> None:
+    op.drop_index(
+        op.f("webauthn_credentials_credential_id_idx"),
+        table_name="webauthn_credentials",
+    )
     op.drop_table("webauthn_credentials")
     op.drop_index(op.f("user_sessions_user_id_idx"), table_name="user_sessions")
     op.drop_table("user_sessions")

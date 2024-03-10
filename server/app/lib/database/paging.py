@@ -16,13 +16,21 @@ async def paginate(
     if paging_info.after is not None:
         statement.filter(paginate_by > paging_info.after)
 
-    statement.limit(paging_info.limit)
-    entities = await session.scalars(statement)
+    statement.limit(paging_info.limit + 1)
+
+    result = await session.scalars(statement)
+
+    entities = list(result)
+
+    next_cursor: CursorT | None = None
+
+    if len(entities) > paging_info.limit:
+        next_entity = entities.pop()
+        next_cursor = next_entity.__getattribute__(str(paginate_by))
 
     return Page(
-        entities=list(entities),
+        entities=entities,
         page_info=PageInfo(
-            has_next=True,
-            start_cursor=None,
+            next_cursor=next_cursor,
         ),
     )

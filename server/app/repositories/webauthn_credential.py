@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from webauthn.helpers.structs import AuthenticatorTransport
 
@@ -27,7 +27,7 @@ class WebAuthnCredentialRepo:
         """Create a new WebAuthn credential."""
         webauthn_credential = WebAuthnCredential(
             user_id=user_id,
-            id=credential_id,
+            credential_id=credential_id,
             public_key=public_key,
             sign_count=sign_count,
             device_type=device_type,
@@ -58,7 +58,7 @@ class WebAuthnCredentialRepo:
         """Get WebAuthn credential by ID and user ID."""
         return await self._session.scalar(
             select(WebAuthnCredential).where(
-                WebAuthnCredential.id == credential_id
+                WebAuthnCredential.credential_id == credential_id
                 and WebAuthnCredential.user_id == user_id,
             ),
         )
@@ -68,10 +68,14 @@ class WebAuthnCredentialRepo:
         *,
         user_id: UUID,
         paging_info: PagingInfo,
-    ) -> Page[WebAuthnCredential, bytes]:
+    ) -> Page[WebAuthnCredential, UUID]:
         """Get all WebAuthn credentials by user ID."""
-        statement = select(WebAuthnCredential).where(
-            WebAuthnCredential.user_id == user_id,
+        statement = (
+            select(WebAuthnCredential)
+            .where(
+                WebAuthnCredential.user_id == user_id,
+            )
+            .order_by(desc(WebAuthnCredential.created_at))
         )
 
         return await paginate(
