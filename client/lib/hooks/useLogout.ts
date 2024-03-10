@@ -4,7 +4,7 @@ import { authenticationApi } from '../api';
 export default function useLogout() {
   return useMutation({
     mutationFn: async ({ rememberSession }: { rememberSession: boolean }) => {
-      return await authenticationApi.deleteCurrentUserSession({
+      return await authenticationApi.logoutCurrentUser({
         logoutInput: { rememberSession },
       });
     },

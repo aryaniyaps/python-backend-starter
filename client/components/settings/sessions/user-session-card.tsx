@@ -6,6 +6,7 @@ import {
   CardHeader,
 } from '@/components/ui/card';
 import { UserSessionSchema } from '@/generated/openapi/v1.0';
+import useDeleteUserSession from '@/lib/hooks/useDeleteUserSession';
 
 const createdAtFormat = new Intl.DateTimeFormat('en', {
   day: '2-digit',
@@ -18,7 +19,11 @@ export default function UserSessionCard({
 }: {
   userSession: UserSessionSchema;
 }) {
-  async function revokeSession() {}
+  const deleteUserSession = useDeleteUserSession();
+
+  async function revokeSession() {
+    await deleteUserSession.mutateAsync({ sessionId: userSession.id });
+  }
 
   return (
     <Card>

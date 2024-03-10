@@ -84,8 +84,8 @@ export interface CreateWebauthnCredentialRequest {
     body: object;
 }
 
-export interface DeleteCurrentUserSessionRequest {
-    logoutInput: LogoutInput;
+export interface DeleteUserSessionRequest {
+    sessionId: string;
 }
 
 export interface FinishWebauthnRegisterFlowRequest {
@@ -104,6 +104,10 @@ export interface GetRegisterFlowRequest {
 export interface GetUserSessionsRequest {
     limit?: number;
     after?: After;
+}
+
+export interface LogoutCurrentUserRequest {
+    logoutInput: LogoutInput;
 }
 
 export interface ResendVerificationRegisterFlowRequest {
@@ -170,20 +174,20 @@ export interface AuthenticationApiInterface {
     createWebauthnCredential(requestParameters: CreateWebauthnCredentialRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any>;
 
     /**
-     * Logout the current user.
-     * @summary Logout the current user.
-     * @param {LogoutInput} logoutInput 
+     * Delete a user session.
+     * @summary Delete a user session.
+     * @param {string} sessionId The ID of the session to delete.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AuthenticationApiInterface
      */
-    deleteCurrentUserSessionRaw(requestParameters: DeleteCurrentUserSessionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+    deleteUserSessionRaw(requestParameters: DeleteUserSessionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
 
     /**
-     * Logout the current user.
-     * Logout the current user.
+     * Delete a user session.
+     * Delete a user session.
      */
-    deleteCurrentUserSession(requestParameters: DeleteCurrentUserSessionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+    deleteUserSession(requestParameters: DeleteUserSessionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
 
     /**
      * Finish the webauthn registration in the register flow.
@@ -265,6 +269,22 @@ export interface AuthenticationApiInterface {
      * Get the current user\'s webauthn credentials.
      */
     getWebauthnCredentials(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WebAuthnCredentialSchema>>;
+
+    /**
+     * Logout the current user.
+     * @summary Logout the current user.
+     * @param {LogoutInput} logoutInput 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthenticationApiInterface
+     */
+    logoutCurrentUserRaw(requestParameters: LogoutCurrentUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+
+    /**
+     * Logout the current user.
+     * Logout the current user.
+     */
+    logoutCurrentUser(requestParameters: LogoutCurrentUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
 
     /**
      * Resend email verification in the register flow.
@@ -428,37 +448,34 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
     }
 
     /**
-     * Logout the current user.
-     * Logout the current user.
+     * Delete a user session.
+     * Delete a user session.
      */
-    async deleteCurrentUserSessionRaw(requestParameters: DeleteCurrentUserSessionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.logoutInput === null || requestParameters.logoutInput === undefined) {
-            throw new runtime.RequiredError('logoutInput','Required parameter requestParameters.logoutInput was null or undefined when calling deleteCurrentUserSession.');
+    async deleteUserSessionRaw(requestParameters: DeleteUserSessionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.sessionId === null || requestParameters.sessionId === undefined) {
+            throw new runtime.RequiredError('sessionId','Required parameter requestParameters.sessionId was null or undefined when calling deleteUserSession.');
         }
 
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        headerParameters['Content-Type'] = 'application/json';
-
         const response = await this.request({
-            path: `/auth/logout`,
-            method: 'POST',
+            path: `/auth/sessions/{session_id}`.replace(`{${"session_id"}}`, encodeURIComponent(String(requestParameters.sessionId))),
+            method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
-            body: LogoutInputToJSON(requestParameters.logoutInput),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
 
     /**
-     * Logout the current user.
-     * Logout the current user.
+     * Delete a user session.
+     * Delete a user session.
      */
-    async deleteCurrentUserSession(requestParameters: DeleteCurrentUserSessionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.deleteCurrentUserSessionRaw(requestParameters, initOverrides);
+    async deleteUserSession(requestParameters: DeleteUserSessionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteUserSessionRaw(requestParameters, initOverrides);
     }
 
     /**
@@ -629,6 +646,40 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
     async getWebauthnCredentials(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WebAuthnCredentialSchema>> {
         const response = await this.getWebauthnCredentialsRaw(initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Logout the current user.
+     * Logout the current user.
+     */
+    async logoutCurrentUserRaw(requestParameters: LogoutCurrentUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.logoutInput === null || requestParameters.logoutInput === undefined) {
+            throw new runtime.RequiredError('logoutInput','Required parameter requestParameters.logoutInput was null or undefined when calling logoutCurrentUser.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/auth/logout`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: LogoutInputToJSON(requestParameters.logoutInput),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Logout the current user.
+     * Logout the current user.
+     */
+    async logoutCurrentUser(requestParameters: LogoutCurrentUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.logoutCurrentUserRaw(requestParameters, initOverrides);
     }
 
     /**

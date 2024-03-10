@@ -467,6 +467,18 @@ class AuthService:
             paging_info=paging_info,
         )
 
+    async def delete_user_session(
+        self,
+        *,
+        user_id: UUID,
+        user_session_id: UUID,
+    ) -> None:
+        """Delete the user session with the given ID."""
+        return await self._user_session_repo.delete(
+            user_id=user_id,
+            user_session_id=user_session_id,
+        )
+
     async def logout_user(
         self,
         *,

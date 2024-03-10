@@ -425,7 +425,7 @@ async def create_webauthn_credential(_data: CreateWebAuthnCredentialInput) -> No
     status_code=HTTPStatus.NO_CONTENT,
     summary="Logout the current user.",
 )
-async def delete_current_user_session(
+async def logout_current_user(
     data: LogoutInput,
     response: Response,
     auth_service: Annotated[
@@ -492,4 +492,39 @@ async def get_user_sessions(
     return await auth_service.get_user_sessions(
         user_id=viewer_info.user_id,
         paging_info=paging_info,
+    )
+
+
+@auth_router.delete(
+    "/sessions/{session_id}",
+    summary="Delete a user session.",
+    response_model=None,
+    status_code=HTTPStatus.NO_CONTENT,
+)
+async def delete_user_session(
+    session_id: Annotated[
+        UUID,
+        Path(
+            title="Session ID",
+            description="The ID of the session to delete.",
+        ),
+    ],
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=get_auth_service,
+        ),
+    ],
+    viewer_info: Annotated[
+        UserInfo,
+        Depends(
+            dependency=get_viewer_info,
+        ),
+    ],
+) -> None:
+    """Delete a user session."""
+    # FIXME: require re-authentication before revoking sessions
+    return await auth_service.delete_user_session(
+        user_id=viewer_info.user_id,
+        user_session_id=session_id,
     )
