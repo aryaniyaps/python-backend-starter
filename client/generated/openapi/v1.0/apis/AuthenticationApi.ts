@@ -76,56 +76,56 @@ import {
     WebAuthnCredentialSchemaToJSON,
 } from '../models/index';
 
-export interface OpenAPITagAUTHENTICATIONCancelRegisterFlowRequest {
+export interface CancelRegisterFlowRequest {
     registerFlowId: string;
 }
 
-export interface OpenAPITagAUTHENTICATIONCreateWebauthnCredentialRequest {
+export interface CreateWebauthnCredentialRequest {
     body: object;
 }
 
-export interface OpenAPITagAUTHENTICATIONDeleteCurrentUserSessionRequest {
+export interface DeleteCurrentUserSessionRequest {
     logoutInput: LogoutInput;
 }
 
-export interface OpenAPITagAUTHENTICATIONFinishWebauthnRegisterFlowRequest {
+export interface FinishWebauthnRegisterFlowRequest {
     registerFlowId: string;
     registerFlowWebAuthnFinishInput: RegisterFlowWebAuthnFinishInput;
 }
 
-export interface OpenAPITagAUTHENTICATIONGenerateAuthenticationOptionsRequest {
+export interface GenerateAuthenticationOptionsRequest {
     authenticateOptionsInput: AuthenticateOptionsInput;
 }
 
-export interface OpenAPITagAUTHENTICATIONGetRegisterFlowRequest {
+export interface GetRegisterFlowRequest {
     flowId: string;
 }
 
-export interface OpenAPITagAUTHENTICATIONGetUserSessionsRequest {
+export interface GetUserSessionsRequest {
     limit?: number;
     after?: After;
 }
 
-export interface OpenAPITagAUTHENTICATIONResendVerificationRegisterFlowRequest {
+export interface ResendVerificationRegisterFlowRequest {
     userAgent: string;
     registerFlowId: string;
 }
 
-export interface OpenAPITagAUTHENTICATIONStartRegisterFlowRequest {
+export interface StartRegisterFlowRequest {
     userAgent: string;
     registerFlowStartInput: RegisterFlowStartInput;
 }
 
-export interface OpenAPITagAUTHENTICATIONStartWebauthnRegisterFlowRequest {
+export interface StartWebauthnRegisterFlowRequest {
     registerFlowId: string;
 }
 
-export interface OpenAPITagAUTHENTICATIONVerifyAuthenticationResponseRequest {
+export interface VerifyAuthenticationResponseRequest {
     userAgent: string;
     authenticateVerificationInput: AuthenticateVerificationInput;
 }
 
-export interface OpenAPITagAUTHENTICATIONVerifyRegisterFlowRequest {
+export interface VerifyRegisterFlowRequest {
     registerFlowId: string;
     registerFlowVerifyInput: RegisterFlowVerifyInput;
 }
@@ -145,13 +145,13 @@ export interface AuthenticationApiInterface {
      * @throws {RequiredError}
      * @memberof AuthenticationApiInterface
      */
-    openAPITagAUTHENTICATIONCancelRegisterFlowRaw(requestParameters: OpenAPITagAUTHENTICATIONCancelRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+    cancelRegisterFlowRaw(requestParameters: CancelRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
 
     /**
      * Cancel a register flow.
      * Cancel a register flow.
      */
-    openAPITagAUTHENTICATIONCancelRegisterFlow(requestParameters: OpenAPITagAUTHENTICATIONCancelRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+    cancelRegisterFlow(requestParameters: CancelRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
 
     /**
      * Create a new webauthn credential.
@@ -161,13 +161,13 @@ export interface AuthenticationApiInterface {
      * @throws {RequiredError}
      * @memberof AuthenticationApiInterface
      */
-    openAPITagAUTHENTICATIONCreateWebauthnCredentialRaw(requestParameters: OpenAPITagAUTHENTICATIONCreateWebauthnCredentialRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>>;
+    createWebauthnCredentialRaw(requestParameters: CreateWebauthnCredentialRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>>;
 
     /**
      * Create a new webauthn credential.
      * Create Webauthn Credential
      */
-    openAPITagAUTHENTICATIONCreateWebauthnCredential(requestParameters: OpenAPITagAUTHENTICATIONCreateWebauthnCredentialRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any>;
+    createWebauthnCredential(requestParameters: CreateWebauthnCredentialRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any>;
 
     /**
      * Logout the current user.
@@ -177,13 +177,13 @@ export interface AuthenticationApiInterface {
      * @throws {RequiredError}
      * @memberof AuthenticationApiInterface
      */
-    openAPITagAUTHENTICATIONDeleteCurrentUserSessionRaw(requestParameters: OpenAPITagAUTHENTICATIONDeleteCurrentUserSessionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+    deleteCurrentUserSessionRaw(requestParameters: DeleteCurrentUserSessionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
 
     /**
      * Logout the current user.
      * Logout the current user.
      */
-    openAPITagAUTHENTICATIONDeleteCurrentUserSession(requestParameters: OpenAPITagAUTHENTICATIONDeleteCurrentUserSessionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+    deleteCurrentUserSession(requestParameters: DeleteCurrentUserSessionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
 
     /**
      * Finish the webauthn registration in the register flow.
@@ -194,13 +194,13 @@ export interface AuthenticationApiInterface {
      * @throws {RequiredError}
      * @memberof AuthenticationApiInterface
      */
-    openAPITagAUTHENTICATIONFinishWebauthnRegisterFlowRaw(requestParameters: OpenAPITagAUTHENTICATIONFinishWebauthnRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RootModelUserSchema>>;
+    finishWebauthnRegisterFlowRaw(requestParameters: FinishWebauthnRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RootModelUserSchema>>;
 
     /**
      * Finish the webauthn registration in the register flow.
      * Finish the webauthn registration in the register flow.
      */
-    openAPITagAUTHENTICATIONFinishWebauthnRegisterFlow(requestParameters: OpenAPITagAUTHENTICATIONFinishWebauthnRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RootModelUserSchema>;
+    finishWebauthnRegisterFlow(requestParameters: FinishWebauthnRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RootModelUserSchema>;
 
     /**
      * Generate options for retrieving a credential.
@@ -210,13 +210,13 @@ export interface AuthenticationApiInterface {
      * @throws {RequiredError}
      * @memberof AuthenticationApiInterface
      */
-    openAPITagAUTHENTICATIONGenerateAuthenticationOptionsRaw(requestParameters: OpenAPITagAUTHENTICATIONGenerateAuthenticationOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AuthenticateOptionsResult>>;
+    generateAuthenticationOptionsRaw(requestParameters: GenerateAuthenticationOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AuthenticateOptionsResult>>;
 
     /**
      * Generate options for retrieving a credential.
      * Generate Authentication Options
      */
-    openAPITagAUTHENTICATIONGenerateAuthenticationOptions(requestParameters: OpenAPITagAUTHENTICATIONGenerateAuthenticationOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AuthenticateOptionsResult>;
+    generateAuthenticationOptions(requestParameters: GenerateAuthenticationOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AuthenticateOptionsResult>;
 
     /**
      * Get a register flow.
@@ -226,13 +226,13 @@ export interface AuthenticationApiInterface {
      * @throws {RequiredError}
      * @memberof AuthenticationApiInterface
      */
-    openAPITagAUTHENTICATIONGetRegisterFlowRaw(requestParameters: OpenAPITagAUTHENTICATIONGetRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegisterFlowSchema>>;
+    getRegisterFlowRaw(requestParameters: GetRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegisterFlowSchema>>;
 
     /**
      * Get a register flow.
      * Get a register flow.
      */
-    openAPITagAUTHENTICATIONGetRegisterFlow(requestParameters: OpenAPITagAUTHENTICATIONGetRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterFlowSchema>;
+    getRegisterFlow(requestParameters: GetRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterFlowSchema>;
 
     /**
      * Get the current user\'s user sessions.
@@ -243,13 +243,13 @@ export interface AuthenticationApiInterface {
      * @throws {RequiredError}
      * @memberof AuthenticationApiInterface
      */
-    openAPITagAUTHENTICATIONGetUserSessionsRaw(requestParameters: OpenAPITagAUTHENTICATIONGetUserSessionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedResultUserSessionSchemaUUID>>;
+    getUserSessionsRaw(requestParameters: GetUserSessionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedResultUserSessionSchemaUUID>>;
 
     /**
      * Get the current user\'s user sessions.
      * Get the current user\'s sessions.
      */
-    openAPITagAUTHENTICATIONGetUserSessions(requestParameters: OpenAPITagAUTHENTICATIONGetUserSessionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginatedResultUserSessionSchemaUUID>;
+    getUserSessions(requestParameters: GetUserSessionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginatedResultUserSessionSchemaUUID>;
 
     /**
      * Get the current user\'s webauthn credentials.
@@ -258,13 +258,13 @@ export interface AuthenticationApiInterface {
      * @throws {RequiredError}
      * @memberof AuthenticationApiInterface
      */
-    openAPITagAUTHENTICATIONGetWebauthnCredentialsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WebAuthnCredentialSchema>>>;
+    getWebauthnCredentialsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WebAuthnCredentialSchema>>>;
 
     /**
      * Get the current user\'s webauthn credentials.
      * Get the current user\'s webauthn credentials.
      */
-    openAPITagAUTHENTICATIONGetWebauthnCredentials(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WebAuthnCredentialSchema>>;
+    getWebauthnCredentials(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WebAuthnCredentialSchema>>;
 
     /**
      * Resend email verification in the register flow.
@@ -275,13 +275,13 @@ export interface AuthenticationApiInterface {
      * @throws {RequiredError}
      * @memberof AuthenticationApiInterface
      */
-    openAPITagAUTHENTICATIONResendVerificationRegisterFlowRaw(requestParameters: OpenAPITagAUTHENTICATIONResendVerificationRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>>;
+    resendVerificationRegisterFlowRaw(requestParameters: ResendVerificationRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>>;
 
     /**
      * Resend email verification in the register flow.
      * Resend email verification in the register flow.
      */
-    openAPITagAUTHENTICATIONResendVerificationRegisterFlow(requestParameters: OpenAPITagAUTHENTICATIONResendVerificationRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any>;
+    resendVerificationRegisterFlow(requestParameters: ResendVerificationRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any>;
 
     /**
      * Start a register flow.
@@ -292,13 +292,13 @@ export interface AuthenticationApiInterface {
      * @throws {RequiredError}
      * @memberof AuthenticationApiInterface
      */
-    openAPITagAUTHENTICATIONStartRegisterFlowRaw(requestParameters: OpenAPITagAUTHENTICATIONStartRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegisterFlowStartResult>>;
+    startRegisterFlowRaw(requestParameters: StartRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegisterFlowStartResult>>;
 
     /**
      * Start a register flow.
      * Start a register flow.
      */
-    openAPITagAUTHENTICATIONStartRegisterFlow(requestParameters: OpenAPITagAUTHENTICATIONStartRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterFlowStartResult>;
+    startRegisterFlow(requestParameters: StartRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterFlowStartResult>;
 
     /**
      * Start the webauthn registration in the register flow.
@@ -308,13 +308,13 @@ export interface AuthenticationApiInterface {
      * @throws {RequiredError}
      * @memberof AuthenticationApiInterface
      */
-    openAPITagAUTHENTICATIONStartWebauthnRegisterFlowRaw(requestParameters: OpenAPITagAUTHENTICATIONStartWebauthnRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegisterFlowWebAuthnStartResult>>;
+    startWebauthnRegisterFlowRaw(requestParameters: StartWebauthnRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegisterFlowWebAuthnStartResult>>;
 
     /**
      * Start the webauthn registration in the register flow.
      * Start the webauthn registration in the register flow.
      */
-    openAPITagAUTHENTICATIONStartWebauthnRegisterFlow(requestParameters: OpenAPITagAUTHENTICATIONStartWebauthnRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterFlowWebAuthnStartResult>;
+    startWebauthnRegisterFlow(requestParameters: StartWebauthnRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterFlowWebAuthnStartResult>;
 
     /**
      * Verify the authenticator\'s response for authentication.
@@ -325,13 +325,13 @@ export interface AuthenticationApiInterface {
      * @throws {RequiredError}
      * @memberof AuthenticationApiInterface
      */
-    openAPITagAUTHENTICATIONVerifyAuthenticationResponseRaw(requestParameters: OpenAPITagAUTHENTICATIONVerifyAuthenticationResponseRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RootModelUserSchema>>;
+    verifyAuthenticationResponseRaw(requestParameters: VerifyAuthenticationResponseRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RootModelUserSchema>>;
 
     /**
      * Verify the authenticator\'s response for authentication.
      * Verify Authentication Response
      */
-    openAPITagAUTHENTICATIONVerifyAuthenticationResponse(requestParameters: OpenAPITagAUTHENTICATIONVerifyAuthenticationResponseRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RootModelUserSchema>;
+    verifyAuthenticationResponse(requestParameters: VerifyAuthenticationResponseRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RootModelUserSchema>;
 
     /**
      * Verify a register flow.
@@ -342,13 +342,13 @@ export interface AuthenticationApiInterface {
      * @throws {RequiredError}
      * @memberof AuthenticationApiInterface
      */
-    openAPITagAUTHENTICATIONVerifyRegisterFlowRaw(requestParameters: OpenAPITagAUTHENTICATIONVerifyRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegisterFlowVerifyResult>>;
+    verifyRegisterFlowRaw(requestParameters: VerifyRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegisterFlowVerifyResult>>;
 
     /**
      * Verify a register flow.
      * Verify a register flow.
      */
-    openAPITagAUTHENTICATIONVerifyRegisterFlow(requestParameters: OpenAPITagAUTHENTICATIONVerifyRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterFlowVerifyResult>;
+    verifyRegisterFlow(requestParameters: VerifyRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterFlowVerifyResult>;
 
 }
 
@@ -361,9 +361,9 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Cancel a register flow.
      * Cancel a register flow.
      */
-    async openAPITagAUTHENTICATIONCancelRegisterFlowRaw(requestParameters: OpenAPITagAUTHENTICATIONCancelRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async cancelRegisterFlowRaw(requestParameters: CancelRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.registerFlowId === null || requestParameters.registerFlowId === undefined) {
-            throw new runtime.RequiredError('registerFlowId','Required parameter requestParameters.registerFlowId was null or undefined when calling openAPITagAUTHENTICATIONCancelRegisterFlow.');
+            throw new runtime.RequiredError('registerFlowId','Required parameter requestParameters.registerFlowId was null or undefined when calling cancelRegisterFlow.');
         }
 
         const queryParameters: any = {};
@@ -384,17 +384,17 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Cancel a register flow.
      * Cancel a register flow.
      */
-    async openAPITagAUTHENTICATIONCancelRegisterFlow(requestParameters: OpenAPITagAUTHENTICATIONCancelRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.openAPITagAUTHENTICATIONCancelRegisterFlowRaw(requestParameters, initOverrides);
+    async cancelRegisterFlow(requestParameters: CancelRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.cancelRegisterFlowRaw(requestParameters, initOverrides);
     }
 
     /**
      * Create a new webauthn credential.
      * Create Webauthn Credential
      */
-    async openAPITagAUTHENTICATIONCreateWebauthnCredentialRaw(requestParameters: OpenAPITagAUTHENTICATIONCreateWebauthnCredentialRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>> {
+    async createWebauthnCredentialRaw(requestParameters: CreateWebauthnCredentialRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>> {
         if (requestParameters.body === null || requestParameters.body === undefined) {
-            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling openAPITagAUTHENTICATIONCreateWebauthnCredential.');
+            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling createWebauthnCredential.');
         }
 
         const queryParameters: any = {};
@@ -422,8 +422,8 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Create a new webauthn credential.
      * Create Webauthn Credential
      */
-    async openAPITagAUTHENTICATIONCreateWebauthnCredential(requestParameters: OpenAPITagAUTHENTICATIONCreateWebauthnCredentialRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
-        const response = await this.openAPITagAUTHENTICATIONCreateWebauthnCredentialRaw(requestParameters, initOverrides);
+    async createWebauthnCredential(requestParameters: CreateWebauthnCredentialRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
+        const response = await this.createWebauthnCredentialRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -431,9 +431,9 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Logout the current user.
      * Logout the current user.
      */
-    async openAPITagAUTHENTICATIONDeleteCurrentUserSessionRaw(requestParameters: OpenAPITagAUTHENTICATIONDeleteCurrentUserSessionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteCurrentUserSessionRaw(requestParameters: DeleteCurrentUserSessionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.logoutInput === null || requestParameters.logoutInput === undefined) {
-            throw new runtime.RequiredError('logoutInput','Required parameter requestParameters.logoutInput was null or undefined when calling openAPITagAUTHENTICATIONDeleteCurrentUserSession.');
+            throw new runtime.RequiredError('logoutInput','Required parameter requestParameters.logoutInput was null or undefined when calling deleteCurrentUserSession.');
         }
 
         const queryParameters: any = {};
@@ -457,21 +457,21 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Logout the current user.
      * Logout the current user.
      */
-    async openAPITagAUTHENTICATIONDeleteCurrentUserSession(requestParameters: OpenAPITagAUTHENTICATIONDeleteCurrentUserSessionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.openAPITagAUTHENTICATIONDeleteCurrentUserSessionRaw(requestParameters, initOverrides);
+    async deleteCurrentUserSession(requestParameters: DeleteCurrentUserSessionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteCurrentUserSessionRaw(requestParameters, initOverrides);
     }
 
     /**
      * Finish the webauthn registration in the register flow.
      * Finish the webauthn registration in the register flow.
      */
-    async openAPITagAUTHENTICATIONFinishWebauthnRegisterFlowRaw(requestParameters: OpenAPITagAUTHENTICATIONFinishWebauthnRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RootModelUserSchema>> {
+    async finishWebauthnRegisterFlowRaw(requestParameters: FinishWebauthnRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RootModelUserSchema>> {
         if (requestParameters.registerFlowId === null || requestParameters.registerFlowId === undefined) {
-            throw new runtime.RequiredError('registerFlowId','Required parameter requestParameters.registerFlowId was null or undefined when calling openAPITagAUTHENTICATIONFinishWebauthnRegisterFlow.');
+            throw new runtime.RequiredError('registerFlowId','Required parameter requestParameters.registerFlowId was null or undefined when calling finishWebauthnRegisterFlow.');
         }
 
         if (requestParameters.registerFlowWebAuthnFinishInput === null || requestParameters.registerFlowWebAuthnFinishInput === undefined) {
-            throw new runtime.RequiredError('registerFlowWebAuthnFinishInput','Required parameter requestParameters.registerFlowWebAuthnFinishInput was null or undefined when calling openAPITagAUTHENTICATIONFinishWebauthnRegisterFlow.');
+            throw new runtime.RequiredError('registerFlowWebAuthnFinishInput','Required parameter requestParameters.registerFlowWebAuthnFinishInput was null or undefined when calling finishWebauthnRegisterFlow.');
         }
 
         const queryParameters: any = {};
@@ -495,8 +495,8 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Finish the webauthn registration in the register flow.
      * Finish the webauthn registration in the register flow.
      */
-    async openAPITagAUTHENTICATIONFinishWebauthnRegisterFlow(requestParameters: OpenAPITagAUTHENTICATIONFinishWebauthnRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RootModelUserSchema> {
-        const response = await this.openAPITagAUTHENTICATIONFinishWebauthnRegisterFlowRaw(requestParameters, initOverrides);
+    async finishWebauthnRegisterFlow(requestParameters: FinishWebauthnRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RootModelUserSchema> {
+        const response = await this.finishWebauthnRegisterFlowRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -504,9 +504,9 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Generate options for retrieving a credential.
      * Generate Authentication Options
      */
-    async openAPITagAUTHENTICATIONGenerateAuthenticationOptionsRaw(requestParameters: OpenAPITagAUTHENTICATIONGenerateAuthenticationOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AuthenticateOptionsResult>> {
+    async generateAuthenticationOptionsRaw(requestParameters: GenerateAuthenticationOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AuthenticateOptionsResult>> {
         if (requestParameters.authenticateOptionsInput === null || requestParameters.authenticateOptionsInput === undefined) {
-            throw new runtime.RequiredError('authenticateOptionsInput','Required parameter requestParameters.authenticateOptionsInput was null or undefined when calling openAPITagAUTHENTICATIONGenerateAuthenticationOptions.');
+            throw new runtime.RequiredError('authenticateOptionsInput','Required parameter requestParameters.authenticateOptionsInput was null or undefined when calling generateAuthenticationOptions.');
         }
 
         const queryParameters: any = {};
@@ -530,8 +530,8 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Generate options for retrieving a credential.
      * Generate Authentication Options
      */
-    async openAPITagAUTHENTICATIONGenerateAuthenticationOptions(requestParameters: OpenAPITagAUTHENTICATIONGenerateAuthenticationOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AuthenticateOptionsResult> {
-        const response = await this.openAPITagAUTHENTICATIONGenerateAuthenticationOptionsRaw(requestParameters, initOverrides);
+    async generateAuthenticationOptions(requestParameters: GenerateAuthenticationOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AuthenticateOptionsResult> {
+        const response = await this.generateAuthenticationOptionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -539,9 +539,9 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Get a register flow.
      * Get a register flow.
      */
-    async openAPITagAUTHENTICATIONGetRegisterFlowRaw(requestParameters: OpenAPITagAUTHENTICATIONGetRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegisterFlowSchema>> {
+    async getRegisterFlowRaw(requestParameters: GetRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegisterFlowSchema>> {
         if (requestParameters.flowId === null || requestParameters.flowId === undefined) {
-            throw new runtime.RequiredError('flowId','Required parameter requestParameters.flowId was null or undefined when calling openAPITagAUTHENTICATIONGetRegisterFlow.');
+            throw new runtime.RequiredError('flowId','Required parameter requestParameters.flowId was null or undefined when calling getRegisterFlow.');
         }
 
         const queryParameters: any = {};
@@ -562,8 +562,8 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Get a register flow.
      * Get a register flow.
      */
-    async openAPITagAUTHENTICATIONGetRegisterFlow(requestParameters: OpenAPITagAUTHENTICATIONGetRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterFlowSchema> {
-        const response = await this.openAPITagAUTHENTICATIONGetRegisterFlowRaw(requestParameters, initOverrides);
+    async getRegisterFlow(requestParameters: GetRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterFlowSchema> {
+        const response = await this.getRegisterFlowRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -571,7 +571,7 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Get the current user\'s user sessions.
      * Get the current user\'s sessions.
      */
-    async openAPITagAUTHENTICATIONGetUserSessionsRaw(requestParameters: OpenAPITagAUTHENTICATIONGetUserSessionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedResultUserSessionSchemaUUID>> {
+    async getUserSessionsRaw(requestParameters: GetUserSessionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedResultUserSessionSchemaUUID>> {
         const queryParameters: any = {};
 
         if (requestParameters.limit !== undefined) {
@@ -598,8 +598,8 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Get the current user\'s user sessions.
      * Get the current user\'s sessions.
      */
-    async openAPITagAUTHENTICATIONGetUserSessions(requestParameters: OpenAPITagAUTHENTICATIONGetUserSessionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginatedResultUserSessionSchemaUUID> {
-        const response = await this.openAPITagAUTHENTICATIONGetUserSessionsRaw(requestParameters, initOverrides);
+    async getUserSessions(requestParameters: GetUserSessionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginatedResultUserSessionSchemaUUID> {
+        const response = await this.getUserSessionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -607,7 +607,7 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Get the current user\'s webauthn credentials.
      * Get the current user\'s webauthn credentials.
      */
-    async openAPITagAUTHENTICATIONGetWebauthnCredentialsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WebAuthnCredentialSchema>>> {
+    async getWebauthnCredentialsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WebAuthnCredentialSchema>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -626,8 +626,8 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Get the current user\'s webauthn credentials.
      * Get the current user\'s webauthn credentials.
      */
-    async openAPITagAUTHENTICATIONGetWebauthnCredentials(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WebAuthnCredentialSchema>> {
-        const response = await this.openAPITagAUTHENTICATIONGetWebauthnCredentialsRaw(initOverrides);
+    async getWebauthnCredentials(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WebAuthnCredentialSchema>> {
+        const response = await this.getWebauthnCredentialsRaw(initOverrides);
         return await response.value();
     }
 
@@ -635,13 +635,13 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Resend email verification in the register flow.
      * Resend email verification in the register flow.
      */
-    async openAPITagAUTHENTICATIONResendVerificationRegisterFlowRaw(requestParameters: OpenAPITagAUTHENTICATIONResendVerificationRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>> {
+    async resendVerificationRegisterFlowRaw(requestParameters: ResendVerificationRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>> {
         if (requestParameters.userAgent === null || requestParameters.userAgent === undefined) {
-            throw new runtime.RequiredError('userAgent','Required parameter requestParameters.userAgent was null or undefined when calling openAPITagAUTHENTICATIONResendVerificationRegisterFlow.');
+            throw new runtime.RequiredError('userAgent','Required parameter requestParameters.userAgent was null or undefined when calling resendVerificationRegisterFlow.');
         }
 
         if (requestParameters.registerFlowId === null || requestParameters.registerFlowId === undefined) {
-            throw new runtime.RequiredError('registerFlowId','Required parameter requestParameters.registerFlowId was null or undefined when calling openAPITagAUTHENTICATIONResendVerificationRegisterFlow.');
+            throw new runtime.RequiredError('registerFlowId','Required parameter requestParameters.registerFlowId was null or undefined when calling resendVerificationRegisterFlow.');
         }
 
         const queryParameters: any = {};
@@ -670,8 +670,8 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Resend email verification in the register flow.
      * Resend email verification in the register flow.
      */
-    async openAPITagAUTHENTICATIONResendVerificationRegisterFlow(requestParameters: OpenAPITagAUTHENTICATIONResendVerificationRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
-        const response = await this.openAPITagAUTHENTICATIONResendVerificationRegisterFlowRaw(requestParameters, initOverrides);
+    async resendVerificationRegisterFlow(requestParameters: ResendVerificationRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
+        const response = await this.resendVerificationRegisterFlowRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -679,13 +679,13 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Start a register flow.
      * Start a register flow.
      */
-    async openAPITagAUTHENTICATIONStartRegisterFlowRaw(requestParameters: OpenAPITagAUTHENTICATIONStartRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegisterFlowStartResult>> {
+    async startRegisterFlowRaw(requestParameters: StartRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegisterFlowStartResult>> {
         if (requestParameters.userAgent === null || requestParameters.userAgent === undefined) {
-            throw new runtime.RequiredError('userAgent','Required parameter requestParameters.userAgent was null or undefined when calling openAPITagAUTHENTICATIONStartRegisterFlow.');
+            throw new runtime.RequiredError('userAgent','Required parameter requestParameters.userAgent was null or undefined when calling startRegisterFlow.');
         }
 
         if (requestParameters.registerFlowStartInput === null || requestParameters.registerFlowStartInput === undefined) {
-            throw new runtime.RequiredError('registerFlowStartInput','Required parameter requestParameters.registerFlowStartInput was null or undefined when calling openAPITagAUTHENTICATIONStartRegisterFlow.');
+            throw new runtime.RequiredError('registerFlowStartInput','Required parameter requestParameters.registerFlowStartInput was null or undefined when calling startRegisterFlow.');
         }
 
         const queryParameters: any = {};
@@ -713,8 +713,8 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Start a register flow.
      * Start a register flow.
      */
-    async openAPITagAUTHENTICATIONStartRegisterFlow(requestParameters: OpenAPITagAUTHENTICATIONStartRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterFlowStartResult> {
-        const response = await this.openAPITagAUTHENTICATIONStartRegisterFlowRaw(requestParameters, initOverrides);
+    async startRegisterFlow(requestParameters: StartRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterFlowStartResult> {
+        const response = await this.startRegisterFlowRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -722,9 +722,9 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Start the webauthn registration in the register flow.
      * Start the webauthn registration in the register flow.
      */
-    async openAPITagAUTHENTICATIONStartWebauthnRegisterFlowRaw(requestParameters: OpenAPITagAUTHENTICATIONStartWebauthnRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegisterFlowWebAuthnStartResult>> {
+    async startWebauthnRegisterFlowRaw(requestParameters: StartWebauthnRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegisterFlowWebAuthnStartResult>> {
         if (requestParameters.registerFlowId === null || requestParameters.registerFlowId === undefined) {
-            throw new runtime.RequiredError('registerFlowId','Required parameter requestParameters.registerFlowId was null or undefined when calling openAPITagAUTHENTICATIONStartWebauthnRegisterFlow.');
+            throw new runtime.RequiredError('registerFlowId','Required parameter requestParameters.registerFlowId was null or undefined when calling startWebauthnRegisterFlow.');
         }
 
         const queryParameters: any = {};
@@ -745,8 +745,8 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Start the webauthn registration in the register flow.
      * Start the webauthn registration in the register flow.
      */
-    async openAPITagAUTHENTICATIONStartWebauthnRegisterFlow(requestParameters: OpenAPITagAUTHENTICATIONStartWebauthnRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterFlowWebAuthnStartResult> {
-        const response = await this.openAPITagAUTHENTICATIONStartWebauthnRegisterFlowRaw(requestParameters, initOverrides);
+    async startWebauthnRegisterFlow(requestParameters: StartWebauthnRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterFlowWebAuthnStartResult> {
+        const response = await this.startWebauthnRegisterFlowRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -754,13 +754,13 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Verify the authenticator\'s response for authentication.
      * Verify Authentication Response
      */
-    async openAPITagAUTHENTICATIONVerifyAuthenticationResponseRaw(requestParameters: OpenAPITagAUTHENTICATIONVerifyAuthenticationResponseRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RootModelUserSchema>> {
+    async verifyAuthenticationResponseRaw(requestParameters: VerifyAuthenticationResponseRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RootModelUserSchema>> {
         if (requestParameters.userAgent === null || requestParameters.userAgent === undefined) {
-            throw new runtime.RequiredError('userAgent','Required parameter requestParameters.userAgent was null or undefined when calling openAPITagAUTHENTICATIONVerifyAuthenticationResponse.');
+            throw new runtime.RequiredError('userAgent','Required parameter requestParameters.userAgent was null or undefined when calling verifyAuthenticationResponse.');
         }
 
         if (requestParameters.authenticateVerificationInput === null || requestParameters.authenticateVerificationInput === undefined) {
-            throw new runtime.RequiredError('authenticateVerificationInput','Required parameter requestParameters.authenticateVerificationInput was null or undefined when calling openAPITagAUTHENTICATIONVerifyAuthenticationResponse.');
+            throw new runtime.RequiredError('authenticateVerificationInput','Required parameter requestParameters.authenticateVerificationInput was null or undefined when calling verifyAuthenticationResponse.');
         }
 
         const queryParameters: any = {};
@@ -788,8 +788,8 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Verify the authenticator\'s response for authentication.
      * Verify Authentication Response
      */
-    async openAPITagAUTHENTICATIONVerifyAuthenticationResponse(requestParameters: OpenAPITagAUTHENTICATIONVerifyAuthenticationResponseRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RootModelUserSchema> {
-        const response = await this.openAPITagAUTHENTICATIONVerifyAuthenticationResponseRaw(requestParameters, initOverrides);
+    async verifyAuthenticationResponse(requestParameters: VerifyAuthenticationResponseRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RootModelUserSchema> {
+        const response = await this.verifyAuthenticationResponseRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -797,13 +797,13 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Verify a register flow.
      * Verify a register flow.
      */
-    async openAPITagAUTHENTICATIONVerifyRegisterFlowRaw(requestParameters: OpenAPITagAUTHENTICATIONVerifyRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegisterFlowVerifyResult>> {
+    async verifyRegisterFlowRaw(requestParameters: VerifyRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegisterFlowVerifyResult>> {
         if (requestParameters.registerFlowId === null || requestParameters.registerFlowId === undefined) {
-            throw new runtime.RequiredError('registerFlowId','Required parameter requestParameters.registerFlowId was null or undefined when calling openAPITagAUTHENTICATIONVerifyRegisterFlow.');
+            throw new runtime.RequiredError('registerFlowId','Required parameter requestParameters.registerFlowId was null or undefined when calling verifyRegisterFlow.');
         }
 
         if (requestParameters.registerFlowVerifyInput === null || requestParameters.registerFlowVerifyInput === undefined) {
-            throw new runtime.RequiredError('registerFlowVerifyInput','Required parameter requestParameters.registerFlowVerifyInput was null or undefined when calling openAPITagAUTHENTICATIONVerifyRegisterFlow.');
+            throw new runtime.RequiredError('registerFlowVerifyInput','Required parameter requestParameters.registerFlowVerifyInput was null or undefined when calling verifyRegisterFlow.');
         }
 
         const queryParameters: any = {};
@@ -827,8 +827,8 @@ export class AuthenticationApi extends runtime.BaseAPI implements Authentication
      * Verify a register flow.
      * Verify a register flow.
      */
-    async openAPITagAUTHENTICATIONVerifyRegisterFlow(requestParameters: OpenAPITagAUTHENTICATIONVerifyRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterFlowVerifyResult> {
-        const response = await this.openAPITagAUTHENTICATIONVerifyRegisterFlowRaw(requestParameters, initOverrides);
+    async verifyRegisterFlow(requestParameters: VerifyRegisterFlowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterFlowVerifyResult> {
+        const response = await this.verifyRegisterFlowRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

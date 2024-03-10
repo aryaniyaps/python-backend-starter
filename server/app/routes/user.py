@@ -8,7 +8,6 @@ from fastapi import APIRouter, Depends, Header, Path
 from app.dependencies.auth import get_viewer_info
 from app.dependencies.ip_address import get_ip_address
 from app.dependencies.user import get_user_service
-from app.lib.constants import OpenAPITag
 from app.models.user import User
 from app.schemas.errors import InvalidInputErrorResult, ResourceNotFoundErrorResult
 from app.schemas.user import (
@@ -23,7 +22,7 @@ from app.types.auth import UserInfo
 
 users_router = APIRouter(
     prefix="/users",
-    tags=[OpenAPITag.USERS],
+    tags=["users"],
 )
 
 

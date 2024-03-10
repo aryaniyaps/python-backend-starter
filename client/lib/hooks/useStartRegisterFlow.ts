@@ -6,7 +6,7 @@ export default function useStartRegisterFlow() {
 
   return useMutation({
     mutationFn: async ({ email }: { email: string }) => {
-      return await authenticationApi.openAPITagAUTHENTICATIONStartRegisterFlow({
+      return await authenticationApi.startRegisterFlow({
         registerFlowStartInput: { email },
         userAgent: navigator.userAgent,
       });

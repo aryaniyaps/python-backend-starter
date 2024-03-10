@@ -4,9 +4,9 @@ import { authenticationApi } from '../api';
 export default function useLogout() {
   return useMutation({
     mutationFn: async ({ rememberSession }: { rememberSession: boolean }) => {
-      return await authenticationApi.openAPITagAUTHENTICATIONDeleteCurrentUserSession(
-        { logoutInput: { rememberSession } }
-      );
+      return await authenticationApi.deleteCurrentUserSession({
+        logoutInput: { rememberSession },
+      });
     },
   });
 }

@@ -11,12 +11,10 @@ export default function useVerifyRegisterFlow() {
       verificationCode: string;
       flowId: string;
     }) => {
-      return await authenticationApi.openAPITagAUTHENTICATIONVerifyRegisterFlow(
-        {
-          registerFlowId: flowId,
-          registerFlowVerifyInput: { verificationCode },
-        }
-      );
+      return await authenticationApi.verifyRegisterFlow({
+        registerFlowId: flowId,
+        registerFlowVerifyInput: { verificationCode },
+      });
     },
     onSuccess(data, variables) {
       // update query data

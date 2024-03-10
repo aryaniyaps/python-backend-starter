@@ -5,7 +5,7 @@ export default function useCurrentUser() {
   return useSuspenseQuery({
     queryKey: ['/users/@me'],
     queryFn: async () => {
-      return await usersApi.openAPITagUSERSGetCurrentUser();
+      return await usersApi.getCurrentUser();
     },
   });
 }

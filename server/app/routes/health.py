@@ -1,11 +1,10 @@
 from fastapi import APIRouter
 
-from app.lib.constants import OpenAPITag
 from app.schemas.health import HealthCheckResult
 
 health_router = APIRouter(
     prefix="/health",
-    tags=[OpenAPITag.HEALTH],
+    tags=["health"],
 )
 
 

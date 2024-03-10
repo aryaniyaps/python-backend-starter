@@ -14,7 +14,7 @@ export default function useRegisterFlow(
   return useQuery({
     queryKey: ['/auth/register/flows', flowId],
     queryFn: async () => {
-      return await authenticationApi.openAPITagAUTHENTICATIONGetRegisterFlow({
+      return await authenticationApi.getRegisterFlow({
         flowId,
       });
     },

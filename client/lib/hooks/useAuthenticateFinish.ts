@@ -5,14 +5,12 @@ export default function useAuthenticateFinish() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ credential }: { credential: string }) => {
-      return await authenticationApi.openAPITagAUTHENTICATIONVerifyAuthenticationResponse(
-        {
-          authenticateVerificationInput: { credential },
-          userAgent: navigator.userAgent,
-        }
-      );
+      return await authenticationApi.verifyAuthenticationResponse({
+        authenticateVerificationInput: { credential },
+        userAgent: navigator.userAgent,
+      });
     },
-    onSuccess(data, variables, context) {
+    onSuccess(data) {
       // update user query data
       queryClient.setQueryData(['/users/@me'], data);
     },

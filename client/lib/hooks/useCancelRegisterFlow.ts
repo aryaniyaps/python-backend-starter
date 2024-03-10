@@ -5,9 +5,9 @@ export default function useCancelRegisterFlow() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ flowId }: { flowId: string }) => {
-      return await authenticationApi.openAPITagAUTHENTICATIONCancelRegisterFlow(
-        { registerFlowId: flowId }
-      );
+      return await authenticationApi.cancelRegisterFlow({
+        registerFlowId: flowId,
+      });
     },
     onSuccess(_data, variables) {
       // update query data here

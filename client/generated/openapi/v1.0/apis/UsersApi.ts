@@ -46,20 +46,20 @@ import {
     ValidationErrorResultToJSON,
 } from '../models/index';
 
-export interface OpenAPITagUSERSChangeCurrentUserEmailRequest {
+export interface ChangeCurrentUserEmailRequest {
     changeUserEmailInput: ChangeUserEmailInput;
 }
 
-export interface OpenAPITagUSERSGetUserRequest {
+export interface GetUserRequest {
     userId: string;
 }
 
-export interface OpenAPITagUSERSRequestCurrentUserEmailChangeRequest {
+export interface RequestCurrentUserEmailChangeRequest {
     userAgent: string;
     changeUserEmailRequestInput: ChangeUserEmailRequestInput;
 }
 
-export interface OpenAPITagUSERSUpdateCurrentUserRequest {
+export interface UpdateCurrentUserRequest {
     updateUserInput: UpdateUserInput;
 }
 
@@ -78,13 +78,13 @@ export interface UsersApiInterface {
      * @throws {RequiredError}
      * @memberof UsersApiInterface
      */
-    openAPITagUSERSChangeCurrentUserEmailRaw(requestParameters: OpenAPITagUSERSChangeCurrentUserEmailRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserSchema>>;
+    changeCurrentUserEmailRaw(requestParameters: ChangeCurrentUserEmailRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserSchema>>;
 
     /**
      * Change the current user\'s email.
      * Change the current user\'s email.
      */
-    openAPITagUSERSChangeCurrentUserEmail(requestParameters: OpenAPITagUSERSChangeCurrentUserEmailRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSchema>;
+    changeCurrentUserEmail(requestParameters: ChangeCurrentUserEmailRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSchema>;
 
     /**
      * Get the current user.
@@ -93,13 +93,13 @@ export interface UsersApiInterface {
      * @throws {RequiredError}
      * @memberof UsersApiInterface
      */
-    openAPITagUSERSGetCurrentUserRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserSchema>>;
+    getCurrentUserRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserSchema>>;
 
     /**
      * Get the current user.
      * Get the current user.
      */
-    openAPITagUSERSGetCurrentUser(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSchema>;
+    getCurrentUser(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSchema>;
 
     /**
      * Get the user with the given ID.
@@ -109,13 +109,13 @@ export interface UsersApiInterface {
      * @throws {RequiredError}
      * @memberof UsersApiInterface
      */
-    openAPITagUSERSGetUserRaw(requestParameters: OpenAPITagUSERSGetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PartialUserSchema>>;
+    getUserRaw(requestParameters: GetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PartialUserSchema>>;
 
     /**
      * Get the user with the given ID.
      * Get the user with the given ID.
      */
-    openAPITagUSERSGetUser(requestParameters: OpenAPITagUSERSGetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PartialUserSchema>;
+    getUser(requestParameters: GetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PartialUserSchema>;
 
     /**
      * Send an email change request.
@@ -126,13 +126,13 @@ export interface UsersApiInterface {
      * @throws {RequiredError}
      * @memberof UsersApiInterface
      */
-    openAPITagUSERSRequestCurrentUserEmailChangeRaw(requestParameters: OpenAPITagUSERSRequestCurrentUserEmailChangeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>>;
+    requestCurrentUserEmailChangeRaw(requestParameters: RequestCurrentUserEmailChangeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>>;
 
     /**
      * Send an email change request.
      * Send an email change request.
      */
-    openAPITagUSERSRequestCurrentUserEmailChange(requestParameters: OpenAPITagUSERSRequestCurrentUserEmailChangeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any>;
+    requestCurrentUserEmailChange(requestParameters: RequestCurrentUserEmailChangeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any>;
 
     /**
      * Update the current user.
@@ -142,13 +142,13 @@ export interface UsersApiInterface {
      * @throws {RequiredError}
      * @memberof UsersApiInterface
      */
-    openAPITagUSERSUpdateCurrentUserRaw(requestParameters: OpenAPITagUSERSUpdateCurrentUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserSchema>>;
+    updateCurrentUserRaw(requestParameters: UpdateCurrentUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserSchema>>;
 
     /**
      * Update the current user.
      * Update the current user.
      */
-    openAPITagUSERSUpdateCurrentUser(requestParameters: OpenAPITagUSERSUpdateCurrentUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSchema>;
+    updateCurrentUser(requestParameters: UpdateCurrentUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSchema>;
 
 }
 
@@ -161,9 +161,9 @@ export class UsersApi extends runtime.BaseAPI implements UsersApiInterface {
      * Change the current user\'s email.
      * Change the current user\'s email.
      */
-    async openAPITagUSERSChangeCurrentUserEmailRaw(requestParameters: OpenAPITagUSERSChangeCurrentUserEmailRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserSchema>> {
+    async changeCurrentUserEmailRaw(requestParameters: ChangeCurrentUserEmailRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserSchema>> {
         if (requestParameters.changeUserEmailInput === null || requestParameters.changeUserEmailInput === undefined) {
-            throw new runtime.RequiredError('changeUserEmailInput','Required parameter requestParameters.changeUserEmailInput was null or undefined when calling openAPITagUSERSChangeCurrentUserEmail.');
+            throw new runtime.RequiredError('changeUserEmailInput','Required parameter requestParameters.changeUserEmailInput was null or undefined when calling changeCurrentUserEmail.');
         }
 
         const queryParameters: any = {};
@@ -187,8 +187,8 @@ export class UsersApi extends runtime.BaseAPI implements UsersApiInterface {
      * Change the current user\'s email.
      * Change the current user\'s email.
      */
-    async openAPITagUSERSChangeCurrentUserEmail(requestParameters: OpenAPITagUSERSChangeCurrentUserEmailRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSchema> {
-        const response = await this.openAPITagUSERSChangeCurrentUserEmailRaw(requestParameters, initOverrides);
+    async changeCurrentUserEmail(requestParameters: ChangeCurrentUserEmailRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSchema> {
+        const response = await this.changeCurrentUserEmailRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -196,7 +196,7 @@ export class UsersApi extends runtime.BaseAPI implements UsersApiInterface {
      * Get the current user.
      * Get the current user.
      */
-    async openAPITagUSERSGetCurrentUserRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserSchema>> {
+    async getCurrentUserRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserSchema>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -215,8 +215,8 @@ export class UsersApi extends runtime.BaseAPI implements UsersApiInterface {
      * Get the current user.
      * Get the current user.
      */
-    async openAPITagUSERSGetCurrentUser(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSchema> {
-        const response = await this.openAPITagUSERSGetCurrentUserRaw(initOverrides);
+    async getCurrentUser(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSchema> {
+        const response = await this.getCurrentUserRaw(initOverrides);
         return await response.value();
     }
 
@@ -224,9 +224,9 @@ export class UsersApi extends runtime.BaseAPI implements UsersApiInterface {
      * Get the user with the given ID.
      * Get the user with the given ID.
      */
-    async openAPITagUSERSGetUserRaw(requestParameters: OpenAPITagUSERSGetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PartialUserSchema>> {
+    async getUserRaw(requestParameters: GetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PartialUserSchema>> {
         if (requestParameters.userId === null || requestParameters.userId === undefined) {
-            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling openAPITagUSERSGetUser.');
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling getUser.');
         }
 
         const queryParameters: any = {};
@@ -247,8 +247,8 @@ export class UsersApi extends runtime.BaseAPI implements UsersApiInterface {
      * Get the user with the given ID.
      * Get the user with the given ID.
      */
-    async openAPITagUSERSGetUser(requestParameters: OpenAPITagUSERSGetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PartialUserSchema> {
-        const response = await this.openAPITagUSERSGetUserRaw(requestParameters, initOverrides);
+    async getUser(requestParameters: GetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PartialUserSchema> {
+        const response = await this.getUserRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -256,13 +256,13 @@ export class UsersApi extends runtime.BaseAPI implements UsersApiInterface {
      * Send an email change request.
      * Send an email change request.
      */
-    async openAPITagUSERSRequestCurrentUserEmailChangeRaw(requestParameters: OpenAPITagUSERSRequestCurrentUserEmailChangeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>> {
+    async requestCurrentUserEmailChangeRaw(requestParameters: RequestCurrentUserEmailChangeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>> {
         if (requestParameters.userAgent === null || requestParameters.userAgent === undefined) {
-            throw new runtime.RequiredError('userAgent','Required parameter requestParameters.userAgent was null or undefined when calling openAPITagUSERSRequestCurrentUserEmailChange.');
+            throw new runtime.RequiredError('userAgent','Required parameter requestParameters.userAgent was null or undefined when calling requestCurrentUserEmailChange.');
         }
 
         if (requestParameters.changeUserEmailRequestInput === null || requestParameters.changeUserEmailRequestInput === undefined) {
-            throw new runtime.RequiredError('changeUserEmailRequestInput','Required parameter requestParameters.changeUserEmailRequestInput was null or undefined when calling openAPITagUSERSRequestCurrentUserEmailChange.');
+            throw new runtime.RequiredError('changeUserEmailRequestInput','Required parameter requestParameters.changeUserEmailRequestInput was null or undefined when calling requestCurrentUserEmailChange.');
         }
 
         const queryParameters: any = {};
@@ -294,8 +294,8 @@ export class UsersApi extends runtime.BaseAPI implements UsersApiInterface {
      * Send an email change request.
      * Send an email change request.
      */
-    async openAPITagUSERSRequestCurrentUserEmailChange(requestParameters: OpenAPITagUSERSRequestCurrentUserEmailChangeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
-        const response = await this.openAPITagUSERSRequestCurrentUserEmailChangeRaw(requestParameters, initOverrides);
+    async requestCurrentUserEmailChange(requestParameters: RequestCurrentUserEmailChangeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
+        const response = await this.requestCurrentUserEmailChangeRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -303,9 +303,9 @@ export class UsersApi extends runtime.BaseAPI implements UsersApiInterface {
      * Update the current user.
      * Update the current user.
      */
-    async openAPITagUSERSUpdateCurrentUserRaw(requestParameters: OpenAPITagUSERSUpdateCurrentUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserSchema>> {
+    async updateCurrentUserRaw(requestParameters: UpdateCurrentUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserSchema>> {
         if (requestParameters.updateUserInput === null || requestParameters.updateUserInput === undefined) {
-            throw new runtime.RequiredError('updateUserInput','Required parameter requestParameters.updateUserInput was null or undefined when calling openAPITagUSERSUpdateCurrentUser.');
+            throw new runtime.RequiredError('updateUserInput','Required parameter requestParameters.updateUserInput was null or undefined when calling updateCurrentUser.');
         }
 
         const queryParameters: any = {};
@@ -329,8 +329,8 @@ export class UsersApi extends runtime.BaseAPI implements UsersApiInterface {
      * Update the current user.
      * Update the current user.
      */
-    async openAPITagUSERSUpdateCurrentUser(requestParameters: OpenAPITagUSERSUpdateCurrentUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSchema> {
-        const response = await this.openAPITagUSERSUpdateCurrentUserRaw(requestParameters, initOverrides);
+    async updateCurrentUser(requestParameters: UpdateCurrentUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSchema> {
+        const response = await this.updateCurrentUserRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

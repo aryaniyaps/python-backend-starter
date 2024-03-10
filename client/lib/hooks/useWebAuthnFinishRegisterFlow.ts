@@ -10,12 +10,10 @@ export default function useWebAuthnFinishRegisterFlow() {
       credential: string;
       flowId: string;
     }) => {
-      return await authenticationApi.openAPITagAUTHENTICATIONFinishWebauthnRegisterFlow(
-        {
-          registerFlowId: flowId,
-          registerFlowWebAuthnFinishInput: { credential },
-        }
-      );
+      return await authenticationApi.finishWebauthnRegisterFlow({
+        registerFlowId: flowId,
+        registerFlowWebAuthnFinishInput: { credential },
+      });
     },
   });
 }

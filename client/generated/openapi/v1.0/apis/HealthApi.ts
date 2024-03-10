@@ -42,13 +42,13 @@ export interface HealthApiInterface {
      * @throws {RequiredError}
      * @memberof HealthApiInterface
      */
-    openAPITagHEALTHCheckHealthRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<HealthCheckResult>>;
+    checkHealthRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<HealthCheckResult>>;
 
     /**
      * Provides information about the health status of the application.
      * Check the health status of the application.
      */
-    openAPITagHEALTHCheckHealth(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<HealthCheckResult>;
+    checkHealth(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<HealthCheckResult>;
 
 }
 
@@ -61,7 +61,7 @@ export class HealthApi extends runtime.BaseAPI implements HealthApiInterface {
      * Provides information about the health status of the application.
      * Check the health status of the application.
      */
-    async openAPITagHEALTHCheckHealthRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<HealthCheckResult>> {
+    async checkHealthRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<HealthCheckResult>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -80,8 +80,8 @@ export class HealthApi extends runtime.BaseAPI implements HealthApiInterface {
      * Provides information about the health status of the application.
      * Check the health status of the application.
      */
-    async openAPITagHEALTHCheckHealth(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<HealthCheckResult> {
-        const response = await this.openAPITagHEALTHCheckHealthRaw(initOverrides);
+    async checkHealth(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<HealthCheckResult> {
+        const response = await this.checkHealthRaw(initOverrides);
         return await response.value();
     }
 

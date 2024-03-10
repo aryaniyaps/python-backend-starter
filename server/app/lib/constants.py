@@ -39,15 +39,3 @@ WEBAUTHN_CHALLENGE_TTL = 300  # 5 minutes
 # rate limiting
 
 PRIMARY_RATE_LIMIT = "5000/hour"
-
-
-# OpenAPI Tags
-
-
-class OpenAPITag(Enum):
-    """OpenAPI path operation tags."""
-
-    USERS = "users"
-    AUTHENTICATION = "authentication"
-    HEALTH = "health"
-    INTERNAL = "internal"

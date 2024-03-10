@@ -4,9 +4,10 @@ import { authenticationApi } from '../api';
 export default function useResendVerificationRegisterFlow() {
   return useMutation({
     mutationFn: async ({ flowId }: { flowId: string }) => {
-      return await authenticationApi.openAPITagAUTHENTICATIONResendVerificationRegisterFlow(
-        { registerFlowId: flowId, userAgent: navigator.userAgent }
-      );
+      return await authenticationApi.resendVerificationRegisterFlow({
+        registerFlowId: flowId,
+        userAgent: navigator.userAgent,
+      });
     },
   });
 }

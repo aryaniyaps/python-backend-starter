@@ -4,9 +4,9 @@ import { authenticationApi } from '../api';
 export default function useWebAuthnStartRegisterFlow() {
   return useMutation({
     mutationFn: async ({ flowId }: { flowId: string }) => {
-      return await authenticationApi.openAPITagAUTHENTICATIONStartWebauthnRegisterFlow(
-        { registerFlowId: flowId }
-      );
+      return await authenticationApi.startWebauthnRegisterFlow({
+        registerFlowId: flowId,
+      });
     },
   });
 }

@@ -20,7 +20,6 @@ from app.dependencies.paging import get_paging_info
 from app.lib.constants import (
     AUTHENTICATION_TOKEN_COOKIE,
     REGISTER_FLOW_ID_COOKIE,
-    OpenAPITag,
 )
 from app.models.register_flow import RegisterFlow
 from app.models.user import User
@@ -52,7 +51,7 @@ from app.types.paging import Page, PagingInfo
 
 auth_router = APIRouter(
     prefix="/auth",
-    tags=[OpenAPITag.AUTHENTICATION],
+    tags=["authentication"],
 )
 
 
