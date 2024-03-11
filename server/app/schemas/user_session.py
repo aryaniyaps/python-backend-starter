@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from pydantic import Field
+from pydantic import Field, computed_field
 from pydantic.networks import IPvAnyAddress
 
 from app.schemas.base import BaseSchema
@@ -63,3 +63,13 @@ class UserSessionSchema(BaseSchema):
             description="When the user session was created.",
         ),
     ]
+
+    @computed_field(  # type: ignore[misc]
+        description="Whether this is the current user's current session.",
+    )
+    @property
+    def is_current(self) -> bool:
+        """Whether this is the current user's current session."""
+        # TODO: implement logic here to figure out if session
+        # is current
+        return True
