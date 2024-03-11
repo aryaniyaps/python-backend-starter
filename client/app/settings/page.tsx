@@ -1,7 +1,8 @@
 'use client';
-import ChangeEmailForm from '@/components/settings/account/change-email-form';
+import ChangeEmailDialog from '@/components/settings/account/change-email-dialog';
 import ProfileForm from '@/components/settings/account/profile-form';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import {
   Tooltip,
@@ -27,7 +28,7 @@ export default function AccountSettingsPage() {
         <ProfileForm />
         <div className='flex flex-col items-center gap-4'>
           <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger asChild>
               <Avatar className='h-32 w-32'>
                 <AvatarImage
                   src={user?.avatarUrl}
@@ -40,6 +41,7 @@ export default function AccountSettingsPage() {
             <TooltipContent>
               Avatars are powered by{' '}
               <Link
+                className='text-primary'
                 href='https://gravatar.com/'
                 rel='noopener noreferrer'
                 target='_blank'
@@ -55,10 +57,13 @@ export default function AccountSettingsPage() {
       <div>
         <h3 className='text-lg font-medium'>User email</h3>
         <p className='text-sm text-muted-foreground'>
-          Manage your email address here.
+          Your email address is private.
         </p>
       </div>
-      <ChangeEmailForm />
+      <div className='flex w-full gap-4'>
+        <Input className='w-96' value={user.email} disabled />
+        <ChangeEmailDialog />
+      </div>
     </div>
   );
 }
