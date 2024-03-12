@@ -1,5 +1,4 @@
 'use client';
-import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -8,6 +7,7 @@ import {
 } from '@/components/ui/card';
 import { UserSessionSchema } from '@/generated/openapi/v1.0';
 import useDeleteUserSession from '@/lib/hooks/useDeleteUserSession';
+import RevokeSessionDialog from './revoke-session-dialog';
 
 const dateTimeFormat = new Intl.DateTimeFormat('en', {
   day: '2-digit',
@@ -36,14 +36,7 @@ export default function UserSessionCard({
           <p>
             {userSession.location} {userSession.ipAddress}
           </p>
-          <Button
-            variant='destructive'
-            disabled
-            size='sm'
-            onClick={revokeSession}
-          >
-            Revoke
-          </Button>
+          <RevokeSessionDialog />
         </div>
       </CardHeader>
       <CardContent>

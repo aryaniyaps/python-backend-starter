@@ -19,10 +19,7 @@ class PartialUserSchema(BaseSchema):
     # email is a private attribute and is not
     # exposed on the partial user schema. We need this field
     # to generate the gravatar URL.
-    email: Annotated[
-        str,
-        PrivateAttr(),
-    ]
+    email: Annotated[str, PrivateAttr()]
 
     created_at: Annotated[
         datetime,

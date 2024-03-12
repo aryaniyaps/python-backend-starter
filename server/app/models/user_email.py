@@ -39,6 +39,5 @@ class UserEmail(Base):
     )
 
     user: Mapped["User"] = relationship(
-        "User",
         back_populates="user_emails",
     )

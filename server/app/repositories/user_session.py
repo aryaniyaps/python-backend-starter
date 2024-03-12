@@ -28,12 +28,14 @@ class UserSessionRepo:
         self,
         *,
         user_id: UUID,
+        webauthn_credential_id: UUID,
         ip_address: str,
         user_agent: UserAgent,
     ) -> UserSession:
         """Create a new user session."""
         user_session = UserSession(
             user_id=user_id,
+            webauthn_credential_id=webauthn_credential_id,
             ip_address=ip_address,
             location=get_city_location(
                 city=get_geoip_city(

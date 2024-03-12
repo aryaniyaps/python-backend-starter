@@ -1,9 +1,9 @@
 """
 initial migration
 
-Revision ID: fecfcdb58705
+Revision ID: c4272183caad
 Revises: 7a23de63905c
-Create Date: 2024-03-10 10:47:15.124374
+Create Date: 2024-03-12 14:48:22.510101
 
 """
 
@@ -14,7 +14,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = "fecfcdb58705"
+revision: str = "c4272183caad"
 down_revision: str | None = "7a23de63905c"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -97,30 +97,6 @@ def upgrade() -> None:
     )
     op.create_index(op.f("users_email_idx"), "users", ["email"], unique=True)
     op.create_table(
-        "user_sessions",
-        sa.Column(
-            "id", sa.Uuid(), server_default=sa.text("gen_random_uuid()"), nullable=False
-        ),
-        sa.Column("user_id", sa.Uuid(), nullable=False),
-        sa.Column("ip_address", sa.String(length=40), nullable=False),
-        sa.Column("location", sa.String(length=256), nullable=False),
-        sa.Column("user_agent", sa.String(), nullable=False),
-        sa.Column("logged_out_at", sa.DateTime(timezone=True), nullable=True),
-        sa.Column(
-            "created_at",
-            sa.DateTime(timezone=True),
-            server_default=sa.text("now()"),
-            nullable=False,
-        ),
-        sa.ForeignKeyConstraint(
-            ["user_id"], ["users.id"], name=op.f("user_sessions_user_id_fkey")
-        ),
-        sa.PrimaryKeyConstraint("id", name=op.f("user_sessions_pkey")),
-    )
-    op.create_index(
-        op.f("user_sessions_user_id_idx"), "user_sessions", ["user_id"], unique=False
-    )
-    op.create_table(
         "webauthn_credentials",
         sa.Column(
             "id", sa.Uuid(), server_default=sa.text("gen_random_uuid()"), nullable=False
@@ -155,9 +131,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(
             ["user_id"], ["users.id"], name=op.f("webauthn_credentials_user_id_fkey")
         ),
-        sa.PrimaryKeyConstraint(
-            "id", "user_id", name=op.f("webauthn_credentials_pkey")
-        ),
+        sa.PrimaryKeyConstraint("id", name=op.f("webauthn_credentials_pkey")),
     )
     op.create_index(
         op.f("webauthn_credentials_credential_id_idx"),
@@ -165,16 +139,46 @@ def upgrade() -> None:
         ["credential_id"],
         unique=False,
     )
+    op.create_table(
+        "user_sessions",
+        sa.Column(
+            "id", sa.Uuid(), server_default=sa.text("gen_random_uuid()"), nullable=False
+        ),
+        sa.Column("user_id", sa.Uuid(), nullable=False),
+        sa.Column("webauthn_credential_id", sa.Uuid(), nullable=False),
+        sa.Column("ip_address", sa.String(length=40), nullable=False),
+        sa.Column("location", sa.String(length=256), nullable=False),
+        sa.Column("user_agent", sa.String(), nullable=False),
+        sa.Column("logged_out_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
+        sa.ForeignKeyConstraint(
+            ["user_id"], ["users.id"], name=op.f("user_sessions_user_id_fkey")
+        ),
+        sa.ForeignKeyConstraint(
+            ["webauthn_credential_id"],
+            ["webauthn_credentials.id"],
+            name=op.f("user_sessions_webauthn_credential_id_fkey"),
+        ),
+        sa.PrimaryKeyConstraint("id", name=op.f("user_sessions_pkey")),
+    )
+    op.create_index(
+        op.f("user_sessions_user_id_idx"), "user_sessions", ["user_id"], unique=False
+    )
 
 
 def downgrade() -> None:
+    op.drop_index(op.f("user_sessions_user_id_idx"), table_name="user_sessions")
+    op.drop_table("user_sessions")
     op.drop_index(
         op.f("webauthn_credentials_credential_id_idx"),
         table_name="webauthn_credentials",
     )
     op.drop_table("webauthn_credentials")
-    op.drop_index(op.f("user_sessions_user_id_idx"), table_name="user_sessions")
-    op.drop_table("user_sessions")
     op.drop_index(op.f("users_email_idx"), table_name="users")
     op.drop_table("users")
     op.drop_index(

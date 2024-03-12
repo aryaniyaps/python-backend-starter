@@ -12,6 +12,7 @@ from app.lib.database.base import Base
 
 if TYPE_CHECKING:
     from app.models.user import User
+    from app.models.user_session import UserSession
 
 
 class WebAuthnCredential(Base):
@@ -28,7 +29,6 @@ class WebAuthnCredential(Base):
 
     user_id: Mapped[UUID] = mapped_column(
         ForeignKey("users.id"),
-        primary_key=True,
     )
 
     public_key: Mapped[bytes]
@@ -48,6 +48,10 @@ class WebAuthnCredential(Base):
     )
 
     user: Mapped["User"] = relationship(
-        "User",
         back_populates="webauthn_credentials",
+    )
+
+    user_sessions: Mapped[set["UserSession"]] = relationship(
+        back_populates="webauthn_credential",
+        cascade="all, delete-orphan",
     )

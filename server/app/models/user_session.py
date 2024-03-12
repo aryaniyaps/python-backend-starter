@@ -10,6 +10,7 @@ from app.lib.database.base import Base
 
 if TYPE_CHECKING:
     from app.models.user import User
+    from app.models.webauthn_credential import WebAuthnCredential
 
 
 class UserSession(Base):
@@ -25,6 +26,10 @@ class UserSession(Base):
     user_id: Mapped[UUID] = mapped_column(
         ForeignKey("users.id"),
         index=True,
+    )
+
+    webauthn_credential_id: Mapped[UUID] = mapped_column(
+        ForeignKey("webauthn_credentials.id"),
     )
 
     ip_address: Mapped[str] = mapped_column(
@@ -44,6 +49,9 @@ class UserSession(Base):
     )
 
     user: Mapped["User"] = relationship(
-        "User",
+        back_populates="user_sessions",
+    )
+
+    webauthn_credential: Mapped["WebAuthnCredential"] = relationship(
         back_populates="user_sessions",
     )

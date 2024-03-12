@@ -2,9 +2,11 @@ import {
   AuthenticationApi,
   Configuration,
   UsersApi,
-} from '../generated/openapi/v1.0';
+} from '../../generated/openapi/v1.0';
 
-import { env } from './env';
+import { env } from '../env';
+import { AuthMiddleware } from './middleware/auth';
+import { RateLimitMiddleware } from './middleware/rate-limit';
 
 function getBasePath(): string {
   if (typeof window !== 'undefined') {
@@ -17,6 +19,7 @@ const configuration = new Configuration({
   basePath: getBasePath(),
   headers: { 'Content-Type': 'application/json' },
   credentials: 'include',
+  middleware: [new AuthMiddleware(), new RateLimitMiddleware()],
 });
 
 export const usersApi = new UsersApi(configuration);

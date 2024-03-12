@@ -1,30 +1,24 @@
 'use client';
-import { Button } from '@/components/ui/button';
-import useUserSessions from '@/lib/hooks/useUserSessions';
-import React from 'react';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import useWebAuthnCredentials from '@/lib/hooks/useWebAuthnCredentials';
 
 export default function PasskeysList() {
-  const userSessions = useUserSessions();
+  const webAuthnCredentials = useWebAuthnCredentials();
 
   return (
     <div className='flex flex-col gap-4'>
-      {userSessions.data.pages.map((page, i) => (
-        <React.Fragment key={i}>
-          {page.entities.map((userSession) => (
-            <p key={userSession.id} />
-          ))}
-        </React.Fragment>
+      {webAuthnCredentials.data.map((credential) => (
+        <Card key={credential.id}>
+          <CardHeader>{credential.deviceType}</CardHeader>
+          <CardContent>
+            <div className='flex flex-col gap-4'>
+              <p>{credential.credentialId}</p>
+              <p>{credential.publicKey}</p>
+              {/* <p>{credential.createdAt}</p> */}
+            </div>
+          </CardContent>
+        </Card>
       ))}
-      {userSessions.hasNextPage ? (
-        <Button
-          className='w-full'
-          variant='outline'
-          onClick={() => userSessions.fetchNextPage()}
-          disabled={userSessions.isFetchingNextPage}
-        >
-          {userSessions.isFetchingNextPage ? 'Loading more...' : 'Load More'}
-        </Button>
-      ) : null}
     </div>
   );
 }

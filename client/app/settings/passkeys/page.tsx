@@ -1,3 +1,4 @@
+import PasskeysList from '@/components/settings/passkeys/passkeys-list';
 import { Button } from '@/components/ui/button';
 
 export default function PasskeysSettingsPage() {
@@ -12,6 +13,7 @@ export default function PasskeysSettingsPage() {
         </div>
         <Button>Add passkey</Button>
       </div>
+      <PasskeysList />
     </div>
   );
 }

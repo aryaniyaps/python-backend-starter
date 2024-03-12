@@ -9,21 +9,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+import { Form } from '@/components/ui/form';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { MAX_EMAIL_LENGTH } from '@/lib/constants';
+import { APP_NAME, MAX_EMAIL_LENGTH } from '@/lib/constants';
 import useAuthenticateStart from '@/lib/hooks/useAuthenticateStart';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DialogClose } from '@radix-ui/react-dialog';
@@ -38,7 +30,7 @@ const changeEmailSchema = z.object({
     .max(MAX_EMAIL_LENGTH),
 });
 
-export default function ChangeEmailDialog() {
+export default function RevokeSessionDialog() {
   const form = useForm({
     resolver: zodResolver(changeEmailSchema),
     defaultValues: { newEmail: '' },
@@ -62,19 +54,19 @@ export default function ChangeEmailDialog() {
         <TooltipTrigger asChild>
           <span>
             <DialogTrigger asChild>
-              <Button size='icon'>
-                <Icons.penBox className='h-6 w-6' />
+              <Button size='icon' variant='destructive'>
+                <Icons.trash className='h-4 w-4' />
               </Button>
             </DialogTrigger>
           </span>
         </TooltipTrigger>
-        <TooltipContent>Change email</TooltipContent>
+        <TooltipContent>Revoke session</TooltipContent>
       </Tooltip>
-      <DialogContent className='sm:max-w-[425px]'>
+      <DialogContent className='sm:max-w-[475px]'>
         <DialogHeader>
-          <DialogTitle>Change email address</DialogTitle>
+          <DialogTitle>Revoke session</DialogTitle>
           <DialogDescription>
-            We'll send a verification code to your new email address
+            This will remove access to your {APP_NAME} account from the device
           </DialogDescription>
         </DialogHeader>
 
@@ -83,25 +75,11 @@ export default function ChangeEmailDialog() {
             onSubmit={form.handleSubmit(onSubmit)}
             className='flex w-full flex-col gap-6'
           >
-            <FormField
-              control={form.control}
-              name='newEmail'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>New email address</FormLabel>
-                  <FormControl>
-                    <Input placeholder='new@example.com' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             <DialogFooter className='flex w-full items-end gap-4'>
               <DialogClose asChild>
                 <Button variant='ghost'>Cancel</Button>
               </DialogClose>
-              <Button type='submit'>Send verification code</Button>
+              <Button type='submit'>Confirm</Button>
             </DialogFooter>
           </form>
         </Form>

@@ -47,6 +47,11 @@ from app.types.auth import UserInfo
 from app.types.paging import Page, PagingInfo
 from app.worker import task_queue
 
+# REFER https://github.com/google/webauthndemo/blob/main/src/libs/webauthn.mts
+# TO IMPROVE AUTH AND REGISTER ROUTES
+
+# WEBAUTHN DEVELOPER GUIDE: https://developers.yubico.com/WebAuthn/WebAuthn_Developer_Guide/User_Handle.html
+
 
 class AuthService:
     def __init__(
@@ -249,6 +254,7 @@ class AuthService:
         )
 
         # store challenge server-side
+        # FIXME: store challenge in session
         await self._webauthn_challenge_repo.create(
             challenge=registration_options.challenge,
             user_id=user_id,
@@ -277,6 +283,7 @@ class AuthService:
             credential.response.client_data_json,
         )
 
+        # FIXME: we should be storing the user ID in the session itself, along with the challenge
         user_id = await self._webauthn_challenge_repo.get(
             challenge=client_data.challenge,
         )
@@ -309,7 +316,7 @@ class AuthService:
             email=register_flow.email,
         )
 
-        await self._webauthn_credential_repo.create(
+        webauthn_credential = await self._webauthn_credential_repo.create(
             user_id=user.id,
             credential_id=verified_registration.credential_id,
             public_key=verified_registration.credential_public_key,
@@ -321,6 +328,7 @@ class AuthService:
 
         user_session = await self._user_session_repo.create(
             user_id=user.id,
+            webauthn_credential_id=webauthn_credential.id,
             ip_address=register_flow.ip_address,
             user_agent=user_agents.parse(register_flow.user_agent),
         )
@@ -374,6 +382,7 @@ class AuthService:
         )
 
         # store challenge server-side
+        # FIXME: store challenge in session
         await self._webauthn_challenge_repo.create(
             challenge=authentication_options.challenge,
             user_id=existing_user.id,
@@ -389,27 +398,33 @@ class AuthService:
         user_agent: UserAgent,
     ) -> tuple[str, User]:
         """Verify the authenticator's response for authentication."""
-        # TODO: check if its okay if we don't use the user_handle here
-        # user_id = credential.response.user_handle
+        user_id = credential.response.user_handle
 
         client_data = parse_client_data_json(
             credential.response.client_data_json,
         )
 
-        user_id = await self._webauthn_challenge_repo.get(
+        # FIXME: verify challenge from stored challenge in session
+        dummy_user_id = await self._webauthn_challenge_repo.get(
             challenge=client_data.challenge,
         )
 
-        if user_id is None:
+        if dummy_user_id is None:
             raise InvalidInputError(
                 message="Challenge response doesn't match.",
             )
 
-        existing_user = await self._user_repo.get(user_id=user_id)
+        if user_id is None:
+            raise InvalidInputError(
+                message="Couldn't find user ID.",
+            )
+
+        existing_user = await self._user_repo.get(user_id=UUID(bytes=user_id))
 
         if existing_user is None:
-            # TODO: handle error here
-            raise Exception
+            raise ResourceNotFoundError(
+                message="User doesn't exist.",
+            )
 
         existing_credential = await self._webauthn_credential_repo.get(
             credential_id=credential.raw_id,
@@ -444,6 +459,7 @@ class AuthService:
 
         user_session = await self._user_session_repo.create(
             user_id=existing_user.id,
+            webauthn_credential_id=existing_credential.id,
             ip_address=request_ip,
             user_agent=user_agent,
         )
