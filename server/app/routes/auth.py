@@ -40,6 +40,7 @@ from app.schemas.auth import (
     RegisterFlowWebAuthnFinishInput,
     RegisterFlowWebAuthnFinishResult,
     RegisterFlowWebAuthnStartResult,
+    RegisterOptionsResult,
 )
 from app.schemas.errors import InvalidInputErrorResult, ResourceNotFoundErrorResult
 from app.schemas.paging import PaginatedResult
@@ -415,9 +416,34 @@ async def get_webauthn_credentials(
     )
 
 
-@auth_router.post("/webauthn-credentials")
-async def create_webauthn_credential(_data: CreateWebAuthnCredentialInput) -> None:
+# We are starting a credential create request here, we also need a verification endpoint
+# We should have a COMMON verification endpoint
+@auth_router.post(
+    "/webauthn-credentials",
+    response_model=RegisterOptionsResult,
+    summary="Create a new WebAuthn credential.",
+)
+async def create_webauthn_credential(
+    _data: CreateWebAuthnCredentialInput,
+    auth_service: Annotated[
+        AuthService,
+        Depends(
+            dependency=get_auth_service,
+        ),
+    ],
+    viewer_info: Annotated[
+        UserInfo,
+        Depends(
+            dependency=get_viewer_info,
+        ),
+    ],
+) -> RegisterOptionsResult:
     """Create a new webauthn credential."""
+    options = await auth_service.create_webauthn_credential(
+        user_id=viewer_info.user_id,
+    )
+
+    return RegisterOptionsResult(options=options)
 
 
 @auth_router.post(

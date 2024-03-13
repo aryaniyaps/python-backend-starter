@@ -542,3 +542,44 @@ class AuthService:
         return await self._webauthn_credential_repo.get_all(
             user_id=user_id,
         )
+
+    async def create_webauthn_credential(
+        self,
+        *,
+        user_id: User,
+    ) -> PublicKeyCredentialCreationOptions:
+        """Create a new WebAuthn credential for the given user ID."""
+        existing_credentials = await self._webauthn_credential_repo.get_all(
+            user_id=user_id
+        )
+
+        user = await self._user_repo.get(user_id=user_id)
+
+        registration_options = generate_registration_options(
+            rp_id=settings.rp_id,
+            rp_name=settings.rp_name,
+            user_id=user_id.bytes,
+            user_name=user.email,
+            authenticator_selection=AuthenticatorSelectionCriteria(
+                authenticator_attachment=AuthenticatorAttachment.PLATFORM,
+                user_verification=UserVerificationRequirement.PREFERRED,
+                resident_key=ResidentKeyRequirement.REQUIRED,
+            ),
+            exclude_credentials=[
+                PublicKeyCredentialDescriptor(
+                    id=credential.credential_id,
+                    type=PublicKeyCredentialType.PUBLIC_KEY,
+                    transports=credential.transports,
+                )
+                for credential in existing_credentials
+            ],
+        )
+
+        # store challenge server-side
+        # FIXME: store challenge in session
+        await self._webauthn_challenge_repo.create(
+            challenge=registration_options.challenge,
+            user_id=user.id,
+        )
+
+        return registration_options

@@ -98,6 +98,10 @@ class CreateWebAuthnCredentialInput(BaseSchema):
     pass
 
 
+class RegisterOptionsResult(BaseSchema):
+    options: PublicKeyCredentialCreationOptions
+
+
 class LogoutInput(BaseSchema):
     remember_session: Annotated[
         bool,
